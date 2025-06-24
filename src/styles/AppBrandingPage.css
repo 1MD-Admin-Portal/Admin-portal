@@ -1,0 +1,75 @@
+.app-branding-container {
+  background: #f9f9fb;
+  margin-left: 260px;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.branding-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.branding-section {
+  margin-bottom: 30px;
+}
+
+.branding-section h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.branding-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.logo-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.logo-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.placeholder-icon {
+  font-size: 28px;
+  color: #777;
+}
+
+.upload-button {
+  background: #f3f4f6;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  transition: 0.2s ease;
+}
+
+.upload-button:hover {
+  background: #e5e7eb;
+}
+
+.theme-color-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}

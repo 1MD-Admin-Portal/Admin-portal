@@ -1,0 +1,92 @@
+/* General layout */
+.access-logs-container {
+  padding: 1.5rem;
+  margin-left: 250px; /* to accommodate sidebar */
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+/* Title */
+.access-logs-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Filter section */
+.access-logs-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.access-logs-filters select,
+.access-logs-filters input[type="date"] {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.access-logs-filters select:focus,
+.access-logs-filters input[type="date"]:focus {
+  border-color: #4f46e5;
+}
+
+/* Table */
+.access-logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.access-logs-table th,
+.access-logs-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.access-logs-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+}
+
+.access-logs-table tr:hover td {
+  background-color: #f9fafb;
+}
+
+.access-logs-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}   
+
+.access-logs-empty p {
+  margin: 0;
+}
+.access-logs-empty a {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+.access-logs-empty a:hover {
+  color: #4338ca;
+}
+.access-logs-empty a:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+.access-logs-empty a:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}

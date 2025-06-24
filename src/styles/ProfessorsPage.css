@@ -1,0 +1,126 @@
+.professors-container {
+  margin-left: 250px;
+  padding: 24px;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #111827;
+}
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.search-box {
+  position: relative;
+  width: 280px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 14px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 17px;
+  left: 30px;
+  color: #6b7280;
+}
+
+.filters-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filters-group select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.professors-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.professors-table th,
+.professors-table td {
+  text-align: left;
+  padding: 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.professors-table th {
+  background-color: #f3f4f6;
+  font-weight: 500;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.badge.douceur {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.badge.ginga {
+  background-color: #fde68a;
+  color: #78350f;
+}
+
+.badge.fiver {
+  background-color: #e9d5ff;
+  color: #6b21a8;
+}
+
+.menu {
+  text-align: center;
+  cursor: pointer;
+  font-size: 20px;
+  color: #9ca3af;
+}

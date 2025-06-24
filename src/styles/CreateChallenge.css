@@ -1,0 +1,130 @@
+/* CreateChallenge.css */
+
+.create-challenge-page {
+ margin-left: 250px; /* ✅ this offsets the fixed sidebar */
+  padding: 30px;
+  background-color: #f4f6f8;
+  overflow-y: auto;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.create-challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create-challenge-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.create-challenge-btn {
+  background-color: #e3aeb1;
+  color: white;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-challenge-btn:hover {
+  background-color: #c98f91;
+}
+
+.create-challenge-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.create-challenge-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.create-challenge-filters select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: white;
+  min-width: 150px;
+}
+
+.create-challenge-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #e0e0e0;
+}
+
+.create-challenge-table thead {
+  background-color: #f3f4f6;
+}
+
+.create-challenge-table th,
+.create-challenge-table td {
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.create-challenge-table th {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.create-challenge-table td img,
+.create-challenge-table .emoji {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status.published {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status.draft {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.status.flagged {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.actions {
+  cursor: pointer;
+  font-size: 20px;
+  color: #6b7280;
+  text-align: center;
+}
+.actions:hover {
+  color: #111827;
+}

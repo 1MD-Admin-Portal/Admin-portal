@@ -1,0 +1,87 @@
+/* EventsPage.css */
+
+.events-container {
+  padding: 20px;
+  margin-left: 250px; /* leave space for fixed sidebar */
+  font-family: sans-serif;
+}
+
+.events-header {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.events-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.events-search {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.events-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  width: 200px;
+}
+
+.events-filter {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 14px;
+}
+
+.create-event-btn {
+  padding: 10px 16px;
+  background-color: #2979ff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.events-table thead {
+  background-color: #f7f7f7;
+}
+
+.events-table th,
+.events-table td {
+  text-align: left;
+  padding: 16px 12px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.events-table th:first-child,
+.events-table td:first-child {
+  width: 40px;
+}
+
+.events-action-link {
+  color: #2962ff;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}

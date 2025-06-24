@@ -1,0 +1,138 @@
+.subscription-page {
+  padding: 2rem;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  margin-left: 250px;
+}
+
+.subscription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.subscription-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.add-plan-btn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-plan-btn:hover {
+  background-color: #2563eb;
+}
+
+.subscription-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.plan-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.8rem;
+  transition: transform 0.2s;
+}
+
+.plan-card:hover {
+  transform: translateY(-2px);
+}
+
+.plan-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.plan-price {
+  font-size: 1rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.features-list {
+  margin-top: 0.8rem;
+}
+
+.features-list li {
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  color: #374151;
+  list-style: disc;
+  margin-left: 1.5rem;
+}
+
+.plan-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  background: #d1d5db;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.toggle-switch input:checked + span {
+  transform: translateX(18px);
+  background-color: #ffffff;
+}
+
+.toggle-switch input:checked ~ .toggle-switch {
+  background-color: #10b981;
+}
+
+.icon-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.icon-buttons button {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.icon-buttons button:hover {
+  color: #111827;
+}

@@ -1,0 +1,78 @@
+.video-programs-page {
+  margin-left: 250px;
+  padding: 24px;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.create-btn {
+  background-color: #f3a4b5;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.filter-bar {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.filter-bar input,
+.filter-bar select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.video-programs-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.video-programs-table th,
+.video-programs-table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.program-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status.published {
+  color: green;
+  font-weight: bold;
+  background: #d3f9d8;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.status.draft {
+  color: gray;
+  font-weight: bold;
+  background: #eee;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.status.flagged {
+  color: red;
+  font-weight: bold;
+  background: #fdd;
+  padding: 2px 8px;
+  border-radius: 6px;
+}

@@ -1,0 +1,136 @@
+.dancers-container {
+  margin-left: 250px;
+  padding: 32px;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  color: #111827;
+}
+
+.header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  width: 300px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  margin-left: 8px;
+  width: 100%;
+}
+
+.search-icon {
+  color: #6b7280;
+}
+
+.filter-btn {
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.dancers-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.dancers-table th,
+.dancers-table td {
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.dancers-table thead {
+  background-color: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+
+.dancers-table tbody tr {
+  border-top: 1px solid #e5e7eb;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.badge.douceur {
+  background-color: #d1d5db;
+  color: #111827;
+}
+
+.badge.ginga {
+  background-color: #facc15;
+  color: #111827;
+}
+
+.badge.fiver {
+  background-color: #c4b5fd;
+  color: #111827;
+}
+
+.menu {
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  color: #6b7280;
+}
+.filters-group {
+  display: flex;
+  gap: 12px;
+}
+
+.filters-group select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+  color: #374151;
+}
