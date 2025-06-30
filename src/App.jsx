@@ -46,6 +46,7 @@ import LegalContentPage from "./components/LegalContentPage";
 import AppVersionInfo from "./components/AppVersionInfo";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ChangePassword";
+import AdminProfile from "./pages/AdminProfile";
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
           <Route path="/settings/subscription-plans" element={<SubscriptionPlansPage />} />
           <Route path="/settings/legal-content" element={<LegalContentPage />} />
           <Route path="/settings/app-version" element={<AppVersionInfo />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
         </Route>
       </Routes>
     </Router>

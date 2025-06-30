@@ -12,10 +12,10 @@ const Home = () => {
     <div className="main-content">
       <header className="main-header">
         <h1>Dashboard</h1>
-        <div className="admin-profile">
-          <span>Admin</span>
-          <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin" />
-        </div>
+        <div className="admin-profile" onClick={() => navigate("/admin-profile")}>
+  <span>Admin</span>
+  <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin" />
+</div>
       </header>
 
       <section className="kpi-cards">

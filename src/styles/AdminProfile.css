@@ -1,0 +1,27 @@
+.admin-profile-page {
+    padding: 20px;
+  margin-left: 260px; /* leave space for fixed sidebar */
+  font-family: sans-serif;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+  max-width: 500px;
+}
+
+.profile-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.profile-card .info p {
+  margin: 6px 0;
+  font-size: 16px;
+}

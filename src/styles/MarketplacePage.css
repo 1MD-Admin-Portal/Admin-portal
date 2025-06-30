@@ -118,3 +118,207 @@
   background-color: #ffecec;
   color: #d9534f;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-listing {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-listing h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.modal-listing p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #374151;
+}
+
+.modal-options {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-option {
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modal-option.active {
+  border-color: #2563eb;
+  background: #e0ecff;
+  font-weight: 500;
+}
+
+.modal-dropdown {
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.modal-dropdown label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #111827;
+}
+
+.modal-dropdown select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.cancel-btn {
+  padding: 10px 18px;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #374151;
+}
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.cancel-btn,
+.apply-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.apply-btn {
+  background-color: #2563eb;
+  color: white;
+}
+.apply-btn:hover {
+  background-color: #1d4ed8;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-listing {
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.modal-options {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.modal-option {
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-option.active {
+  background-color: #e0e7ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.modal-dropdown {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.modal-dropdown label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal-dropdown select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  gap: 10px;
+}
+
+.cancel-btn,
+.apply-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.apply-btn {
+  background-color: #2979ff;
+  color: white;
+}

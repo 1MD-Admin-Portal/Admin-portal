@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import '../styles/ClassModeration.css';
 
 const classData = [
@@ -42,6 +42,28 @@ const classData = [
 
 const ClassModeration = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpenDropdownIndex(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleApprove = (index) => {
+    alert(`Approved: ${classData[index].title}`);
+    setOpenDropdownIndex(null);
+  };
+
+  const handleReject = (index) => {
+    alert(`Rejected: ${classData[index].title}`);
+    setOpenDropdownIndex(null);
+  };
 
   return (
     <div className="class-moderation-container">
@@ -61,15 +83,12 @@ const ClassModeration = () => {
         <select className="class-moderation-filter">
           <option>Instructor</option>
         </select>
-
         <select className="class-moderation-filter">
           <option>Type</option>
         </select>
-
         <select className="class-moderation-filter">
           <option>Status</option>
         </select>
-
         <select className="class-moderation-filter">
           <option>Date</option>
         </select>
@@ -102,7 +121,15 @@ const ClassModeration = () => {
               <td>
                 <span className="status-label">{classItem.status}</span>
               </td>
-              <td className="class-actions">⋮</td>
+              <td className="class-actions" style={{ position: 'relative' }}>
+                <span onClick={() => setOpenDropdownIndex(index)}>⋮</span>
+                {openDropdownIndex === index && (
+                  <div className="dropdown-menu" ref={dropdownRef}>
+                    <div onClick={() => handleApprove(index)}>Approve</div>
+                    <div onClick={() => handleReject(index)}>Reject</div>
+                  </div>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

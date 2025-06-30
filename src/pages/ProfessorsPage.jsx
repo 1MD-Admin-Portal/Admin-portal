@@ -1,69 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/ProfessorsPage.css';
 import { FaSearch } from 'react-icons/fa';
+import ProfessorDetailModal from '../components/ProfessorDetailModal';
+import EditProfessorModal from '../components/EditProfessorModal';
+import CalendarProfessorModal from '../components/CalendarProfessorModal';
+import PreferenceProfessorModal from '../components/PreferenceProfessorModal';
+import ResetProfessorPasswordModal from '../components/ResetProfessorPasswordModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 
-const professors = [
+const professorsData = [
   {
     id: 201,
     name: 'John Carter',
     email: 'john.carter@example.com',
     subscription: 'Douceur',
     rating: 4.5,
-    status: 'Active',
+    status: 'Pending',
     avatar: 'https://i.pravatar.cc/40?img=4',
   },
   {
     id: 202,
+    name: 'Michael Johnson',
+    email: 'michael.j@example.com',
+    subscription: 'Douceur',
+    rating: 4.5,
+    status: 'Pending',
+    avatar: 'https://i.pravatar.cc/40?img=10',
+  },
+  {
+    id: 203,
+    name: 'David Smith',
+    email: 'david.smith@example.com',
+    subscription: 'Douceur',
+    rating: 4.5,
+    status: 'Pending',
+    avatar: 'https://i.pravatar.cc/40?img=11',
+  },
+  {
+    id: 204,
     name: 'Sophie Duran',
     email: 'sophie.duran@example.com',
     subscription: 'Ginga',
     rating: 3.8,
-    status: 'Inactive',
-    avatar: 'https://i.pravatar.cc/40?img=5',
-  },
-  {
-    id: 203,
-    name: 'Carlos Mendez',
-    email: 'carlos.m@example.com',
-    subscription: 'Fiver',
-    rating: 4.9,
     status: 'Active',
-    avatar: 'https://i.pravatar.cc/40?img=6',
-  },
+    avatar: 'https://i.pravatar.cc/40?img=5',
+  }
 ];
 
 const ProfessorsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [subscriptionFilter, setSubscriptionFilter] = useState('');
-  const [ratingFilter, setRatingFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [professors, setProfessors] = useState(professorsData);
+  const [selectedProfessor, setSelectedProfessor] = useState(null);
+  const [dropdownId, setDropdownId] = useState(null);
+  const [openModal, setOpenModal] = useState('');
+  const [confirmApprove, setConfirmApprove] = useState(null);
 
-  const filteredProfessors = professors.filter((prof) => {
-    const matchesSearch = prof.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSubscription = !subscriptionFilter || prof.subscription === subscriptionFilter;
-    const matchesStatus = !statusFilter || prof.status === statusFilter;
+  const handleOptionClick = (type, prof) => {
+    setSelectedProfessor(prof);
+    setOpenModal(type);
+    setDropdownId(null);
+  };
 
-    const ratingValue = parseFloat(prof.rating);
-    let matchesRating = true;
+  const handleApprove = (prof) => {
+    setConfirmApprove(prof);
+    setDropdownId(null);
+  };
 
-    if (ratingFilter === '5') {
-      matchesRating = ratingValue >= 5;
-    } else if (ratingFilter === '4') {
-      matchesRating = ratingValue >= 4;
-    } else if (ratingFilter === '3') {
-      matchesRating = ratingValue >= 3;
-    } else if (ratingFilter === '2') {
-      matchesRating = ratingValue >= 2;
-    }
+  const confirmApproval = () => {
+    setProfessors(prev =>
+      prev.map(p =>
+        p.id === confirmApprove.id ? { ...p, status: 'Active' } : p
+      )
+    );
+    setConfirmApprove(null);
+  };
 
-    return matchesSearch && matchesSubscription && matchesStatus && matchesRating;
-  });
+  const filtered = professors.filter((prof) =>
+    prof.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    const closeOnClickOutside = (e) => {
+      if (!e.target.closest('.dropdown')) {
+        setDropdownId(null);
+      }
+    };
+    document.addEventListener('mousedown', closeOnClickOutside);
+    return () => document.removeEventListener('mousedown', closeOnClickOutside);
+  }, []);
 
   return (
     <div className="professors-container">
-      <div className="header">
-        <h2>Professors</h2>
-      </div>
+      <div className="header"><h2>Professors</h2></div>
 
       <div className="top-controls">
         <div className="search-box">
@@ -75,35 +103,12 @@ const ProfessorsPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
-        <div className="filters-group">
-          <select value={subscriptionFilter} onChange={(e) => setSubscriptionFilter(e.target.value)}>
-            <option value="">All Subscriptions</option>
-            <option value="Douceur">Douceur</option>
-            <option value="Ginga">Ginga</option>
-            <option value="Fiver">Fiver</option>
-          </select>
-
-          <select value={ratingFilter} onChange={(e) => setRatingFilter(e.target.value)}>
-            <option value="">All Ratings</option>
-            <option value="5">5</option>
-            <option value="4">4+</option>
-            <option value="3">3+</option>
-            <option value="2">2+</option>
-          </select>
-
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
       </div>
 
       <table className="professors-table">
         <thead>
           <tr>
-            <th>User ID</th>
+            <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Subscription</th>
@@ -113,12 +118,11 @@ const ProfessorsPage = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredProfessors.map((prof) => (
+          {filtered.map((prof) => (
             <tr key={prof.id}>
               <td>{prof.id}</td>
-              <td className="user-info">
-                <img src={prof.avatar} alt="avatar" />
-                {prof.name}
+              <td className="user-info clickable" onClick={() => handleOptionClick('detail', prof)}>
+                <img src={prof.avatar} alt="avatar" /> {prof.name}
               </td>
               <td>{prof.email}</td>
               <td>
@@ -126,13 +130,48 @@ const ProfessorsPage = () => {
                   {prof.subscription}
                 </span>
               </td>
-              <td>{prof.rating.toFixed(1)}</td>
+              <td>{prof.rating}</td>
               <td>{prof.status}</td>
-              <td className="menu">⋮</td>
+              <td className="menu">
+                <div className="dropdown">
+                  <span onClick={() => setDropdownId(dropdownId === prof.id ? null : prof.id)}>⋮</span>
+                  {dropdownId === prof.id && (
+                    <>
+                      <div className="dropdown-menu">
+                        {prof.status === 'Pending' ? (
+                          <div onClick={() => handleApprove(prof)}>✅ Approve</div>
+                        ) : (
+                          <>
+                            <div onClick={() => handleOptionClick('edit', prof)}>✏️ Edit</div>
+                            <div onClick={() => handleOptionClick('calendar', prof)}>📅 Calendar</div>
+                            <div onClick={() => handleOptionClick('preferences', prof)}>🎯 Preferences</div>
+                            <div onClick={() => handleOptionClick('reset', prof)}>🔐 Reset Pass.</div>
+                          </>
+                        )}
+                      </div>
+                      <div className="dropdown-overlay"></div>
+                    </>
+                  )}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Modals */}
+      {openModal === 'detail' && <ProfessorDetailModal professor={selectedProfessor} onClose={() => setOpenModal('')} />}
+      {openModal === 'edit' && <EditProfessorModal professor={selectedProfessor} onClose={() => setOpenModal('')} />}
+      {openModal === 'calendar' && <CalendarProfessorModal professor={selectedProfessor} onClose={() => setOpenModal('')} />}
+      {openModal === 'preferences' && <PreferenceProfessorModal professor={selectedProfessor} onClose={() => setOpenModal('')} />}
+      {openModal === 'reset' && <ResetProfessorPasswordModal professor={selectedProfessor} onClose={() => setOpenModal('')} />}
+      {confirmApprove && (
+        <ConfirmationModal
+          message={`Are you sure you want to approve ${confirmApprove.name}?`}
+          onConfirm={confirmApproval}
+          onCancel={() => setConfirmApprove(null)}
+        />
+      )}
     </div>
   );
 };

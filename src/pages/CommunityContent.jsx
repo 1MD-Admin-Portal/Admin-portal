@@ -138,13 +138,6 @@ const CommunityContent = () => {
     <div className="community-content-page">
       <div className="community-header">
         <h1>Community Content</h1>
-        <div className="admin-profile">
-          <span>Admin</span>
-          <img
-            src="https://randomuser.me/api/portraits/men/75.jpg"
-            alt="Admin"
-          />
-        </div>
       </div>
 
       <div className="filters-bar">

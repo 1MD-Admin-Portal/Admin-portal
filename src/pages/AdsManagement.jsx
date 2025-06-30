@@ -1,6 +1,6 @@
-// AdsManagement.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/AdsManagement.css';
+import CreateAdModal from '../components/CreateAdModal';
 
 const adsData = [
   { id: '01', title: 'Summer Bash 2025', type: 'Home Banner', status: 'Active' },
@@ -9,11 +9,13 @@ const adsData = [
 ];
 
 const AdsManagement = () => {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="ads-management-container">
       <h1 className="ads-management-header">Ads Management</h1>
 
-      <button className="create-ad-btn">+ Create New Ad</button>
+      <button className="create-ad-btn" onClick={() => setShowModal(true)}>+ Create New Ad</button>
 
       <table className="ads-table">
         <thead>
@@ -53,6 +55,8 @@ const AdsManagement = () => {
         <button className="active">1</button>
         <button>{'>'}</button>
       </div>
+
+      {showModal && <CreateAdModal onClose={() => setShowModal(false)} />}
     </div>
   );
 };

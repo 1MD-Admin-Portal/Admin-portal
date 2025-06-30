@@ -189,8 +189,8 @@ const Sidebar = () => {
                 )}
               </li>
               <li><Link to="/CommunityContent"><Video size={18} /> Community Content</Link></li>
-              <li><Link to="/ProgramManagement"><Flag size={18} /> Program Management</Link></li>
-              <li><Link to="/challenges"><Activity size={18} /> Challenges</Link></li>
+              <li><Link to="/VideoPrograms"><Flag size={18} /> Program Management</Link></li>
+              <li><Link to="CreateChallenge"><Activity size={18} /> Challenges</Link></li>
               <li><Link to="/ClassModeration"><Video size={18} /> Class Moderation</Link></li>
               <li><Link to="/EventsPage"><Video size={18} /> Events</Link></li>
               <li><Link to="/MarketplacePage"><DollarSign size={18} /> Marketplace</Link></li>
