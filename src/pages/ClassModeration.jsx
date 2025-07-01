@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/ClassModeration.css';
+import { X } from 'lucide-react';
 
 const classData = [
   {
@@ -43,6 +44,7 @@ const classData = [
 const ClassModeration = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [selectedClass, setSelectedClass] = useState(null);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -64,6 +66,10 @@ const ClassModeration = () => {
     alert(`Rejected: ${classData[index].title}`);
     setOpenDropdownIndex(null);
   };
+
+  const filteredClasses = classData.filter((classItem) =>
+    classItem.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="class-moderation-container">
@@ -110,8 +116,12 @@ const ClassModeration = () => {
           </tr>
         </thead>
         <tbody>
-          {classData.map((classItem, index) => (
-            <tr key={index}>
+          {filteredClasses.map((classItem, index) => (
+            <tr
+              key={index}
+              className="clickable-row"
+              onClick={() => setSelectedClass(classItem)}
+            >
               <td>{classItem.instructor}</td>
               <td>{classItem.title}</td>
               <td>{classItem.type}</td>
@@ -121,7 +131,7 @@ const ClassModeration = () => {
               <td>
                 <span className="status-label">{classItem.status}</span>
               </td>
-              <td className="class-actions" style={{ position: 'relative' }}>
+              <td className="class-actions" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
                 <span onClick={() => setOpenDropdownIndex(index)}>⋮</span>
                 {openDropdownIndex === index && (
                   <div className="dropdown-menu" ref={dropdownRef}>
@@ -134,6 +144,24 @@ const ClassModeration = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Modal Popup */}
+      {selectedClass && (
+        <div className="class-popup-overlay" onClick={() => setSelectedClass(null)}>
+          <div className="class-popup-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-header">
+              <h2>{selectedClass.title}</h2>
+              <X className="popup-close" onClick={() => setSelectedClass(null)} />
+            </div>
+            <p><strong>Instructor:</strong> {selectedClass.instructor}</p>
+            <p><strong>Type:</strong> {selectedClass.type}</p>
+            <p><strong>Capacity:</strong> {selectedClass.capacity}</p>
+            <p><strong>Slots/Day:</strong> {selectedClass.slots}</p>
+            <p><strong>Price:</strong> {selectedClass.price}</p>
+            <p><strong>Status:</strong> {selectedClass.status}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

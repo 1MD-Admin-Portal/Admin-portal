@@ -10,7 +10,7 @@ const EditProfessorModal = ({ professor, onClose }) => {
   };
 
   return (
-    <div className="modal">
+
       <div className="modal-content">
         <h2>Edit Professor</h2>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
@@ -18,7 +18,7 @@ const EditProfessorModal = ({ professor, onClose }) => {
         <button onClick={handleSubmit}>Save</button>
         <button onClick={onClose} style={{ marginLeft: '8px', background: '#6b7280' }}>Cancel</button>
       </div>
-    </div>
+
   );
 };
 

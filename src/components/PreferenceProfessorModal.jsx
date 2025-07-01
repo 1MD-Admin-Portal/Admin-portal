@@ -25,7 +25,7 @@ const PreferenceProfessorModal = ({ professor, onClose }) => {
   const sortedStyles = [...styles, ...allStyles.filter(s => !styles.includes(s))];
 
   return (
-    <div className="modal">
+    <>
       <div className="modal-content">
         <h2>Teaching Preferences for {professor.name}</h2>
 
@@ -115,7 +115,7 @@ const PreferenceProfessorModal = ({ professor, onClose }) => {
           background: #e0f7fa;
         }
       `}</style>
-    </div>
+    </>
   );
 };
 

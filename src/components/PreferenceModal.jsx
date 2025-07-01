@@ -26,7 +26,7 @@ const PreferenceModal = ({ dancer, onClose }) => {
   const sortedStyles = [...style, ...allStyles.filter(s => !style.includes(s))];
 
   return (
-    <div className="modal">
+    <>
       <div className="modal-content">
         <h2>Edit Your Dance Preference</h2>
 
@@ -81,7 +81,6 @@ const PreferenceModal = ({ dancer, onClose }) => {
         <button onClick={onClose}>Save</button>
       </div>
 
-      {/* Simple CSS */}
       <style jsx>{`
         .custom-dropdown {
           position: relative;
@@ -115,7 +114,7 @@ const PreferenceModal = ({ dancer, onClose }) => {
           background: #e0f7fa;
         }
       `}</style>
-    </div>
+    </>
   );
 };
 

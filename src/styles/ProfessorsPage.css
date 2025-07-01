@@ -1,10 +1,10 @@
-/* Base Layout */
 .professors-container {
   margin-left: 250px;
   padding: 24px;
   font-family: 'Inter', sans-serif;
   background-color: #f9fafb;
   min-height: 100vh;
+  overflow-x: auto;
 }
 
 /* Header */
@@ -43,13 +43,17 @@
 .search-icon {
   position: absolute;
   top: 50%;
-  left: 35px;
+  left: 39px;
   transform: translateY(-50%);
   color: #6b7280;
   font-size: 14px;
 }
 
 /* Table */
+.professors-table-container {
+  overflow-x: auto;
+}
+
 .professors-table {
   width: 100%;
   border-collapse: collapse;
@@ -108,11 +112,6 @@
   color: #78350f;
 }
 
-.badge.fiver {
-  background-color: #e9d5ff;
-  color: #6b21a8;
-}
-
 /* Menu */
 .menu {
   text-align: center;
@@ -131,11 +130,12 @@
 .dropdown span {
   cursor: pointer;
   padding: 8px;
+  display: inline-block;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 32px;
+  top: 100%;
   right: 0;
   min-width: 160px;
   background: white;
@@ -144,6 +144,13 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1001;
   padding: 8px 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.dropdown-menu.upwards {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 8px;
 }
 
 .dropdown-menu div {
@@ -163,75 +170,4 @@
   inset: 0;
   background-color: transparent;
   z-index: 1000;
-}
-
-/* Modal */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1100;
-}
-
-.modal-content {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  font-family: 'Inter', sans-serif;
-}
-
-.modal-content h2 {
-  font-size: 20px;
-  margin-bottom: 16px;
-}
-
-.modal-content input,
-.modal-content select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.modal-content button {
-  padding: 10px 16px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.modal-content button:hover {
-  background-color: #2563eb;
-}
-
-/* Chip for Preferences */
-.chip {
-  display: inline-block;
-  padding: 6px 12px;
-  margin: 4px 6px;
-  background-color: #f3f4f6;
-  border-radius: 20px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.chip.selected {
-  background-color: #3b82f6;
-  color: white;
 }

@@ -51,7 +51,7 @@ const CalendarModal = ({ dancer, onClose }) => {
   };
 
   return (
-    <div className="modal">
+
       <div className="modal-content calendar-modal-small">
         <h2>Select Date</h2>
         <div className="calendar-controls">
@@ -78,7 +78,6 @@ const CalendarModal = ({ dancer, onClose }) => {
           Close
         </button>
       </div>
-    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ConfirmationModal = ({ message, onConfirm, onCancel }) => (
-  <div className="modal">
+
     <div className="modal-content small">
       <h2>Confirmation</h2>
       <p>{message}</p>
@@ -10,7 +10,7 @@ const ConfirmationModal = ({ message, onConfirm, onCancel }) => (
         <button onClick={onCancel} className="btn cancel">Cancel</button>
       </div>
     </div>
-  </div>
+
 );
 
 export default ConfirmationModal;

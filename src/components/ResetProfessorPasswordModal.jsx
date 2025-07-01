@@ -20,7 +20,7 @@ const ResetProfessorPasswordModal = ({ professor, onClose }) => {
   };
 
   return (
-    <div className="modal">
+  
       <div className="modal-content">
         <h2>Reset Password for {professor.name}</h2>
 
@@ -50,7 +50,6 @@ const ResetProfessorPasswordModal = ({ professor, onClose }) => {
           </>
         )}
       </div>
-    </div>
   );
 };
 

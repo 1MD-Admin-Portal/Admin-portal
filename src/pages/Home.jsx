@@ -43,11 +43,11 @@ const Home = () => {
       <section className="charts">
         <div className="chart">
           <h3>User Growth</h3>
-          <img src="https://dummyimage.com/400x200/eee/000&text=User+Growth+Chart" alt="User Growth" />
+          <img src="https://static.vecteezy.com/system/resources/thumbnails/014/030/664/small/trading-graph-chart-of-growth-or-fall-in-flat-design-free-vector.jpg" alt="User Growth" />
         </div>
         <div className="chart">
           <h3>Subscription Growth</h3>
-          <img src="https://dummyimage.com/400x200/eee/000&text=Subscription+Growth+Chart" alt="Subscription Growth" />
+          <img src="https://static.vecteezy.com/system/resources/thumbnails/014/030/664/small/trading-graph-chart-of-growth-or-fall-in-flat-design-free-vector.jpg" alt="Subscription Growth" />
         </div>
       </section>
 

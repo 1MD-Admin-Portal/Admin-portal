@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import "../styles/Challenges.css";
+import { X } from "lucide-react";
 
 const Challenges = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
+
 
   const challenges = [
     {
@@ -85,7 +88,12 @@ const Challenges = () => {
         </thead>
         <tbody>
           {filteredChallenges.map((item) => (
-            <tr key={item.id}>
+            <tr
+  key={item.id}
+  onClick={() => setSelectedChallenge(item)}
+  className="clickable-row"
+>
+
               <td>
                 <input type="checkbox" />
               </td>
@@ -116,7 +124,27 @@ const Challenges = () => {
           ))}
         </tbody>
       </table>
+      {selectedChallenge && (
+  <div
+    className="challenge-popup-overlay"
+    onClick={() => setSelectedChallenge(null)}
+  >
+    <div className="challenge-popup-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="popup-header">
+        <h2>{selectedChallenge.title}</h2>
+        <X className="popup-close" onClick={() => setSelectedChallenge(null)} />
+      </div>
+      <img src={selectedChallenge.image} alt={selectedChallenge.title} />
+      <p><strong>Host:</strong> {selectedChallenge.host}</p>
+      <p><strong>Duration:</strong> {selectedChallenge.duration}</p>
+      <p><strong>Participants:</strong> {selectedChallenge.participants}</p>
+      <p><strong>Status:</strong> {selectedChallenge.status}</p>
     </div>
+  </div>
+)}
+
+    </div>
+    
   );
 };
 

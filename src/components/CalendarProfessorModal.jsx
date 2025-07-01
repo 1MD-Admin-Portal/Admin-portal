@@ -72,7 +72,7 @@ const CalendarProfessorModal = ({ dancer, onClose }) => {
   };
 
   return (
-    <div className="modal">
+  
       <div className="modal-content calendar-modal-small">
         <h2>Select Date</h2>
         <div className="calendar-controls">
@@ -99,7 +99,7 @@ const CalendarProfessorModal = ({ dancer, onClose }) => {
           Close
         </button>
       </div>
-    </div>
+
   );
 };
 

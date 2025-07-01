@@ -24,7 +24,7 @@ const CreateChallengeModal = ({ onClose }) => {
 
   return (
     <div className="create-challenge-modal">
-      <div className="modal-content small">
+      <div className="modal-content-challenge">
         <div className="modal-header">
           <span onClick={onClose} className="back-button">← Back</span>
           <h2>Create New Challenge</h2>

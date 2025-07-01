@@ -6,7 +6,7 @@ const ResetPasswordModal = ({ dancer, onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   return (
-    <div className="modal">
+
       <div className="modal-content">
         <h2>Reset Password</h2>
         {mode === '' ? (
@@ -23,7 +23,6 @@ const ResetPasswordModal = ({ dancer, onClose }) => {
           </>
         )}
       </div>
-    </div>
   );
 };
 

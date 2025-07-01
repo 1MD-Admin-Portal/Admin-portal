@@ -9,7 +9,7 @@ const CreateEventModal = ({ onClose }) => {
 
   return (
     <div className="create-event-modal">
-      <div className="modal-content">
+      <div className="modal-content-event">
         <div className="modal-header">
           <span onClick={onClose} className="back-button">← Back</span>
           <h2>Create New Event</h2>

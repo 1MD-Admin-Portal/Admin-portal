@@ -6,7 +6,7 @@ const DancerDetailModal = ({ dancer, onClose }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content-profile">
         <button className="modal-close" onClick={onClose}>×</button>
         <h2 className="modal-title">Dancer Details</h2>
         <div className="modal-profile-img">

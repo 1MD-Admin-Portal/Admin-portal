@@ -1,154 +1,3 @@
-// import React, { useState } from 'react';
-// import '../styles/DancersPage.css';
-// import { FaSearch } from 'react-icons/fa';
-// import DancerDetailModal from "../components/DancerDetailModal";
-// import EditModal from '../components/EditModal';
-// import CalendarModal from '../components/CalendarModal';
-// import PreferenceModal from '../components/PreferenceModal';
-// import ResetPasswordModal from '../components/ResetPasswordModal';
-
-// const dancers = [
-//   {
-//     id: 101,
-//     name: 'Maya Rivers',
-//     email: 'maya.rivers@example.com',
-//     subscription: 'Douceur',
-//     level: 'Intermediate',
-//     status: 'Active',
-//     avatar: 'https://i.pravatar.cc/40?img=1',
-//   },
-//   {
-//     id: 102,
-//     name: 'Leo Martinez',
-//     email: 'leo.martinez@example.com',
-//     subscription: 'Ginga',
-//     level: 'Beginner',
-//     status: 'Active',
-//     avatar: 'https://i.pravatar.cc/40?img=2',
-//   },
-//   {
-//     id: 103,
-//     name: 'Aisha Kapoor',
-//     email: 'aisha.k@example.com',
-//     subscription: 'Fiver',
-//     level: 'Advanced',
-//     status: 'Active',
-//     avatar: 'https://i.pravatar.cc/40?img=3',
-//   },
-// ];
-
-// const DancersPage = () => {
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [subscriptionFilter, setSubscriptionFilter] = useState('');
-//   const [levelFilter, setLevelFilter] = useState('');
-//   const [statusFilter, setStatusFilter] = useState('');
-//   const [selectedDancer, setSelectedDancer] = useState(null);
-//   const [openModal, setOpenModal] = useState(''); // 'edit', 'calendar', 'preferences', 'reset'
-
-
-//   const filteredDancers = dancers.filter((dancer) => {
-//     return (
-//       dancer.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-//       (subscriptionFilter === '' || dancer.subscription === subscriptionFilter) &&
-//       (levelFilter === '' || dancer.level === levelFilter) &&
-//       (statusFilter === '' || dancer.status === statusFilter)
-//     );
-  
-//   const handleOptionClick = (type, dancer) => {
-//     setSelectedDancer(dancer);
-//     setOpenModal(type);
-//   };
-//   });
-
-//   return (
-//     <div className="dancers-container">
-//       <div className="header">
-//         <h2>Dancers</h2>
-//       </div>
-
-//       <div className="top-controls">
-//         <div className="search-box">
-//           <FaSearch className="search-icon" />
-//           <input
-//             type="text"
-//             placeholder="Search"
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//           />
-//         </div>
-
-//         <div className="filters-group">
-//           <select value={subscriptionFilter} onChange={(e) => setSubscriptionFilter(e.target.value)}>
-//             <option value="">All Subscriptions</option>
-//             <option value="Douceur">Douceur</option>
-//             <option value="Ginga">Ginga</option>
-//             <option value="Fiver">Fiver</option>
-//           </select>
-
-//           <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}>
-//             <option value="">All Levels</option>
-//             <option value="Beginner">Beginner</option>
-//             <option value="Intermediate">Intermediate</option>
-//             <option value="Advanced">Advanced</option>
-//           </select>
-
-//           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-//             <option value="">All Status</option>
-//             <option value="Active">Active</option>
-//             <option value="Inactive">Inactive</option>
-//           </select>
-//         </div>
-//       </div>
-
-//       <table className="dancers-table">
-//         <thead>
-//           <tr>
-//             <th>User ID</th>
-//             <th>Name</th>
-//             <th>Email</th>
-//             <th>Subscription</th>
-//             <th>Dance Level</th>
-//             <th>Status</th>
-//             <th></th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {filteredDancers.map((dancer) => (
-//             <tr key={dancer.id}>
-//               <td>{dancer.id}</td>
-//               <td
-//   className="user-info clickable"
-//   onClick={() => setSelectedDancer(dancer)}
-// >
-//   <img src={dancer.avatar} alt="avatar" />
-//   {dancer.name}
-// </td>
-
-//               <td>{dancer.email}</td>
-//               <td>
-//                 <span className={`badge ${dancer.subscription.toLowerCase()}`}>
-//                   {dancer.subscription}
-//                 </span>
-//               </td>
-//               <td>{dancer.level}</td>
-//               <td>{dancer.status}</td>
-//               <td className="menu">⋮</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//       {selectedDancer && (
-//   <DancerDetailModal
-//     dancer={selectedDancer}
-//     onClose={() => setSelectedDancer(null)}
-//   />
-// )}
-
-//     </div>
-//   );
-// };
-
-// export default DancersPage;
 import React, { useState, useEffect } from 'react';
 import '../styles/DancersPage.css';
 import { FaSearch } from 'react-icons/fa';
@@ -186,7 +35,7 @@ const dancers = [
     status: 'Active',
     avatar: 'https://i.pravatar.cc/40?img=3',
   },
-    {
+  {
     id: 104,
     name: 'Henry Smith',
     email: 'henry@example.com',
@@ -195,18 +44,18 @@ const dancers = [
     status: 'Active',
     avatar: 'https://i.pravatar.cc/40?img=3',
   },
-    {
+  {
     id: 105,
-    name: ' Caroline Johnson',
+    name: 'Caroline Johnson',
     email: 'aisha.k@example.com',
     subscription: 'Fiver',
     level: 'Advanced',
     status: 'Active',
     avatar: 'https://i.pravatar.cc/40?img=3',
   },
-    {
+  {
     id: 106,
-    name: 'james Smith',
+    name: 'James Smith',
     email: 'aisha.k@example.com',
     subscription: 'Fiver',
     level: 'Advanced',
@@ -235,7 +84,7 @@ const DancersPage = () => {
   const handleOptionClick = (type, dancer) => {
     setSelectedDancer(dancer);
     setOpenModal(type);
-    setDropdownDancerId(null); // close dropdown
+    setDropdownDancerId(null);
   };
 
   const closeModal = () => {
@@ -307,7 +156,7 @@ const DancersPage = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredDancers.map((dancer) => (
+          {filteredDancers.map((dancer, index) => (
             <tr key={dancer.id}>
               <td>{dancer.id}</td>
               <td
@@ -337,18 +186,15 @@ const DancersPage = () => {
                     ⋮
                   </span>
                   {dropdownDancerId === dancer.id && (
-                    <>
-                      <div className="dropdown-overlay" />
-                      <div
-                        className="dropdown-menu"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div onClick={() => handleOptionClick('edit', dancer)}>✏️ Edit</div>
-                        <div onClick={() => handleOptionClick('calendar', dancer)}>🗓️ Calendar</div>
-                        <div onClick={() => handleOptionClick('preferences', dancer)}>🎯 Preferences</div>
-                        <div onClick={() => handleOptionClick('reset', dancer)}>🔐 Reset Pass.</div>
-                      </div>
-                    </>
+                    <div
+                      className={`dropdown-menu ${index >= filteredDancers.length - 3 ? 'dropdown-up' : ''}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="edit" onClick={() => handleOptionClick('edit', dancer)}>✏️ Edit</div>
+                      <div onClick={() => handleOptionClick('calendar', dancer)}>🗓️ Calendar</div>
+                      <div onClick={() => handleOptionClick('preferences', dancer)}>🎯 Preferences</div>
+                      <div onClick={() => handleOptionClick('reset', dancer)}>🔐 Reset Pass.</div>
+                    </div>
                   )}
                 </div>
               </td>
@@ -367,4 +213,3 @@ const DancersPage = () => {
 };
 
 export default DancersPage;
-

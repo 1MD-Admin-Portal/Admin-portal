@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import '../styles/ProfessorsPage.css';
 import { FaSearch } from 'react-icons/fa';
 import ProfessorDetailModal from '../components/ProfessorDetailModal';
@@ -44,6 +44,15 @@ const professorsData = [
     rating: 3.8,
     status: 'Active',
     avatar: 'https://i.pravatar.cc/40?img=5',
+  },
+  {
+    id: 205,
+    name: 'mia williams',
+    email: 'mia@example.com',
+    subscription: 'Ginga',
+    rating: 4.9,
+    status: 'Active',
+    avatar: 'https://i.pravatar.cc/40?img=5',
   }
 ];
 
@@ -54,6 +63,7 @@ const ProfessorsPage = () => {
   const [dropdownId, setDropdownId] = useState(null);
   const [openModal, setOpenModal] = useState('');
   const [confirmApprove, setConfirmApprove] = useState(null);
+  const dropdownRef = useRef(null);
 
   const handleOptionClick = (type, prof) => {
     setSelectedProfessor(prof);
@@ -79,15 +89,20 @@ const ProfessorsPage = () => {
     prof.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  useEffect(() => {
-    const closeOnClickOutside = (e) => {
-      if (!e.target.closest('.dropdown')) {
-        setDropdownId(null);
-      }
-    };
-    document.addEventListener('mousedown', closeOnClickOutside);
-    return () => document.removeEventListener('mousedown', closeOnClickOutside);
-  }, []);
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    const isDropdownTrigger = e.target.closest('.dropdown span');
+    const isDropdownMenu = e.target.closest('.dropdown-menu');
+
+    if (!isDropdownTrigger && !isDropdownMenu) {
+      setDropdownId(null);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
+
 
   return (
     <div className="professors-container">
@@ -105,59 +120,66 @@ const ProfessorsPage = () => {
         </div>
       </div>
 
-      <table className="professors-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Subscription</th>
-            <th>Rating</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((prof) => (
-            <tr key={prof.id}>
-              <td>{prof.id}</td>
-              <td className="user-info clickable" onClick={() => handleOptionClick('detail', prof)}>
-                <img src={prof.avatar} alt="avatar" /> {prof.name}
-              </td>
-              <td>{prof.email}</td>
-              <td>
-                <span className={`badge ${prof.subscription.toLowerCase()}`}>
-                  {prof.subscription}
-                </span>
-              </td>
-              <td>{prof.rating}</td>
-              <td>{prof.status}</td>
-              <td className="menu">
-                <div className="dropdown">
-                  <span onClick={() => setDropdownId(dropdownId === prof.id ? null : prof.id)}>⋮</span>
-                  {dropdownId === prof.id && (
-                    <>
-                      <div className="dropdown-menu">
-                        {prof.status === 'Pending' ? (
-                          <div onClick={() => handleApprove(prof)}>✅ Approve</div>
-                        ) : (
-                          <>
-                            <div onClick={() => handleOptionClick('edit', prof)}>✏️ Edit</div>
-                            <div onClick={() => handleOptionClick('calendar', prof)}>📅 Calendar</div>
-                            <div onClick={() => handleOptionClick('preferences', prof)}>🎯 Preferences</div>
-                            <div onClick={() => handleOptionClick('reset', prof)}>🔐 Reset Pass.</div>
-                          </>
-                        )}
-                      </div>
-                      <div className="dropdown-overlay"></div>
-                    </>
-                  )}
-                </div>
-              </td>
+      <div className="professors-table-container">
+        <table className="professors-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Subscription</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+           {filtered.map((prof, index) => {
+  const isLastThree = index >= filtered.length - 3;
+
+  return (
+    <tr key={prof.id}>
+      <td>{prof.id}</td>
+      <td className="user-info clickable" onClick={() => handleOptionClick('detail', prof)}>
+        <img src={prof.avatar} alt="avatar" /> {prof.name}
+      </td>
+      <td>{prof.email}</td>
+      <td>
+        <span className={`badge ${prof.subscription.toLowerCase()}`}>
+          {prof.subscription}
+        </span>
+      </td>
+      <td>{prof.rating}</td>
+      <td>{prof.status}</td>
+      <td className="menu">
+        <div className="dropdown" ref={dropdownRef}>
+          <span onClick={() => setDropdownId(dropdownId === prof.id ? null : prof.id)}>⋮</span>
+          {dropdownId === prof.id && (
+            <>
+              <div className={`dropdown-menu ${isLastThree ? 'upwards' : ''}`}>
+                {prof.status === 'Pending' ? (
+                  <div onClick={() => handleApprove(prof)}>✅ Approve</div>
+                ) : (
+                  <>
+                    <div onClick={() => handleOptionClick('edit', prof)}>✏️ Edit</div>
+                    <div onClick={() => handleOptionClick('calendar', prof)}>📅 Calendar</div>
+                    <div onClick={() => handleOptionClick('preferences', prof)}>🎯 Preferences</div>
+                    <div onClick={() => handleOptionClick('reset', prof)}>🔐 Reset Pass.</div>
+                  </>
+                )}
+              </div>
+              <div className="dropdown-overlay"></div>
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+})}
+
+          </tbody>
+        </table>
+      </div>
 
       {/* Modals */}
       {openModal === 'detail' && <ProfessorDetailModal professor={selectedProfessor} onClose={() => setOpenModal('')} />}

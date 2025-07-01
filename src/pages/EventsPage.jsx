@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "../styles/EventsPage.css";
-import { FiSearch, FiFilter } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import CreateEventModal from "../pages/dashboard/CreateEventModal";
+import { X } from "lucide-react";
 
 const mockEvents = [
   {
@@ -42,6 +43,7 @@ const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [ticketFilter, setTicketFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const filteredEvents = mockEvents.filter((event) => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -90,7 +92,11 @@ const EventsPage = () => {
         </thead>
         <tbody>
           {filteredEvents.map((event) => (
-            <tr key={event.id}>
+            <tr
+              key={event.id}
+              className="clickable-row"
+              onClick={() => setSelectedEvent(event)}
+            >
               <td>{event.id}</td>
               <td>{event.title}</td>
               <td>{event.organizer}</td>
@@ -105,9 +111,27 @@ const EventsPage = () => {
         </tbody>
       </table>
 
-      <button className="create-event-btn" onClick={() => setShowModal(true)}>Create Event</button>
+      <button className="create-event-btn" onClick={() => setShowModal(true)}>
+        Create Event
+      </button>
 
       {showModal && <CreateEventModal onClose={() => setShowModal(false)} />}
+
+      {/* Row-Click Popup Modal */}
+      {selectedEvent && (
+        <div className="event-popup-overlay" onClick={() => setSelectedEvent(null)}>
+          <div className="event-popup-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-header">
+              <h2>{selectedEvent.title}</h2>
+              <X className="popup-close" onClick={() => setSelectedEvent(null)} />
+            </div>
+            <p><strong>Organizer:</strong> {selectedEvent.organizer}</p>
+            <p><strong>Date & Time:</strong> {selectedEvent.dateTime}</p>
+            <p><strong>Location:</strong> {selectedEvent.location}</p>
+            <p><strong>Ticket Type:</strong> {selectedEvent.ticketType}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
