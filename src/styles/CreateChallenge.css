@@ -23,7 +23,7 @@
 }
 
 .create-challenge-btn {
-  background-color: #e3aeb1;
+  background-color: #dc3545;
   color: white;
   padding: 10px 18px;
   font-weight: 500;
@@ -35,7 +35,7 @@
 }
 
 .create-challenge-btn:hover {
-  background-color: #c98f91;
+  background-color: #cd1319;
 }
 
 .create-challenge-filters {
@@ -106,7 +106,7 @@
 
 .status.published {
   background-color: #d1fae5;
-  color: #065f46;
+  color: #dc3545;
 }
 
 .status.draft {

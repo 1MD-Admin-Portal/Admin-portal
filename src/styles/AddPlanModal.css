@@ -94,10 +94,10 @@
 }
 
 .submit-btn {
-  background-color: #3b82f6;
+  background-color: #dc3545;
   color: white;
 }
 
 .submit-btn:hover {
-  background-color: #2563eb;
+  background-color: #ce1515;
 }

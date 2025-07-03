@@ -20,7 +20,7 @@
 }
 
 .icon {
-  color: #3b82f6;
+  color: #dc3545;
 }
 
 .form-group input[type="text"],
@@ -37,7 +37,7 @@
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #3b82f6;
+  border-color: #dc3545;
   outline: none;
   background-color: #fefefe;
 }
@@ -109,12 +109,12 @@ h3 {
 }
 
 .send-btn {
-  background-color: #3b82f6;
+  background-color: #dc3545;
   color: white;
 }
 
 .send-btn:hover {
-  background-color: #2563eb;
+  background-color: #cb1c1c;
 }
 .notification-list {
   margin-top: 32px;

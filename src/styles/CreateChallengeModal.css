@@ -110,7 +110,7 @@ textarea {
 }
 
 .publish-btn {
-  background-color: #3b7d80;
+  background-color: #dc3545;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -119,5 +119,5 @@ textarea {
 }
 
 .publish-btn:hover {
-  background-color: #356c6e;
+  background-color: #c81313;
 }

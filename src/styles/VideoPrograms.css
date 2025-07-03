@@ -19,7 +19,7 @@
 }
 
 .create-video-btn {
-  background-color: #f3a4b5;
+  background-color: #dc3545;
   border: none;
   padding: 10px 20px;
   color: white;
@@ -30,7 +30,7 @@
 }
 
 .create-video-btn:hover {
-  background-color: #e991a3;
+  background-color: #dc3545;
 }
 
 .filter-bar {

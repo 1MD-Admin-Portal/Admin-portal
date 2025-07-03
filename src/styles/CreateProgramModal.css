@@ -85,7 +85,7 @@
 }
 
 .vp-create-btn {
-  background: #d88a94;
+  background: #dc3545;
   border: none;
   padding: 8px 16px;
   color: white;
@@ -96,7 +96,7 @@
 }
 
 .vp-create-btn:hover {
-  background: #c37680;
+  background: #cf1515;
 }
 
 .vp-cancel-btn {

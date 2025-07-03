@@ -14,7 +14,7 @@
 
 .create-ad-btn {
   padding: 10px 20px;
-  background-color: #2979ff;
+  background-color: #dc3545;
   border: none;
   border-radius: 8px;
   color: white;
@@ -102,6 +102,6 @@
 }
 
 .pagination .active {
-  background-color: #2979ff;
+  background-color: #dc3545;
   color: white;
 }
