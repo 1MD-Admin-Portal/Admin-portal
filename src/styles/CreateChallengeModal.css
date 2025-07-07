@@ -121,3 +121,84 @@ textarea {
 .publish-btn:hover {
   background-color: #c81313;
 }
+.task-group {
+  margin-bottom: 32px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.watch-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.watch-video-block,
+.upload-response-block {
+  flex: 1 1 48%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.watch-upload-row input[type="text"],
+.watch-upload-row input[type="file"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.add-task-btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 8px;
+  cursor: pointer;
+  border: none;
+}
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.task-type {
+  min-width: 120px;
+  font-weight: 500;
+}
+
+.task-row input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.task-row input[type="file"] {
+  flex: 1;
+}
+
+.insert-btn,
+.remove-task-btn,
+.add-task-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  border: none;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.insert-btn:hover,
+.remove-task-btn:hover,
+.add-task-btn:hover {
+  background-color: #ccc;
+}

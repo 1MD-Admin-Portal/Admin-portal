@@ -75,7 +75,7 @@ const CommunityContent = () => {
               <th>Likes</th>
               <th>Status</th>
               <th>Date</th>
-              <th>Actions</th>
+              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
@@ -96,7 +96,7 @@ const CommunityContent = () => {
                   </span>
                 </td>
                 <td>{content.date}</td>
-                <td className="actions">⋮</td>
+                {/* <td className="actions">⋮</td> */}
               </tr>
             ))}
           </tbody>

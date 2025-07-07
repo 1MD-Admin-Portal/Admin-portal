@@ -2,24 +2,67 @@ import React, { useState } from "react";
 import "../../styles/CreateChallengeModal.css";
 
 const CreateChallengeModal = ({ onClose }) => {
-  const [watchVideos, setWatchVideos] = useState([{ title: "", id: Date.now() }]);
-  const [uploadVideo, setUploadVideo] = useState({ title: "", file: null });
+  const [taskGroups, setTaskGroups] = useState([
+    {
+      watchVideos: [{ id: Date.now(), title: "" }],
+      uploadVideos: [{ id: Date.now() + 1, title: "", file: null }],
+    },
+  ]);
 
-  const handleAddWatchVideo = () => {
-    setWatchVideos([...watchVideos, { title: "", id: Date.now() }]);
+  const handleWatchTitleChange = (groupIndex, watchIndex, value) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].watchVideos[watchIndex].title = value;
+    setTaskGroups(updatedGroups);
   };
 
-  const handleWatchTitleChange = (index, value) => {
-    const updated = [...watchVideos];
-    updated[index].title = value;
-    setWatchVideos(updated);
+  const handleUploadTitleChange = (groupIndex, uploadIndex, value) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].uploadVideos[uploadIndex].title = value;
+    setTaskGroups(updatedGroups);
   };
 
-  const handleUploadVideoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUploadVideo((prev) => ({ ...prev, file }));
-    }
+  const handleUploadFileChange = (groupIndex, uploadIndex, file) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].uploadVideos[uploadIndex].file = file;
+    setTaskGroups(updatedGroups);
+  };
+
+  const addWatchVideo = (groupIndex) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].watchVideos.push({ id: Date.now(), title: "" });
+    setTaskGroups(updatedGroups);
+  };
+
+  const addUploadVideo = (groupIndex) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].uploadVideos.push({
+      id: Date.now(),
+      title: "",
+      file: null,
+    });
+    setTaskGroups(updatedGroups);
+  };
+
+  const addTaskGroup = () => {
+    setTaskGroups([
+      ...taskGroups,
+      {
+        watchVideos: [{ id: Date.now(), title: "" }],
+        uploadVideos: [{ id: Date.now() + 1, title: "", file: null }],
+      },
+    ]);
+  };
+
+  const removeWatchVideo = (groupIndex, watchIndex) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].watchVideos.splice(watchIndex, 1);
+    setTaskGroups(updatedGroups);
+  };
+
+  const removeUploadVideo = (groupIndex, uploadIndex) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].uploadVideos.splice(uploadIndex, 1);
+    setTaskGroups(updatedGroups);
   };
 
   return (
@@ -72,40 +115,87 @@ const CreateChallengeModal = ({ onClose }) => {
             </select>
           </div>
 
+          {/* Challenge Tasks */}
           <div className="task-section">
             <h4>Challenge Tasks</h4>
-            {watchVideos.map((video, index) => (
-              <div key={video.id} className="task-row">
-                <span className="task-type">+ Watch Video</span>
-                <input
-                  type="text"
-                  placeholder="Video Title"
-                  value={video.title}
-                  onChange={(e) => handleWatchTitleChange(index, e.target.value)}
-                />
+
+            {taskGroups.map((group, groupIndex) => (
+              <div key={groupIndex} className="task-group">
+                <h5>Task Group {groupIndex + 1}</h5>
+
+                {/* Watch Videos */}
+                {group.watchVideos.map((watch, watchIndex) => (
+                  <div key={watch.id} className="task-row watch-upload-row">
+                    <span className="task-type">+ Watch Video</span>
+                    <input
+                      type="text"
+                      placeholder="Video Title"
+                      value={watch.title}
+                      onChange={(e) =>
+                        handleWatchTitleChange(groupIndex, watchIndex, e.target.value)
+                      }
+                    />
+                    <button className="insert-btn">Insert Video</button>
+                    <button
+                      className="remove-task-btn"
+                      onClick={() => removeWatchVideo(groupIndex, watchIndex)}
+                    >
+                      ❌
+                    </button>
+                  </div>
+                ))}
+
+                <button className="add-task-btn" onClick={() => addWatchVideo(groupIndex)}>
+                  + Add Watch Video
+                </button>
+
+                {/* Upload Videos */}
+                {group.uploadVideos.map((upload, uploadIndex) => (
+                  <div key={upload.id} className="task-row watch-upload-row">
+                    <span className="task-type">Upload Video</span>
+                    <input
+                      type="text"
+                      placeholder="Upload Title"
+                      value={upload.title}
+                      onChange={(e) =>
+                        handleUploadTitleChange(groupIndex, uploadIndex, e.target.value)
+                      }
+                    />
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) =>
+                        handleUploadFileChange(groupIndex, uploadIndex, e.target.files[0])
+                      }
+                    />
+                    <button
+                      className="remove-task-btn"
+                      onClick={() => removeUploadVideo(groupIndex, uploadIndex)}
+                    >
+                      ❌
+                    </button>
+                  </div>
+                ))}
+
+                <button className="add-task-btn" onClick={() => addUploadVideo(groupIndex)}>
+                  + Add Upload Video
+                </button>
+
+                <hr />
               </div>
             ))}
-            <button onClick={handleAddWatchVideo} className="add-task-btn">+ Add Watch Video</button>
 
-            <div className="task-row">
-              <span className="task-type">Upload Video</span>
-              <input
-                type="text"
-                placeholder="Upload Task Title"
-                value={uploadVideo.title}
-                onChange={(e) => setUploadVideo((prev) => ({ ...prev, title: e.target.value }))}
-              />
-              <input
-                type="file"
-                accept="video/*"
-                onChange={handleUploadVideoChange}
-              />
-            </div>
+            {/* Add Group Button */}
+            <button className="add-task-btn" onClick={addTaskGroup}>
+              + Add New Task Group
+            </button>
           </div>
         </div>
 
         <div className="modal-footer">
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="cancel-btn" onClick={onClose}>
+            Cancel
+          </button>
           <button className="publish-btn">Publish Challenge</button>
         </div>
       </div>
