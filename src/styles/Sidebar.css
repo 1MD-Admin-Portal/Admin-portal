@@ -178,9 +178,9 @@
 }
 
 .submenu {
-  padding-left: 24px;
-  margin-top: 5px;
+  margin-top: 1px;
   list-style: none;
+  align-self: start;
 }
 
 .submenu li {

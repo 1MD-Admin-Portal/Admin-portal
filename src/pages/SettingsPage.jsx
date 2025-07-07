@@ -4,12 +4,12 @@ import { FaPalette, FaClipboardList, FaFileContract, FaBell, FaUserShield, FaInf
 import '../styles/SettingsPage.css';
 
 const settingsOptions = [
-  {
-    title: 'App Branding',
-    description: 'Logo & Theme Color',
-    icon: <FaPalette />,
-    path: '/settings/app-branding',
-  },
+  // {
+  //   title: 'App Branding',
+  //   description: 'Logo & Theme Color',
+  //   icon: <FaPalette />,
+  //   path: '/settings/app-branding',
+  // },
   {
     title: 'Subscription Plans',
     description: 'Danceur, Ginga, Fiver Plans',

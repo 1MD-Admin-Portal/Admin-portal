@@ -1,23 +1,42 @@
-// src/pages/Home.js
-
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Flag, UserPlus } from "lucide-react";
 import "../styles/Home.css";
 
 const Home = () => {
-  const navigate = useNavigate(); // 👈 Hook for navigation
+  const navigate = useNavigate();
+  const [showProfileCard, setShowProfileCard] = useState(false);
+
+  const handleMouseEnter = () => setShowProfileCard(true);
+  const handleMouseLeave = () => setShowProfileCard(false);
 
   return (
     <div className="main-content">
       <header className="main-header">
         <h1>Dashboard</h1>
-        <div className="admin-profile" onClick={() => navigate("/admin-profile")}>
-  <span>Admin</span>
-  <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin" />
-</div>
+
+        <div
+          className="admin-profile-wrapper"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="admin-profile" onClick={() => navigate("/admin-profile")}>
+            <span>Admin</span>
+            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin" />
+          </div>
+
+          {showProfileCard && (
+            <div className="profile-card">
+              <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin" />
+              <h3>Mark</h3>
+              <p>Username - admin@local.com</p>
+              <p>Role - Super Admin</p>
+            </div>
+          )}
+        </div>
       </header>
 
+      {/* KPI Cards */}
       <section className="kpi-cards">
         <div className="kpi-card blue">
           <h2>1250</h2>
@@ -40,6 +59,7 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Charts */}
       <section className="charts">
         <div className="chart">
           <h3>User Growth</h3>
@@ -51,6 +71,7 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Quick Actions */}
       <section className="quick-actions">
         <h3>Quick Actions</h3>
         <div className="buttons">

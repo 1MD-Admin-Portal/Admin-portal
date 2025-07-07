@@ -1,8 +1,13 @@
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Login from "./pages/Login";
-import DashboardLayout from "./layouts/DashboardLayout"; // layout with sidebar
+import ForgotPassword from "./pages/ForgotPassword";
+import ChangePassword from "./pages/ChangePassword";
+import DashboardLayout from "./layouts/DashboardLayout";
+
 import Home from "./pages/Home";
 import Users from "./pages/Users";
 import CommunityContent from "./pages/CommunityContent";
@@ -25,45 +30,51 @@ import AppBrandingPage from "./components/AppBrandingPage";
 import SubscriptionPlansPage from "./components/SubscriptionPlansPage";
 import LegalContentPage from "./components/LegalContentPage";
 import AppVersionInfo from "./components/AppVersionInfo";
-import ForgotPassword from "./pages/ForgotPassword";
-import ChangePassword from "./pages/ChangePassword";
 import AdminProfile from "./pages/AdminProfile";
 
 function App() {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/change-password" element={<ChangePassword />} />
+    <AuthProvider>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
 
-      {/* Protected/Admin routes with sidebar */}
-      <Route element={<DashboardLayout />}>
-        <Route path="/home" element={<Home />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/CommunityContent" element={<CommunityContent />} />
-        <Route path="/ProgramManagement" element={<ProgramManagement />} />
-        <Route path="/Challenges" element={<Challenges />} />
-        <Route path="/ClassModeration" element={<ClassModeration />} />
-        <Route path="/EventsPage" element={<EventsPage />} />
-        <Route path="/MarketplacePage" element={<MarketplacePage />} />
-        <Route path="/AdsManagement" element={<AdsManagement />} />
-        <Route path="/NotificationPage" element={<NotificationPage />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/SettingsPage" element={<SettingsPage />} />
-        <Route path="/users/Dancers" element={<DancersPage />} />
-        <Route path="/users/Professors" element={<ProfessorsPage />} />
-        <Route path="/PayoutsPage" element={<PayoutsPage />} />
-        <Route path="/AccessLogs" element={<AccessLogs />} />
-        <Route path="/VideoPrograms" element={<VideoPrograms />} />
-        <Route path="/CreateChallenge" element={<CreateChallenge />} />
-        <Route path="/settings/app-branding" element={<AppBrandingPage />} />
-        <Route path="/settings/subscription-plans" element={<SubscriptionPlansPage />} />
-        <Route path="/settings/legal-content" element={<LegalContentPage />} />
-        <Route path="/settings/app-version" element={<AppVersionInfo />} />
-        <Route path="/admin-profile" element={<AdminProfile />} />
-      </Route>
-    </Routes>
+        {/* Protected routes */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/home" element={<Home />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/CommunityContent" element={<CommunityContent />} />
+          <Route path="/ProgramManagement" element={<ProgramManagement />} />
+          <Route path="/Challenges" element={<Challenges />} />
+          <Route path="/ClassModeration" element={<ClassModeration />} />
+          <Route path="/EventsPage" element={<EventsPage />} />
+          <Route path="/MarketplacePage" element={<MarketplacePage />} />
+          <Route path="/AdsManagement" element={<AdsManagement />} />
+          <Route path="/NotificationPage" element={<NotificationPage />} />
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/SettingsPage" element={<SettingsPage />} />
+          <Route path="/users/Dancers" element={<DancersPage />} />
+          <Route path="/users/Professors" element={<ProfessorsPage />} />
+          <Route path="/PayoutsPage" element={<PayoutsPage />} />
+          <Route path="/AccessLogs" element={<AccessLogs />} />
+          <Route path="/VideoPrograms" element={<VideoPrograms />} />
+          <Route path="/CreateChallenge" element={<CreateChallenge />} />
+          <Route path="/settings/app-branding" element={<AppBrandingPage />} />
+          <Route path="/settings/subscription-plans" element={<SubscriptionPlansPage />} />
+          <Route path="/settings/legal-content" element={<LegalContentPage />} />
+          <Route path="/settings/app-version" element={<AppVersionInfo />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }
 

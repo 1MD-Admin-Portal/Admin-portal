@@ -1,10 +1,10 @@
-.admin-profile-page {
+.admin-profile-page-container {
     padding: 20px;
-  margin-left: 260px; /* leave space for fixed sidebar */
+  margin-left: 280px; /* leave space for fixed sidebar */
   font-family: sans-serif;
 }
 
-.profile-card {
+.profile-card-container {
   display: flex;
   align-items: center;
   gap: 20px;

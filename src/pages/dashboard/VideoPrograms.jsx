@@ -74,7 +74,7 @@ const VideoPrograms = () => {
       const v = video.videos;
       switch (videoFilter) {
         case "0": return v === 0;
-        case "0-10": return v > 0 && v <= 10;
+        case "1-10": return v > 0 && v <= 10;
         case "10-30": return v > 10 && v <= 30;
         case "30-50": return v > 30 && v <= 50;
         case "50-100": return v > 50 && v <= 100;

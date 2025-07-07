@@ -1,7 +1,7 @@
 /* CreateChallenge.css */
 
 .create-challenge-page {
- margin-left: 250px; /* ✅ this offsets the fixed sidebar */
+ margin-left: 265px; /* ✅ this offsets the fixed sidebar */
   padding: 30px;
   background-color: #f4f6f8;
   overflow-y: auto;

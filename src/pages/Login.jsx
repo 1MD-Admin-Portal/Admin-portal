@@ -1,57 +1,35 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import loginImage from "../assets/login.jpg";
 import { loginService } from "../services/auth.service";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // use login from context
 
-  // const handleLogin = async () => {
-  //   if (!email || !password) {
-  //     const response = await loginService(email, password);
-  //     if (response.status === 200) {
-  //       alert("Login successful!");
-  //       navigate("/home");
-  //     } else {
-  //       alert("Invalid credentials. Please try again.");
-  //     }
-  //     return;
-  //   }   
-  //     alert("Please enter both email and password.");
-  // };
-  // const handleLogin = () => {
-  //   if (email === "test@gmail.com" && password === "test") {
-  //     alert("Login successful!");
-  //     navigate("/home");
-  //   } else {
-  //     alert("Invalid credentials.");
-  //   }
-  // };
   const handleLogin = async () => {
-  if (!email || !password) {
-    alert("Please enter both email and password.");
-    return;
-  }
-
-  try {
-    const response = await loginService(email, password);
-    if (response.status === 200) {
-      alert("Login successful!");
-      navigate("/home");
-    } else {
-      alert("Invalid credentials. Please try again.");
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
     }
-  } catch (error) {
-    alert("Login failed. Please try again later.");
-    console.error(error);
-  }
-};
 
-
+    try {
+      const response = await loginService(email, password);
+      if (response.status === 200 && response.data?.token) {
+        login(response.data.token); // ✅ store token & update auth state
+        navigate("/home");
+      } else {
+        alert("Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      alert("Login failed. Please try again later.");
+      console.error(error);
+    }
+  };
 
   return (
     <div className="login-container">
@@ -76,7 +54,9 @@ const Login = () => {
         />
 
         <div className="login-options">
-          <a href="#" onClick={() => navigate("/forgot-password")}>Forgot password</a>
+          <a href="#" onClick={() => navigate("/forgot-password")}>
+            Forgot password
+          </a>
         </div>
 
         <button className="login-button" onClick={handleLogin}>
