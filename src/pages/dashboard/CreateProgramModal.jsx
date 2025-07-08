@@ -1,10 +1,158 @@
+// import React, { useState } from "react";
+// import "../../styles/CreateProgramModal.css"; // Assuming you have a CSS file for styling
+// const CreateProgramModal = ({ isOpen, onClose }) => {
+//   const [title, setTitle] = useState("");
+//   const [description, setDescription] = useState("");
+//   const [overview, setOverview] = useState("");
+//   const [tags, setTags] = useState([]);
+//   const [danceStyle, setDanceStyle] = useState("");
+//   const [danceLevel, setDanceLevel] = useState("");
+//   const [pricing, setPricing] = useState("free");
+//   const [price, setPrice] = useState("");
+//   const [videos, setVideos] = useState([]);
+//   const [instructor, setInstructor] = useState("");
+
+//   const instructorOptions = ["Ananya R.", "Dev P.", "Maria K."];
+//   const danceStyles = ["Salsa", "Bachata", "Hip-Hop", "Contemporary"];
+
+//   const addVideo = () => {
+//     setVideos([...videos, { title: "", duration: "" }]);
+//   };
+
+//   const removeVideo = (index) => {
+//     const updated = [...videos];
+//     updated.splice(index, 1);
+//     setVideos(updated);
+//   };
+
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="vp-modal-backdrop">
+//       <div className="vp-modal">
+//         <h2>Create a Video Program</h2>
+
+//         <input
+//           placeholder="Program Title"
+//           value={title}
+//           onChange={(e) => setTitle(e.target.value)}
+//         />
+
+//         <textarea
+//           placeholder="Description"
+//           value={description}
+//           onChange={(e) => setDescription(e.target.value)}
+//         />
+
+//         <div className="vp-tags-container">
+//           <label>Dance Style:</label>
+//           <select value={danceStyle} onChange={(e) => setDanceStyle(e.target.value)}>
+//             <option value="">Select style</option>
+//             {danceStyles.map((style, idx) => (
+//               <option key={idx} value={style}>{style}</option>
+//             ))}
+//           </select>
+
+//           <label>Dance Level:</label>
+//           <input
+//             placeholder="e.g., Beginner"
+//             value={danceLevel}
+//             onChange={(e) => setDanceLevel(e.target.value)}
+//           />
+//         </div>
+
+//         <textarea
+//           className="overview"
+//           placeholder="Overview (e.g., - Bullet points)"
+//           value={overview}
+//           onChange={(e) => setOverview(e.target.value)}
+//         />
+
+//         <div className="vp-pricing-section">
+//           <label>Pricing:</label>
+//           <div>
+//             <label>
+//               <input
+//                 type="radio"
+//                 checked={pricing === "free"}
+//                 onChange={() => setPricing("free")}
+//               />
+//               Free
+//             </label>
+//             <label>
+//               <input
+//                 type="radio"
+//                 checked={pricing === "paid"}
+//                 onChange={() => setPricing("paid")}
+//               />
+//               Paid
+//               {pricing === "paid" && (
+//                 <input
+//                   type="text"
+//                   value={price}
+//                   placeholder="Enter price"
+//                   onChange={(e) => setPrice(e.target.value)}
+//                 />
+//               )}
+//             </label>
+//           </div>
+//         </div>
+
+//         <div className="vp-videos-section">
+//           <div className="vp-video-header">
+//             <strong>Videos</strong>
+//             <button onClick={addVideo}>+ Add Video</button>
+//           </div>
+//           {videos.map((vid, idx) => (
+//             <div key={idx} className="vp-video-item">
+//               <input
+//                 placeholder="Title"
+//                 value={vid.title}
+//                 onChange={(e) => {
+//                   const updated = [...videos];
+//                   updated[idx].title = e.target.value;
+//                   setVideos(updated);
+//                 }}
+//               />
+//               <input
+//                 placeholder="Duration (e.g., 5:32)"
+//                 value={vid.duration}
+//                 onChange={(e) => {
+//                   const updated = [...videos];
+//                   updated[idx].duration = e.target.value;
+//                   setVideos(updated);
+//                 }}
+//               />
+//               <button onClick={() => removeVideo(idx)}>Remove</button>
+//             </div>
+//           ))}
+//         </div>
+
+//         <div className="vp-modal-footer">
+//           <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
+//             <option value="">Select Instructor</option>
+//             {instructorOptions.map((inst, i) => (
+//               <option key={i} value={inst}>{inst}</option>
+//             ))}
+//           </select>
+//           <button className="vp-create-btn">+ Create Program</button>
+//           <button className="vp-cancel-btn" onClick={onClose}>Cancel</button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CreateProgramModal;
+
 import React, { useState } from "react";
-import "../../styles/CreateProgramModal.css"; // Assuming you have a CSS file for styling
+import "../../styles/CreateProgramModal.css";
+import { createProgramService } from "../../services/program.service";
+
 const CreateProgramModal = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [overview, setOverview] = useState("");
-  const [tags, setTags] = useState([]);
   const [danceStyle, setDanceStyle] = useState("");
   const [danceLevel, setDanceLevel] = useState("");
   const [pricing, setPricing] = useState("free");
@@ -12,17 +160,45 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
   const [videos, setVideos] = useState([]);
   const [instructor, setInstructor] = useState("");
 
-  const instructorOptions = ["Ananya R.", "Dev P.", "Maria K."];
+  const instructorOptions = [
+    { name: "Ananya R.", id: 1 },
+    { name: "Dev P.", id: 2 },
+    { name: "Maria K.", id: 3 }
+  ];
   const danceStyles = ["Salsa", "Bachata", "Hip-Hop", "Contemporary"];
 
   const addVideo = () => {
-    setVideos([...videos, { title: "", duration: "" }]);
+    setVideos([...videos, { title: "", duration: "", video_url: "" }]);
   };
 
   const removeVideo = (index) => {
     const updated = [...videos];
     updated.splice(index, 1);
     setVideos(updated);
+  };
+
+  const handleCreate = async () => {
+    const selectedInstructor = instructorOptions.find(i => i.name === instructor);
+
+    const payload = {
+      title,
+      description,
+      dance_style: danceStyle,
+      dance_level: danceLevel,
+      overview,
+      pricing_type: pricing,
+      price: pricing === "paid" ? parseFloat(price) : 0,
+      instructor_id: selectedInstructor?.id,
+      videos
+    };
+
+    try {
+      await createProgramService(payload);
+      alert("Program created successfully!");
+      onClose();
+    } catch (error) {
+      alert("Failed to create program. Check console for details.");
+    }
   };
 
   if (!isOpen) return null;
@@ -32,17 +208,8 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
       <div className="vp-modal">
         <h2>Create a Video Program</h2>
 
-        <input
-          placeholder="Program Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <input placeholder="Program Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
         <div className="vp-tags-container">
           <label>Dance Style:</label>
@@ -54,37 +221,20 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
           </select>
 
           <label>Dance Level:</label>
-          <input
-            placeholder="e.g., Beginner"
-            value={danceLevel}
-            onChange={(e) => setDanceLevel(e.target.value)}
-          />
+          <input placeholder="e.g., Beginner" value={danceLevel} onChange={(e) => setDanceLevel(e.target.value)} />
         </div>
 
-        <textarea
-          className="overview"
-          placeholder="Overview (e.g., - Bullet points)"
-          value={overview}
-          onChange={(e) => setOverview(e.target.value)}
-        />
+        <textarea className="overview" placeholder="Overview (e.g., - Bullet points)" value={overview} onChange={(e) => setOverview(e.target.value)} />
 
         <div className="vp-pricing-section">
           <label>Pricing:</label>
           <div>
             <label>
-              <input
-                type="radio"
-                checked={pricing === "free"}
-                onChange={() => setPricing("free")}
-              />
+              <input type="radio" checked={pricing === "free"} onChange={() => setPricing("free")} />
               Free
             </label>
             <label>
-              <input
-                type="radio"
-                checked={pricing === "paid"}
-                onChange={() => setPricing("paid")}
-              />
+              <input type="radio" checked={pricing === "paid"} onChange={() => setPricing("paid")} />
               Paid
               {pricing === "paid" && (
                 <input
@@ -123,6 +273,15 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
                   setVideos(updated);
                 }}
               />
+              <input
+                placeholder="Video URL"
+                value={vid.video_url || ""}
+                onChange={(e) => {
+                  const updated = [...videos];
+                  updated[idx].video_url = e.target.value;
+                  setVideos(updated);
+                }}
+              />
               <button onClick={() => removeVideo(idx)}>Remove</button>
             </div>
           ))}
@@ -132,10 +291,10 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
           <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
             <option value="">Select Instructor</option>
             {instructorOptions.map((inst, i) => (
-              <option key={i} value={inst}>{inst}</option>
+              <option key={i} value={inst.name}>{inst.name}</option>
             ))}
           </select>
-          <button className="vp-create-btn">+ Create Program</button>
+          <button className="vp-create-btn" onClick={handleCreate}>+ Create Program</button>
           <button className="vp-cancel-btn" onClick={onClose}>Cancel</button>
         </div>
       </div>

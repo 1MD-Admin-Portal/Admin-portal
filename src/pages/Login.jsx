@@ -54,9 +54,10 @@ const Login = () => {
         />
 
         <div className="login-options">
-          <a href="#" onClick={() => navigate("/forgot-password")}>
-            Forgot password
-          </a>
+          <span className="forgot-link" onClick={() => navigate("/forgot-password")}>
+  Forgot password
+</span>
+
         </div>
 
         <button className="login-button" onClick={handleLogin}>

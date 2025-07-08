@@ -9,20 +9,17 @@ const ForgotPassword = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSendOtp = () => {
-    if (!email) {
-      alert("Please enter your email.");
-      return;
-    }
+const handleSendOtp = () => {
+  if (!email) {
+    alert("Please enter your email.");
+    return;
+  }
 
-    if (email !== "test@gmail.com") {
-      alert("No account associated with this email.");
-      return;
-    }
+  // Simulate always valid for test
+  alert("OTP sent to your email.");
+  setShowOtpBox(true);
+};
 
-    alert("OTP sent to your email.");
-    setShowOtpBox(true);
-  };
 
   const handleVerifyOtp = () => {
     if (otp === "123") {

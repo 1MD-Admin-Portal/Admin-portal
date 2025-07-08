@@ -6,6 +6,10 @@ export const CONSTANTS = {
         DASHBOARD: "/dashboard",
         PROFILE: "/profile",
         USERS: "/users",
+        GET_PROGRAMS: "/api/v1/admin/program",
+         CREATE_PROGRAM: "/api/v1/admin/program",
+        GET_CHALLENGES: "/api/v1/admin/challenge",
+        CHALLENGE_CREATE: "/api/v1/admin/challenge",
     }
      // ✅ change this to your backend base URL
 }
