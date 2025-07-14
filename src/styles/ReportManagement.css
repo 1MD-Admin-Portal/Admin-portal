@@ -1,0 +1,177 @@
+/* Layout */
+.report-management-container {
+  padding: 1.5rem;
+  margin-left: 270px; /* adjust based on sidebar */
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Title */
+.report-management-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* KPI Dashboard */
+.report-kpi-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-box {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-box h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #4b5563;
+}
+
+.kpi-box p {
+  margin: 0.5rem 0 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #111827;
+}
+
+/* Filters + Search */
+.report-management-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.report-management-filters input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  outline: none;
+  width: 240px;
+}
+
+.report-management-filters select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  outline: none;
+  width: 180px;
+}
+
+.report-management-filters input:focus,
+.report-management-filters select:focus {
+  border-color: #4f46e5;
+}
+
+/* Table */
+.report-management-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.report-management-table th,
+.report-management-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.report-management-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+}
+
+.report-management-table tr:hover td {
+  background-color: #f9fafb;
+}
+
+.report-management-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* Actions */
+.actions-cell {
+  position: relative;
+}
+
+.dots-button {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #6b7280;
+}
+
+.dots-button:hover {
+  color: #111827;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 140px;
+  z-index: 10;
+}
+
+.dropdown-menu div {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #374151;
+  transition: background-color 0.2s;
+}
+
+.dropdown-menu div:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* Dropdown opens upward */
+.dropdown-menu.open-up {
+  top: auto;
+  bottom: 28px;
+}
+.reset-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.reset-button:hover {
+  background-color: #dc2626;
+}

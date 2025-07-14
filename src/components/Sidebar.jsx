@@ -138,12 +138,20 @@ import {
   Home as HomeIcon,
   Users,
   Video,
-  DollarSign,
-  Activity,
+  Euro,
+  Megaphone,
+  Logs,
   Bell,
   Cog,
+  PersonStanding,
   LogOut,
-  Flag
+  TicketPercent,
+  ClipboardMinus,
+  Film,
+  Swords,
+  GraduationCap,
+  Store,
+  Book
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import "../styles/Sidebar.css";
@@ -176,27 +184,28 @@ const Sidebar = () => {
               <li onClick={toggleUserDropdown} className="has-submenu">
                 <div className="menu-item-with-arrow">
                   <Users size={18} />
-                  <span>Users</span>
+                  <span> Users</span>
                   <span className={`arrow ${userDropdownOpen ? "open" : ""}`}>
                     {userDropdownOpen ? "▲" : "▼"}
                   </span>
                 </div>
                 {userDropdownOpen && (
                   <ul className="submenu">
-                    <li><Link to="/users/Dancers">Dancers</Link></li>
-                    <li><Link to="/users/Professors">Professors</Link></li>
+                    <li><Link to="/users/Dancers"><PersonStanding size={18} />Dancers</Link></li>
+                    <li><Link to="/users/Professors"><GraduationCap size={18} />Professors</Link></li>
                   </ul>
                 )}
               </li>
-              <li><Link to="/CommunityContent"><Video size={18} /> Community Content</Link></li>
-              <li><Link to="/VideoPrograms"><Flag size={18} /> Program Management</Link></li>
-              <li><Link to="CreateChallenge"><Activity size={18} /> Challenges</Link></li>
+              <li><Link to="/CommunityContent"><Film size={18} /> Community Content</Link></li>
+              <li><Link to="/VideoPrograms"><Book size={18} /> Program Management</Link></li>
+              <li><Link to="CreateChallenge"><Swords size={18} /> Challenges</Link></li>
               <li><Link to="/ClassModeration"><Video size={18} /> Class Moderation</Link></li>
-              <li><Link to="/EventsPage"><Video size={18} /> Events</Link></li>
-              <li><Link to="/MarketplacePage"><DollarSign size={18} /> Marketplace</Link></li>
-              <li><Link to="/PayoutsPage"><DollarSign size={18} /> Earnings & Payouts</Link></li>
-              <li><Link to="/AccessLogs"><Activity size={18} /> Access Logs</Link></li>
-              <li><Link to="/AdsManagement"><Video size={18} /> Ads Management</Link></li>
+              <li><Link to="/EventsPage"><TicketPercent size={18} /> Events</Link></li>
+              <li><Link to="/MarketplacePage"><Store size={18} /> Marketplace</Link></li>
+              <li><Link to="/PayoutsPage"><Euro size={18} /> Earnings & Payouts</Link></li>
+              <li><Link to="/ReportManagement"><ClipboardMinus size={18} /> Reported Section</Link></li>
+              <li><Link to="/AccessLogs"><Logs size={18} /> Access Logs</Link></li>
+              <li><Link to="/AdsManagement"><Megaphone size={18} /> Ads Management</Link></li>
             </ul>
           </div>
           <div className="menu-section">
