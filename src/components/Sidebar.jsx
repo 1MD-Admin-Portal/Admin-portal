@@ -53,7 +53,6 @@
 
 // // export default Sidebar;
 
-
 // import React, { useState } from "react";
 // import {
 //   Home as HomeIcon,
@@ -151,7 +150,9 @@ import {
   Swords,
   GraduationCap,
   Store,
-  Book
+  Book,
+  Disc3,
+  NotepadText,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import "../styles/Sidebar.css";
@@ -180,7 +181,11 @@ const Sidebar = () => {
           <div className="menu-section">
             <p className="menu-section-title">MAIN</p>
             <ul>
-              <li><Link to="/home"><HomeIcon size={18} /> Dashboard</Link></li>
+              <li>
+                <Link to="/home">
+                  <HomeIcon size={18} /> Dashboard
+                </Link>
+              </li>
               <li onClick={toggleUserDropdown} className="has-submenu">
                 <div className="menu-item-with-arrow">
                   <Users size={18} />
@@ -191,35 +196,107 @@ const Sidebar = () => {
                 </div>
                 {userDropdownOpen && (
                   <ul className="submenu">
-                    <li><Link to="/users/Dancers"><PersonStanding size={18} />Dancers</Link></li>
-                    <li><Link to="/users/Professors"><GraduationCap size={18} />Professors</Link></li>
+                    <li>
+                      <Link to="/users/Dancers">
+                        <PersonStanding size={18} />
+                        Dancers
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/users/Professors">
+                        <GraduationCap size={18} />
+                        Professors
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/users/DJs">
+                        <Disc3 size={18} />
+                        D.Js
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/users/Organizers">
+                        <NotepadText size={18} />
+                        Organizers
+                      </Link>
+                    </li>
                   </ul>
                 )}
               </li>
-              <li><Link to="/CommunityContent"><Film size={18} /> Community Content</Link></li>
-              <li><Link to="/VideoPrograms"><Book size={18} /> Program Management</Link></li>
-              <li><Link to="CreateChallenge"><Swords size={18} /> Challenges</Link></li>
-              <li><Link to="/ClassModeration"><Video size={18} /> Class Moderation</Link></li>
-              <li><Link to="/EventsPage"><TicketPercent size={18} /> Events</Link></li>
-              <li><Link to="/MarketplacePage"><Store size={18} /> Marketplace</Link></li>
-              <li><Link to="/PayoutsPage"><Euro size={18} /> Earnings & Payouts</Link></li>
-              <li><Link to="/ReportManagement"><ClipboardMinus size={18} /> Reported Section</Link></li>
-              <li><Link to="/AccessLogs"><Logs size={18} /> Access Logs</Link></li>
-              <li><Link to="/AdsManagement"><Megaphone size={18} /> Ads Management</Link></li>
+              <li>
+                <Link to="/CommunityContent">
+                  <Film size={18} /> Community Content
+                </Link>
+              </li>
+              <li>
+                <Link to="/VideoPrograms">
+                  <Book size={18} /> Program Management
+                </Link>
+              </li>
+              <li>
+                <Link to="CreateChallenge">
+                  <Swords size={18} /> Challenges
+                </Link>
+              </li>
+              <li>
+                <Link to="/ClassModeration">
+                  <Video size={18} /> Class Moderation
+                </Link>
+              </li>
+              <li>
+                <Link to="/EventsPage">
+                  <TicketPercent size={18} /> Events
+                </Link>
+              </li>
+              <li>
+                <Link to="/MarketplacePage">
+                  <Store size={18} /> Marketplace
+                </Link>
+              </li>
+              <li>
+                <Link to="/PayoutsPage">
+                  <Euro size={18} /> Earnings & Payouts
+                </Link>
+              </li>
+              <li>
+                <Link to="/ReportManagement">
+                  <ClipboardMinus size={18} /> Reported IT Section
+                </Link>
+              </li>
+              <li>
+                <Link to="/AccessLogs">
+                  <Logs size={18} /> Access Logs
+                </Link>
+              </li>
+              <li>
+                <Link to="/AdsManagement">
+                  <Megaphone size={18} /> Ads Management
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="menu-section">
             <p className="menu-section-title">SETTINGS</p>
             <ul>
-              <li><Link to="/NotificationPage"><Bell size={18} /> Notification</Link></li>
-              <li><Link to="/SettingsPage"><Cog size={18} /> Settings</Link></li>
+              <li>
+                <Link to="/NotificationPage">
+                  <Bell size={18} /> Notification
+                </Link>
+              </li>
+              <li>
+                <Link to="/SettingsPage">
+                  <Cog size={18} /> Settings
+                </Link>
+              </li>
             </ul>
           </div>
         </nav>
       </div>
 
       <div className="logout">
-        <Link to="/"><LogOut size={18} /> Logout</Link>
+        <Link to="/">
+          <LogOut size={18} /> Logout
+        </Link>
       </div>
     </aside>
   );

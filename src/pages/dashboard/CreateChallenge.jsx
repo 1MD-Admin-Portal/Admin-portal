@@ -243,36 +243,53 @@ const CreateChallenge = () => {
   }));
 
   const filterChallenges = (challenge) => {
-    const matchesSearch = challenge.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = challenge.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
 
     const matchesDuration = (() => {
       const d = challenge.duration;
       switch (durationFilter) {
-        case "0-5": return d >= 0 && d <= 5;
-        case "5-10": return d > 5 && d <= 10;
-        case "10-20": return d > 10 && d <= 20;
-        case "20-50": return d > 20 && d <= 50;
-        case "50+": return d > 50;
-        default: return true;
+        case "0-5":
+          return d >= 0 && d <= 5;
+        case "5-10":
+          return d > 5 && d <= 10;
+        case "10-20":
+          return d > 10 && d <= 20;
+        case "20-50":
+          return d > 20 && d <= 50;
+        case "50+":
+          return d > 50;
+        default:
+          return true;
       }
     })();
 
     const matchesParticipants = (() => {
       const p = challenge.participants;
       switch (participantsFilter) {
-        case "0-20": return p >= 0 && p <= 20;
-        case "20-50": return p > 20 && p <= 50;
-        case "50-100": return p > 50 && p <= 100;
-        case "100-500": return p > 100 && p <= 500;
-        case "500-1k": return p > 500 && p <= 1000;
-        case "1k+": return p > 1000;
-        default: return true;
+        case "0-20":
+          return p >= 0 && p <= 20;
+        case "20-50":
+          return p > 20 && p <= 50;
+        case "50-100":
+          return p > 50 && p <= 100;
+        case "100-500":
+          return p > 100 && p <= 500;
+        case "500-1k":
+          return p > 500 && p <= 1000;
+        case "1k+":
+          return p > 1000;
+        default:
+          return true;
       }
     })();
 
     const matchesStatus = !statusFilter || challenge.status === statusFilter;
 
-    return matchesSearch && matchesDuration && matchesParticipants && matchesStatus;
+    return (
+      matchesSearch && matchesDuration && matchesParticipants && matchesStatus
+    );
   };
 
   const filteredChallenges = processedChallenges.filter(filterChallenges);
@@ -281,7 +298,10 @@ const CreateChallenge = () => {
     <div className="create-challenge-page">
       <div className="create-challenge-header">
         <h1>Challenges</h1>
-        <button className="create-challenge-btn" onClick={() => setIsModalOpen(true)}>
+        <button
+          className="create-challenge-btn"
+          onClick={() => setIsModalOpen(true)}
+        >
           + Create Challenge
         </button>
       </div>
@@ -295,7 +315,10 @@ const CreateChallenge = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
 
-        <select onChange={(e) => setDurationFilter(e.target.value)} defaultValue="">
+        <select
+          onChange={(e) => setDurationFilter(e.target.value)}
+          defaultValue=""
+        >
           <option value="">All Durations</option>
           <option value="0-5">0-5 Days</option>
           <option value="5-10">5-10 Days</option>
@@ -304,7 +327,10 @@ const CreateChallenge = () => {
           <option value="50+">50+ Days</option>
         </select>
 
-        <select onChange={(e) => setParticipantsFilter(e.target.value)} defaultValue="">
+        <select
+          onChange={(e) => setParticipantsFilter(e.target.value)}
+          defaultValue=""
+        >
           <option value="">All Participants</option>
           <option value="0-20">0-20</option>
           <option value="20-50">20-50</option>
@@ -314,7 +340,10 @@ const CreateChallenge = () => {
           <option value="1k+">1k+</option>
         </select>
 
-        <select onChange={(e) => setStatusFilter(e.target.value)} defaultValue="">
+        <select
+          onChange={(e) => setStatusFilter(e.target.value)}
+          defaultValue=""
+        >
           <option value="">All Status</option>
           <option value="Published">Published</option>
           <option value="Draft">Draft</option>
@@ -326,7 +355,9 @@ const CreateChallenge = () => {
         <table>
           <thead>
             <tr>
-              <th><input type="checkbox" /></th>
+              <th>
+                <input type="checkbox" />
+              </th>
               <th>Title</th>
               <th>Host</th>
               <th>Duration</th>
@@ -337,10 +368,19 @@ const CreateChallenge = () => {
           </thead>
           <tbody>
             {filteredChallenges.map((challenge, index) => (
-              <tr key={index} onClick={() => setSelectedChallenge(challenge)} className="clickable-row">
-                <td><input type="checkbox" /></td>
+              <tr
+                key={index}
+                onClick={() => setSelectedChallenge(challenge)}
+                className="clickable-row"
+              >
                 <td>
-                  <span role="img" className="emoji">🏆</span> {challenge.title}
+                  <input type="checkbox" />
+                </td>
+                <td>
+                  <span role="img" className="emoji">
+                    🏆
+                  </span>{" "}
+                  {challenge.title}
                 </td>
                 <td>{challenge.host}</td>
                 <td>{challenge.duration} Days</td>
@@ -354,26 +394,49 @@ const CreateChallenge = () => {
               </tr>
             ))}
             {filteredChallenges.length === 0 && (
-              <tr><td colSpan="7" style={{ textAlign: "center" }}>No challenges found.</td></tr>
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  No challenges found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {isModalOpen && <CreateChallengeModal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <CreateChallengeModal onClose={() => setIsModalOpen(false)} />
+      )}
 
       {selectedChallenge && (
-        <div className="challenge-popup-overlay" onClick={() => setSelectedChallenge(null)}>
-          <div className="challenge-popup-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="challenge-popup-overlay"
+          onClick={() => setSelectedChallenge(null)}
+        >
+          <div
+            className="challenge-popup-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="popup-header">
               <h2>{selectedChallenge.title}</h2>
-              <X className="popup-close" onClick={() => setSelectedChallenge(null)} />
+              <X
+                className="popup-close"
+                onClick={() => setSelectedChallenge(null)}
+              />
             </div>
             <img src={selectedChallenge.image} alt={selectedChallenge.title} />
-            <p><strong>Host:</strong> {selectedChallenge.host}</p>
-            <p><strong>Duration:</strong> {selectedChallenge.duration} Days</p>
-            <p><strong>Participants:</strong> {selectedChallenge.participants}</p>
-            <p><strong>Status:</strong> {selectedChallenge.status}</p>
+            <p>
+              <strong>Host:</strong> {selectedChallenge.host}
+            </p>
+            <p>
+              <strong>Duration:</strong> {selectedChallenge.duration} Days
+            </p>
+            <p>
+              <strong>Participants:</strong> {selectedChallenge.participants}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedChallenge.status}
+            </p>
           </div>
         </div>
       )}

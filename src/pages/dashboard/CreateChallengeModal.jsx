@@ -250,7 +250,11 @@ const CreateChallengeModal = ({ onClose }) => {
 
   const addUploadVideo = (groupIndex) => {
     const updatedGroups = [...taskGroups];
-    updatedGroups[groupIndex].uploadVideos.push({ id: Date.now(), title: "", file: null });
+    updatedGroups[groupIndex].uploadVideos.push({
+      id: Date.now(),
+      title: "",
+      file: null,
+    });
     setTaskGroups(updatedGroups);
   };
 
@@ -279,22 +283,22 @@ const CreateChallengeModal = ({ onClose }) => {
   const handleSubmit = async () => {
     const tasks = [];
 
-    taskGroups.forEach(group => {
-      group.watchVideos.forEach(watch => {
+    taskGroups.forEach((group) => {
+      group.watchVideos.forEach((watch) => {
         if (watch.title.trim()) {
           tasks.push({
             task_type: "watch_video",
             task_title: watch.title,
-            video_url: "https://cdn.example.com/videos/intro.mp4" // placeholder or upload handling
+            video_url: "https://cdn.example.com/videos/intro.mp4", // placeholder or upload handling
           });
         }
       });
 
-      group.uploadVideos.forEach(upload => {
+      group.uploadVideos.forEach((upload) => {
         if (upload.title.trim()) {
           tasks.push({
             task_type: "upload_video",
-            task_title: upload.title
+            task_title: upload.title,
             // You can later handle actual upload
           });
         }
@@ -308,7 +312,7 @@ const CreateChallengeModal = ({ onClose }) => {
       image_url: imageUrl,
       dance_style: danceStyle,
       dance_level: danceLevel,
-      tasks
+      tasks,
     };
 
     try {
@@ -324,29 +328,45 @@ const CreateChallengeModal = ({ onClose }) => {
     <div className="create-challenge-modal">
       <div className="modal-content-challenge">
         <div className="modal-header">
-          <span onClick={onClose} className="back-button">← Back</span>
+          <span onClick={onClose} className="back-button">
+            ← Back
+          </span>
           <h2>Create New Challenge</h2>
         </div>
 
         <div className="modal-body">
           <div className="form-group">
             <label>Challenge Title</label>
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
           </div>
 
           <div className="form-group">
             <label>Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
 
           <div className="form-group">
             <label>Image URL</label>
-            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+            <input
+              type="text"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
           </div>
 
           <div className="form-group">
             <label>Dance Style</label>
-            <select value={danceStyle} onChange={(e) => setDanceStyle(e.target.value)}>
+            <select
+              value={danceStyle}
+              onChange={(e) => setDanceStyle(e.target.value)}
+            >
               <option>Salsa</option>
               <option>Bachata</option>
               <option>Kizomba</option>
@@ -355,7 +375,10 @@ const CreateChallengeModal = ({ onClose }) => {
 
           <div className="form-group">
             <label>Dance Level</label>
-            <select value={danceLevel} onChange={(e) => setDanceLevel(e.target.value)}>
+            <select
+              value={danceLevel}
+              onChange={(e) => setDanceLevel(e.target.value)}
+            >
               <option>Beginner</option>
               <option>Intermediate</option>
               <option>Advance</option>
@@ -376,12 +399,28 @@ const CreateChallengeModal = ({ onClose }) => {
                       type="text"
                       placeholder="Video Title"
                       value={watch.title}
-                      onChange={(e) => handleWatchTitleChange(groupIndex, watchIndex, e.target.value)}
+                      onChange={(e) =>
+                        handleWatchTitleChange(
+                          groupIndex,
+                          watchIndex,
+                          e.target.value
+                        )
+                      }
                     />
-                    <button className="remove-task-btn" onClick={() => removeWatchVideo(groupIndex, watchIndex)}>❌</button>
+                    <button
+                      className="remove-task-btn"
+                      onClick={() => removeWatchVideo(groupIndex, watchIndex)}
+                    >
+                      ❌
+                    </button>
                   </div>
                 ))}
-                <button className="add-task-btn" onClick={() => addWatchVideo(groupIndex)}>+ Add Watch Video</button>
+                <button
+                  className="add-task-btn"
+                  onClick={() => addWatchVideo(groupIndex)}
+                >
+                  + Add Watch Video
+                </button>
 
                 {group.uploadVideos.map((upload, uploadIndex) => (
                   <div key={upload.id} className="task-row watch-upload-row">
@@ -390,27 +429,55 @@ const CreateChallengeModal = ({ onClose }) => {
                       type="text"
                       placeholder="Upload Title"
                       value={upload.title}
-                      onChange={(e) => handleUploadTitleChange(groupIndex, uploadIndex, e.target.value)}
+                      onChange={(e) =>
+                        handleUploadTitleChange(
+                          groupIndex,
+                          uploadIndex,
+                          e.target.value
+                        )
+                      }
                     />
                     <input
                       type="file"
                       accept="video/*"
-                      onChange={(e) => handleUploadFileChange(groupIndex, uploadIndex, e.target.files[0])}
+                      onChange={(e) =>
+                        handleUploadFileChange(
+                          groupIndex,
+                          uploadIndex,
+                          e.target.files[0]
+                        )
+                      }
                     />
-                    <button className="remove-task-btn" onClick={() => removeUploadVideo(groupIndex, uploadIndex)}>❌</button>
+                    <button
+                      className="remove-task-btn"
+                      onClick={() => removeUploadVideo(groupIndex, uploadIndex)}
+                    >
+                      ❌
+                    </button>
                   </div>
                 ))}
-                <button className="add-task-btn" onClick={() => addUploadVideo(groupIndex)}>+ Add Upload Video</button>
+                <button
+                  className="add-task-btn"
+                  onClick={() => addUploadVideo(groupIndex)}
+                >
+                  + Add Upload Video
+                </button>
                 <hr />
               </div>
             ))}
-            <button className="add-task-btn" onClick={addTaskGroup}>+ Add New Task Group</button>
+            <button className="add-task-btn" onClick={addTaskGroup}>
+              + Add New Task Group
+            </button>
           </div>
         </div>
 
         <div className="modal-footer">
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button className="publish-btn" onClick={handleSubmit}>Publish Challenge</button>
+          <button className="cancel-btn" onClick={onClose}>
+            Cancel
+          </button>
+          <button className="publish-btn" onClick={handleSubmit}>
+            Publish Challenge
+          </button>
         </div>
       </div>
     </div>

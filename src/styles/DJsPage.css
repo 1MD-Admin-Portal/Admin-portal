@@ -1,0 +1,177 @@
+.dj-container {
+  margin-left: 260px;
+  padding: 32px;
+  font-family: "Inter", sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  color: #111827;
+}
+
+.header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  margin-left: 8px;
+  width: 100%;
+}
+
+.search-icon {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.filters-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 20px;
+}
+
+.filters-group select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+  color: #374151;
+}
+
+.dj-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.dj-table th,
+.dj-table td {
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.dj-table thead {
+  background-color: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+
+.dj-table tbody tr {
+  border-top: 1px solid #e5e7eb;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.badge.beatrookie {
+  background-color: #93c5fd; /* Light Blue */
+  color: #1e3a8a;
+}
+
+.badge.beatplayer {
+  background-color: #facc15; /* Yellow */
+  color: #92400e;
+}
+
+.badge.vibemaker {
+  background-color: #c084fc; /* Violet */
+  color: #581c87;
+}
+
+.menu {
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  color: #6b7280;
+  position: relative;
+  z-index: 1001;
+}
+
+/* Dropdown styles */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 30px;
+  left: -160px;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 0;
+  width: 160px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.dropdown-menu div {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.dropdown-menu div:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-overlay {
+  position: relative;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+}
+
+.clickable {
+  cursor: pointer;
+  color: #dc3545;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}

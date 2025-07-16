@@ -2,12 +2,10 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ChangePassword";
 import DashboardLayout from "./layouts/DashboardLayout";
-
 import Home from "./pages/Home";
 import Users from "./pages/Users";
 import CommunityContent from "./pages/CommunityContent";
@@ -32,6 +30,8 @@ import LegalContentPage from "./components/LegalContentPage";
 import AppVersionInfo from "./components/AppVersionInfo";
 import AdminProfile from "./pages/AdminProfile";
 import ReportManagement from "./pages/ReportManagement";
+import OrganizersPage from "./pages/OrganizersPage";
+import DJsPage from "./pages/DJsPage";
 
 function App() {
   return (
@@ -64,13 +64,21 @@ function App() {
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/users/Dancers" element={<DancersPage />} />
           <Route path="/users/Professors" element={<ProfessorsPage />} />
+          <Route path="/users/Organizers" element={<OrganizersPage />} />
+          <Route path="/users/DJs" element={<DJsPage />} />
           <Route path="/PayoutsPage" element={<PayoutsPage />} />
           <Route path="/AccessLogs" element={<AccessLogs />} />
           <Route path="/VideoPrograms" element={<VideoPrograms />} />
           <Route path="/CreateChallenge" element={<CreateChallenge />} />
           <Route path="/settings/app-branding" element={<AppBrandingPage />} />
-          <Route path="/settings/subscription-plans" element={<SubscriptionPlansPage />} />
-          <Route path="/settings/legal-content" element={<LegalContentPage />} />
+          <Route
+            path="/settings/subscription-plans"
+            element={<SubscriptionPlansPage />}
+          />
+          <Route
+            path="/settings/legal-content"
+            element={<LegalContentPage />}
+          />
           <Route path="/settings/app-version" element={<AppVersionInfo />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
           <Route path="/ReportManagement" element={<ReportManagement />} />
