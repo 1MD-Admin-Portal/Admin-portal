@@ -1,211 +1,4 @@
-// import React, { useState } from "react";
-// import "../../styles/CreateChallengeModal.css";
-
-// const CreateChallengeModal = ({ onClose }) => {
-//   const [taskGroups, setTaskGroups] = useState([
-//     {
-//       watchVideos: [{ id: Date.now(), title: "" }],
-//       uploadVideos: [{ id: Date.now() + 1, title: "", file: null }],
-//     },
-//   ]);
-
-//   const handleWatchTitleChange = (groupIndex, watchIndex, value) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].watchVideos[watchIndex].title = value;
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   const handleUploadTitleChange = (groupIndex, uploadIndex, value) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].uploadVideos[uploadIndex].title = value;
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   const handleUploadFileChange = (groupIndex, uploadIndex, file) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].uploadVideos[uploadIndex].file = file;
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   const addWatchVideo = (groupIndex) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].watchVideos.push({ id: Date.now(), title: "" });
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   const addUploadVideo = (groupIndex) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].uploadVideos.push({
-//       id: Date.now(),
-//       title: "",
-//       file: null,
-//     });
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   const addTaskGroup = () => {
-//     setTaskGroups([
-//       ...taskGroups,
-//       {
-//         watchVideos: [{ id: Date.now(), title: "" }],
-//         uploadVideos: [{ id: Date.now() + 1, title: "", file: null }],
-//       },
-//     ]);
-//   };
-
-//   const removeWatchVideo = (groupIndex, watchIndex) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].watchVideos.splice(watchIndex, 1);
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   const removeUploadVideo = (groupIndex, uploadIndex) => {
-//     const updatedGroups = [...taskGroups];
-//     updatedGroups[groupIndex].uploadVideos.splice(uploadIndex, 1);
-//     setTaskGroups(updatedGroups);
-//   };
-
-//   return (
-//     <div className="create-challenge-modal">
-//       <div className="modal-content-challenge">
-//         <div className="modal-header">
-//           <span onClick={onClose} className="back-button">← Back</span>
-//           <h2>Create New Challenge</h2>
-//         </div>
-
-//         <div className="modal-body">
-//           <div className="form-group">
-//             <label>Challenge Title</label>
-//             <input type="text" placeholder="Challenge" />
-//           </div>
-
-//           {/* <div className="form-group">
-//             <label>Challenger Type</label>
-//             <select>
-//               <option>Public</option>
-//               <option>Private</option>
-//             </select>
-//           </div> */}
-
-//           <div className="form-group">
-//             <label>Description</label>
-//             <textarea placeholder="Description" />
-//           </div>
-
-//           <div className="form-group">
-//             <label>Upload Image</label>
-//             <input type="file" accept="image/*" />
-//           </div>
-
-//           <div className="form-group">
-//             <label>Dance Style</label>
-//             <select>
-//               <option>Salsa</option>
-//               <option>Bachata</option>
-//               <option>Kizomba</option>
-//             </select>
-//           </div>
-
-//           <div className="form-group">
-//             <label>Dance Level</label>
-//             <select>
-//               <option>Beginner</option>
-//               <option>Intermediate</option>
-//               <option>Advance</option>
-//             </select>
-//           </div>
-
-//           {/* Challenge Tasks */}
-//           <div className="task-section">
-//             <h4>Challenge Tasks</h4>
-
-//             {taskGroups.map((group, groupIndex) => (
-//               <div key={groupIndex} className="task-group">
-//                 <h5>Task Group {groupIndex + 1}</h5>
-
-//                 {/* Watch Videos */}
-//                 {group.watchVideos.map((watch, watchIndex) => (
-//                   <div key={watch.id} className="task-row watch-upload-row">
-//                     <span className="task-type">+ Watch Video</span>
-//                     <input
-//                       type="text"
-//                       placeholder="Video Title"
-//                       value={watch.title}
-//                       onChange={(e) =>
-//                         handleWatchTitleChange(groupIndex, watchIndex, e.target.value)
-//                       }
-//                     />
-//                     <button className="insert-btn">Insert Video</button>
-//                     <button
-//                       className="remove-task-btn"
-//                       onClick={() => removeWatchVideo(groupIndex, watchIndex)}
-//                     >
-//                       ❌
-//                     </button>
-//                   </div>
-//                 ))}
-
-//                 <button className="add-task-btn" onClick={() => addWatchVideo(groupIndex)}>
-//                   + Add Watch Video
-//                 </button>
-
-//                 {/* Upload Videos */}
-//                 {group.uploadVideos.map((upload, uploadIndex) => (
-//                   <div key={upload.id} className="task-row watch-upload-row">
-//                     <span className="task-type">Upload Video</span>
-//                     <input
-//                       type="text"
-//                       placeholder="Upload Title"
-//                       value={upload.title}
-//                       onChange={(e) =>
-//                         handleUploadTitleChange(groupIndex, uploadIndex, e.target.value)
-//                       }
-//                     />
-//                     <input
-//                       type="file"
-//                       accept="video/*"
-//                       onChange={(e) =>
-//                         handleUploadFileChange(groupIndex, uploadIndex, e.target.files[0])
-//                       }
-//                     />
-//                     <button
-//                       className="remove-task-btn"
-//                       onClick={() => removeUploadVideo(groupIndex, uploadIndex)}
-//                     >
-//                       ❌
-//                     </button>
-//                   </div>
-//                 ))}
-
-//                 <button className="add-task-btn" onClick={() => addUploadVideo(groupIndex)}>
-//                   + Add Upload Video
-//                 </button>
-
-//                 <hr />
-//               </div>
-//             ))}
-
-//             {/* Add Group Button */}
-//             <button className="add-task-btn" onClick={addTaskGroup}>
-//               + Add New Task Group
-//             </button>
-//           </div>
-//         </div>
-
-//         <div className="modal-footer">
-//           <button className="cancel-btn" onClick={onClose}>
-//             Cancel
-//           </button>
-//           <button className="publish-btn">Publish Challenge</button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CreateChallengeModal;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/CreateChallengeModal.css";
 import { createChallengeService } from "../../services/challenge.service";
 
@@ -213,20 +6,47 @@ const CreateChallengeModal = ({ onClose }) => {
   const [title, setTitle] = useState("");
   const [challengerType, setChallengerType] = useState("public");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const [danceStyle, setDanceStyle] = useState("Salsa");
   const [danceLevel, setDanceLevel] = useState("Beginner");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [duration, setDuration] = useState("");
 
   const [taskGroups, setTaskGroups] = useState([
     {
-      watchVideos: [{ id: Date.now(), title: "" }],
-      uploadVideos: [{ id: Date.now() + 1, title: "", file: null }],
+      watchVideos: [{ id: Date.now(), title: "", file: null }],
+      uploadVideos: [{ id: Date.now() + 1, title: "" }],
     },
   ]);
+
+  const calculateDuration = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffMs = endDate - startDate;
+
+    if (isNaN(diffMs) || diffMs <= 0) return "";
+    const hours = Math.floor(diffMs / 3600000);
+    const minutes = Math.floor((diffMs % 3600000) / 60000);
+    return `${hours}h ${minutes}m`;
+  };
+
+  useEffect(() => {
+    if (startTime && endTime) {
+      const dur = calculateDuration(startTime, endTime);
+      setDuration(dur);
+    }
+  }, [startTime, endTime]);
 
   const handleWatchTitleChange = (groupIndex, watchIndex, value) => {
     const updatedGroups = [...taskGroups];
     updatedGroups[groupIndex].watchVideos[watchIndex].title = value;
+    setTaskGroups(updatedGroups);
+  };
+
+  const handleWatchFileChange = (groupIndex, watchIndex, file) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].watchVideos[watchIndex].file = file;
     setTaskGroups(updatedGroups);
   };
 
@@ -236,21 +56,9 @@ const CreateChallengeModal = ({ onClose }) => {
     setTaskGroups(updatedGroups);
   };
 
-  const handleUploadFileChange = (groupIndex, uploadIndex, file) => {
-    const updatedGroups = [...taskGroups];
-    updatedGroups[groupIndex].uploadVideos[uploadIndex].file = file;
-    setTaskGroups(updatedGroups);
-  };
-
   const addWatchVideo = (groupIndex) => {
     const updatedGroups = [...taskGroups];
-    updatedGroups[groupIndex].watchVideos.push({ id: Date.now(), title: "" });
-    setTaskGroups(updatedGroups);
-  };
-
-  const addUploadVideo = (groupIndex) => {
-    const updatedGroups = [...taskGroups];
-    updatedGroups[groupIndex].uploadVideos.push({
+    updatedGroups[groupIndex].watchVideos.push({
       id: Date.now(),
       title: "",
       file: null,
@@ -258,14 +66,10 @@ const CreateChallengeModal = ({ onClose }) => {
     setTaskGroups(updatedGroups);
   };
 
-  const addTaskGroup = () => {
-    setTaskGroups([
-      ...taskGroups,
-      {
-        watchVideos: [{ id: Date.now(), title: "" }],
-        uploadVideos: [{ id: Date.now() + 1, title: "", file: null }],
-      },
-    ]);
+  const addUploadVideo = (groupIndex) => {
+    const updatedGroups = [...taskGroups];
+    updatedGroups[groupIndex].uploadVideos.push({ id: Date.now(), title: "" });
+    setTaskGroups(updatedGroups);
   };
 
   const removeWatchVideo = (groupIndex, watchIndex) => {
@@ -289,7 +93,7 @@ const CreateChallengeModal = ({ onClose }) => {
           tasks.push({
             task_type: "watch_video",
             task_title: watch.title,
-            video_url: "https://cdn.example.com/videos/intro.mp4", // placeholder or upload handling
+            video_url: watch.file ? watch.file.name : "sample.mp4", // Replace with actual file upload handling
           });
         }
       });
@@ -299,7 +103,6 @@ const CreateChallengeModal = ({ onClose }) => {
           tasks.push({
             task_type: "upload_video",
             task_title: upload.title,
-            // You can later handle actual upload
           });
         }
       });
@@ -309,9 +112,12 @@ const CreateChallengeModal = ({ onClose }) => {
       title,
       challenger_type: challengerType,
       description,
-      image_url: imageUrl,
+      image_url: imageFile ? imageFile.name : "", // Replace with actual image upload handling
       dance_style: danceStyle,
       dance_level: danceLevel,
+      start_time: startTime,
+      end_time: endTime,
+      duration,
       tasks,
     };
 
@@ -353,11 +159,11 @@ const CreateChallengeModal = ({ onClose }) => {
           </div>
 
           <div className="form-group">
-            <label>Image URL</label>
+            <label>Upload Image</label>
             <input
-              type="text"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
             />
           </div>
 
@@ -385,13 +191,35 @@ const CreateChallengeModal = ({ onClose }) => {
             </select>
           </div>
 
-          {/* Challenge Tasks */}
+          <div className="form-group">
+            <label>Start Time</label>
+            <input
+              type="datetime-local"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>End Time</label>
+            <input
+              type="datetime-local"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
+          </div>
+
+          {duration && (
+            <div className="form-group">
+              <label>Challenge Duration</label>
+              <input type="text" value={duration} readOnly />
+            </div>
+          )}
+
           <div className="task-section">
             <h4>Challenge Tasks</h4>
             {taskGroups.map((group, groupIndex) => (
               <div key={groupIndex} className="task-group">
-                <h5>Task Group {groupIndex + 1}</h5>
-
                 {group.watchVideos.map((watch, watchIndex) => (
                   <div key={watch.id} className="task-row watch-upload-row">
                     <span className="task-type">+ Watch Video</span>
@@ -404,6 +232,17 @@ const CreateChallengeModal = ({ onClose }) => {
                           groupIndex,
                           watchIndex,
                           e.target.value
+                        )
+                      }
+                    />
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) =>
+                        handleWatchFileChange(
+                          groupIndex,
+                          watchIndex,
+                          e.target.files[0]
                         )
                       }
                     />
@@ -437,17 +276,6 @@ const CreateChallengeModal = ({ onClose }) => {
                         )
                       }
                     />
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) =>
-                        handleUploadFileChange(
-                          groupIndex,
-                          uploadIndex,
-                          e.target.files[0]
-                        )
-                      }
-                    />
                     <button
                       className="remove-task-btn"
                       onClick={() => removeUploadVideo(groupIndex, uploadIndex)}
@@ -462,12 +290,8 @@ const CreateChallengeModal = ({ onClose }) => {
                 >
                   + Add Upload Video
                 </button>
-                <hr />
               </div>
             ))}
-            <button className="add-task-btn" onClick={addTaskGroup}>
-              + Add New Task Group
-            </button>
           </div>
         </div>
 

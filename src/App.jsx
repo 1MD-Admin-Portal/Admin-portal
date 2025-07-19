@@ -32,6 +32,10 @@ import AdminProfile from "./pages/AdminProfile";
 import ReportManagement from "./pages/ReportManagement";
 import OrganizersPage from "./pages/OrganizersPage";
 import DJsPage from "./pages/DJsPage";
+import DisputesPage from "./pages/earning&payout/Disputes/DisputesPage";
+import EarningsPage from "./pages/earning&payout/earning/EarningsPage";
+import ClassDisputesPage from "./pages/operation&support/classrelateddispute/ClassDisputesPage";
+import TicketRaisePage from "./pages/operation&support/ticketraise/TicketRaisePage";
 
 function App() {
   return (
@@ -66,8 +70,15 @@ function App() {
           <Route path="/users/Professors" element={<ProfessorsPage />} />
           <Route path="/users/Organizers" element={<OrganizersPage />} />
           <Route path="/users/DJs" element={<DJsPage />} />
-          <Route path="/PayoutsPage" element={<PayoutsPage />} />
+          <Route path="/payouts/payouts" element={<PayoutsPage />} />
+          <Route path="/payouts/disputes" element={<DisputesPage />} />
+          <Route path="/payouts/earnings" element={<EarningsPage />} />
+          <Route
+            path="/support/class-disputes"
+            element={<ClassDisputesPage />}
+          />
           <Route path="/AccessLogs" element={<AccessLogs />} />
+          <Route path="/support/ticket-raise" element={<TicketRaisePage />} />
           <Route path="/VideoPrograms" element={<VideoPrograms />} />
           <Route path="/CreateChallenge" element={<CreateChallenge />} />
           <Route path="/settings/app-branding" element={<AppBrandingPage />} />
