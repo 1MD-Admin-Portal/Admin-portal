@@ -4,7 +4,7 @@ import { FiSearch } from "react-icons/fi";
 import CreateEventModal from "../pages/dashboard/CreateEventModal";
 import { X } from "lucide-react";
 
-const mockEvents = [
+const initialEvents = [
   {
     id: 101,
     title: "Kizomba Night",
@@ -12,6 +12,7 @@ const mockEvents = [
     dateTime: "Jun 10, 2025 8:00 PM",
     location: "NYC, NY",
     ticketType: "Paid",
+    approvalStatus: "Pending",
   },
   {
     id: 102,
@@ -20,6 +21,7 @@ const mockEvents = [
     dateTime: "Jun 25, 2025 6:00 PM",
     location: "Miami, FL",
     ticketType: "Free",
+    approvalStatus: "Pending",
   },
   {
     id: 103,
@@ -28,6 +30,7 @@ const mockEvents = [
     dateTime: "Jul 5, 2025 7:30 PM",
     location: "Los Angeles",
     ticketType: "Paid",
+    approvalStatus: "Pending",
   },
   {
     id: 104,
@@ -36,21 +39,34 @@ const mockEvents = [
     dateTime: "Jul 5, 2025 7:30 PM",
     location: "Miami, FL",
     ticketType: "Free",
+    approvalStatus: "Pending",
   },
 ];
 
 const EventsPage = () => {
+  const [events, setEvents] = useState(initialEvents);
   const [searchTerm, setSearchTerm] = useState("");
   const [ticketFilter, setTicketFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  const filteredEvents = mockEvents.filter((event) => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch = event.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesFilter =
-      ticketFilter === "All" || event.ticketType.toLowerCase() === ticketFilter.toLowerCase();
+      ticketFilter === "All" ||
+      event.ticketType.toLowerCase() === ticketFilter.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const handleApproval = (id, status) => {
+    const updatedEvents = events.map((event) =>
+      event.id === id ? { ...event, approvalStatus: status } : event
+    );
+    setEvents(updatedEvents);
+    setSelectedEvent(null);
+  };
 
   return (
     <div className="events-container">
@@ -87,6 +103,7 @@ const EventsPage = () => {
             <th>Date & Time</th>
             <th>Location</th>
             <th>Ticket Type</th>
+            <th>Status</th>
             <th>Acts.</th>
           </tr>
         </thead>
@@ -103,6 +120,7 @@ const EventsPage = () => {
               <td>{event.dateTime}</td>
               <td>{event.location}</td>
               <td>{event.ticketType}</td>
+              <td>{event.approvalStatus}</td>
               <td>
                 <span className="events-action-link">View</span>
               </td>
@@ -119,16 +137,71 @@ const EventsPage = () => {
 
       {/* Row-Click Popup Modal */}
       {selectedEvent && (
-        <div className="event-popup-overlay" onClick={() => setSelectedEvent(null)}>
-          <div className="event-popup-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="event-popup-overlay"
+          onClick={() => setSelectedEvent(null)}
+        >
+          <div
+            className="event-popup-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="popup-header">
               <h2>{selectedEvent.title}</h2>
-              <X className="popup-close" onClick={() => setSelectedEvent(null)} />
+              <X
+                className="popup-close"
+                onClick={() => setSelectedEvent(null)}
+              />
             </div>
-            <p><strong>Organizer:</strong> {selectedEvent.organizer}</p>
-            <p><strong>Date & Time:</strong> {selectedEvent.dateTime}</p>
-            <p><strong>Location:</strong> {selectedEvent.location}</p>
-            <p><strong>Ticket Type:</strong> {selectedEvent.ticketType}</p>
+            <p>
+              <strong>Organizer:</strong> {selectedEvent.organizer}
+            </p>
+            <p>
+              <strong>Date & Time:</strong> {selectedEvent.dateTime}
+            </p>
+            <p>
+              <strong>Location:</strong> {selectedEvent.location}
+            </p>
+            <p>
+              <strong>Ticket Type:</strong> {selectedEvent.ticketType}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedEvent.approvalStatus}
+            </p>
+
+            <div className="popup-actions">
+              {selectedEvent.approvalStatus === "Pending" && (
+                <>
+                  <button
+                    className="approve-btn"
+                    onClick={() => handleApproval(selectedEvent.id, "Approved")}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() => handleApproval(selectedEvent.id, "Rejected")}
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+              {selectedEvent.approvalStatus === "Approved" && (
+                <button
+                  className="reject-btn"
+                  onClick={() => handleApproval(selectedEvent.id, "Rejected")}
+                >
+                  Mark as Rejected
+                </button>
+              )}
+              {selectedEvent.approvalStatus === "Rejected" && (
+                <button
+                  className="approve-btn"
+                  onClick={() => handleApproval(selectedEvent.id, "Approved")}
+                >
+                  Mark as Approved
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

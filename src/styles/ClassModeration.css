@@ -101,7 +101,7 @@
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   width: 120px;
   z-index: 1000;
 }
@@ -170,4 +170,23 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-buttons button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.tab-buttons button.active {
+  background-color: #3f51b5;
+  color: white;
 }

@@ -11,7 +11,9 @@ const CreateEventModal = ({ onClose }) => {
     <div className="create-event-modal">
       <div className="modal-content-event">
         <div className="modal-header">
-          <span onClick={onClose} className="back-button">← Back</span>
+          <span onClick={onClose} className="back-button">
+            ← Back
+          </span>
           <h2>Create New Event</h2>
         </div>
 
@@ -31,8 +33,10 @@ const CreateEventModal = ({ onClose }) => {
           <div className="form-group">
             <label>Event Type</label>
             <div className="checkbox-group">
-              {['Workshop', 'Festival', 'Social', 'Competition'].map(type => (
-                <label key={type}><input type="radio" name="eventType" /> {type}</label>
+              {["Workshop", "Festival", "Social", "Competition"].map((type) => (
+                <label key={type}>
+                  <input type="radio" name="eventType" /> {type}
+                </label>
               ))}
             </div>
           </div>
@@ -40,18 +44,26 @@ const CreateEventModal = ({ onClose }) => {
           <div className="form-group">
             <label>Dance Style</label>
             <div className="checkbox-group">
-              {['Salsa', 'Bachata', 'Zouk', 'Hip-Hop', 'Ballet'].map(style => (
-                <label key={style}><input type="checkbox" /> {style}</label>
-              ))}
+              {["Salsa", "Bachata", "Zouk", "Hip-Hop", "Ballet"].map(
+                (style) => (
+                  <label key={style}>
+                    <input type="checkbox" /> {style}
+                  </label>
+                )
+              )}
             </div>
           </div>
 
           <div className="form-group">
             <label>Level</label>
             <div className="checkbox-group">
-              {['Beginner', 'Intermediate', 'Advanced', 'All Levels'].map(level => (
-                <label key={level}><input type="radio" name="level" /> {level}</label>
-              ))}
+              {["Beginner", "Intermediate", "Advanced", "All Levels"].map(
+                (level) => (
+                  <label key={level}>
+                    <input type="radio" name="level" /> {level}
+                  </label>
+                )
+              )}
             </div>
           </div>
 
@@ -60,7 +72,9 @@ const CreateEventModal = ({ onClose }) => {
             <div className="date-time-group">
               <input type="date" />
               <input type="time" />
-              <select><option>Timezone</option></select>
+              <select>
+                <option>Timezone</option>
+              </select>
             </div>
           </div>
 
@@ -72,8 +86,12 @@ const CreateEventModal = ({ onClose }) => {
           <div className="form-group">
             <label>Ticketing Pricing</label>
             <div className="checkbox-group">
-              <label><input type="radio" name="pricing" /> Free</label>
-              <label><input type="radio" name="pricing" /> Fixed Price</label>
+              <label>
+                <input type="radio" name="pricing" /> Free
+              </label>
+              <label>
+                <input type="radio" name="pricing" /> Fixed Price
+              </label>
             </div>
           </div>
 
@@ -82,7 +100,7 @@ const CreateEventModal = ({ onClose }) => {
             <input type="number" placeholder="Capacity" />
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Ticket Pricing</label>
             <table>
               <thead>
@@ -102,7 +120,7 @@ const CreateEventModal = ({ onClose }) => {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label>Upload Banner Image</label>
@@ -126,7 +144,9 @@ const CreateEventModal = ({ onClose }) => {
         </div>
 
         <div className="modal-footer">
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="cancel-btn" onClick={onClose}>
+            Cancel
+          </button>
           <button className="publish-btn">Create Event</button>
         </div>
       </div>

@@ -62,7 +62,6 @@
 //   const [isModalOpen, setIsModalOpen] = useState(false);
 //   const [selectedProgram, setSelectedProgram] = useState(null);
 
-
 //   const instructorOptions = ["Ananya R.", "Dev P.", "Maria K.", "Mira S.", "Rajra S."];
 //   const danceStyles = ["Hip-Hop", "Bachata", "Salsa", "Contemporary", "Jazz", "Ballet"];
 
@@ -212,29 +211,40 @@ const VideoPrograms = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [action, setAction] = useState(null);
+  const [reason, setReason] = useState("");
 
-useEffect(() => {
-  const loadPrograms = async () => {
-    const data = await getProgramsService();
-    setPrograms(data);
-  };
-  loadPrograms();
-}, []);
+  useEffect(() => {
+    const loadPrograms = async () => {
+      const data = await getProgramsService();
+      setPrograms(data);
+    };
+    loadPrograms();
+  }, []);
 
   const filterVideos = (prog) => {
-    const matchesSearch = prog.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = prog.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchesLevel = !levelFilter || prog.dance_level === levelFilter;
     const matchesStatus = !statusFilter || prog.status === statusFilter;
     const videoCount = prog.videos.length;
     const matchesVideoCount = (() => {
       switch (videoFilter) {
-        case "0": return videoCount === 0;
-        case "1-10": return videoCount > 0 && videoCount <= 10;
-        case "10-30": return videoCount > 10 && videoCount <= 30;
-        case "30-50": return videoCount > 30 && videoCount <= 50;
-        case "50-100": return videoCount > 50 && videoCount <= 100;
-        case "100+": return videoCount > 100;
-        default: return true;
+        case "0":
+          return videoCount === 0;
+        case "1-10":
+          return videoCount > 0 && videoCount <= 10;
+        case "10-30":
+          return videoCount > 10 && videoCount <= 30;
+        case "30-50":
+          return videoCount > 30 && videoCount <= 50;
+        case "50-100":
+          return videoCount > 50 && videoCount <= 100;
+        case "100+":
+          return videoCount > 100;
+        default:
+          return true;
       }
     })();
     return matchesSearch && matchesLevel && matchesStatus && matchesVideoCount;
@@ -247,21 +257,34 @@ useEffect(() => {
       {/* header and filters */}
       <div className="header">
         <h1>Video Programs</h1>
-        <button className="create-video-btn" onClick={() => setIsModalOpen(true)}>
+        <button
+          className="create-video-btn"
+          onClick={() => setIsModalOpen(true)}
+        >
           + Create Video Program
         </button>
       </div>
-
       <div className="filter-bar">
-        <input type="text" placeholder="Search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-        <select onChange={(e) => setLevelFilter(e.target.value)} defaultValue="">
+        <input
+          type="text"
+          placeholder="Search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select
+          onChange={(e) => setLevelFilter(e.target.value)}
+          defaultValue=""
+        >
           <option value="">All Levels</option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
           <option value="Advance">Advance</option>
           <option value="Professional">Professional</option>
         </select>
-        <select onChange={(e) => setVideoFilter(e.target.value)} defaultValue="">
+        <select
+          onChange={(e) => setVideoFilter(e.target.value)}
+          defaultValue=""
+        >
           <option value="">All Videos</option>
           <option value="0">0</option>
           <option value="1-10">1 - 10</option>
@@ -270,14 +293,16 @@ useEffect(() => {
           <option value="50-100">50 - 100</option>
           <option value="100+">100+</option>
         </select>
-        <select onChange={(e) => setStatusFilter(e.target.value)} defaultValue="">
+        <select
+          onChange={(e) => setStatusFilter(e.target.value)}
+          defaultValue=""
+        >
           <option value="">All Status</option>
           <option value="Published">Published</option>
           <option value="Draft">Draft</option>
           <option value="Flagged">Flagged</option>
         </select>
       </div>
-
       {/* table */}
       <div className="video-programs-table">
         <table>
@@ -293,8 +318,14 @@ useEffect(() => {
           </thead>
           <tbody>
             {filteredPrograms.map((prog) => (
-              <tr key={prog.program_id} onClick={() => setSelectedProgram(prog)} className="clickable-row">
-                <td><input type="checkbox" /></td>
+              <tr
+                key={prog.program_id}
+                onClick={() => setSelectedProgram(prog)}
+                className="clickable-row"
+              >
+                <td>
+                  <input type="checkbox" />
+                </td>
                 <td className="program-title">
                   <img src="https://via.placeholder.com/40" alt="thumbnail" />
                   {prog.title}
@@ -302,16 +333,27 @@ useEffect(() => {
                 <td>{prog.instructor_name}</td>
                 <td>{prog.dance_level}</td>
                 <td>{prog.videos.length}</td>
-                <td><span className={`status ${prog.status?.toLowerCase() || 'published'}`}>Published</span></td>
+                <td>
+                  <span
+                    className={`status ${
+                      prog.status?.toLowerCase() || "published"
+                    }`}
+                  >
+                    Published
+                  </span>
+                </td>
               </tr>
             ))}
             {filteredPrograms.length === 0 && (
-              <tr><td colSpan="6" style={{ textAlign: 'center' }}>No programs found.</td></tr>
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No programs found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
-
       {/* create modal */}
       <CreateProgramModal
         isOpen={isModalOpen}
@@ -319,25 +361,97 @@ useEffect(() => {
         instructorOptions={["Ananya R."]}
         danceStyles={["Hip-Hop"]}
       />
-
       {/* view modal */}
       {selectedProgram && (
-        <div className="video-popup-overlay" onClick={() => setSelectedProgram(null)}>
-          <div className="video-popup-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="video-popup-overlay"
+          onClick={() => {
+            setSelectedProgram(null);
+            setAction(null);
+            setReason("");
+          }}
+        >
+          <div
+            className="video-popup-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="popup-header">
               <h2>{selectedProgram.title}</h2>
-              <X className="popup-close" onClick={() => setSelectedProgram(null)} />
+              <X
+                className="popup-close"
+                onClick={() => {
+                  setSelectedProgram(null);
+                  setAction(null);
+                  setReason("");
+                }}
+              />
             </div>
             <img src="https://via.placeholder.com/300" alt="cover" />
-            <p><strong>Host:</strong> {selectedProgram.instructor_name}</p>
-            <p><strong>Level:</strong> {selectedProgram.dance_level}</p>
-            <p><strong>Status:</strong> Published</p>
-            <p><strong>Videos:</strong></p>
+            <p>
+              <strong>Host:</strong> {selectedProgram.instructor_name}
+            </p>
+            <p>
+              <strong>Level:</strong> {selectedProgram.dance_level}
+            </p>
+            <p>
+              <strong>Status:</strong> Published
+            </p>
+            <p>
+              <strong>Videos:</strong>
+            </p>
             <ul>
-              {selectedProgram.videos.map(video => (
-                <li key={video.id}>{video.title} ({video.duration})</li>
+              {selectedProgram.videos.map((video) => (
+                <li key={video.id}>
+                  {video.title} ({video.duration})
+                </li>
               ))}
             </ul>
+
+            <div className="program-actions">
+              <button
+                className="danger-btn"
+                onClick={() => setAction("Delete")}
+              >
+                Delete
+              </button>
+              <button
+                className="warning-btn"
+                onClick={() => setAction("Retire")}
+              >
+                Retire
+              </button>
+              <button className="pause-btn" onClick={() => setAction("Pause")}>
+                Pause
+              </button>
+            </div>
+
+            {action && (
+              <div className="reason-form">
+                <p>
+                  <strong>{action} Reason:</strong>
+                </p>
+                <textarea
+                  placeholder={`Why do you want to ${action.toLowerCase()} this program?`}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                />
+                <button
+                  className="submit-reason"
+                  onClick={() => {
+                    console.log(
+                      `${action} program ${selectedProgram.title} for reason: ${reason}`
+                    );
+                    // Handle API or state update here
+                    setSelectedProgram(null);
+                    setAction(null);
+                    setReason("");
+                  }}
+                  disabled={!reason.trim()}
+                >
+                  Submit
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
