@@ -1,7 +1,7 @@
 .admin-dashboard {
   display: flex;
   height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .sidebar {
@@ -57,7 +57,7 @@
   background-color: #f4f6f8;
   overflow-y: auto;
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .main-header {
@@ -102,10 +102,18 @@
   font-size: 12px;
 }
 
-.kpi-card.blue { background: #e6f0ff; }
-.kpi-card.green { background: #e6ffec; }
-.kpi-card.purple { background: #f3e6ff; }
-.kpi-card.red { background: #ffe6e6; }
+.kpi-card.blue {
+  background: #e6f0ff;
+}
+.kpi-card.green {
+  background: #e6ffec;
+}
+.kpi-card.purple {
+  background: #f3e6ff;
+}
+.kpi-card.red {
+  background: #ffe6e6;
+}
 
 .charts {
   display: flex;
@@ -183,3 +191,80 @@
   margin: 2px 0;
 }
 
+/* Existing styles remain unchanged... */
+
+/* Toggle between Monthly/Yearly view and select dropdown */
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 20px;
+  flex-wrap: wrap;
+}
+
+.view-toggle button {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.view-toggle button.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.view-toggle button:hover {
+  background-color: #e0e7ff;
+  border-color: #3b82f6;
+}
+
+.period-dropdown {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+  transition: border 0.2s ease;
+}
+
+.period-dropdown:hover,
+.period-dropdown:focus {
+  border-color: #3b82f6;
+}
+
+/* Optional: make KPI card % spans bold if you want */
+.kpi-card span {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* Responsive adjustment (optional) */
+@media (max-width: 768px) {
+  .kpi-cards {
+    flex-direction: column;
+  }
+
+  .charts {
+    flex-direction: column;
+  }
+
+  .quick-actions .buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .view-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
