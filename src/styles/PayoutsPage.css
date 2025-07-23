@@ -1,11 +1,10 @@
 .payouts-container {
   margin-left: 265px;
   padding: 32px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   background-color: #f9fafb;
   min-height: 100vh;
   color: #111827;
-
 }
 
 .payouts-container h2 {
@@ -22,7 +21,7 @@
 .payout-card {
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
   width: 100%;
   max-width: 400px;
@@ -46,7 +45,8 @@
   font-size: 1.25rem;
 }
 
-.stats p, .payout-status p {
+.stats p,
+.payout-status p {
   display: flex;
   justify-content: space-between;
   margin: 0.25rem 0;
@@ -83,4 +83,16 @@
 .actions button.primary {
   background-color: #dc3545;
   color: white;
+}
+.calendar-cell.has-class {
+  position: relative;
+  background-color: #e8f5e9;
+  border-radius: 6px;
+}
+
+.class-dot {
+  font-size: 0.7rem;
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
 }

@@ -19,6 +19,11 @@ const professorsData = [
     avatar: "https://i.pravatar.cc/40?img=4",
     followers: 1200,
     referrals: 45,
+    classes: [
+      { title: "Music Theory", date: "2025-07-23" },
+      { title: "Rhythm Training", date: "2025-07-26" },
+      { title: "Live Jam Session", date: "2025-07-30" },
+    ],
   },
   {
     id: 202,
@@ -30,6 +35,11 @@ const professorsData = [
     avatar: "https://i.pravatar.cc/40?img=10",
     followers: 300,
     referrals: 20,
+    classes: [
+      { title: "Music Theory", date: "2025-07-24" },
+      { title: "Rhythm Training", date: "2025-07-25" },
+      { title: "Live Jam Session", date: "2025-07-31" },
+    ],
   },
   {
     id: 203,
@@ -41,6 +51,11 @@ const professorsData = [
     avatar: "https://i.pravatar.cc/40?img=11",
     followers: 5100,
     referrals: 99,
+    classes: [
+      { title: "Music Theory", date: "2025-07-22" },
+      { title: "Rhythm Training", date: "2025-07-27" },
+      { title: "Live Jam Session", date: "2025-07-28" },
+    ],
   },
   {
     id: 204,
@@ -52,6 +67,11 @@ const professorsData = [
     avatar: "https://i.pravatar.cc/40?img=5",
     followers: 80,
     referrals: 2,
+    classes: [
+      { title: "Music Theory", date: "2025-07-20" },
+      { title: "Rhythm Training", date: "2025-07-18" },
+      { title: "Live Jam Session", date: "2025-08-01" },
+    ],
   },
   {
     id: 205,
@@ -63,6 +83,11 @@ const professorsData = [
     avatar: "https://i.pravatar.cc/40?img=5",
     followers: 26000,
     referrals: 180,
+    classes: [
+      { title: "Music Theory", date: "2025-08-23" },
+      { title: "Rhythm Training", date: "2025-08-26" },
+      { title: "Live Jam Session", date: "2025-08-30" },
+    ],
   },
 ];
 

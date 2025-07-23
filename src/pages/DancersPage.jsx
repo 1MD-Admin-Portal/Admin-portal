@@ -17,6 +17,10 @@ const dancers = [
     status: "Active",
     avatar: "https://i.pravatar.cc/40?img=1",
     referrals: 18, // Silver
+    classes: [
+      { title: "Bachata Session", date: "2025-07-25" },
+      { title: "Salsa Workshop", date: "2025-08-01" },
+    ],
   },
   {
     id: 102,
@@ -27,6 +31,10 @@ const dancers = [
     status: "Active",
     avatar: "https://i.pravatar.cc/40?img=2",
     referrals: 7, // Bronze
+    classes: [
+      { title: "Bachata Session", date: "2025-07-20" },
+      { title: "Salsa Workshop", date: "2025-08-11" },
+    ],
   },
   {
     id: 103,
@@ -37,6 +45,10 @@ const dancers = [
     status: "Active",
     avatar: "https://i.pravatar.cc/40?img=3",
     referrals: 104, // Diamond
+    classes: [
+      { title: "Bachata Session", date: "2025-07-29" },
+      { title: "Salsa Workshop", date: "2025-08-02" },
+    ],
   },
   {
     id: 104,
@@ -47,6 +59,10 @@ const dancers = [
     status: "Active",
     avatar: "https://i.pravatar.cc/40?img=4",
     referrals: 38, // Gold
+    classes: [
+      { title: "Bachata Session", date: "2025-07-24" },
+      { title: "Salsa Workshop", date: "2025-08-05" },
+    ],
   },
   {
     id: 105,
@@ -57,6 +73,10 @@ const dancers = [
     status: "Active",
     avatar: "https://i.pravatar.cc/40?img=5",
     referrals: 9999, // Star
+    classes: [
+      { title: "Bachata Session", date: "2025-07-23" },
+      { title: "Salsa Workshop", date: "2025-08-10" },
+    ],
   },
   {
     id: 106,
@@ -67,6 +87,10 @@ const dancers = [
     status: "Active",
     avatar: "https://i.pravatar.cc/40?img=6",
     referrals: 25000, // Legendary
+    classes: [
+      { title: "Bachata Session", date: "2025-07-22" },
+      { title: "Salsa Workshop", date: "2025-08-07" },
+    ],
   },
 ];
 

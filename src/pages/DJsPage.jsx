@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import "../styles/DJsPage.css";
+import { X } from "lucide-react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import UserCalendar from "../components/DjCalendar"; // adjust path
 
 const djsData = [
   {
@@ -13,6 +17,11 @@ const djsData = [
     plays: 520,
     followers: 210,
     avgRating: 4.6,
+    bio: "A sonic architect spinning vibes around the globe.",
+    classes: [
+      { date: new Date(2025, 6, 18), title: "House Party Mix" },
+      { date: new Date(2025, 6, 20), title: "Live Set" },
+    ],
   },
   {
     id: 402,
@@ -24,17 +33,11 @@ const djsData = [
     plays: 75,
     followers: 65,
     avgRating: 4.2,
-  },
-  {
-    id: 403,
-    name: "DJ Nova",
-    email: "nova@example.com",
-    status: "Active",
-    avatar: "https://i.pravatar.cc/40?img=17",
-    uploadedTracks: 4,
-    plays: 30,
-    followers: 10,
-    avgRating: 3.8,
+    bio: "Smooth mixes and nighttime energy.",
+    classes: [
+      { date: new Date(2025, 6, 19), title: "Midnight Groove" },
+      { date: new Date(2025, 6, 21), title: "Evening Beats" },
+    ],
   },
 ];
 
@@ -42,14 +45,28 @@ const DJsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [djs, setDJs] = useState(djsData);
   const [dropdownId, setDropdownId] = useState(null);
+  const [profileModal, setProfileModal] = useState(null);
+  const [calendarModal, setCalendarModal] = useState(null);
+  const [resetModal, setResetModal] = useState(null);
+  const [actionReason, setActionReason] = useState("");
+  const [activeAction, setActiveAction] = useState("");
+
   const dropdownRef = useRef(null);
 
-  const [tracksFilter, setTracksFilter] = useState("");
-  const [playsFilter, setPlaysFilter] = useState("");
-  const [followersFilter, setFollowersFilter] = useState("");
-  const [ratingFilter, setRatingFilter] = useState("");
-  const [badgeFilter, setBadgeFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const approveDJ = (id) => {
+    setDJs((prev) =>
+      prev.map((dj) => (dj.id === id ? { ...dj, status: "Active" } : dj))
+    );
+    setDropdownId(null);
+  };
+
+  const getDJLevel = (dj) => {
+    if (dj.plays >= 500 && dj.followers >= 200 && dj.avgRating >= 4.5)
+      return "🎧 Vibe Maker";
+    if (dj.plays >= 50 && dj.avgRating >= 4.0) return "🎵 Beat Player";
+    if (dj.uploadedTracks >= 5) return "🥁 Beat Rookie";
+    return "🕶️ Newbie";
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -63,59 +80,9 @@ const DJsPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const getDJLevel = (dj) => {
-    if (dj.plays >= 500 && dj.followers >= 200 && dj.avgRating >= 4.5)
-      return "🎧 Vibe Maker";
-    if (dj.plays >= 50 && dj.avgRating >= 4.0) return "🎵 Beat Player";
-    if (dj.uploadedTracks >= 5) return "🥁 Beat Rookie";
-    return "🕶️ Newbie";
-  };
-
-  const approveDJ = (id) => {
-    setDJs((prev) =>
-      prev.map((dj) => (dj.id === id ? { ...dj, status: "Active" } : dj))
-    );
-  };
-
-  const filteredDjs = djs.filter((dj) => {
-    const level = getDJLevel(dj);
-
-    const tracksMatch =
-      !tracksFilter ||
-      (tracksFilter === "0-10" && dj.uploadedTracks <= 10) ||
-      (tracksFilter === "10-20" &&
-        dj.uploadedTracks > 10 &&
-        dj.uploadedTracks <= 20) ||
-      (tracksFilter === "20-50" &&
-        dj.uploadedTracks > 20 &&
-        dj.uploadedTracks <= 50) ||
-      (tracksFilter === "50-100" &&
-        dj.uploadedTracks > 50 &&
-        dj.uploadedTracks <= 100) ||
-      (tracksFilter === "100-500" &&
-        dj.uploadedTracks > 100 &&
-        dj.uploadedTracks <= 500) ||
-      (tracksFilter === "500+" && dj.uploadedTracks > 500);
-
-    const playsMatch = !playsFilter || dj.plays >= parseInt(playsFilter);
-    const followersMatch =
-      !followersFilter || dj.followers >= parseInt(followersFilter);
-    const ratingMatch =
-      !ratingFilter || dj.avgRating >= parseFloat(ratingFilter);
-    const badgeMatch = !badgeFilter || level === badgeFilter;
-    const statusMatch = !statusFilter || dj.status === statusFilter;
-    const nameMatch = dj.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-    return (
-      nameMatch &&
-      tracksMatch &&
-      playsMatch &&
-      followersMatch &&
-      ratingMatch &&
-      badgeMatch &&
-      statusMatch
-    );
-  });
+  const filteredDjs = djs.filter((dj) =>
+    dj.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="organizers-container">
@@ -132,74 +99,6 @@ const DJsPage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
-
-        <div className="filters-group">
-          <select
-            value={tracksFilter}
-            onChange={(e) => setTracksFilter(e.target.value)}
-          >
-            <option value="">All Tracks</option>
-            <option value="0-10">0–10</option>
-            <option value="10-20">10–20</option>
-            <option value="20-50">20–50</option>
-            <option value="50-100">50–100</option>
-            <option value="100-500">100–500</option>
-            <option value="500+">500+</option>
-          </select>
-
-          <select
-            value={playsFilter}
-            onChange={(e) => setPlaysFilter(e.target.value)}
-          >
-            <option value="">Min Plays</option>
-            <option value="50">50+</option>
-            <option value="100">100+</option>
-            <option value="500">500+</option>
-            <option value="1000">1000+</option>
-          </select>
-
-          <select
-            value={followersFilter}
-            onChange={(e) => setFollowersFilter(e.target.value)}
-          >
-            <option value="">Min Followers</option>
-            <option value="50">50+</option>
-            <option value="100">100+</option>
-            <option value="200">200+</option>
-            <option value="500">500+</option>
-          </select>
-
-          <select
-            value={ratingFilter}
-            onChange={(e) => setRatingFilter(e.target.value)}
-          >
-            <option value="">Min Rating</option>
-            <option value="5">5</option>
-            <option value="4.5">4.5+</option>
-            <option value="4">4+</option>
-            <option value="3.5">3.5+</option>
-          </select>
-
-          <select
-            value={badgeFilter}
-            onChange={(e) => setBadgeFilter(e.target.value)}
-          >
-            <option value="">All Badges</option>
-            <option value="🕶️ Newbie">Newbie</option>
-            <option value="🥁 Beat Rookie">Beat Rookie</option>
-            <option value="🎵 Beat Player">Beat Player</option>
-            <option value="🎧 Vibe Maker">Vibe Maker</option>
-          </select>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Active">Active</option>
-          </select>
         </div>
       </div>
 
@@ -227,7 +126,14 @@ const DJsPage = () => {
               return (
                 <tr key={dj.id}>
                   <td>{dj.id}</td>
-                  <td className="user-info">
+                  <td
+                    className="user-info clickable"
+                    onClick={() => {
+                      setProfileModal(dj);
+                      setActionReason("");
+                      setActiveAction("");
+                    }}
+                  >
                     <img src={dj.avatar} alt="avatar" /> {dj.name}
                   </td>
                   <td>{dj.email}</td>
@@ -255,10 +161,19 @@ const DJsPage = () => {
                               isLastThree ? "upwards" : ""
                             }`}
                           >
-                            {dj.status === "Pending" && (
+                            {dj.status === "Pending" ? (
                               <div onClick={() => approveDJ(dj.id)}>
                                 ✅ Approve
                               </div>
+                            ) : (
+                              <>
+                                <div onClick={() => setCalendarModal(dj)}>
+                                  📅 Calendar
+                                </div>
+                                <div onClick={() => setResetModal(dj)}>
+                                  🔐 Reset Password
+                                </div>
+                              </>
                             )}
                           </div>
                           <div className="dropdown-overlay"></div>
@@ -272,6 +187,100 @@ const DJsPage = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Profile Modal */}
+      {profileModal && (
+        <div className="modal-overlay" onClick={() => setProfileModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{profileModal.name}</h2>
+              <X
+                onClick={() => setProfileModal(null)}
+                className="modal-close"
+              />
+            </div>
+            <img
+              src={profileModal.avatar}
+              alt="DJ avatar"
+              className="modal-avatar"
+            />
+            <p>
+              <strong>Email:</strong> {profileModal.email}
+            </p>
+            <p>
+              <strong>Status:</strong> {profileModal.status}
+            </p>
+            <p>
+              <strong>Tracks:</strong> {profileModal.uploadedTracks}
+            </p>
+            <p>
+              <strong>Plays:</strong> {profileModal.plays}
+            </p>
+            <p>
+              <strong>Followers:</strong> {profileModal.followers}
+            </p>
+            <p>
+              <strong>Rating:</strong> {profileModal.avgRating}
+            </p>
+            <p>
+              <strong>Level:</strong> {getDJLevel(profileModal)}
+            </p>
+            <p>
+              <strong>Bio:</strong> {profileModal.bio}
+            </p>
+
+            <div className="action-buttons">
+              {["Delete", "Flag", "Suspend"].map((action) => (
+                <button
+                  key={action}
+                  onClick={() => setActiveAction(action)}
+                  className={`action-btn ${
+                    activeAction === action ? "active" : ""
+                  }`}
+                >
+                  {action}
+                </button>
+              ))}
+            </div>
+            {activeAction && (
+              <div className="reason-box">
+                <label>
+                  Reason for {activeAction}:
+                  <textarea
+                    value={actionReason}
+                    onChange={(e) => setActionReason(e.target.value)}
+                    placeholder={`Write reason to ${activeAction.toLowerCase()}...`}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {calendarModal && (
+        <UserCalendar
+          user={calendarModal}
+          onClose={() => setCalendarModal(null)}
+        />
+      )}
+
+      {/* Reset Password Modal */}
+      {resetModal && (
+        <div className="modal-overlay" onClick={() => setResetModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Reset Password for {resetModal.name}</h2>
+              <X onClick={() => setResetModal(null)} className="modal-close" />
+            </div>
+            <label>Enter New Password:</label>
+            <input type="password" placeholder="New password" />
+            <label>Confirm Password:</label>
+            <input type="password" placeholder="Confirm password" />
+            <button className="primary-btn">Reset Password</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
