@@ -4,7 +4,7 @@ import "../styles/DJsPage.css";
 import { X } from "lucide-react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import UserCalendar from "../components/DjCalendar"; // adjust path
+import UserCalendar from "../components/DjCalendar";
 
 const djsData = [
   {
