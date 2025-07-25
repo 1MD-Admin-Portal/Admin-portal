@@ -7,6 +7,10 @@ import CalendarProfessorModal from "../components/CalendarProfessorModal";
 import PreferenceProfessorModal from "../components/PreferenceProfessorModal";
 import ResetProfessorPasswordModal from "../components/ResetProfessorPasswordModal";
 import ConfirmationModal from "../components/ConfirmationModal";
+import {
+  approveInstructorApplication,
+  rejectInstructorApplication,
+} from "../services/professor.service";
 
 const professorsData = [
   {
@@ -105,6 +109,8 @@ const ProfessorsPage = () => {
   const [referralFilter, setReferralFilter] = useState("");
   const [followersFilter, setFollowersFilter] = useState("");
   const [badgeFilter, setBadgeFilter] = useState("");
+  const [rejectingProfessor, setRejectingProfessor] = useState(null);
+  const [rejectComment, setRejectComment] = useState("");
 
   const handleOptionClick = (type, prof) => {
     setSelectedProfessor(prof);
@@ -123,17 +129,45 @@ const ProfessorsPage = () => {
   };
 
   const handleApprove = (prof) => {
-    setConfirmApprove(prof);
+    setDropdownId(null); // close dropdown first
+    setTimeout(() => setConfirmApprove(prof), 0); // delay to prevent dropdown closing interference
+  };
+  const handleReject = (prof) => {
+    console.log("Reject clicked for:", prof.name);
     setDropdownId(null);
+    setTimeout(() => setRejectingProfessor(prof), 0);
   };
 
-  const confirmApproval = () => {
-    setProfessors((prev) =>
-      prev.map((p) =>
-        p.id === confirmApprove.id ? { ...p, status: "Active" } : p
-      )
-    );
-    setConfirmApprove(null);
+  const confirmApproval = async () => {
+    console.log("confirmApprove state:", confirmApprove);
+    if (!confirmApprove || !confirmApprove.id) {
+      console.log("No professor selected for approval");
+      return;
+    }
+
+    try {
+      const res = await approveInstructorApplication(confirmApprove.id);
+      console.log("Approved successfully:", res.data);
+      setConfirmApprove(null);
+      fetchProfessors();
+    } catch (error) {
+      console.error("Error approving:", error);
+    }
+  };
+
+  const handleRejectSubmit = async () => {
+    try {
+      await rejectInstructorApplication(rejectingProfessor.id, rejectComment);
+      setProfessors((prev) =>
+        prev.filter((p) => p.id !== rejectingProfessor.id)
+      );
+    } catch (err) {
+      console.error("Rejection failed", err);
+      alert("Failed to reject instructor.");
+    } finally {
+      setRejectingProfessor(null);
+      setRejectComment("");
+    }
   };
 
   const filtered = professors.filter((prof) => {
@@ -289,9 +323,14 @@ const ProfessorsPage = () => {
                             }`}
                           >
                             {prof.status === "Pending" ? (
-                              <div onClick={() => handleApprove(prof)}>
-                                ✅ Approve
-                              </div>
+                              <>
+                                <div onClick={() => handleApprove(prof)}>
+                                  ✅ Approve
+                                </div>
+                                <div onClick={() => handleReject(prof)}>
+                                  ❌ Reject
+                                </div>
+                              </>
                             ) : (
                               <>
                                 <div
@@ -366,6 +405,31 @@ const ProfessorsPage = () => {
           message={`Are you sure you want to approve ${confirmApprove.name}?`}
           onConfirm={confirmApproval}
           onCancel={() => setConfirmApprove(null)}
+        />
+      )}
+
+      {rejectingProfessor && (
+        <ConfirmationModal
+          message={
+            <>
+              <p>
+                Why are you rejecting <strong>{rejectingProfessor.name}</strong>
+                ?
+              </p>
+              <textarea
+                placeholder="Enter reason..."
+                value={rejectComment}
+                onChange={(e) => setRejectComment(e.target.value)}
+                style={{ width: "100%", height: "80px", marginTop: "10px" }}
+              />
+            </>
+          }
+          onConfirm={handleRejectSubmit}
+          onCancel={() => {
+            setRejectingProfessor(null);
+            setRejectComment("");
+          }}
+          confirmLabel="Reject"
         />
       )}
     </div>
