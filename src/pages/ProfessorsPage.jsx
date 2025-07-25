@@ -147,23 +147,35 @@ const ProfessorsPage = () => {
 
     try {
       const res = await approveInstructorApplication(confirmApprove.id);
-      console.log("Approved successfully:", res.data);
+      console.log("Approved successfully:", res);
+      setProfessors((prev) =>
+        prev.map((p) =>
+          p.id === confirmApprove.id ? { ...p, status: "Active" } : p
+        )
+      );
       setConfirmApprove(null);
-      fetchProfessors();
+      console.log(`🔄 Updated status to Active for ID ${confirmApprove.id}`);
     } catch (error) {
-      console.error("Error approving:", error);
+      console.error("❌ Error approving instructor:", error);
+      alert("Failed to approve instructor. Please try again.");
     }
   };
 
   const handleRejectSubmit = async () => {
     try {
+      console.log("🚫 Sending reject request with:", {
+        id: rejectingProfessor.id,
+        comment: rejectComment,
+      });
       await rejectInstructorApplication(rejectingProfessor.id, rejectComment);
+
+      console.log("✅ Rejection successful");
       setProfessors((prev) =>
         prev.filter((p) => p.id !== rejectingProfessor.id)
       );
     } catch (err) {
-      console.error("Rejection failed", err);
-      alert("Failed to reject instructor.");
+      console.error("❌ Rejection failed:", err);
+      alert("Failed to reject instructor. Please try again.");
     } finally {
       setRejectingProfessor(null);
       setRejectComment("");

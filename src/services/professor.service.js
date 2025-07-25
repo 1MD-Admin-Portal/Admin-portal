@@ -5,10 +5,10 @@ import { CONSTANTS } from "../utils/constants";
 const BASE_URL = CONSTANTS.URL.BASE_URL;
 
 export const approveInstructorApplication = async (applicationId) => {
-  const token = localStorage.getItem("token"); // <-- or from your auth store
+  const token = localStorage.getItem("token");
 
-  const res = await axios.post(
-    `${BASE_URL}${CONSTANTS.URL.APPROVE_INSTRUCTOR}`, // e.g. /api/v1/user/approveInstructorApplication
+  const res = await axios.put(
+    `${BASE_URL}${CONSTANTS.URL.APPROVE_INSTRUCTOR}`,
     { applicationId },
     {
       headers: {
@@ -26,8 +26,8 @@ export const rejectInstructorApplication = async (
 ) => {
   const token = localStorage.getItem("token");
 
-  const res = await axios.post(
-    `${BASE_URL}${CONSTANTS.URL.REJECT_INSTRUCTOR}`, // e.g. /api/v1/user/rejectInstructorApplication
+  const res = await axios.put(
+    `${BASE_URL}${CONSTANTS.URL.REJECT_INSTRUCTOR}`,
     { applicationId, comment },
     {
       headers: {
