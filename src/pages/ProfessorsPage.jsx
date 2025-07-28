@@ -462,6 +462,13 @@ const ProfessorsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
+  const [activeTab, setActiveTab] = useState("applications");
+
+  const allProfessors = [
+    { id: 1, name: "Prof. John Doe", email: "john@example.com" },
+    { id: 2, name: "Prof. Jane Smith", email: "jane@example.com" },
+    { id: 3, name: "Prof. Alice Brown", email: "alice@example.com" },
+  ];
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -526,69 +533,113 @@ const ProfessorsPage = () => {
 
   return (
     <div className="professors-container">
-      <h1 className="professors-title">Professor Applications</h1>
+      <h1 className="professors-title">Professors</h1>
 
-      <table className="professors-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Email</th>
-            <th>Dance Styles</th>
-            <th>Availability</th>
-            <th>Goal</th>
-            <th>Experience</th>
-            <th>Document</th>
-            <th>Status</th>
-            <th>Comment</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {applications.map((app) => (
-            <tr key={app.id}>
-              <td>{app.id}</td>
-              <td>{app.email}</td>
-              <td>{formatField(app.dance_style)}</td>
-              <td>{formatField(app.availability)}</td>
-              <td>{app.goal}</td>
-              <td>{app.experience}</td>
-              <td>
-                {app.document_url ? (
-                  <a
-                    href={app.document_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="document-link"
-                  >
-                    View
-                  </a>
-                ) : (
-                  "No document"
-                )}
-              </td>
-              <td>{app.status}</td>
-              <td>{app.comment || "-"}</td>
-              <td>
-                <button
-                  className="action-button approve-btn"
-                  onClick={() => handleApprove(app.id)}
-                  disabled={app.status !== "pending"}
-                >
-                  Approve
-                </button>
-                <button
-                  className="action-button reject-btn"
-                  onClick={() => setSelectedRejectId(app.id)}
-                  disabled={app.status !== "pending"}
-                >
-                  Reject
-                </button>
-              </td>
+      {/* Tabs */}
+      <div className="tabs">
+        <button
+          className={activeTab === "applications" ? "active-tab" : ""}
+          onClick={() => setActiveTab("applications")}
+        >
+          Professor Applications
+        </button>
+        <button
+          className={activeTab === "list" ? "active-tab" : ""}
+          onClick={() => setActiveTab("list")}
+        >
+          All Professors List
+        </button>
+      </div>
+
+      {/* Tab 1: Applications */}
+      {activeTab === "applications" && (
+        <table className="professors-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Dance Styles</th>
+              <th>Availability</th>
+              <th>Goal</th>
+              <th>Experience</th>
+              <th>Document</th>
+              <th>Status</th>
+              <th>Comment</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {applications.map((app) => (
+              <tr key={app.id}>
+                <td>{app.id}</td>
+                <td>{app.email}</td>
+                <td>{formatField(app.dance_style)}</td>
+                <td>{formatField(app.availability)}</td>
+                <td>{app.goal}</td>
+                <td>{app.experience}</td>
+                <td>
+                  {app.document_url ? (
+                    <a
+                      href={app.document_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="document-link"
+                    >
+                      View
+                    </a>
+                  ) : (
+                    "No document"
+                  )}
+                </td>
+                <td>{app.status}</td>
+                <td>{app.comment || "-"}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button
+                      className="action-button approve-btn"
+                      onClick={() => handleApprove(app.id)}
+                      disabled={app.status !== "pending"}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="action-button reject-btn"
+                      onClick={() => setSelectedRejectId(app.id)}
+                      disabled={app.status !== "pending"}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
+      {/* Tab 2: All Professors List */}
+      {activeTab === "list" && (
+        <table className="professors-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allProfessors.map((prof) => (
+              <tr key={prof.id}>
+                <td>{prof.id}</td>
+                <td>{prof.name}</td>
+                <td>{prof.email}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* Reject Modal */}
       {selectedRejectId && (
         <div className="reject-modal">
           <h2>Reject Application</h2>
@@ -598,7 +649,7 @@ const ProfessorsPage = () => {
             value={rejectComment}
             onChange={(e) => setRejectComment(e.target.value)}
           />
-          <div>
+          <div className="modal-button-group">
             <button
               onClick={handleReject}
               className="modal-btn submit-reject-btn"

@@ -210,6 +210,7 @@
 }
 
 .action-button {
+  display: flex;
   margin-right: 0.5rem;
   padding: 0.4rem 0.8rem;
   border: none;
@@ -217,6 +218,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  gap: 10px;
 }
 
 .approve-btn {
@@ -278,4 +280,34 @@
 .cancel-btn {
   background-color: #6b7280;
   color: #fff;
+}
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tabs button {
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tabs .active-tab {
+  background-color: #2563eb;
+  color: white;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-button-group {
+  margin-top: 1rem;
+  display: flex;
+  gap: 10px;
 }

@@ -256,7 +256,7 @@ const VideoPrograms = () => {
     <div className="video-programs-page">
       {/* header and filters */}
       <div className="header">
-        <h1>Video Programs</h1>
+        <h1>Video Programs Management</h1>
         <button
           className="create-video-btn"
           onClick={() => setIsModalOpen(true)}

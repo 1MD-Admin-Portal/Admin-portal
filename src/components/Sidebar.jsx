@@ -24,6 +24,8 @@ import {
   Gavel,
   TvMinimalPlay,
   Landmark,
+  Flashlight,
+  AlignEndHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import "../styles/Sidebar.css";
@@ -183,7 +185,7 @@ const Sidebar = () => {
                     </li>
                     <li>
                       <Link to="/payouts/payoutslabs">
-                        <Gavel size={18} />
+                        <AlignEndHorizontal size={18} />
                         Payout Slabs
                       </Link>
                     </li>
@@ -213,6 +215,12 @@ const Sidebar = () => {
                       <Link to="/support/ticket-raise">
                         <NotepadText size={18} />
                         Ticket Raise
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/support/redemption-spotlight">
+                        <Flashlight size={18} />
+                        Redemption & Spotlight
                       </Link>
                     </li>
                   </ul>

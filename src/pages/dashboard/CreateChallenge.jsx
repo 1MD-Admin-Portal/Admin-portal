@@ -297,7 +297,7 @@ const CreateChallenge = () => {
   return (
     <div className="create-challenge-page">
       <div className="create-challenge-header">
-        <h1>Challenges</h1>
+        <h1>Challenge Management</h1>
         <button
           className="create-challenge-btn"
           onClick={() => setIsModalOpen(true)}
