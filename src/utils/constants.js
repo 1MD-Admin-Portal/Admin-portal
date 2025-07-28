@@ -13,6 +13,7 @@ export const CONSTANTS = {
     CHALLENGE_CREATE: "/api/v1/admin/challenge",
     APPROVE_INSTRUCTOR: "/api/v1/user/approveInstructorApplication",
     REJECT_INSTRUCTOR: "/api/v1/user/rejectInstructorApplication",
+    INSTRUCTOR_APPLICATION_LIST: "/api/v1/user/instructorApplicationList",
   },
   // ✅ change this to your backend base URL
 };

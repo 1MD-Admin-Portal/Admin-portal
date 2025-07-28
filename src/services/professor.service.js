@@ -38,3 +38,18 @@ export const rejectInstructorApplication = async (
 
   return res.data;
 };
+
+export const getInstructorApplications = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get(
+    `${BASE_URL}${CONSTANTS.URL.INSTRUCTOR_APPLICATION_LIST}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data.application; // returns just the applications array
+};

@@ -109,12 +109,12 @@ const Sidebar = () => {
 
               <li>
                 <Link to="/CommunityContent">
-                  <Film size={18} /> Content Moderation
+                  <Film size={18} /> User Generated Content
                 </Link>
               </li>
               <li>
                 <Link to="/VideoPrograms">
-                  <Book size={18} /> Program Management
+                  <Book size={18} /> Video Program Management
                 </Link>
               </li>
               <li>
@@ -179,6 +179,12 @@ const Sidebar = () => {
                       <Link to="/payouts/disputes">
                         <Gavel size={18} />
                         Disputes
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/payouts/payoutslabs">
+                        <Gavel size={18} />
+                        Payout Slabs
                       </Link>
                     </li>
                   </ul>
