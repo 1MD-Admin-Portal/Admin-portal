@@ -69,7 +69,7 @@ function App() {
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/users/Dancers" element={<DancersPage />} />
-          <Route path="/users/Professors" element={<ProfessorsPage />} />
+          <Route path="/Applicants/Professors" element={<ProfessorsPage />} />
           <Route path="/users/Organizers" element={<OrganizersList />} />
           <Route path="/users/DJs" element={<DJsList />} />
           <Route path="/payouts/payouts" element={<PayoutsPage />} />

@@ -36,6 +36,11 @@ const Sidebar = () => {
   const [earningDropdownOpen, setEarningDropdownOpen] = useState(false);
   const [operationDropdownOpen, setOperationDropdownOpen] = useState(false);
   const [applicantDropdownOpen, setApplicantDropdownOpen] = useState(false);
+  const [contentDropdownOpen, setContentDropdownOpen] = useState(false);
+
+  const toggleContentDropdown = () => {
+    setContentDropdownOpen(!contentDropdownOpen);
+  };
 
   const toggleOperationDropdown = () => {
     setOperationDropdownOpen(!operationDropdownOpen);
@@ -149,7 +154,7 @@ const Sidebar = () => {
                 )}
               </li>
 
-              <li>
+              {/* <li>
                 <Link to="/CommunityContent">
                   <Film size={18} /> User Generated Content
                 </Link>
@@ -158,7 +163,39 @@ const Sidebar = () => {
                 <Link to="/VideoPrograms">
                   <Book size={18} /> Video Program Management
                 </Link>
+              </li> */}
+
+              <li onClick={toggleContentDropdown} className="has-submenu">
+                <div className="menu-item-with-arrow">
+                  <Video size={18} />
+                  <span> Content Moderation</span>
+                  <span
+                    className={`arrow ${contentDropdownOpen ? "open" : ""}`}
+                  >
+                    {contentDropdownOpen ? "▲" : "▼"}
+                  </span>
+                </div>
+                {contentDropdownOpen && (
+                  <ul className="submenu">
+                    <li>
+                      <Link to="/CommunityContent">
+                        <Film size={18} /> User Generated Content
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/VideoPrograms">
+                        <Book size={18} /> Video Program Management
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/playlists">
+                        <TvMinimalPlay size={18} /> Playlists
+                      </Link>
+                    </li>
+                  </ul>
+                )}
               </li>
+
               <li>
                 <Link to="/CreateChallenge">
                   <Swords size={18} /> Challenges
@@ -186,11 +223,11 @@ const Sidebar = () => {
                 </Link>
               </li>
 
-              <li>
+              {/* <li>
                 <Link to="/playlists">
                   <TvMinimalPlay size={18} /> Playlists
                 </Link>
-              </li>
+              </li> */}
 
               {/* Earnings & Payouts Dropdown */}
               <li onClick={toggleEarningDropdown} className="has-submenu">

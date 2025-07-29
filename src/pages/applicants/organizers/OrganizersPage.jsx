@@ -4,7 +4,7 @@ import {
   getOrganizerApplications,
   rejectOrganizerApplication,
 } from "../../../services/organizer.service";
-import "../../../styles/ProfessorsPage.css"; // reuse the same CSS
+import "../professors/ProfessorsPage.css"; // reuse the same CSS
 import { CheckCircle, XCircle } from "lucide-react";
 
 const OrganizersPage = () => {

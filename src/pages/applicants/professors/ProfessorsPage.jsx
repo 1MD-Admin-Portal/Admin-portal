@@ -3,7 +3,7 @@ import {
   approveInstructorApplication,
   getInstructorApplications,
   rejectInstructorApplication,
-} from "../services/professor.service";
+} from "../../../services/professor.service";
 import "./ProfessorsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
 
