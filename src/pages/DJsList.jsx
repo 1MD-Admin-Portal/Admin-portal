@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
-import "../styles/DJsPage.css";
+import "../styles/DJsList.css";
 import { X } from "lucide-react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -41,7 +41,7 @@ const djsData = [
   },
 ];
 
-const DJsPage = () => {
+const DJsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [djs, setDJs] = useState(djsData);
   const [dropdownId, setDropdownId] = useState(null);
@@ -285,4 +285,4 @@ const DJsPage = () => {
   );
 };
 
-export default DJsPage;
+export default DJsList;

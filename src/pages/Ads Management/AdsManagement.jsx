@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
-import '../styles/AdsManagement.css';
-import CreateAdModal from '../components/CreateAdModal';
+import React, { useState } from "react";
+import "./AdsManagement.css";
+import CreateAdModal from "../../components/CreateAdModal";
 
 const adsData = [
-  { id: '01', title: 'Summer Bash 2025', type: 'Home Banner', status: 'Active' },
-  { id: '02', title: 'New Course Promo', type: 'Feed Ad', status: 'Draft' },
-  { id: '03', title: 'Footer Sponsor', type: 'Footer Ad', status: 'Expired' },
+  {
+    id: "01",
+    title: "Summer Bash 2025",
+    type: "Home Banner",
+    status: "Active",
+  },
+  { id: "02", title: "New Course Promo", type: "Feed Ad", status: "Draft" },
+  { id: "03", title: "Footer Sponsor", type: "Footer Ad", status: "Expired" },
 ];
 
 const AdsManagement = () => {
@@ -15,7 +20,9 @@ const AdsManagement = () => {
     <div className="ads-management-container">
       <h1 className="ads-management-header">Ads Management</h1>
 
-      <button className="create-ad-btn" onClick={() => setShowModal(true)}>+ Create New Ad</button>
+      <button className="create-ad-btn" onClick={() => setShowModal(true)}>
+        + Create New Ad
+      </button>
 
       <table className="ads-table">
         <thead>
@@ -34,13 +41,19 @@ const AdsManagement = () => {
               <td>{ad.id}</td>
               <td>{ad.title}</td>
               <td>{ad.type}</td>
-              <td><span className="ads-view-link">View</span></td>
               <td>
-                <span className={
-                  ad.status === 'Active' ? 'ads-status-active' :
-                  ad.status === 'Draft' ? 'ads-status-draft' :
-                  'ads-status-expired'
-                }>
+                <span className="ads-view-link">View</span>
+              </td>
+              <td>
+                <span
+                  className={
+                    ad.status === "Active"
+                      ? "ads-status-active"
+                      : ad.status === "Draft"
+                      ? "ads-status-draft"
+                      : "ads-status-expired"
+                  }
+                >
                   {ad.status}
                 </span>
               </td>
@@ -51,9 +64,9 @@ const AdsManagement = () => {
       </table>
 
       <div className="pagination">
-        <button>{'<'}</button>
+        <button>{"<"}</button>
         <button className="active">1</button>
-        <button>{'>'}</button>
+        <button>{">"}</button>
       </div>
 
       {showModal && <CreateAdModal onClose={() => setShowModal(false)} />}

@@ -1,0 +1,78 @@
+.djs-container {
+  padding: 20px;
+  margin-left: 271px;
+}
+
+.djs-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.djs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.djs-table th,
+.djs-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  color: orange;
+}
+
+.status.approved {
+  color: green;
+}
+
+.status.rejected {
+  color: red;
+}
+
+.action-icon {
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.action-icon.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.bulk-actions-bar {
+  margin-bottom: 15px;
+}
+
+.reject-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-card {
+  background-color: white;
+  margin: 100px auto;
+  padding: 20px;
+  width: 400px;
+  border-radius: 6px;
+}
+
+.modal-btn {
+  padding: 8px 12px;
+  margin: 5px;
+}
+
+.cancel-btn {
+  background-color: lightgray;
+}

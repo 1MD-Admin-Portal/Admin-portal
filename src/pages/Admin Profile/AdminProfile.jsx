@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/AdminProfile.css";
+import "./AdminProfile.css";
 
 const AdminProfile = () => {
   return (
@@ -8,9 +8,15 @@ const AdminProfile = () => {
       <div className="profile-card-container">
         <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Admin" />
         <div className="info">
-          <p><strong>Name:</strong> Mark</p>
-          <p><strong>Email:</strong> admin@local.com</p>
-          <p><strong>Role:</strong> Super Admin</p>
+          <p>
+            <strong>Name:</strong> Mark
+          </p>
+          <p>
+            <strong>Email:</strong> admin@local.com
+          </p>
+          <p>
+            <strong>Role:</strong> Super Admin
+          </p>
         </div>
       </div>
     </div>

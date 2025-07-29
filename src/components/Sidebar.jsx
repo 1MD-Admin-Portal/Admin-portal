@@ -35,6 +35,7 @@ const Sidebar = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [earningDropdownOpen, setEarningDropdownOpen] = useState(false);
   const [operationDropdownOpen, setOperationDropdownOpen] = useState(false);
+  const [applicantDropdownOpen, setApplicantDropdownOpen] = useState(false);
 
   const toggleOperationDropdown = () => {
     setOperationDropdownOpen(!operationDropdownOpen);
@@ -42,6 +43,10 @@ const Sidebar = () => {
 
   const toggleUserDropdown = () => {
     setUserDropdownOpen(!userDropdownOpen);
+  };
+
+  const toggleApplicantDropdown = () => {
+    setApplicantDropdownOpen(!applicantDropdownOpen);
   };
 
   const toggleEarningDropdown = () => {
@@ -101,6 +106,41 @@ const Sidebar = () => {
                     </li>
                     <li>
                       <Link to="/users/Organizers">
+                        <NotepadText size={18} />
+                        Organizers
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Applicants Dropdown */}
+              <li onClick={toggleApplicantDropdown} className="has-submenu">
+                <div className="menu-item-with-arrow">
+                  <Users size={18} />
+                  <span> Applicants</span>
+                  <span
+                    className={`arrow ${applicantDropdownOpen ? "open" : ""}`}
+                  >
+                    {applicantDropdownOpen ? "▲" : "▼"}
+                  </span>
+                </div>
+                {applicantDropdownOpen && (
+                  <ul className="submenu">
+                    <li>
+                      <Link to="/Applicants/Professors">
+                        <GraduationCap size={18} />
+                        Professors
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/Applicants/DJs">
+                        <Disc3 size={18} />
+                        D.Js
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/Applicants/Organizers">
                         <NotepadText size={18} />
                         Organizers
                       </Link>

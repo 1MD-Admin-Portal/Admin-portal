@@ -14,28 +14,30 @@ import Challenges from "./pages/Challenges";
 import ClassModeration from "./pages/ClassModeration";
 import EventsPage from "./pages/EventsPage";
 import MarketplacePage from "./pages/MarketplacePage";
-import AdsManagement from "./pages/AdsManagement";
+import AdsManagement from "./pages/Ads Management/AdsManagement";
 import NotificationPage from "./pages/NotificationPage";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import DancersPage from "./pages/DancersPage";
-import ProfessorsPage from "./pages/ProfessorsPage";
+import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
 import PayoutsPage from "./pages/PayoutsPage";
-import AccessLogs from "./pages/AccessLogs";
+import AccessLogs from "./pages/Access Logs/AccessLogs";
 import VideoPrograms from "./pages/dashboard/VideoPrograms";
 import CreateChallenge from "./pages/dashboard/CreateChallenge";
 import AppBrandingPage from "./components/AppBrandingPage";
 import SubscriptionPlansPage from "./components/SubscriptionPlansPage";
 import LegalContentPage from "./components/LegalContentPage";
 import AppVersionInfo from "./components/AppVersionInfo";
-import AdminProfile from "./pages/AdminProfile";
+import AdminProfile from "./pages/Admin Profile/AdminProfile";
 import ReportManagement from "./pages/ReportManagement";
-import OrganizersPage from "./pages/OrganizersPage";
-import DJsPage from "./pages/DJsPage";
+import OrganizersList from "./pages/OrganizersList.jsx";
+import DJsList from "./pages/DJsList.jsx";
 import DisputesPage from "./pages/earning&payout/Disputes/DisputesPage";
 import EarningsPage from "./pages/earning&payout/earning/EarningsPage";
 import ClassDisputesPage from "./pages/operation&support/classrelateddispute/ClassDisputesPage";
 import TicketRaisePage from "./pages/operation&support/ticketraise/TicketRaisePage";
+import OrganizersPage from "./pages/applicants/organizers/OrganizersPage.jsx";
+import DJsPage from "./pages/applicants/djs/DJsPage.jsx";
 
 function App() {
   return (
@@ -68,8 +70,8 @@ function App() {
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/users/Dancers" element={<DancersPage />} />
           <Route path="/users/Professors" element={<ProfessorsPage />} />
-          <Route path="/users/Organizers" element={<OrganizersPage />} />
-          <Route path="/users/DJs" element={<DJsPage />} />
+          <Route path="/users/Organizers" element={<OrganizersList />} />
+          <Route path="/users/DJs" element={<DJsList />} />
           <Route path="/payouts/payouts" element={<PayoutsPage />} />
           <Route path="/payouts/disputes" element={<DisputesPage />} />
           <Route path="/payouts/earnings" element={<EarningsPage />} />
@@ -93,6 +95,8 @@ function App() {
           <Route path="/settings/app-version" element={<AppVersionInfo />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
           <Route path="/ReportManagement" element={<ReportManagement />} />
+          <Route path="/Applicants/Organizers" element={<OrganizersPage />} />
+          <Route path="/Applicants/DJs" element={<DJsPage />} />
         </Route>
       </Routes>
     </AuthProvider>

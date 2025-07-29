@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/OrganizersPage.css";
+import "../styles/OrganizersList.css";
 import { FaSearch } from "react-icons/fa";
 import { X } from "lucide-react";
 
@@ -46,7 +46,7 @@ const getBadge = (status, events, attendees) => {
   return "✅ Verified";
 };
 
-const OrganizersPage = () => {
+const OrganizersList = () => {
   const [organizers, setOrganizers] = useState(organizersData);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
@@ -272,4 +272,4 @@ const OrganizersPage = () => {
   );
 };
 
-export default OrganizersPage;
+export default OrganizersList;
