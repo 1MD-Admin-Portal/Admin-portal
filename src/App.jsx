@@ -18,7 +18,6 @@ import AdsManagement from "./pages/Ads Management/AdsManagement";
 import NotificationPage from "./pages/NotificationPage";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
-import DancersPage from "./pages/DancersPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
 import PayoutsPage from "./pages/PayoutsPage";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
@@ -30,14 +29,16 @@ import LegalContentPage from "./components/LegalContentPage";
 import AppVersionInfo from "./components/AppVersionInfo";
 import AdminProfile from "./pages/Admin Profile/AdminProfile";
 import ReportManagement from "./pages/ReportManagement";
-import OrganizersList from "./pages/OrganizersList.jsx";
-import DJsList from "./pages/DJsList.jsx";
 import DisputesPage from "./pages/earning&payout/Disputes/DisputesPage";
 import EarningsPage from "./pages/earning&payout/earning/EarningsPage";
 import ClassDisputesPage from "./pages/operation&support/classrelateddispute/ClassDisputesPage";
 import TicketRaisePage from "./pages/operation&support/ticketraise/TicketRaisePage";
 import OrganizersPage from "./pages/applicants/organizers/OrganizersPage.jsx";
 import DJsPage from "./pages/applicants/djs/DJsPage.jsx";
+import ProfessorsListPage from "./pages/users/Professors/ProfessorsListPage.jsx";
+import OrganizerListPage from "./pages/users/organizers/OrganizerListPage.jsx";
+import DJListPage from "./pages/users/djs/DJListPage.jsx";
+import DancersList from "./pages/users/dancers/DancersList.jsx";
 
 function App() {
   return (
@@ -68,10 +69,7 @@ function App() {
           <Route path="/NotificationPage" element={<NotificationPage />} />
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
-          <Route path="/users/Dancers" element={<DancersPage />} />
           <Route path="/Applicants/Professors" element={<ProfessorsPage />} />
-          <Route path="/users/Organizers" element={<OrganizersList />} />
-          <Route path="/users/DJs" element={<DJsList />} />
           <Route path="/payouts/payouts" element={<PayoutsPage />} />
           <Route path="/payouts/disputes" element={<DisputesPage />} />
           <Route path="/payouts/earnings" element={<EarningsPage />} />
@@ -97,6 +95,10 @@ function App() {
           <Route path="/ReportManagement" element={<ReportManagement />} />
           <Route path="/Applicants/Organizers" element={<OrganizersPage />} />
           <Route path="/Applicants/DJs" element={<DJsPage />} />
+          <Route path="/users/Professors" element={<ProfessorsListPage />} />
+          <Route path="/users/Organizers" element={<OrganizerListPage />} />
+          <Route path="/users/DJs" element={<DJListPage />} />
+          <Route path="/users/Dancers" element={<DancersList />} />
         </Route>
       </Routes>
     </AuthProvider>

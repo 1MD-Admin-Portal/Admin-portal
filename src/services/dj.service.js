@@ -49,3 +49,24 @@ export const rejectDJApplication = async (applicationId, comment = "") => {
 
   return res.data;
 };
+export const fetchDJs = async (page = 1, limit = 10) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const url = `${BASE_URL}${CONSTANTS.URL.USERS_DJ.replace(
+      "page=1",
+      `page=${page}`
+    ).replace("limit=10", `limit=${limit}`)}`;
+
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching DJs:", error);
+    return { users: [], pagination: {} };
+  }
+};

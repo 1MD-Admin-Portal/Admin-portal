@@ -20,9 +20,9 @@ export const CONSTANTS = {
     APPROVE_DJ: "/api/v1/admin/approveDjApplication",
     REJECT_DJ: "/api/v1/admin/rejectDjApplication",
     DJ_APPLICATION_LIST: "/api/v1/admin/djApplicationList",
-    USERS: "/api/v1/admin/users?userType=user&page=1&limit=10",
+    USERS_USER: "/api/v1/admin/users?userType=user&page=1&limit=10",
     USERS_DJ: "/api/v1/admin/users?userType=dj&page=1&limit=10",
     USERS_PROFESSOR: "/api/v1/admin/users?userType=instructor&page=1&limit=10",
-    USERS_ORGANIZER: "/api/v1/admin/users?userType=organizer&page=1&limit=10",
+    USERS_ORGANIZER: "/api/v1/admin/users?userType=organiser&page=1&limit=10",
   },
 };

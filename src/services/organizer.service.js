@@ -53,3 +53,24 @@ export const getOrganizerApplications = async () => {
 
   return res.data.applications;
 };
+
+// ✅ Add this to fetch organizer users list with pagination
+// services/organizer.service.js
+export const fetchOrganizers = async (page = 1, limit = 10) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const url = `${BASE_URL}/api/v1/admin/users?userType=organiser&page=${page}&limit=${limit}`;
+
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching organizers:", error);
+    return { users: [], pagination: {} };
+  }
+};
