@@ -14,6 +14,7 @@ const DJsPage = () => {
   const [rejectComment, setRejectComment] = useState("");
   const [showConfirm, setShowConfirm] = useState(null);
   const [bulkRejectComment, setBulkRejectComment] = useState("");
+  const [selectedApplication, setSelectedApplication] = useState(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -72,6 +73,7 @@ const DJsPage = () => {
   };
 
   const pendingApps = applications.filter((a) => a.status === "pending");
+
   if (loading) return <div className="djs-container">Loading...</div>;
 
   return (
@@ -98,7 +100,6 @@ const DJsPage = () => {
             <th>DJ Type</th>
             <th>Experience</th>
             <th>Frequency</th>
-            <th>Goal</th>
             <th>Document</th>
             <th>Status</th>
             <th>Comment</th>
@@ -109,12 +110,18 @@ const DJsPage = () => {
           {applications.map((app) => (
             <tr key={app.id}>
               <td>{app.id}</td>
-              <td>{app.email}</td>
+              <td>
+                <button
+                  onClick={() => setSelectedApplication(app)}
+                  className="link-button"
+                >
+                  {app.email}
+                </button>
+              </td>
               <td>{formatField(app.genres)}</td>
               <td>{app.dj_type}</td>
               <td>{app.dj_experience}</td>
               <td>{formatField(app.performance_frequency)}</td>
-              <td>{app.mail_goal}</td>
               <td>
                 {app.document_url ? (
                   <a
@@ -257,6 +264,112 @@ const DJsPage = () => {
                 className="modal-btn cancel-btn"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedApplication && (
+        <div className="reject-modal">
+          <div className="modal-card">
+            <h2>Application Details</h2>
+            <table className="detail-table">
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>ID:</strong>
+                  </td>
+                  <td>{selectedApplication.id}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Email:</strong>
+                  </td>
+                  <td>{selectedApplication.email}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Experience:</strong>
+                  </td>
+                  <td>{selectedApplication.dj_experience}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Genres:</strong>
+                  </td>
+                  <td>{formatField(selectedApplication.genres)}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>DJ Type:</strong>
+                  </td>
+                  <td>{selectedApplication.dj_type}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Performance Frequency:</strong>
+                  </td>
+                  <td>
+                    {formatField(selectedApplication.performance_frequency)}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Document Type:</strong>
+                  </td>
+                  <td>{selectedApplication.document_type}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Document:</strong>
+                  </td>
+                  <td>
+                    {selectedApplication.document_url ? (
+                      <a
+                        href={selectedApplication.document_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Document
+                      </a>
+                    ) : (
+                      "No document"
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Status:</strong>
+                  </td>
+                  <td>{selectedApplication.status}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>User ID:</strong>
+                  </td>
+                  <td>{selectedApplication.user_id}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Main goal:</strong>
+                  </td>
+                  <td>{selectedApplication.main_goal}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Comment:</strong>
+                  </td>
+                  <td>{selectedApplication.comment || "-"}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="modal-button-group">
+              <button
+                className="modal-btn cancel-btn"
+                onClick={() => setSelectedApplication(null)}
+              >
+                Close
               </button>
             </div>
           </div>

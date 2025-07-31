@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   approveOrganizerApplication,
   getOrganizerApplications,
   rejectOrganizerApplication,
 } from "../../../services/organizer.service";
-import "../professors/ProfessorsPage.css"; // reuse the same CSS
+import "../professors/ProfessorsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
 
 const OrganizersPage = () => {
@@ -14,6 +14,8 @@ const OrganizersPage = () => {
   const [rejectComment, setRejectComment] = useState("");
   const [showConfirm, setShowConfirm] = useState(null);
   const [bulkRejectComment, setBulkRejectComment] = useState("");
+  const [selectedApp, setSelectedApp] = useState(null);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -28,6 +30,18 @@ const OrganizersPage = () => {
     };
     fetchApplications();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        setSelectedApp(null);
+      }
+    };
+    if (selectedApp) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [selectedApp]);
 
   const handleApprove = async (id) => {
     try {
@@ -114,7 +128,12 @@ const OrganizersPage = () => {
           {applications.map((app) => (
             <tr key={app.id}>
               <td>{app.id}</td>
-              <td>{app.email}</td>
+              <td
+                className="clickable-email"
+                onClick={() => setSelectedApp(app)}
+              >
+                {app.email}
+              </td>
               <td>{formatField(app.event_types)}</td>
               <td>{app.expected_event_size}</td>
               <td>{app.total_organized_event}</td>
@@ -265,6 +284,57 @@ const OrganizersPage = () => {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {selectedApp && (
+        <div className="modal-overlay">
+          <div className="detail-modal" ref={modalRef}>
+            <h3>Application Details</h3>
+            <p>
+              <strong>ID:</strong> {selectedApp.id}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedApp.email}
+            </p>
+            <p>
+              <strong>Event Types:</strong>{" "}
+              {formatField(selectedApp.event_types)}
+            </p>
+            <p>
+              <strong>Expected Size:</strong> {selectedApp.expected_event_size}
+            </p>
+            <p>
+              <strong>Total Organized Events:</strong>{" "}
+              {selectedApp.total_organized_event}
+            </p>
+            <p>
+              <strong>Document Type:</strong> {selectedApp.document_type}
+            </p>
+            <p>
+              <strong>Document:</strong>{" "}
+              {selectedApp.document_url ? (
+                <a
+                  href={selectedApp.document_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View
+                </a>
+              ) : (
+                "No document"
+              )}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedApp.status}
+            </p>
+            <p>
+              <strong>Comment:</strong> {selectedApp.comment || "-"}
+            </p>
+            <button onClick={() => setSelectedApp(null)} className="close-btn">
+              Close
+            </button>
           </div>
         </div>
       )}

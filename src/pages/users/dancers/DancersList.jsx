@@ -4,17 +4,20 @@ import { fetchUsers } from "../../../services/user.Service";
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
+  const [selectedDancer, setSelectedDancer] = useState(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
-  const [selectedDancer, setSelectedDancer] = useState(null);
 
   useEffect(() => {
     const loadDancers = async () => {
       try {
-        const data = await fetchUsers("user", page, 10);
+        const data = await fetchUsers(page, 10);
+        // ask backend for page
         if (data?.users) {
+          console.log("Fetched users:", data.users); // ✅ log fetched entries
+          console.log("Pagination info:", data.pagination); // ✅ log pagination too
           setDancers(data.users);
-          setPagination(data.pagination);
+          setPagination(data.pagination); // save pagination info
           window.scrollTo(0, 0);
         }
       } catch (error) {
@@ -24,14 +27,6 @@ const DancersList = () => {
     };
     loadDancers();
   }, [page]);
-
-  const handleNext = () => {
-    if (page < pagination.totalPages) setPage((prev) => prev + 1);
-  };
-
-  const handlePrev = () => {
-    if (page > 1) setPage((prev) => prev - 1);
-  };
 
   return (
     <div className="professors-container">
@@ -72,7 +67,7 @@ const DancersList = () => {
       <div className="pagination-controls">
         <button
           className="pagination-btn"
-          onClick={handlePrev}
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page <= 1}
         >
           Previous
@@ -82,7 +77,9 @@ const DancersList = () => {
         </span>
         <button
           className="pagination-btn"
-          onClick={handleNext}
+          onClick={() =>
+            setPage((prev) => Math.min(prev + 1, pagination.totalPages))
+          }
           disabled={page >= pagination.totalPages}
         >
           Next

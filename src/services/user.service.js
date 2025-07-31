@@ -7,10 +7,9 @@ export const fetchUsers = async (page = 1, limit = 10) => {
   const token = localStorage.getItem("token");
 
   try {
-    const url = `${BASE_URL}${CONSTANTS.URL.USERS_USER.replace(
-      "page=1",
-      `page=${page}`
-    ).replace("limit=10", `limit=${limit}`)}`;
+    // Build the URL directly (instead of using .replace)
+    const url = `${BASE_URL}/api/v1/admin/users?userType=user&page=${page}&limit=${limit}`;
+    console.log("Fetching URL:", url); // For debug
 
     const res = await axios.get(url, {
       headers: {
@@ -18,7 +17,7 @@ export const fetchUsers = async (page = 1, limit = 10) => {
       },
     });
 
-    return res.data;
+    return res.data; // Should include: { users: [...], pagination: {...} }
   } catch (error) {
     console.error("Error fetching Users:", error);
     return { users: [], pagination: {} };
