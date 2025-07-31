@@ -25,6 +25,7 @@ const ProfessorsPage = () => {
   const fetchApplications = async () => {
     try {
       const data = await getInstructorApplications();
+      console.log("Fetched instructor applications:", data);
       setApplications(data);
     } catch (error) {
       console.error("Error fetching instructor applications:", error);
@@ -212,6 +213,32 @@ const ProfessorsPage = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Single Reject Modal */}
+      {selectedRejectId && (
+        <div className="reject-modal" onClick={() => setSelectedRejectId(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Reject Application</h3>
+            <textarea
+              rows="4"
+              placeholder="Add a comment for rejection (optional)"
+              value={rejectComment}
+              onChange={(e) => setRejectComment(e.target.value)}
+            />
+            <div className="modal-button-group">
+              <button
+                className="modal-btn cancel-btn"
+                onClick={() => setSelectedRejectId(null)}
+              >
+                Cancel
+              </button>
+              <button className="modal-btn" onClick={handleReject}>
+                Confirm Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bulk Reject Modal */}
       {rejectAllOpen && (
