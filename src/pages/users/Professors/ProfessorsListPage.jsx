@@ -80,8 +80,8 @@ const ProfessorsListPage = () => {
         </button>
       </div>
       {isModalOpen && selectedProfessor && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Professor Details</h2>
 
             <p>
@@ -94,24 +94,26 @@ const ProfessorsListPage = () => {
               <strong>Name:</strong> {selectedProfessor.name || "N/A"}
             </p>
             <p>
-              <strong>Location:</strong> {selectedProfessor.location}
+              <strong>Location:</strong> {selectedProfessor.location || "N/A"}
             </p>
             <p>
-              <strong>Skill Level:</strong> {selectedProfessor.skill_level}
+              <strong>Skill Level:</strong>{" "}
+              {selectedProfessor.skill_level || "N/A"}
             </p>
             <p>
               <strong>Profile User Type:</strong>{" "}
-              {selectedProfessor.profile_user_type}
+              {selectedProfessor.profile_user_type || "N/A"}
             </p>
             <p>
-              <strong>Provider:</strong> {selectedProfessor.provider}
+              <strong>Provider:</strong> {selectedProfessor.provider || "N/A"}
             </p>
             <p>
               <strong>Created At:</strong>{" "}
               {new Date(selectedProfessor.created_at).toLocaleString()}
             </p>
             <p>
-              <strong>Roles:</strong> {selectedProfessor.roles?.join(", ")}
+              <strong>Roles:</strong>{" "}
+              {selectedProfessor.roles?.join(", ") || "N/A"}
             </p>
 
             <h3>Active Subscription</h3>
@@ -126,45 +128,139 @@ const ProfessorsListPage = () => {
                   {selectedProfessor.active_subscription.payment_status}
                 </p>
                 <p>
+                  <strong>ID:</strong>{" "}
+                  {selectedProfessor.active_subscription.id}
+                </p>
+                <p>
+                  <strong>Stripe Subscription ID:</strong>{" "}
+                  {selectedProfessor.active_subscription.stripe_subscription_id}
+                </p>
+                <p>
+                  <strong>Stripe Customer ID:</strong>{" "}
+                  {selectedProfessor.active_subscription.stripe_customer_id}
+                </p>
+                <p>
+                  <strong>Price ID:</strong>{" "}
+                  {selectedProfessor.active_subscription.price_id}
+                </p>
+                <p>
                   <strong>Start Date:</strong>{" "}
                   {new Date(
                     selectedProfessor.active_subscription.start_date
-                  ).toLocaleDateString()}
+                  ).toLocaleString()}
                 </p>
                 <p>
                   <strong>End Date:</strong>{" "}
                   {new Date(
                     selectedProfessor.active_subscription.end_date
-                  ).toLocaleDateString()}
+                  ).toLocaleString()}
+                </p>
+                <p>
+                  <strong>Billing:</strong>{" "}
+                  {selectedProfessor.active_subscription.billing_interval}
+                </p>
+                <p>
+                  <strong>Payment Ref:</strong>{" "}
+                  {selectedProfessor.active_subscription.payment_reference}
+                </p>
+                <p>
+                  <strong>Created At:</strong>{" "}
+                  {new Date(
+                    selectedProfessor.active_subscription.created_at
+                  ).toLocaleString()}
+                </p>
+                <p>
+                  <strong>Is Active:</strong>{" "}
+                  {selectedProfessor.active_subscription.is_active
+                    ? "Yes"
+                    : "No"}
                 </p>
               </>
             ) : (
-              <p>No active subscription</p>
+              <p>No Active Subscription</p>
+            )}
+
+            <h3>Subscription History</h3>
+            {selectedProfessor.subscription_history?.length > 0 ? (
+              selectedProfessor.subscription_history.map((sub, idx) => (
+                <div key={sub.id || idx} className="subscription-history-block">
+                  <p>
+                    <strong>Name:</strong> {sub.subscription_name}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {sub.payment_status}
+                  </p>
+                  <p>
+                    <strong>ID:</strong> {sub.id}
+                  </p>
+                  <p>
+                    <strong>Start:</strong>{" "}
+                    {new Date(sub.start_date).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>End:</strong>{" "}
+                    {new Date(sub.end_date).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Billing:</strong> {sub.billing_interval}
+                  </p>
+                  <p>
+                    <strong>Stripe Customer ID:</strong>{" "}
+                    {sub.stripe_customer_id}
+                  </p>
+                  <p>
+                    <strong>Stripe Subscription ID:</strong>{" "}
+                    {sub.stripe_subscription_id}
+                  </p>
+                  <p>
+                    <strong>Price ID:</strong> {sub.price_id}
+                  </p>
+                  <p>
+                    <strong>Created At:</strong>{" "}
+                    {new Date(sub.created_at).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Is Active:</strong> {sub.is_active ? "Yes" : "No"}
+                  </p>
+                  <p>
+                    <strong>Payment Ref:</strong> {sub.payment_reference}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p>No Subscription History</p>
             )}
 
             <h3>Subscription Summary</h3>
-            <p>
-              <strong>Total Subscriptions:</strong>{" "}
-              {selectedProfessor.subscription_summary.subscription_count}
-            </p>
-            <p>
-              <strong>Active Subscriptions:</strong>{" "}
-              {selectedProfessor.subscription_summary.active_subscriptions}
-            </p>
-            <p>
-              <strong>Has Paid Subscription:</strong>{" "}
-              {selectedProfessor.subscription_summary.has_paid_subscription
-                ? "Yes"
-                : "No"}
-            </p>
-            <p>
-              <strong>Latest Subscription Date:</strong>{" "}
-              {selectedProfessor.subscription_summary.latest_subscription_date
-                ? new Date(
-                    selectedProfessor.subscription_summary.latest_subscription_date
-                  ).toLocaleString()
-                : "N/A"}
-            </p>
+            {selectedProfessor.subscription_summary ? (
+              <>
+                <p>
+                  <strong>Total Subscriptions:</strong>{" "}
+                  {selectedProfessor.subscription_summary.subscription_count}
+                </p>
+                <p>
+                  <strong>Active Subscriptions:</strong>{" "}
+                  {selectedProfessor.subscription_summary.active_subscriptions}
+                </p>
+                <p>
+                  <strong>Has Paid Subscription:</strong>{" "}
+                  {selectedProfessor.subscription_summary.has_paid_subscription
+                    ? "Yes"
+                    : "No"}
+                </p>
+                <p>
+                  <strong>Latest Subscription Date:</strong>
+                  {selectedProfessor.subscription_summary
+                    .latest_subscription_date
+                    ? new Date(
+                        selectedProfessor.subscription_summary.latest_subscription_date
+                      ).toLocaleString()
+                    : "N/A"}
+                </p>
+              </>
+            ) : (
+              <p>No Subscription Summary</p>
+            )}
 
             <button
               className="modal-close-btn"

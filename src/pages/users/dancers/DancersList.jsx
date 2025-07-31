@@ -134,6 +134,21 @@ const DancersList = () => {
                   {selectedDancer.active_subscription.payment_status}
                 </p>
                 <p>
+                  <strong>ID:</strong> {selectedDancer.active_subscription.id}
+                </p>
+                <p>
+                  <strong>Stripe Subscription ID:</strong>{" "}
+                  {selectedDancer.active_subscription.stripe_subscription_id}
+                </p>
+                <p>
+                  <strong>Stripe Customer ID:</strong>{" "}
+                  {selectedDancer.active_subscription.stripe_customer_id}
+                </p>
+                <p>
+                  <strong>Price ID:</strong>{" "}
+                  {selectedDancer.active_subscription.price_id}
+                </p>
+                <p>
                   <strong>Start:</strong>{" "}
                   {new Date(
                     selectedDancer.active_subscription.start_date
@@ -153,9 +168,67 @@ const DancersList = () => {
                   <strong>Reference:</strong>{" "}
                   {selectedDancer.active_subscription.payment_reference}
                 </p>
+                <p>
+                  <strong>Created at:</strong>{" "}
+                  {selectedDancer.active_subscription.created_at}
+                </p>
+                <p>
+                  <strong>Is Active:</strong>{" "}
+                  {selectedDancer.active_subscription.is_active ? "Yes" : "No"}
+                </p>
               </>
             ) : (
               <p>No Active Subscription</p>
+            )}
+
+            <h4>Subscription History</h4>
+            {selectedDancer.subscription_history?.length > 0 ? (
+              selectedDancer.subscription_history.map((sub, idx) => (
+                <div key={sub.id || idx} className="subscription-history-block">
+                  <p>
+                    <strong>Subscription Name:</strong> {sub.subscription_name}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {sub.payment_status}
+                  </p>
+                  <p>
+                    <strong>Id:</strong> {sub.id}
+                  </p>
+                  <p>
+                    <strong>Start:</strong>{" "}
+                    {new Date(sub.start_date).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>End:</strong>{" "}
+                    {new Date(sub.end_date).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Billing:</strong> {sub.billing_interval}
+                  </p>
+                  <p>
+                    <strong>Stripe Customer Id:</strong>{" "}
+                    {sub.stripe_customer_id}
+                  </p>
+                  <p>
+                    <strong>Stripe Subscription Id:</strong>{" "}
+                    {sub.stripe_subscription_id}
+                  </p>
+                  <p>
+                    <strong>Price Id:</strong> {sub.price_id}
+                  </p>
+                  <p>
+                    <strong>Created at:</strong> {sub.created_at}
+                  </p>
+                  <p>
+                    <strong>Is Active:</strong> {sub.is_active ? "Yes" : "No"}
+                  </p>
+                  <p>
+                    <strong>Payment Ref:</strong> {sub.payment_reference}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p>No Subscription History</p>
             )}
 
             <h4>Subscription Summary</h4>

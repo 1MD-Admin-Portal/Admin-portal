@@ -136,6 +136,7 @@ const ProfessorsPage = () => {
                   "No document"
                 )}
               </td>
+
               <td className={`status ${app.status}`}>{app.status}</td>
               <td>{app.comment || "-"}</td>
               <td>
