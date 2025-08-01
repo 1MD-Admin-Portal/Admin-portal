@@ -10,7 +10,6 @@ import Home from "./pages/Home";
 import Users from "./pages/Users";
 import CommunityContent from "./pages/CommunityContent";
 import ProgramManagement from "./pages/ProgramManagement";
-import Challenges from "./pages/Challenges";
 import ClassModeration from "./pages/ClassModeration";
 import EventsPage from "./pages/EventsPage";
 import MarketplacePage from "./pages/MarketplacePage";
@@ -61,7 +60,6 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/CommunityContent" element={<CommunityContent />} />
           <Route path="/ProgramManagement" element={<ProgramManagement />} />
-          <Route path="/Challenges" element={<Challenges />} />
           <Route path="/ClassModeration" element={<ClassModeration />} />
           <Route path="/EventsPage" element={<EventsPage />} />
           <Route path="/MarketplacePage" element={<MarketplacePage />} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/CreateChallengeModal.css";
 import { createChallengeService } from "../../services/challenge.service";
+import { uploadImageService } from "../../services/program.service";
 
 const CreateChallengeModal = ({ onClose }) => {
   const [title, setTitle] = useState("");
@@ -85,47 +86,58 @@ const CreateChallengeModal = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    const tasks = [];
-
-    taskGroups.forEach((group) => {
-      group.watchVideos.forEach((watch) => {
-        if (watch.title.trim()) {
-          tasks.push({
-            task_type: "watch_video",
-            task_title: watch.title,
-            video_url: watch.file ? watch.file.name : "sample.mp4", // Replace with actual file upload handling
-          });
-        }
-      });
-
-      group.uploadVideos.forEach((upload) => {
-        if (upload.title.trim()) {
-          tasks.push({
-            task_type: "upload_video",
-            task_title: upload.title,
-          });
-        }
-      });
-    });
-
-    const challengeData = {
-      title,
-      challenger_type: challengerType,
-      description,
-      image_url: imageFile ? imageFile.name : "", // Replace with actual image upload handling
-      dance_style: danceStyle,
-      dance_level: danceLevel,
-      start_time: startTime,
-      end_time: endTime,
-      duration,
-      tasks,
-    };
-
     try {
+      // Upload cover image first if selected
+      let uploadedImageUrl = "";
+      if (imageFile) {
+        uploadedImageUrl = await uploadImageService(imageFile);
+      }
+
+      const tasks = [];
+
+      for (const group of taskGroups) {
+        for (const watch of group.watchVideos) {
+          if (watch.title.trim()) {
+            let uploadedVideoUrl = "";
+            if (watch.file) {
+              uploadedVideoUrl = await uploadImageService(watch.file);
+            }
+            tasks.push({
+              task_type: "watch_video",
+              task_title: watch.title,
+              video_url: uploadedVideoUrl || "sample.mp4", // fallback
+            });
+          }
+        }
+
+        group.uploadVideos.forEach((upload) => {
+          if (upload.title.trim()) {
+            tasks.push({
+              task_type: "upload_video",
+              task_title: upload.title,
+            });
+          }
+        });
+      }
+
+      const challengeData = {
+        title,
+        challenger_type: challengerType,
+        description,
+        image_url: uploadedImageUrl,
+        dance_style: danceStyle,
+        dance_level: danceLevel,
+        start_time: startTime,
+        end_time: endTime,
+        duration,
+        tasks,
+      };
+
       await createChallengeService(challengeData);
       alert("Challenge created successfully!");
       onClose();
     } catch (error) {
+      console.error("Error creating challenge:", error);
       alert("Error creating challenge.");
     }
   };
@@ -261,7 +273,7 @@ const CreateChallengeModal = ({ onClose }) => {
                   + Add Watch Video
                 </button>
 
-                {group.uploadVideos.map((upload, uploadIndex) => (
+                {/* {group.uploadVideos.map((upload, uploadIndex) => (
                   <div key={upload.id} className="task-row watch-upload-row">
                     <span className="task-type">Upload Video</span>
                     <input
@@ -283,13 +295,13 @@ const CreateChallengeModal = ({ onClose }) => {
                       ❌
                     </button>
                   </div>
-                ))}
-                <button
+                ))} */}
+                {/* <button
                   className="add-task-btn"
                   onClick={() => addUploadVideo(groupIndex)}
                 >
                   + Add Upload Video
-                </button>
+                </button> */}
               </div>
             ))}
           </div>

@@ -4,6 +4,7 @@ export const CONSTANTS = {
       "https://dancewithme-b9gadtdhbjdya5c5.westus-01.azurewebsites.net",
     // BASE_URL: "",
     LOGIN: "/api/v1/admin/login",
+    UPLOAD_MEDIA: "/api/v1/file/upload",
     DASHBOARD: "/dashboard",
     PROFILE: "/profile",
     USERS: "/users",
