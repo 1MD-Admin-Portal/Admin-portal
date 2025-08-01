@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../Professors/ProfessorsListPage.css"; // Assuming you have a CSS file for styling
 import { fetchUsers } from "../../../services/user.Service";
+import "../Dancers/DancersList.css"; // Assuming you have a CSS file for styling
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
@@ -27,6 +28,20 @@ const DancersList = () => {
     };
     loadDancers();
   }, [page]);
+
+  // Helper function to render info items in grid
+  const renderInfoGrid = (items) => {
+    return (
+      <div className="info-grid">
+        {items.map((item, index) => (
+          <div key={index} className={`info-item ${item.status || ""}`}>
+            <div className="info-label">{item.label}</div>
+            <div className="info-value">{item.value}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="professors-container">
@@ -89,177 +104,229 @@ const DancersList = () => {
       {selectedDancer && (
         <div className="modal-overlay" onClick={() => setSelectedDancer(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Dancer Details</h3>
-            <p>
-              <strong>ID:</strong> {selectedDancer.id}
-            </p>
-            <p>
-              <strong>Name:</strong> {selectedDancer.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedDancer.email}
-            </p>
-            <p>
-              <strong>Location:</strong> {selectedDancer.location}
-            </p>
-            <p>
-              <strong>Skill Level:</strong> {selectedDancer.skill_level}
-            </p>
-            <p>
-              <strong>User Type:</strong> {selectedDancer.profile_user_type}
-            </p>
-            <p>
-              <strong>Provider:</strong> {selectedDancer.provider}
-            </p>
-            <p>
-              <strong>Created At:</strong>{" "}
-              {new Date(selectedDancer.created_at).toLocaleString()}
-            </p>
-            <p>
-              <strong>Roles:</strong> {selectedDancer.roles?.join(", ")}
-            </p>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <h3>Dancer Details</h3>
+            </div>
 
-            <h4>Active Subscription</h4>
-            {selectedDancer.active_subscription ? (
-              <>
-                <p>
-                  <strong>Name:</strong>{" "}
-                  {selectedDancer.active_subscription.subscription_name}
-                </p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {selectedDancer.active_subscription.payment_status}
-                </p>
-                <p>
-                  <strong>ID:</strong> {selectedDancer.active_subscription.id}
-                </p>
-                <p>
-                  <strong>Stripe Subscription ID:</strong>{" "}
-                  {selectedDancer.active_subscription.stripe_subscription_id}
-                </p>
-                <p>
-                  <strong>Stripe Customer ID:</strong>{" "}
-                  {selectedDancer.active_subscription.stripe_customer_id}
-                </p>
-                <p>
-                  <strong>Price ID:</strong>{" "}
-                  {selectedDancer.active_subscription.price_id}
-                </p>
-                <p>
-                  <strong>Start:</strong>{" "}
-                  {new Date(
-                    selectedDancer.active_subscription.start_date
-                  ).toLocaleString()}
-                </p>
-                <p>
-                  <strong>End:</strong>{" "}
-                  {new Date(
-                    selectedDancer.active_subscription.end_date
-                  ).toLocaleString()}
-                </p>
-                <p>
-                  <strong>Billing:</strong>{" "}
-                  {selectedDancer.active_subscription.billing_interval}
-                </p>
-                <p>
-                  <strong>Reference:</strong>{" "}
-                  {selectedDancer.active_subscription.payment_reference}
-                </p>
-                <p>
-                  <strong>Created at:</strong>{" "}
-                  {selectedDancer.active_subscription.created_at}
-                </p>
-                <p>
-                  <strong>Is Active:</strong>{" "}
-                  {selectedDancer.active_subscription.is_active ? "Yes" : "No"}
-                </p>
-              </>
-            ) : (
-              <p>No Active Subscription</p>
-            )}
+            {/* Modal Body - Scrollable */}
+            <div className="modal-body">
+              {/* Basic Information Section */}
+              <div className="modal-section">
+                <h4>Basic Information</h4>
+                {renderInfoGrid([
+                  { label: "ID", value: selectedDancer.id },
+                  { label: "Name", value: selectedDancer.name },
+                  { label: "Email", value: selectedDancer.email },
+                  { label: "Location", value: selectedDancer.location },
+                  { label: "Skill Level", value: selectedDancer.skill_level },
+                  {
+                    label: "User Type",
+                    value: selectedDancer.profile_user_type,
+                  },
+                  { label: "Provider", value: selectedDancer.provider },
+                  {
+                    label: "Created At",
+                    value: new Date(selectedDancer.created_at).toLocaleString(),
+                  },
+                  {
+                    label: "Roles",
+                    value: selectedDancer.roles?.join(", ") || "None",
+                  },
+                ])}
+              </div>
 
-            <h4>Subscription History</h4>
-            {selectedDancer.subscription_history?.length > 0 ? (
-              selectedDancer.subscription_history.map((sub, idx) => (
-                <div key={sub.id || idx} className="subscription-history-block">
-                  <p>
-                    <strong>Subscription Name:</strong> {sub.subscription_name}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {sub.payment_status}
-                  </p>
-                  <p>
-                    <strong>Id:</strong> {sub.id}
-                  </p>
-                  <p>
-                    <strong>Start:</strong>{" "}
-                    {new Date(sub.start_date).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>End:</strong>{" "}
-                    {new Date(sub.end_date).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Billing:</strong> {sub.billing_interval}
-                  </p>
-                  <p>
-                    <strong>Stripe Customer Id:</strong>{" "}
-                    {sub.stripe_customer_id}
-                  </p>
-                  <p>
-                    <strong>Stripe Subscription Id:</strong>{" "}
-                    {sub.stripe_subscription_id}
-                  </p>
-                  <p>
-                    <strong>Price Id:</strong> {sub.price_id}
-                  </p>
-                  <p>
-                    <strong>Created at:</strong> {sub.created_at}
-                  </p>
-                  <p>
-                    <strong>Is Active:</strong> {sub.is_active ? "Yes" : "No"}
-                  </p>
-                  <p>
-                    <strong>Payment Ref:</strong> {sub.payment_reference}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p>No Subscription History</p>
-            )}
+              {/* Active Subscription Section */}
+              <div className="modal-section">
+                <h4>Active Subscription</h4>
+                {selectedDancer.active_subscription ? (
+                  renderInfoGrid([
+                    {
+                      label: "Subscription Name",
+                      value:
+                        selectedDancer.active_subscription.subscription_name,
+                    },
+                    {
+                      label: "Status",
+                      value: selectedDancer.active_subscription.payment_status,
+                      status: selectedDancer.active_subscription.is_active
+                        ? "status-active"
+                        : "status-inactive",
+                    },
+                    {
+                      label: "Is Active",
+                      value: selectedDancer.active_subscription.is_active
+                        ? "Yes"
+                        : "No",
+                      status: selectedDancer.active_subscription.is_active
+                        ? "status-active"
+                        : "status-inactive",
+                    },
+                    {
+                      label: "ID",
+                      value: selectedDancer.active_subscription.id,
+                    },
+                    {
+                      label: "Stripe Subscription ID",
+                      value:
+                        selectedDancer.active_subscription
+                          .stripe_subscription_id,
+                    },
+                    {
+                      label: "Stripe Customer ID",
+                      value:
+                        selectedDancer.active_subscription.stripe_customer_id,
+                    },
+                    {
+                      label: "Price ID",
+                      value: selectedDancer.active_subscription.price_id,
+                    },
+                    {
+                      label: "Start Date",
+                      value: new Date(
+                        selectedDancer.active_subscription.start_date
+                      ).toLocaleString(),
+                    },
+                    {
+                      label: "End Date",
+                      value: new Date(
+                        selectedDancer.active_subscription.end_date
+                      ).toLocaleString(),
+                    },
+                    {
+                      label: "Billing Interval",
+                      value:
+                        selectedDancer.active_subscription.billing_interval,
+                    },
+                    {
+                      label: "Payment Reference",
+                      value:
+                        selectedDancer.active_subscription.payment_reference,
+                    },
+                    {
+                      label: "Created At",
+                      value: selectedDancer.active_subscription.created_at,
+                    },
+                  ])
+                ) : (
+                  <div className="empty-state">No Active Subscription</div>
+                )}
+              </div>
 
-            <h4>Subscription Summary</h4>
-            {selectedDancer.subscription_summary && (
-              <>
-                <p>
-                  <strong>Count:</strong>{" "}
-                  {selectedDancer.subscription_summary.subscription_count}
-                </p>
-                <p>
-                  <strong>Active:</strong>{" "}
-                  {selectedDancer.subscription_summary.active_subscriptions}
-                </p>
-                <p>
-                  <strong>Paid:</strong>{" "}
-                  {selectedDancer.subscription_summary.has_paid_subscription
-                    ? "Yes"
-                    : "No"}
-                </p>
-                <p>
-                  <strong>Latest:</strong>{" "}
-                  {new Date(
-                    selectedDancer.subscription_summary.latest_subscription_date
-                  ).toLocaleString()}
-                </p>
-              </>
-            )}
+              {/* Subscription History Section */}
+              <div className="modal-section">
+                <h4>Subscription History</h4>
+                {selectedDancer.subscription_history?.length > 0 ? (
+                  selectedDancer.subscription_history.map((sub, idx) => (
+                    <div
+                      key={sub.id || idx}
+                      className="subscription-history-block"
+                    >
+                      {renderInfoGrid([
+                        {
+                          label: "Subscription Name",
+                          value: sub.subscription_name,
+                        },
+                        {
+                          label: "Status",
+                          value: sub.payment_status,
+                          status: sub.is_active
+                            ? "status-active"
+                            : "status-inactive",
+                        },
+                        { label: "ID", value: sub.id },
+                        {
+                          label: "Is Active",
+                          value: sub.is_active ? "Yes" : "No",
+                          status: sub.is_active
+                            ? "status-active"
+                            : "status-inactive",
+                        },
+                        {
+                          label: "Start Date",
+                          value: new Date(sub.start_date).toLocaleString(),
+                        },
+                        {
+                          label: "End Date",
+                          value: new Date(sub.end_date).toLocaleString(),
+                        },
+                        {
+                          label: "Billing Interval",
+                          value: sub.billing_interval,
+                        },
+                        {
+                          label: "Stripe Customer ID",
+                          value: sub.stripe_customer_id,
+                        },
+                        {
+                          label: "Stripe Subscription ID",
+                          value: sub.stripe_subscription_id,
+                        },
+                        { label: "Price ID", value: sub.price_id },
+                        { label: "Created At", value: sub.created_at },
+                        {
+                          label: "Payment Reference",
+                          value: sub.payment_reference,
+                        },
+                      ])}
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-state">No Subscription History</div>
+                )}
+              </div>
 
-            <button
-              className="modal-close-btn"
-              onClick={() => setSelectedDancer(null)}
-            >
-              Close
-            </button>
+              {/* Subscription Summary Section */}
+              <div className="modal-section">
+                <h4>Subscription Summary</h4>
+                {selectedDancer.subscription_summary ? (
+                  renderInfoGrid([
+                    {
+                      label: "Total Subscriptions",
+                      value:
+                        selectedDancer.subscription_summary.subscription_count,
+                    },
+                    {
+                      label: "Active Subscriptions",
+                      value:
+                        selectedDancer.subscription_summary
+                          .active_subscriptions,
+                    },
+                    {
+                      label: "Has Paid Subscription",
+                      value: selectedDancer.subscription_summary
+                        .has_paid_subscription
+                        ? "Yes"
+                        : "No",
+                      status: selectedDancer.subscription_summary
+                        .has_paid_subscription
+                        ? "status-active"
+                        : "status-inactive",
+                    },
+                    {
+                      label: "Latest Subscription Date",
+                      value: new Date(
+                        selectedDancer.subscription_summary.latest_subscription_date
+                      ).toLocaleString(),
+                    },
+                  ])
+                ) : (
+                  <div className="empty-state">
+                    No Subscription Summary Available
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="modal-footer">
+              <button
+                className="modal-close-btn"
+                onClick={() => setSelectedDancer(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -19,6 +19,20 @@ const ProfessorsListPage = () => {
     setPagination(data.pagination || {});
   };
 
+  // Helper function to render info items in grid
+  const renderInfoGrid = (items) => {
+    return (
+      <div className="info-grid">
+        {items.map((item, index) => (
+          <div key={index} className={`info-item ${item.status || ""}`}>
+            <div className="info-label">{item.label}</div>
+            <div className="info-value">{item.value}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="professors-container">
       <h2 className="professors-title">All Professors</h2>
@@ -79,195 +93,255 @@ const ProfessorsListPage = () => {
           Next
         </button>
       </div>
+
       {isModalOpen && selectedProfessor && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Professor Details</h2>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <h2>Professor Details</h2>
+            </div>
 
-            <p>
-              <strong>ID:</strong> {selectedProfessor.id}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedProfessor.email}
-            </p>
-            <p>
-              <strong>Name:</strong> {selectedProfessor.name || "N/A"}
-            </p>
-            <p>
-              <strong>Location:</strong> {selectedProfessor.location || "N/A"}
-            </p>
-            <p>
-              <strong>Skill Level:</strong>{" "}
-              {selectedProfessor.skill_level || "N/A"}
-            </p>
-            <p>
-              <strong>Profile User Type:</strong>{" "}
-              {selectedProfessor.profile_user_type || "N/A"}
-            </p>
-            <p>
-              <strong>Provider:</strong> {selectedProfessor.provider || "N/A"}
-            </p>
-            <p>
-              <strong>Created At:</strong>{" "}
-              {new Date(selectedProfessor.created_at).toLocaleString()}
-            </p>
-            <p>
-              <strong>Roles:</strong>{" "}
-              {selectedProfessor.roles?.join(", ") || "N/A"}
-            </p>
+            {/* Modal Body - Scrollable */}
+            <div className="modal-body">
+              {/* Basic Information Section */}
+              <div className="modal-section">
+                <h3>Basic Information</h3>
+                {renderInfoGrid([
+                  { label: "ID", value: selectedProfessor.id },
+                  { label: "Name", value: selectedProfessor.name || "N/A" },
+                  { label: "Email", value: selectedProfessor.email },
+                  {
+                    label: "Location",
+                    value: selectedProfessor.location || "N/A",
+                  },
+                  {
+                    label: "Skill Level",
+                    value: selectedProfessor.skill_level || "N/A",
+                  },
+                  {
+                    label: "Profile User Type",
+                    value: selectedProfessor.profile_user_type || "N/A",
+                  },
+                  {
+                    label: "Provider",
+                    value: selectedProfessor.provider || "N/A",
+                  },
+                  {
+                    label: "Created At",
+                    value: new Date(
+                      selectedProfessor.created_at
+                    ).toLocaleString(),
+                  },
+                  {
+                    label: "Roles",
+                    value: selectedProfessor.roles?.join(", ") || "N/A",
+                  },
+                ])}
+              </div>
 
-            <h3>Active Subscription</h3>
-            {selectedProfessor.active_subscription ? (
-              <>
-                <p>
-                  <strong>Name:</strong>{" "}
-                  {selectedProfessor.active_subscription.subscription_name}
-                </p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {selectedProfessor.active_subscription.payment_status}
-                </p>
-                <p>
-                  <strong>ID:</strong>{" "}
-                  {selectedProfessor.active_subscription.id}
-                </p>
-                <p>
-                  <strong>Stripe Subscription ID:</strong>{" "}
-                  {selectedProfessor.active_subscription.stripe_subscription_id}
-                </p>
-                <p>
-                  <strong>Stripe Customer ID:</strong>{" "}
-                  {selectedProfessor.active_subscription.stripe_customer_id}
-                </p>
-                <p>
-                  <strong>Price ID:</strong>{" "}
-                  {selectedProfessor.active_subscription.price_id}
-                </p>
-                <p>
-                  <strong>Start Date:</strong>{" "}
-                  {new Date(
-                    selectedProfessor.active_subscription.start_date
-                  ).toLocaleString()}
-                </p>
-                <p>
-                  <strong>End Date:</strong>{" "}
-                  {new Date(
-                    selectedProfessor.active_subscription.end_date
-                  ).toLocaleString()}
-                </p>
-                <p>
-                  <strong>Billing:</strong>{" "}
-                  {selectedProfessor.active_subscription.billing_interval}
-                </p>
-                <p>
-                  <strong>Payment Ref:</strong>{" "}
-                  {selectedProfessor.active_subscription.payment_reference}
-                </p>
-                <p>
-                  <strong>Created At:</strong>{" "}
-                  {new Date(
-                    selectedProfessor.active_subscription.created_at
-                  ).toLocaleString()}
-                </p>
-                <p>
-                  <strong>Is Active:</strong>{" "}
-                  {selectedProfessor.active_subscription.is_active
-                    ? "Yes"
-                    : "No"}
-                </p>
-              </>
-            ) : (
-              <p>No Active Subscription</p>
-            )}
+              {/* Active Subscription Section */}
+              <div className="modal-section">
+                <h3>Active Subscription</h3>
+                {selectedProfessor.active_subscription ? (
+                  renderInfoGrid([
+                    {
+                      label: "Subscription Name",
+                      value:
+                        selectedProfessor.active_subscription.subscription_name,
+                    },
+                    {
+                      label: "Status",
+                      value:
+                        selectedProfessor.active_subscription.payment_status,
+                      status: selectedProfessor.active_subscription.is_active
+                        ? "status-active"
+                        : "status-inactive",
+                    },
+                    {
+                      label: "Is Active",
+                      value: selectedProfessor.active_subscription.is_active
+                        ? "Yes"
+                        : "No",
+                      status: selectedProfessor.active_subscription.is_active
+                        ? "status-active"
+                        : "status-inactive",
+                    },
+                    {
+                      label: "ID",
+                      value: selectedProfessor.active_subscription.id,
+                    },
+                    {
+                      label: "Stripe Subscription ID",
+                      value:
+                        selectedProfessor.active_subscription
+                          .stripe_subscription_id,
+                    },
+                    {
+                      label: "Stripe Customer ID",
+                      value:
+                        selectedProfessor.active_subscription
+                          .stripe_customer_id,
+                    },
+                    {
+                      label: "Price ID",
+                      value: selectedProfessor.active_subscription.price_id,
+                    },
+                    {
+                      label: "Start Date",
+                      value: new Date(
+                        selectedProfessor.active_subscription.start_date
+                      ).toLocaleString(),
+                    },
+                    {
+                      label: "End Date",
+                      value: new Date(
+                        selectedProfessor.active_subscription.end_date
+                      ).toLocaleString(),
+                    },
+                    {
+                      label: "Billing Interval",
+                      value:
+                        selectedProfessor.active_subscription.billing_interval,
+                    },
+                    {
+                      label: "Payment Reference",
+                      value:
+                        selectedProfessor.active_subscription.payment_reference,
+                    },
+                    {
+                      label: "Created At",
+                      value: new Date(
+                        selectedProfessor.active_subscription.created_at
+                      ).toLocaleString(),
+                    },
+                  ])
+                ) : (
+                  <div className="empty-state">No Active Subscription</div>
+                )}
+              </div>
 
-            <h3>Subscription History</h3>
-            {selectedProfessor.subscription_history?.length > 0 ? (
-              selectedProfessor.subscription_history.map((sub, idx) => (
-                <div key={sub.id || idx} className="subscription-history-block">
-                  <p>
-                    <strong>Name:</strong> {sub.subscription_name}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {sub.payment_status}
-                  </p>
-                  <p>
-                    <strong>ID:</strong> {sub.id}
-                  </p>
-                  <p>
-                    <strong>Start:</strong>{" "}
-                    {new Date(sub.start_date).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>End:</strong>{" "}
-                    {new Date(sub.end_date).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Billing:</strong> {sub.billing_interval}
-                  </p>
-                  <p>
-                    <strong>Stripe Customer ID:</strong>{" "}
-                    {sub.stripe_customer_id}
-                  </p>
-                  <p>
-                    <strong>Stripe Subscription ID:</strong>{" "}
-                    {sub.stripe_subscription_id}
-                  </p>
-                  <p>
-                    <strong>Price ID:</strong> {sub.price_id}
-                  </p>
-                  <p>
-                    <strong>Created At:</strong>{" "}
-                    {new Date(sub.created_at).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Is Active:</strong> {sub.is_active ? "Yes" : "No"}
-                  </p>
-                  <p>
-                    <strong>Payment Ref:</strong> {sub.payment_reference}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p>No Subscription History</p>
-            )}
+              {/* Subscription History Section */}
+              <div className="modal-section">
+                <h3>Subscription History</h3>
+                {selectedProfessor.subscription_history?.length > 0 ? (
+                  selectedProfessor.subscription_history.map((sub, idx) => (
+                    <div
+                      key={sub.id || idx}
+                      className="subscription-history-block"
+                    >
+                      {renderInfoGrid([
+                        {
+                          label: "Subscription Name",
+                          value: sub.subscription_name,
+                        },
+                        {
+                          label: "Status",
+                          value: sub.payment_status,
+                          status: sub.is_active
+                            ? "status-active"
+                            : "status-inactive",
+                        },
+                        { label: "ID", value: sub.id },
+                        {
+                          label: "Is Active",
+                          value: sub.is_active ? "Yes" : "No",
+                          status: sub.is_active
+                            ? "status-active"
+                            : "status-inactive",
+                        },
+                        {
+                          label: "Start Date",
+                          value: new Date(sub.start_date).toLocaleString(),
+                        },
+                        {
+                          label: "End Date",
+                          value: new Date(sub.end_date).toLocaleString(),
+                        },
+                        {
+                          label: "Billing Interval",
+                          value: sub.billing_interval,
+                        },
+                        {
+                          label: "Stripe Customer ID",
+                          value: sub.stripe_customer_id,
+                        },
+                        {
+                          label: "Stripe Subscription ID",
+                          value: sub.stripe_subscription_id,
+                        },
+                        { label: "Price ID", value: sub.price_id },
+                        {
+                          label: "Created At",
+                          value: new Date(sub.created_at).toLocaleString(),
+                        },
+                        {
+                          label: "Payment Reference",
+                          value: sub.payment_reference,
+                        },
+                      ])}
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-state">No Subscription History</div>
+                )}
+              </div>
 
-            <h3>Subscription Summary</h3>
-            {selectedProfessor.subscription_summary ? (
-              <>
-                <p>
-                  <strong>Total Subscriptions:</strong>{" "}
-                  {selectedProfessor.subscription_summary.subscription_count}
-                </p>
-                <p>
-                  <strong>Active Subscriptions:</strong>{" "}
-                  {selectedProfessor.subscription_summary.active_subscriptions}
-                </p>
-                <p>
-                  <strong>Has Paid Subscription:</strong>{" "}
-                  {selectedProfessor.subscription_summary.has_paid_subscription
-                    ? "Yes"
-                    : "No"}
-                </p>
-                <p>
-                  <strong>Latest Subscription Date:</strong>
-                  {selectedProfessor.subscription_summary
-                    .latest_subscription_date
-                    ? new Date(
-                        selectedProfessor.subscription_summary.latest_subscription_date
-                      ).toLocaleString()
-                    : "N/A"}
-                </p>
-              </>
-            ) : (
-              <p>No Subscription Summary</p>
-            )}
+              {/* Subscription Summary Section */}
+              <div className="modal-section">
+                <h3>Subscription Summary</h3>
+                {selectedProfessor.subscription_summary ? (
+                  renderInfoGrid([
+                    {
+                      label: "Total Subscriptions",
+                      value:
+                        selectedProfessor.subscription_summary
+                          .subscription_count,
+                    },
+                    {
+                      label: "Active Subscriptions",
+                      value:
+                        selectedProfessor.subscription_summary
+                          .active_subscriptions,
+                    },
+                    {
+                      label: "Has Paid Subscription",
+                      value: selectedProfessor.subscription_summary
+                        .has_paid_subscription
+                        ? "Yes"
+                        : "No",
+                      status: selectedProfessor.subscription_summary
+                        .has_paid_subscription
+                        ? "status-active"
+                        : "status-inactive",
+                    },
+                    {
+                      label: "Latest Subscription Date",
+                      value: selectedProfessor.subscription_summary
+                        .latest_subscription_date
+                        ? new Date(
+                            selectedProfessor.subscription_summary.latest_subscription_date
+                          ).toLocaleString()
+                        : "N/A",
+                    },
+                  ])
+                ) : (
+                  <div className="empty-state">
+                    No Subscription Summary Available
+                  </div>
+                )}
+              </div>
+            </div>
 
-            <button
-              className="modal-close-btn"
-              onClick={() => setIsModalOpen(false)}
-            >
-              Close
-            </button>
+            {/* Modal Footer */}
+            <div className="modal-footer">
+              <button
+                className="modal-close-btn"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
