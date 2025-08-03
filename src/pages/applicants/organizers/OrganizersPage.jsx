@@ -113,6 +113,7 @@ const OrganizersPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
+            <th></th>
             <th>ID</th>
             <th>Email</th>
             <th>Event Types</th>

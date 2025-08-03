@@ -24,6 +24,7 @@ const DJListPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
+            <th></th>
             <th>Email</th>
             <th>Location</th>
             <th>Skill Level</th>

@@ -49,6 +49,7 @@ const DancersList = () => {
       <table className="professors-table">
         <thead>
           <tr>
+            <th></th>
             <th>ID</th>
             <th>Email</th>
             <th>Name</th>

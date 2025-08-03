@@ -8,8 +8,9 @@ import { useAuth } from "../contexts/AuthContext";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👈 new state
   const navigate = useNavigate();
-  const { login } = useAuth(); // use login from context
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -20,7 +21,7 @@ const Login = () => {
     try {
       const response = await loginService(email, password);
       if (response.status === 200 && response.data?.token) {
-        login(response.data.token); // ✅ store token & update auth state
+        login(response.data.token);
         navigate("/home");
       } else {
         alert("Invalid credentials. Please try again.");
@@ -47,17 +48,35 @@ const Login = () => {
 
         <label>Password</label>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"} // 👈 toggle input type
           placeholder="**********"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <div className="login-options">
-          <span className="forgot-link" onClick={() => navigate("/forgot-password")}>
-  Forgot password
-</span>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            marginBottom: "1rem",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={showPassword}
+            onChange={() => setShowPassword(!showPassword)}
+          />
+          Show Password
+        </label>
 
+        <div className="login-options">
+          <span
+            className="forgot-link"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot password
+          </span>
         </div>
 
         <button className="login-button" onClick={handleLogin}>

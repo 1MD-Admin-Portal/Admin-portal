@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchOrganizers } from "../../../services/organizer.service";
-import "../Professors/ProfessorsListPage.css";
+import "./OrganizerListPage.css";
 
 const OrganizerListPage = () => {
   const [organizers, setOrganizers] = useState([]);
@@ -34,39 +34,50 @@ const OrganizerListPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
+            <th></th>
+            <th>ID</th>
             <th>Email</th>
+            <th>Name</th>
             <th>Location</th>
             <th>Skill Level</th>
+            <th>User Type</th>
+            <th>Provider</th>
+            <th>Created At</th>
+            <th>Roles</th>
             <th>Subscription</th>
           </tr>
         </thead>
         <tbody>
           {organizers.map((user) => (
-            <tr
-              key={user.id}
-              onClick={() => setSelectedUser(user)}
-              style={{ cursor: "pointer" }}
-            >
+            <tr key={user.id} onClick={() => setSelectedUser(user)}>
+              <td>{user.id}</td>
               <td>{user.email}</td>
-              <td>{user.location}</td>
-              <td>{user.skill_level}</td>
+              <td>{user.name || "N/A"}</td>
+              <td>{user.location || "N/A"}</td>
+              <td>{user.skill_level || "N/A"}</td>
+              <td>{user.profile_user_type || "N/A"}</td>
+              <td>{user.provider || "N/A"}</td>
+              <td>{new Date(user.created_at).toLocaleString()}</td>
+              <td>{user.roles?.join(", ") || "N/A"}</td>
               <td>{user.active_subscription?.subscription_name || "None"}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
-      <div className="bulk-actions-bar">
+      <div className="pagination-controls">
         <button
-          className="bulk-approve-btn"
+          className="pagination-btn"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
         >
           Previous
         </button>
+        <span className="page-indicator">
+          Page {pagination.page || page} of {pagination.totalPages || 1}
+        </span>
         <button
-          className="bulk-reject-btn"
+          className="pagination-btn"
           onClick={() => setPage((prev) => prev + 1)}
           disabled={page === pagination.totalPages}
         >
@@ -75,10 +86,9 @@ const OrganizerListPage = () => {
       </div>
 
       {selectedUser && (
-        <div className="reject-modal" onClick={() => setSelectedUser(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>User Details</h3>
-
+        <div className="modal-overlay" onClick={() => setSelectedUser(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Organizer Details</h3>
             <p>
               <strong>ID:</strong> {selectedUser.id}
             </p>
@@ -249,14 +259,12 @@ const OrganizerListPage = () => {
               <p>No Subscription Summary</p>
             )}
 
-            <div className="modal-button-group">
-              <button
-                className="cancel-btn"
-                onClick={() => setSelectedUser(null)}
-              >
-                Close
-              </button>
-            </div>
+            <button
+              className="modal-close-btn"
+              onClick={() => setSelectedUser(null)}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

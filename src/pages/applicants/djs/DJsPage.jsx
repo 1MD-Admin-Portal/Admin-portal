@@ -74,26 +74,33 @@ const DJsPage = () => {
 
   const pendingApps = applications.filter((a) => a.status === "pending");
 
-  if (loading) return <div className="djs-container">Loading...</div>;
+  if (loading) return <div className="professors-container">Loading...</div>;
 
   return (
-    <div className="djs-container">
-      <h1 className="djs-title">DJ Applications</h1>
+    <div className="professors-container">
+      <h2 className="professors-title">DJ Applications</h2>
 
       {pendingApps.length > 0 && (
-        <div className="bulk-actions-bar">
-          <button onClick={() => setShowConfirm("approve")}>
+        <div className="pagination-controls">
+          <button
+            className="pagination-btn"
+            onClick={() => setShowConfirm("approve")}
+          >
             ✅ Approve All
           </button>
-          <button onClick={() => setShowConfirm("reject")}>
+          <button
+            className="pagination-btn"
+            onClick={() => setShowConfirm("reject")}
+          >
             ❌ Reject All
           </button>
         </div>
       )}
 
-      <table className="djs-table">
+      <table className="professors-table">
         <thead>
           <tr>
+            <th></th>
             <th>ID</th>
             <th>Email</th>
             <th>Genres</th>
@@ -161,40 +168,38 @@ const DJsPage = () => {
       </table>
 
       {showConfirm === "approve" && (
-        <div className="reject-modal">
-          <div className="modal-card">
+        <div className="modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Approve all pending applications?</h3>
-            <div className="modal-button-group">
-              <button
-                className="modal-btn"
-                onClick={async () => {
-                  for (const { id } of pendingApps) {
-                    await approveDJApplication(id);
-                  }
-                  setApplications((prev) =>
-                    prev.map((a) =>
-                      a.status === "pending" ? { ...a, status: "approved" } : a
-                    )
-                  );
-                  setShowConfirm(null);
-                }}
-              >
-                Yes, Approve All
-              </button>
-              <button
-                className="modal-btn cancel-btn"
-                onClick={() => setShowConfirm(null)}
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              className="modal-close-btn"
+              onClick={async () => {
+                for (const { id } of pendingApps) {
+                  await approveDJApplication(id);
+                }
+                setApplications((prev) =>
+                  prev.map((a) =>
+                    a.status === "pending" ? { ...a, status: "approved" } : a
+                  )
+                );
+                setShowConfirm(null);
+              }}
+            >
+              Yes, Approve All
+            </button>
+            <button
+              className="modal-close-btn"
+              onClick={() => setShowConfirm(null)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {showConfirm === "reject" && (
-        <div className="reject-modal">
-          <div className="modal-card">
+        <div className="modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Reject all pending applications</h3>
             <textarea
               rows="4"
@@ -202,176 +207,135 @@ const DJsPage = () => {
               value={bulkRejectComment}
               onChange={(e) => setBulkRejectComment(e.target.value)}
             />
-            <div className="modal-button-group">
-              <button
-                className="modal-btn"
-                disabled={!bulkRejectComment.trim()}
-                onClick={async () => {
-                  for (const { id } of pendingApps) {
-                    await rejectDJApplication(id, bulkRejectComment);
-                  }
-                  setApplications((prev) =>
-                    prev.map((a) =>
-                      a.status === "pending"
-                        ? {
-                            ...a,
-                            status: "rejected",
-                            comment: bulkRejectComment,
-                          }
-                        : a
-                    )
-                  );
-                  setShowConfirm(null);
-                  setBulkRejectComment("");
-                }}
-              >
-                Yes, Reject All
-              </button>
-              <button
-                className="modal-btn cancel-btn"
-                onClick={() => setShowConfirm(null)}
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              className="modal-close-btn"
+              disabled={!bulkRejectComment.trim()}
+              onClick={async () => {
+                for (const { id } of pendingApps) {
+                  await rejectDJApplication(id, bulkRejectComment);
+                }
+                setApplications((prev) =>
+                  prev.map((a) =>
+                    a.status === "pending"
+                      ? {
+                          ...a,
+                          status: "rejected",
+                          comment: bulkRejectComment,
+                        }
+                      : a
+                  )
+                );
+                setShowConfirm(null);
+                setBulkRejectComment("");
+              }}
+            >
+              Yes, Reject All
+            </button>
+            <button
+              className="modal-close-btn"
+              onClick={() => setShowConfirm(null)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {selectedRejectId && (
-        <div className="reject-modal">
-          <div className="modal-card">
-            <h2>Reject Application</h2>
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedRejectId(null)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Reject Application</h3>
             <textarea
               rows="4"
               placeholder="Add a comment (required)"
               value={rejectComment}
               onChange={(e) => setRejectComment(e.target.value)}
             />
-            <div className="modal-button-group">
-              <button
-                onClick={handleReject}
-                className="modal-btn"
-                disabled={!rejectComment.trim()}
-              >
-                Submit Rejection
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedRejectId(null);
-                  setRejectComment("");
-                }}
-                className="modal-btn cancel-btn"
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              onClick={handleReject}
+              className="modal-close-btn"
+              disabled={!rejectComment.trim()}
+            >
+              Submit Rejection
+            </button>
+            <button
+              onClick={() => {
+                setSelectedRejectId(null);
+                setRejectComment("");
+              }}
+              className="modal-close-btn"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {selectedApplication && (
-        <div className="reject-modal">
-          <div className="modal-card">
-            <h2>Application Details</h2>
-            <table className="detail-table">
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>ID:</strong>
-                  </td>
-                  <td>{selectedApplication.id}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Email:</strong>
-                  </td>
-                  <td>{selectedApplication.email}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Experience:</strong>
-                  </td>
-                  <td>{selectedApplication.dj_experience}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Genres:</strong>
-                  </td>
-                  <td>{formatField(selectedApplication.genres)}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>DJ Type:</strong>
-                  </td>
-                  <td>{selectedApplication.dj_type}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Performance Frequency:</strong>
-                  </td>
-                  <td>
-                    {formatField(selectedApplication.performance_frequency)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Document Type:</strong>
-                  </td>
-                  <td>{selectedApplication.document_type}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Document:</strong>
-                  </td>
-                  <td>
-                    {selectedApplication.document_url ? (
-                      <a
-                        href={selectedApplication.document_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View Document
-                      </a>
-                    ) : (
-                      "No document"
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Status:</strong>
-                  </td>
-                  <td>{selectedApplication.status}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>User ID:</strong>
-                  </td>
-                  <td>{selectedApplication.user_id}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Main goal:</strong>
-                  </td>
-                  <td>{selectedApplication.main_goal}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Comment:</strong>
-                  </td>
-                  <td>{selectedApplication.comment || "-"}</td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="modal-button-group">
-              <button
-                className="modal-btn cancel-btn"
-                onClick={() => setSelectedApplication(null)}
-              >
-                Close
-              </button>
-            </div>
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedApplication(null)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>DJ Application Details</h3>
+            <p>
+              <strong>ID:</strong> {selectedApplication.id}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedApplication.email}
+            </p>
+            <p>
+              <strong>Experience:</strong> {selectedApplication.dj_experience}
+            </p>
+            <p>
+              <strong>Genres:</strong> {formatField(selectedApplication.genres)}
+            </p>
+            <p>
+              <strong>DJ Type:</strong> {selectedApplication.dj_type}
+            </p>
+            <p>
+              <strong>Performance Frequency:</strong>{" "}
+              {formatField(selectedApplication.performance_frequency)}
+            </p>
+            <p>
+              <strong>Document Type:</strong>{" "}
+              {selectedApplication.document_type}
+            </p>
+            <p>
+              <strong>Document:</strong>{" "}
+              {selectedApplication.document_url ? (
+                <a
+                  href={selectedApplication.document_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Document
+                </a>
+              ) : (
+                "No document"
+              )}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedApplication.status}
+            </p>
+            <p>
+              <strong>User ID:</strong> {selectedApplication.user_id}
+            </p>
+            <p>
+              <strong>Main Goal:</strong> {selectedApplication.main_goal}
+            </p>
+            <p>
+              <strong>Comment:</strong> {selectedApplication.comment || "-"}
+            </p>
+            <button
+              className="modal-close-btn"
+              onClick={() => setSelectedApplication(null)}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
