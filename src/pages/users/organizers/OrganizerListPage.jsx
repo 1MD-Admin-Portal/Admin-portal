@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchOrganizers } from "../../../services/organizer.service";
-import "./OrganizerListPage.css";
+// import "./OrganizerListPage.css";
 
 const OrganizerListPage = () => {
   const [organizers, setOrganizers] = useState([]);
