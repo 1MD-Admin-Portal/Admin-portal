@@ -41,6 +41,8 @@ const ProfessorsListPage = () => {
         <thead>
           <tr>
             <th></th>
+            <th>ID</th>
+            <th>Name</th>
             <th>Email</th>
             <th>Location</th>
             <th>Skill Level</th>
@@ -58,6 +60,8 @@ const ProfessorsListPage = () => {
                 setIsModalOpen(true);
               }}
             >
+              <td>{prof.id}</td>
+              <td>{prof.name}</td>
               <td>{prof.email}</td>
               <td>{prof.location}</td>
               <td>{prof.skill_level}</td>

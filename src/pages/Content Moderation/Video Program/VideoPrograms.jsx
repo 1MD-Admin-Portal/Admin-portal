@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/VideoPrograms.css";
+import "./VideoPrograms.css";
 import CreateProgramModal from "./CreateProgramModal";
 import { X } from "lucide-react";
-import { getProgramsService } from "../../services/program.service";
+import { getProgramsService } from "../../../services/program.service";
 
 const VideoPrograms = () => {
   const [programs, setPrograms] = useState([]);

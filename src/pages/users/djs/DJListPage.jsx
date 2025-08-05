@@ -39,6 +39,8 @@ const DJListPage = () => {
         <thead>
           <tr>
             <th></th>
+            <th>ID</th>
+            <th>Name</th>
             <th>Email</th>
             <th>Location</th>
             <th>Skill Level</th>
@@ -57,6 +59,8 @@ const DJListPage = () => {
                 onClick={() => setSelectedUser(user)}
                 style={{ cursor: "pointer" }}
               >
+                <td>{user.id}</td>
+                <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.location || "N/A"}</td>
                 <td>{user.skill_level || "N/A"}</td>

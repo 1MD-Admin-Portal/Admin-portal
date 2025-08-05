@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
-import loginImage from "../assets/login.jpg";
-import { loginService } from "../services/auth.service";
-import { useAuth } from "../contexts/AuthContext";
+import "./Login.css";
+import loginImage from "../../../assets/login.jpg"; // Adjust the path as necessary
+import { loginService } from "../../../services/auth.service";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");

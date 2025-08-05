@@ -2,26 +2,25 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import ChangePassword from "./pages/ChangePassword";
+import Login from "./pages/Onboarding/login/Login.jsx";
+import ForgotPassword from "./pages/Onboarding/forgot password/ForgotPassword.jsx";
+import ChangePassword from "./pages/Onboarding/change password/ChangePassword.jsx";
 import DashboardLayout from "./layouts/DashboardLayout";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home.jsx";
 import Users from "./pages/Users";
-import CommunityContent from "./pages/CommunityContent";
-import ProgramManagement from "./pages/ProgramManagement";
+import CommunityContent from "./pages/Content Moderation/User Generated Content/CommunityContent";
 import ClassModeration from "./pages/ClassModeration";
-import EventsPage from "./pages/EventsPage";
-import MarketplacePage from "./pages/MarketplacePage";
+import EventsPage from "./pages/Events/Event page/EventsPage.jsx";
+import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
 import AdsManagement from "./pages/Ads Management/AdsManagement";
-import NotificationPage from "./pages/NotificationPage";
+import NotificationPage from "./pages/Notification/NotificationPage";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
-import PayoutsPage from "./pages/PayoutsPage";
+import PayoutsPage from "./pages/earning&payout/payouts/PayoutsPage.jsx";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
-import VideoPrograms from "./pages/dashboard/VideoPrograms";
-import CreateChallenge from "./pages/dashboard/CreateChallenge";
+import VideoPrograms from "./pages/Content Moderation/Video Program/VideoPrograms.jsx";
+import CreateChallenge from "./pages/Content Moderation/Challenges/Challenge page/CreateChallenge.jsx";
 import AppBrandingPage from "./components/AppBrandingPage";
 import SubscriptionPlansPage from "./components/SubscriptionPlansPage";
 import LegalContentPage from "./components/LegalContentPage";
@@ -59,7 +58,6 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/users" element={<Users />} />
           <Route path="/CommunityContent" element={<CommunityContent />} />
-          <Route path="/ProgramManagement" element={<ProgramManagement />} />
           <Route path="/ClassModeration" element={<ClassModeration />} />
           <Route path="/EventsPage" element={<EventsPage />} />
           <Route path="/MarketplacePage" element={<MarketplacePage />} />

@@ -1,37 +1,37 @@
-import React from 'react';
-import '../styles/PayoutsPage.css';
+import React from "react";
+import "./PayoutsPage.css";
 
 const payouts = [
   {
     id: 1,
-    title: 'Urban Kiz Mastery',
-    icon: '🕺',
-    type: 'Video',
+    title: "Urban Kiz Mastery",
+    icon: "🕺",
+    type: "Video",
     price: 100,
     sales: 15,
     penalty: 0,
     gross: 1500,
     commission: 20,
     net: 1200,
-    payoutStatus: 'Not Requested',
+    payoutStatus: "Not Requested",
     lastRequest: null,
     paidOn: null,
     receipt: null,
   },
   {
     id: 2,
-    title: 'Salsa 1-on-1',
-    icon: '💃',
-    type: '1-on-1',
+    title: "Salsa 1-on-1",
+    icon: "💃",
+    type: "1-on-1",
     price: 80,
     sales: 5,
     penalty: 0,
     gross: 400,
     commission: 20,
     net: 320,
-    payoutStatus: 'Paid',
-    lastRequest: '2025-05-10',
-    receipt: 'https://example.com/receipt.pdf',
+    payoutStatus: "Paid",
+    lastRequest: "2025-05-10",
+    receipt: "https://example.com/receipt.pdf",
   },
 ];
 
@@ -46,28 +46,46 @@ const PayoutsPage = () => {
               <span className="emoji">{item.icon}</span>
               <h3>{item.title}</h3>
             </div>
-            <p>Type: {item.type} <span>Price: ${item.price}</span></p>
-            <p>Sales: {item.sales} <span>Penalty: ${item.penalty}</span></p>
+            <p>
+              Type: {item.type} <span>Price: ${item.price}</span>
+            </p>
+            <p>
+              Sales: {item.sales} <span>Penalty: ${item.penalty}</span>
+            </p>
 
             <div className="stats">
-              <p>Gross Revenue <span>${item.gross}</span></p>
-              <p>Commission <span>{item.commission}%</span></p>
-              <p>Net Earning <span>${item.net}</span></p>
+              <p>
+                Gross Revenue <span>${item.gross}</span>
+              </p>
+              <p>
+                Commission <span>{item.commission}%</span>
+              </p>
+              <p>
+                Net Earning <span>${item.net}</span>
+              </p>
             </div>
 
             <div className="payout-status">
               <p>
                 Payout Status:
-                <span className={item.payoutStatus === 'Paid' ? 'paid' : 'not-requested'}>
-                  {item.payoutStatus === 'Paid' ? '✅ Paid' : '❌ Not Requested Yet'}
+                <span
+                  className={
+                    item.payoutStatus === "Paid" ? "paid" : "not-requested"
+                  }
+                >
+                  {item.payoutStatus === "Paid"
+                    ? "✅ Paid"
+                    : "❌ Not Requested Yet"}
                 </span>
               </p>
-              <p>Paid On: {item.paidOn || '-'}</p>
-              <p>Receipt: {item.receipt ? <a href={item.receipt}>View</a> : '-'}</p>
+              <p>Paid On: {item.paidOn || "-"}</p>
+              <p>
+                Receipt: {item.receipt ? <a href={item.receipt}>View</a> : "-"}
+              </p>
             </div>
 
             <div className="actions">
-              {item.payoutStatus !== 'Paid' ? (
+              {item.payoutStatus !== "Paid" ? (
                 <>
                   <button className="primary">Send Email to Admin</button>
                   <button>Upload Receipt</button>

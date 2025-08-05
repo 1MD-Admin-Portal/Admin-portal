@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../styles/EventsPage.css";
+import "./EventsPage.css";
 import { FiSearch } from "react-icons/fi";
-import CreateEventModal from "../pages/dashboard/CreateEventModal";
+import CreateEventModal from "../Create Event Modal/CreateEventModal.jsx";
 import { X } from "lucide-react";
 
 const initialEvents = [

@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import {
   uploadImageService,
   createProgramService,
-} from "../../services/program.service";
+} from "../../../services/program.service";
 
 const CreateProgramModal = ({
   isOpen,

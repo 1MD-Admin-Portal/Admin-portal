@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/CommunityContent.css";
+import "./CommunityContent.css";
 
 const dummyContent = [
   {

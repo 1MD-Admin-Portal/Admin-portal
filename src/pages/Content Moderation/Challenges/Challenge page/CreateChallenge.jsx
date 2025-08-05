@@ -205,10 +205,10 @@
 // export default CreateChallenge;
 
 import React, { useState, useEffect } from "react";
-import "../../styles/CreateChallenge.css";
-import CreateChallengeModal from "./CreateChallengeModal";
+import "./CreateChallenge.css";
+import CreateChallengeModal from "../Challenge modal/CreateChallengeModal";
 import { X } from "lucide-react";
-import { getChallengesService } from "../../services/challenge.service";
+import { getChallengesService } from "../../../../services/challenge.service";
 
 const CreateChallenge = () => {
   const [challenges, setChallenges] = useState([]);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../styles/CreateEventModal.css";
+import "./CreateEventModal.css";
 
 const CreateEventModal = ({ onClose }) => {
   const [tiers, setTiers] = useState([

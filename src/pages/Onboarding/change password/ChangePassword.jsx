@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import "../styles/ChangePassword.css"; // new CSS file
+import "./ChangePassword.css"; // new CSS file
 
 const ChangePassword = () => {
   const location = useLocation();

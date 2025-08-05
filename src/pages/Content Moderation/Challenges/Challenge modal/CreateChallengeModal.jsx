@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/CreateChallengeModal.css";
-import { createChallengeService } from "../../services/challenge.service";
-import { uploadImageService } from "../../services/program.service";
+import "./CreateChallengeModal.css";
+import { createChallengeService } from "../../../../services/challenge.service";
+import { uploadImageService } from "../../../../services/program.service";
 
 const CreateChallengeModal = ({ onClose }) => {
   const [title, setTitle] = useState("");

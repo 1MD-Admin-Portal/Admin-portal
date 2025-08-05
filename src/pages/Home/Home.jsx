@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import { Plus, Flag, UserPlus } from "lucide-react";
-import "../styles/Home.css";
+import "./Home.css";
 
 // ---------- MOCK DATA ---------- //
 const monthlyData = [

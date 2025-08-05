@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/ForgotPassword.css";
+import "./ForgotPassword.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -9,17 +9,16 @@ const ForgotPassword = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-const handleSendOtp = () => {
-  if (!email) {
-    alert("Please enter your email.");
-    return;
-  }
+  const handleSendOtp = () => {
+    if (!email) {
+      alert("Please enter your email.");
+      return;
+    }
 
-  // Simulate always valid for test
-  alert("OTP sent to your email.");
-  setShowOtpBox(true);
-};
-
+    // Simulate always valid for test
+    alert("OTP sent to your email.");
+    setShowOtpBox(true);
+  };
 
   const handleVerifyOtp = () => {
     if (otp === "123") {
