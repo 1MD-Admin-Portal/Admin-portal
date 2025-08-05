@@ -1,159 +1,5 @@
-// // src/components/VideoPrograms/CreateProgramModal.js
-// import React, { useState } from "react";
-// import {
-//   uploadImageService,
-//   createProgramService,
-// } from "../../services/program.service";
-
-// const CreateProgramModal = ({
-//   isOpen,
-//   onClose,
-//   instructorOptions,
-//   danceStyles,
-// }) => {
-//   if (!isOpen) return null;
-
-//   const [title, setTitle] = useState("");
-//   const [description, setDescription] = useState("");
-//   const [danceStyle, setDanceStyle] = useState(danceStyles[0] || "");
-//   const [danceLevel, setDanceLevel] = useState("Beginner");
-//   const [pricingType, setPricingType] = useState("free");
-//   const [price, setPrice] = useState(0);
-//   const [instructorId, setInstructorId] = useState(""); // use IDs in real app
-//   const [videos, setVideos] = useState([]);
-//   const [imageFile, setImageFile] = useState(null);
-//   const [loading, setLoading] = useState(false);
-
-//   const handleCreateProgram = async () => {
-//     try {
-//       setLoading(true);
-//       let uploadedImageUrl = "";
-//       if (imageFile) {
-//         uploadedImageUrl = await uploadImageService(imageFile);
-//       }
-
-//       const programPayload = {
-//         title,
-//         description,
-//         dance_style: danceStyle,
-//         dance_level: danceLevel,
-//         pricing_type: pricingType,
-//         price: pricingType === "paid" ? price : 0,
-//         instructor_id: instructorId || 11, // fallback if you don't implement dropdown yet
-//         videos: videos.length
-//           ? videos
-//           : [
-//               // placeholder demo video
-//               {
-//                 title: "Sample Video",
-//                 duration: "5:00",
-//                 video_url: "https://example.com/sample.mp4",
-//                 description: "Sample video description",
-//               },
-//             ],
-//         image_url: uploadedImageUrl,
-//       };
-
-//       await createProgramService(programPayload);
-//       alert("Program created successfully!");
-//       onClose();
-//     } catch (error) {
-//       console.error("Error creating program:", error);
-//       alert("Failed to create program.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="modal-overlay" onClick={onClose}>
-//       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-//         <h2>Create Video Program</h2>
-//         <label>Title:</label>
-//         <input value={title} onChange={(e) => setTitle(e.target.value)} />
-
-//         <label>Description:</label>
-//         <textarea
-//           value={description}
-//           onChange={(e) => setDescription(e.target.value)}
-//         />
-
-//         <label>Dance Style:</label>
-//         <select
-//           value={danceStyle}
-//           onChange={(e) => setDanceStyle(e.target.value)}
-//         >
-//           {danceStyles.map((style) => (
-//             <option key={style} value={style}>
-//               {style}
-//             </option>
-//           ))}
-//         </select>
-
-//         <label>Level:</label>
-//         <select
-//           value={danceLevel}
-//           onChange={(e) => setDanceLevel(e.target.value)}
-//         >
-//           <option value="Beginner">Beginner</option>
-//           <option value="Intermediate">Intermediate</option>
-//           <option value="Advance">Advance</option>
-//           <option value="Professional">Professional</option>
-//         </select>
-
-//         <label>Pricing Type:</label>
-//         <select
-//           value={pricingType}
-//           onChange={(e) => setPricingType(e.target.value)}
-//         >
-//           <option value="free">Free</option>
-//           <option value="paid">Paid</option>
-//         </select>
-
-//         {pricingType === "paid" && (
-//           <>
-//             <label>Price (₹):</label>
-//             <input
-//               type="number"
-//               value={price}
-//               onChange={(e) => setPrice(Number(e.target.value))}
-//             />
-//           </>
-//         )}
-
-//         <label>Instructor:</label>
-//         <select
-//           value={instructorId}
-//           onChange={(e) => setInstructorId(e.target.value)}
-//         >
-//           <option value="">Select Instructor</option>
-//           {instructorOptions.map((inst, idx) => (
-//             <option key={idx} value={11}>
-//               {inst}
-//             </option> // hardcoded id=11 for now
-//           ))}
-//         </select>
-
-//         <label>Cover Image:</label>
-//         <input type="file" onChange={(e) => setImageFile(e.target.files[0])} />
-//         {imageFile && <p>Selected image: {imageFile.name}</p>}
-
-//         {/* Optionally: add UI to add videos manually */}
-
-//         <div className="modal-buttons">
-//           <button onClick={handleCreateProgram} disabled={loading}>
-//             {loading ? "Creating..." : "Create Program"}
-//           </button>
-//           <button onClick={onClose}>Cancel</button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CreateProgramModal;
-// src/components/VideoPrograms/CreateProgramModal.js
 import React, { useState } from "react";
+import { X } from "lucide-react";
 import {
   uploadImageService,
   createProgramService,
@@ -274,127 +120,242 @@ const CreateProgramModal = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Create Video Program</h2>
+      <div
+        className="modal-content create-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-header">
+          <h2 className="modal-title">Create Video Program</h2>
+          <button className="modal-close-btn" onClick={onClose}>
+            <X />
+          </button>
+        </div>
 
-        <label>Title:</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} />
+        <div className="modal-body">
+          <div className="modal-section">
+            <h3 className="section-title">Basic Information</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">Program Title</label>
+                <input
+                  className="form-input"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter program title"
+                />
+              </div>
 
-        <label>Description:</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+              <div className="form-group full-width">
+                <label className="form-label">Description</label>
+                <textarea
+                  className="form-textarea"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter program description"
+                  rows="4"
+                />
+              </div>
 
-        <label>Dance Style:</label>
-        <select
-          value={danceStyle}
-          onChange={(e) => setDanceStyle(e.target.value)}
-        >
-          {danceStyles.map((style) => (
-            <option key={style} value={style}>
-              {style}
-            </option>
-          ))}
-        </select>
+              <div className="form-group">
+                <label className="form-label">Dance Style</label>
+                <select
+                  className="form-select"
+                  value={danceStyle}
+                  onChange={(e) => setDanceStyle(e.target.value)}
+                >
+                  {danceStyles.map((style) => (
+                    <option key={style} value={style}>
+                      {style}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <label>Level:</label>
-        <select
-          value={danceLevel}
-          onChange={(e) => setDanceLevel(e.target.value)}
-        >
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advance">Advance</option>
-          <option value="Professional">Professional</option>
-        </select>
+              <div className="form-group">
+                <label className="form-label">Level</label>
+                <select
+                  className="form-select"
+                  value={danceLevel}
+                  onChange={(e) => setDanceLevel(e.target.value)}
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advance">Advance</option>
+                  <option value="Professional">Professional</option>
+                </select>
+              </div>
 
-        <label>Pricing Type:</label>
-        <select
-          value={pricingType}
-          onChange={(e) => setPricingType(e.target.value)}
-        >
-          <option value="free">Free</option>
-          <option value="paid">Paid</option>
-        </select>
+              <div className="form-group">
+                <label className="form-label">Pricing Type</label>
+                <select
+                  className="form-select"
+                  value={pricingType}
+                  onChange={(e) => setPricingType(e.target.value)}
+                >
+                  <option value="free">Free</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
 
-        {pricingType === "paid" && (
-          <>
-            <label>Price (₹):</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-            />
-          </>
-        )}
+              {pricingType === "paid" && (
+                <div className="form-group">
+                  <label className="form-label">Price (₹)</label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(Number(e.target.value))}
+                    placeholder="Enter price"
+                  />
+                </div>
+              )}
 
-        <label>Instructor:</label>
-        <select
-          value={instructorId}
-          onChange={(e) => setInstructorId(e.target.value)}
-        >
-          <option value="">Select Instructor</option>
-          {instructorOptions.map((inst) => (
-            <option key={inst.id} value={inst.id}>
-              {inst.name}
-            </option>
-          ))}
-        </select>
+              <div className="form-group">
+                <label className="form-label">Instructor</label>
+                <select
+                  className="form-select"
+                  value={instructorId}
+                  onChange={(e) => setInstructorId(e.target.value)}
+                >
+                  <option value="">Select Instructor</option>
+                  {instructorOptions.map((inst) => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <label>Cover Image:</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files[0])}
-        />
-        {imageFile && <p>Selected image: {imageFile.name}</p>}
-
-        <h4>Videos:</h4>
-        {videos.map((vid, index) => (
-          <div key={index} style={{ marginBottom: "8px" }}>
-            <input
-              placeholder="Title"
-              value={vid.title}
-              onChange={(e) =>
-                handleVideoChange(index, "title", e.target.value)
-              }
-            />
-            <input
-              placeholder="Duration (e.g. 9:20)"
-              value={vid.duration}
-              onChange={(e) =>
-                handleVideoChange(index, "duration", e.target.value)
-              }
-            />
-            <textarea
-              placeholder="Description"
-              value={vid.description}
-              onChange={(e) =>
-                handleVideoChange(index, "description", e.target.value)
-              }
-            />
-            <input
-              type="file"
-              accept="video/*"
-              onChange={(e) =>
-                handleVideoChange(index, "file", e.target.files[0])
-              }
-            />
-            <button type="button" onClick={() => removeVideo(index)}>
-              Remove
-            </button>
+              <div className="form-group">
+                <label className="form-label">Cover Image</label>
+                <div className="file-input-container">
+                  <input
+                    className="file-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files[0])}
+                    id="cover-image"
+                  />
+                  <label htmlFor="cover-image" className="file-input-label">
+                    {imageFile ? imageFile.name : "Choose cover image"}
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-        ))}
-        <button type="button" onClick={addVideo}>
-          + Add Video
-        </button>
 
-        <div className="modal-buttons">
-          <button onClick={handleCreateProgram} disabled={loading}>
+          <div className="modal-section">
+            <div className="section-header">
+              <h3 className="section-title">Videos</h3>
+              <button
+                type="button"
+                className="add-video-btn"
+                onClick={addVideo}
+              >
+                + Add Video
+              </button>
+            </div>
+
+            <div className="videos-container">
+              {videos.map((vid, index) => (
+                <div key={index} className="video-form-card">
+                  <div className="video-card-header">
+                    <span className="video-number">Video {index + 1}</span>
+                    {videos.length > 1 && (
+                      <button
+                        type="button"
+                        className="remove-video-btn"
+                        onClick={() => removeVideo(index)}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="video-form-grid">
+                    <div className="form-group">
+                      <label className="form-label">Title</label>
+                      <input
+                        className="form-input"
+                        placeholder="Video title"
+                        value={vid.title}
+                        onChange={(e) =>
+                          handleVideoChange(index, "title", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Duration</label>
+                      <input
+                        className="form-input"
+                        placeholder="e.g. 9:20"
+                        value={vid.duration}
+                        onChange={(e) =>
+                          handleVideoChange(index, "duration", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label className="form-label">Description</label>
+                      <textarea
+                        className="form-textarea"
+                        placeholder="Video description"
+                        value={vid.description}
+                        onChange={(e) =>
+                          handleVideoChange(
+                            index,
+                            "description",
+                            e.target.value
+                          )
+                        }
+                        rows="3"
+                      />
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label className="form-label">Video File</label>
+                      <div className="file-input-container">
+                        <input
+                          className="file-input"
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) =>
+                            handleVideoChange(index, "file", e.target.files[0])
+                          }
+                          id={`video-file-${index}`}
+                        />
+                        <label
+                          htmlFor={`video-file-${index}`}
+                          className="file-input-label"
+                        >
+                          {vid.file ? vid.file.name : "Choose video file"}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button
+            className="modal-btn cancel-btn"
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            className="modal-btn create-btn"
+            onClick={handleCreateProgram}
+            disabled={loading}
+          >
             {loading ? "Creating..." : "Create Program"}
           </button>
-          <button onClick={onClose}>Cancel</button>
         </div>
       </div>
     </div>

@@ -168,11 +168,14 @@ const DJsPage = () => {
       </table>
 
       {showConfirm === "approve" && (
-        <div className="modal-overlay" onClick={() => setShowConfirm(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="dj-modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div
+            className="dj-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Approve all pending applications?</h3>
             <button
-              className="modal-close-btn"
+              className="dj-close-btn"
               onClick={async () => {
                 for (const { id } of pendingApps) {
                   await approveDJApplication(id);
@@ -188,7 +191,7 @@ const DJsPage = () => {
               Yes, Approve All
             </button>
             <button
-              className="modal-close-btn"
+              className="dj-close-btn"
               onClick={() => setShowConfirm(null)}
             >
               Cancel
@@ -198,8 +201,11 @@ const DJsPage = () => {
       )}
 
       {showConfirm === "reject" && (
-        <div className="modal-overlay" onClick={() => setShowConfirm(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="dj-modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div
+            className="dj-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Reject all pending applications</h3>
             <textarea
               rows="4"
@@ -208,7 +214,7 @@ const DJsPage = () => {
               onChange={(e) => setBulkRejectComment(e.target.value)}
             />
             <button
-              className="modal-close-btn"
+              className="dj-close-btn"
               disabled={!bulkRejectComment.trim()}
               onClick={async () => {
                 for (const { id } of pendingApps) {
@@ -232,7 +238,7 @@ const DJsPage = () => {
               Yes, Reject All
             </button>
             <button
-              className="modal-close-btn"
+              className="dj-close-btn"
               onClick={() => setShowConfirm(null)}
             >
               Cancel
@@ -243,10 +249,13 @@ const DJsPage = () => {
 
       {selectedRejectId && (
         <div
-          className="modal-overlay"
+          className="dj-modal-overlay"
           onClick={() => setSelectedRejectId(null)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="dj-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Reject Application</h3>
             <textarea
               rows="4"
@@ -256,7 +265,7 @@ const DJsPage = () => {
             />
             <button
               onClick={handleReject}
-              className="modal-close-btn"
+              className="dj-close-btn"
               disabled={!rejectComment.trim()}
             >
               Submit Rejection
@@ -266,7 +275,7 @@ const DJsPage = () => {
                 setSelectedRejectId(null);
                 setRejectComment("");
               }}
-              className="modal-close-btn"
+              className="dj-close-btn"
             >
               Cancel
             </button>
@@ -276,10 +285,13 @@ const DJsPage = () => {
 
       {selectedApplication && (
         <div
-          className="modal-overlay"
+          className="dj-modal-overlay"
           onClick={() => setSelectedApplication(null)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="dj-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>DJ Application Details</h3>
             <p>
               <strong>ID:</strong> {selectedApplication.id}
@@ -331,7 +343,7 @@ const DJsPage = () => {
               <strong>Comment:</strong> {selectedApplication.comment || "-"}
             </p>
             <button
-              className="modal-close-btn"
+              className="dj-close-btn"
               onClick={() => setSelectedApplication(null)}
             >
               Close

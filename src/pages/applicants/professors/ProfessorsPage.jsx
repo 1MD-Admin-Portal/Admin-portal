@@ -141,6 +141,7 @@ const ProfessorsPage = () => {
         <thead>
           <tr>
             <th></th>
+            <th></th>
             <th>ID</th>
             <th>Email</th>
             <th>Dance Styles</th>

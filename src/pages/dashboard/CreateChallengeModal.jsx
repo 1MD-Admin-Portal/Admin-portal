@@ -272,36 +272,6 @@ const CreateChallengeModal = ({ onClose }) => {
                 >
                   + Add Watch Video
                 </button>
-
-                {/* {group.uploadVideos.map((upload, uploadIndex) => (
-                  <div key={upload.id} className="task-row watch-upload-row">
-                    <span className="task-type">Upload Video</span>
-                    <input
-                      type="text"
-                      placeholder="Upload Title"
-                      value={upload.title}
-                      onChange={(e) =>
-                        handleUploadTitleChange(
-                          groupIndex,
-                          uploadIndex,
-                          e.target.value
-                        )
-                      }
-                    />
-                    <button
-                      className="remove-task-btn"
-                      onClick={() => removeUploadVideo(groupIndex, uploadIndex)}
-                    >
-                      ❌
-                    </button>
-                  </div>
-                ))} */}
-                {/* <button
-                  className="add-task-btn"
-                  onClick={() => addUploadVideo(groupIndex)}
-                >
-                  + Add Upload Video
-                </button> */}
               </div>
             ))}
           </div>

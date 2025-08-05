@@ -30,18 +30,24 @@ const CommunityContent = () => {
   return (
     <div className="community-content-page">
       <div className="community-header">
-        <h1>Community Content</h1>
+        <h1>User Generated Content</h1>
       </div>
 
       <div className="filters-bar">
         <div className="filters-left">
-          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
             <option value="All">All Types</option>
             <option value="Video">Video</option>
             <option value="Image">Image</option>
           </select>
 
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option value="All">All Status</option>
             <option value="Published">Published</option>
             <option value="Draft">Draft</option>
@@ -91,7 +97,9 @@ const CommunityContent = () => {
                 <td>{content.postedBy}</td>
                 <td>{content.likes}</td>
                 <td>
-                  <span className={`status-tag status-${content.status.toLowerCase()}`}>
+                  <span
+                    className={`status-tag status-${content.status.toLowerCase()}`}
+                  >
                     {content.status}
                   </span>
                 </td>
@@ -107,16 +115,32 @@ const CommunityContent = () => {
       {selectedContent && (
         <div className="modal-overlay">
           <div className="modal-content-community">
-            <button className="modal-close" onClick={closeModal}>×</button>
+            <button className="modal-close" onClick={closeModal}>
+              ×
+            </button>
             <h2 className="modal-title">Content Details</h2>
 
             <div className="modal-info">
-              <img src={selectedContent.image} alt="preview" className="modal-img" />
-              <p><strong>Caption:</strong> {selectedContent.caption}</p>
-              <p><strong>Posted By:</strong> {selectedContent.postedBy}</p>
-              <p><strong>Likes:</strong> {selectedContent.likes}</p>
-              <p><strong>Status:</strong> {selectedContent.status}</p>
-              <p><strong>Date:</strong> {selectedContent.date}</p>
+              <img
+                src={selectedContent.image}
+                alt="preview"
+                className="modal-img"
+              />
+              <p>
+                <strong>Caption:</strong> {selectedContent.caption}
+              </p>
+              <p>
+                <strong>Posted By:</strong> {selectedContent.postedBy}
+              </p>
+              <p>
+                <strong>Likes:</strong> {selectedContent.likes}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedContent.status}
+              </p>
+              <p>
+                <strong>Date:</strong> {selectedContent.date}
+              </p>
             </div>
 
             <div className="modal-actions">
