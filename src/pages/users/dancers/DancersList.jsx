@@ -8,6 +8,10 @@ const DancersList = () => {
   const [selectedDancer, setSelectedDancer] = useState(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc"); // "asc" or "desc"
+  const [subscriptionFilter, setSubscriptionFilter] = useState("");
+  const [skillLevelFilter, setSkillLevelFilter] = useState("");
 
   useEffect(() => {
     const loadDancers = async () => {
@@ -46,6 +50,40 @@ const DancersList = () => {
   return (
     <div className="professors-container">
       <h2 className="professors-title">Dancers List</h2>
+      <div className="filters-container">
+        <input
+          type="text"
+          placeholder="Search by name or location"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <select
+          value={subscriptionFilter}
+          onChange={(e) => setSubscriptionFilter(e.target.value)}
+        >
+          <option value="">All Subscriptions</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+
+        <select
+          value={skillLevelFilter}
+          onChange={(e) => setSkillLevelFilter(e.target.value)}
+        >
+          <option value="">All Skill Levels</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+
+        <button
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+        >
+          Sort by Date: {sortOrder === "asc" ? "Oldest First" : "Newest First"}
+        </button>
+      </div>
+
       <table className="professors-table">
         <thead>
           <tr>
@@ -56,27 +94,56 @@ const DancersList = () => {
             <th>Location</th>
             <th>Skill Level</th>
             <th>User Type</th>
-            <th>Provider</th>
             <th>Created At</th>
             <th>Roles</th>
             <th>Subscription</th>
           </tr>
         </thead>
         <tbody>
-          {dancers.map((dancer) => (
-            <tr key={dancer.id} onClick={() => setSelectedDancer(dancer)}>
-              <td>{dancer.id}</td>
-              <td>{dancer.email}</td>
-              <td>{dancer.name}</td>
-              <td>{dancer.location}</td>
-              <td>{dancer.skill_level}</td>
-              <td>{dancer.profile_user_type}</td>
-              <td>{dancer.provider}</td>
-              <td>{new Date(dancer.created_at).toLocaleString()}</td>
-              <td>{dancer.roles?.join(", ")}</td>
-              <td>{dancer.active_subscription?.subscription_name || "N/A"}</td>
-            </tr>
-          ))}
+          {dancers
+            .filter((dancer) => {
+              const matchesSearch =
+                (dancer.name?.toLowerCase() || "").includes(
+                  searchTerm.toLowerCase()
+                ) ||
+                (dancer.location?.toLowerCase() || "").includes(
+                  searchTerm.toLowerCase()
+                );
+
+              const matchesSubscription =
+                subscriptionFilter === "" ||
+                (subscriptionFilter === "Active"
+                  ? dancer.active_subscription?.is_active
+                  : !dancer.active_subscription?.is_active);
+
+              const matchesSkill =
+                skillLevelFilter === "" ||
+                (dancer.skill_level?.toLowerCase() || "") ===
+                  skillLevelFilter.toLowerCase();
+
+              return matchesSearch && matchesSubscription && matchesSkill;
+            })
+
+            .sort((a, b) => {
+              const dateA = new Date(a.created_at);
+              const dateB = new Date(b.created_at);
+              return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            })
+            .map((dancer) => (
+              <tr key={dancer.id} onClick={() => setSelectedDancer(dancer)}>
+                <td>{dancer.id}</td>
+                <td>{dancer.email}</td>
+                <td>{dancer.name}</td>
+                <td>{dancer.location}</td>
+                <td>{dancer.skill_level}</td>
+                <td>{dancer.profile_user_type}</td>
+                <td>{new Date(dancer.created_at).toLocaleString()}</td>
+                <td>{dancer.roles?.join(", ")}</td>
+                <td>
+                  {dancer.active_subscription?.subscription_name || "N/A"}
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
 

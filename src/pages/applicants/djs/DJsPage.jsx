@@ -15,6 +15,7 @@ const DJsPage = () => {
   const [showConfirm, setShowConfirm] = useState(null);
   const [bulkRejectComment, setBulkRejectComment] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -100,7 +101,25 @@ const DJsPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
+            {/* <th>
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedIds(pendingApps.map((app) => app.id));
+                  } else {
+                    setSelectedIds([]);
+                  }
+                }}
+                checked={
+                  selectedIds.length === pendingApps.length &&
+                  pendingApps.length > 0
+                }
+              />
+            </th> */}
             <th></th>
+            <th></th>
+
             <th>ID</th>
             <th>Email</th>
             <th>Genres</th>
@@ -116,6 +135,23 @@ const DJsPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(app.id)}
+                  disabled={app.status !== "pending"}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedIds((prev) => [...prev, app.id]);
+                    } else {
+                      setSelectedIds((prev) =>
+                        prev.filter((id) => id !== app.id)
+                      );
+                    }
+                  }}
+                />
+              </td>
+
               <td>{app.id}</td>
               <td>
                 <button
