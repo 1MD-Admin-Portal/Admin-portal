@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import {
-  uploadImageService,
-  createProgramService,
-} from "../../../services/program.service";
+import { createProgramService } from "../../../services/program.service";
+import { uploadMediaFile } from "../../../services/upload.service";
 
 const CreateProgramModal = ({
   isOpen,
@@ -44,7 +42,6 @@ const CreateProgramModal = ({
     updated.splice(index, 1);
     setVideos(updated);
   };
-
   const handleCreateProgram = async () => {
     try {
       setLoading(true);
@@ -52,35 +49,39 @@ const CreateProgramModal = ({
       // 1️⃣ Upload cover image
       let uploadedImageUrl = "";
       if (imageFile) {
-        const uploadRes = await uploadImageService(imageFile);
-        uploadedImageUrl = uploadRes?.uploadResponse?.fileURL || "";
+        try {
+          const uploadRes = await uploadMediaFile(imageFile);
+          uploadedImageUrl = uploadRes?.uploadResponse?.fileURL || "";
+          console.log("✅ Uploaded image URL:", uploadedImageUrl);
+        } catch (err) {
+          console.error("❌ Image upload failed:", err);
+        }
       }
 
-      // 2️⃣ Upload each video or use fallback demo URLs
+      // 2️⃣ Upload videos
       const uploadedVideos = [];
-      for (const video of videos.length
-        ? videos
-        : [
-            {
-              title: "Spot Turns with Control",
-              duration: "9:20",
-              description:
-                "Learn how to execute clean, sharp spot turns with balance and grace.",
-              video_url: "https://example.com/videos/salsa_spins.mp4",
-            },
-            {
-              title: "Speed Drills",
-              duration: "8:45",
-              description:
-                "Push your limits with fast-paced drills focused on timing, control, and acceleration.",
-              video_url: "https://example.com/videos/salsa_speed_drills.mp4",
-            },
-          ]) {
-        let videoUrl = video.video_url || "";
+
+      for (const [index, video] of videos.entries()) {
+        let videoUrl = "";
+
         if (video.file) {
-          const uploadRes = await uploadImageService(video.file);
-          videoUrl = uploadRes?.uploadResponse?.fileURL || "";
+          try {
+            const uploadRes = await uploadMediaFile(video.file, {
+              title: video.title,
+              duration: video.duration,
+              program_id: 1, // Replace with actual program ID if needed
+            });
+
+            videoUrl = uploadRes?.uploadResponse?.fileURL || "";
+            console.log(`✅ Video ${index + 1} uploaded URL:`, videoUrl);
+          } catch (err) {
+            console.error(`❌ Failed to upload video ${index + 1}:`, err);
+          }
+        } else {
+          videoUrl = video.video_url || "";
+          console.log(`ℹ️ Video ${index + 1} used fallback URL:`, videoUrl);
         }
+
         uploadedVideos.push({
           title: video.title,
           duration: video.duration,
@@ -89,7 +90,7 @@ const CreateProgramModal = ({
         });
       }
 
-      // 3️⃣ Build payload exactly matching Postman body
+      // 3️⃣ Build payload
       const payload = {
         title,
         description,
@@ -102,7 +103,8 @@ const CreateProgramModal = ({
         image_url: uploadedImageUrl,
       };
 
-      console.log("🚀 Sending payload:", JSON.stringify(payload, null, 2));
+      console.log("🚀 Final payload being sent to createProgramService:");
+      console.log(JSON.stringify(payload, null, 2));
 
       await createProgramService(payload);
       alert("✅ Program created successfully!");

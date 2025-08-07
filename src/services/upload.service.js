@@ -3,14 +3,14 @@ import axios from "axios";
 import { CONSTANTS } from "../utils/constants";
 
 const BASE_URL = CONSTANTS.URL.BASE_URL;
-const UPLOAD_ENDPOINT = "/api/v1/file/upload"; // make sure this is correct
+const UPLOAD_ENDPOINT = "/api/v1/file/upload";
 
 export const uploadMediaFile = async (file, metadata = {}) => {
   try {
     const token = localStorage.getItem("token");
 
     const formData = new FormData();
-    formData.append("file", file); // or "media" if your backend expects that
+    formData.append("attachment", file);
 
     // Append extra fields
     if (metadata.title) formData.append("title", metadata.title);
