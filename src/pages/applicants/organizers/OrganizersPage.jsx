@@ -10,12 +10,19 @@ import { CheckCircle, XCircle } from "lucide-react";
 const OrganizersPage = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // single-reject modal state
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
-  const [showConfirm, setShowConfirm] = useState(null);
+
+  // bulk states & selection
+  const [selectedIds, setSelectedIds] = useState([]);
   const [bulkRejectComment, setBulkRejectComment] = useState("");
+  const [showConfirm, setShowConfirm] = useState(null); // "approve-all", "reject-all", "approve-selected", "reject-selected"
   const [selectedApp, setSelectedApp] = useState(null);
+
   const modalRef = useRef(null);
+  const selectAllRef = useRef(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -31,6 +38,7 @@ const OrganizersPage = () => {
     fetchApplications();
   }, []);
 
+  // click outside detail modal to close
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -42,6 +50,18 @@ const OrganizersPage = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [selectedApp]);
+
+  const formatField = (field) => {
+    if (Array.isArray(field)) return field.join(", ");
+    if (typeof field === "string" && field.startsWith("[")) {
+      try {
+        return JSON.parse(field).join(", ");
+      } catch {
+        return field;
+      }
+    }
+    return field;
+  };
 
   const handleApprove = async (id) => {
     try {
@@ -73,47 +93,171 @@ const OrganizersPage = () => {
     }
   };
 
-  const formatField = (field) => {
-    if (Array.isArray(field)) return field.join(", ");
-    if (typeof field === "string" && field.startsWith("[")) {
-      try {
-        return JSON.parse(field).join(", ");
-      } catch {
-        return field;
-      }
+  // selection helpers
+  const pendingApps = applications.filter((a) => a.status === "pending");
+
+  useEffect(() => {
+    // update header checkbox indeterminate state
+    if (!selectAllRef.current) return;
+    const totalPending = pendingApps.length;
+    if (totalPending === 0) {
+      selectAllRef.current.indeterminate = false;
+      selectAllRef.current.checked = false;
+    } else {
+      selectAllRef.current.indeterminate =
+        selectedIds.length > 0 && selectedIds.length < totalPending;
+      selectAllRef.current.checked = selectedIds.length === totalPending;
     }
-    return field;
+  }, [selectedIds, pendingApps]);
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    const selectable = pendingApps.map((app) => app.id);
+    if (selectedIds.length === selectable.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(selectable);
+    }
+  };
+
+  // Bulk operations
+  const performApproveAll = async () => {
+    try {
+      await Promise.all(
+        pendingApps.map((a) => approveOrganizerApplication(a.id))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          a.status === "pending" ? { ...a, status: "approved" } : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
+      setSelectedIds([]);
+    }
+  };
+
+  const performRejectAll = async (comment) => {
+    try {
+      await Promise.all(
+        pendingApps.map((a) => rejectOrganizerApplication(a.id, comment))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          a.status === "pending" ? { ...a, status: "rejected", comment } : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
+      setBulkRejectComment("");
+      setSelectedIds([]);
+    }
+  };
+
+  const performApproveSelected = async () => {
+    try {
+      await Promise.all(
+        selectedIds.map((id) => approveOrganizerApplication(id))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          selectedIds.includes(a.id) ? { ...a, status: "approved" } : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
+      setSelectedIds([]);
+    }
+  };
+
+  const performRejectSelected = async (comment) => {
+    try {
+      await Promise.all(
+        selectedIds.map((id) => rejectOrganizerApplication(id, comment))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          selectedIds.includes(a.id) ? { ...a, status: "rejected", comment } : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
+      setBulkRejectComment("");
+      setSelectedIds([]);
+    }
   };
 
   if (loading) return <div className="professors-container">Loading...</div>;
-
-  const pendingApps = applications.filter((a) => a.status === "pending");
 
   return (
     <div className="professors-container">
       <h1 className="professors-title">Organizer Applications</h1>
 
-      {pendingApps.length > 0 && (
-        <div className="bulk-actions-bar">
-          <button
-            className="bulk-approve-btn"
-            onClick={() => setShowConfirm("approve")}
-          >
-            ✅ Approve All ({pendingApps.length})
-          </button>
-          <button
-            className="bulk-reject-btn"
-            onClick={() => setShowConfirm("reject")}
-          >
-            ❌ Reject All ({pendingApps.length})
-          </button>
-        </div>
-      )}
+      {/* Bulk actions bar:
+          - If nothing selected -> show Approve All / Reject All
+          - If something selected -> show Approve Selected / Reject Selected (only)
+      */}
+      <div className="bulk-actions-bar">
+        {selectedIds.length === 0 ? (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve-all")}
+            >
+              ✅ Approve All ({pendingApps.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject-all")}
+            >
+              ❌ Reject All ({pendingApps.length})
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve-selected")}
+            >
+              ✅ Approve Selected ({selectedIds.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject-selected")}
+            >
+              ❌ Reject Selected ({selectedIds.length})
+            </button>
+          </>
+        )}
+      </div>
 
       <table className="professors-table">
         <thead>
           <tr>
             <th></th>
+            <th>
+              {/* header checkbox only for pending items */}
+              <input
+                ref={selectAllRef}
+                type="checkbox"
+                onChange={toggleSelectAll}
+                // checked/indeterminate handled via useEffect
+                disabled={pendingApps.length === 0}
+              />
+            </th>
             <th>ID</th>
             <th>Email</th>
             <th>Event Types</th>
@@ -128,13 +272,25 @@ const OrganizersPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  onChange={() => toggleSelect(app.id)}
+                  checked={selectedIds.includes(app.id)}
+                  disabled={app.status !== "pending"}
+                />
+              </td>
+
               <td>{app.id}</td>
+
               <td
                 className="clickable-email"
                 onClick={() => setSelectedApp(app)}
+                style={{ cursor: "pointer" }}
               >
                 {app.email}
               </td>
+
               <td>{formatField(app.event_types)}</td>
               <td>{app.expected_event_size}</td>
               <td>{app.total_organized_event}</td>
@@ -179,24 +335,15 @@ const OrganizersPage = () => {
         </tbody>
       </table>
 
-      {showConfirm === "approve" && (
+      {/* Confirm modals */}
+      {showConfirm === "approve-all" && (
         <div className="reject-modal">
           <div className="modal-card">
             <h3>Approve all pending applications?</h3>
             <div className="modal-button-group">
               <button
                 className="modal-btn submit-approve-btn"
-                onClick={async () => {
-                  for (const { id } of pendingApps) {
-                    await approveOrganizerApplication(id);
-                  }
-                  setApplications((prev) =>
-                    prev.map((a) =>
-                      a.status === "pending" ? { ...a, status: "approved" } : a
-                    )
-                  );
-                  setShowConfirm(null);
-                }}
+                onClick={performApproveAll}
               >
                 Yes, Approve All
               </button>
@@ -211,7 +358,7 @@ const OrganizersPage = () => {
         </div>
       )}
 
-      {showConfirm === "reject" && (
+      {showConfirm === "reject-all" && (
         <div className="reject-modal">
           <div className="modal-card">
             <h3>Reject all pending applications</h3>
@@ -225,26 +372,34 @@ const OrganizersPage = () => {
               <button
                 className="modal-btn submit-reject-btn"
                 disabled={!bulkRejectComment.trim()}
-                onClick={async () => {
-                  for (const { id } of pendingApps) {
-                    await rejectOrganizerApplication(id, bulkRejectComment);
-                  }
-                  setApplications((prev) =>
-                    prev.map((a) =>
-                      a.status === "pending"
-                        ? {
-                            ...a,
-                            status: "rejected",
-                            comment: bulkRejectComment,
-                          }
-                        : a
-                    )
-                  );
-                  setBulkRejectComment("");
-                  setShowConfirm(null);
-                }}
+                onClick={() => performRejectAll(bulkRejectComment)}
               >
                 Yes, Reject All
+              </button>
+              <button
+                className="modal-btn cancel-btn"
+                onClick={() => {
+                  setShowConfirm(null);
+                  setBulkRejectComment("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfirm === "approve-selected" && (
+        <div className="reject-modal">
+          <div className="modal-card">
+            <h3>Approve selected applications?</h3>
+            <div className="modal-button-group">
+              <button
+                className="modal-btn submit-approve-btn"
+                onClick={performApproveSelected}
+              >
+                Yes, Approve Selected
               </button>
               <button
                 className="modal-btn cancel-btn"
@@ -257,6 +412,39 @@ const OrganizersPage = () => {
         </div>
       )}
 
+      {showConfirm === "reject-selected" && (
+        <div className="reject-modal">
+          <div className="modal-card">
+            <h3>Reject selected applications</h3>
+            <textarea
+              rows="4"
+              placeholder="Enter reason for rejection"
+              value={bulkRejectComment}
+              onChange={(e) => setBulkRejectComment(e.target.value)}
+            />
+            <div className="modal-button-group">
+              <button
+                className="modal-btn submit-reject-btn"
+                disabled={!bulkRejectComment.trim()}
+                onClick={() => performRejectSelected(bulkRejectComment)}
+              >
+                Yes, Reject Selected
+              </button>
+              <button
+                className="modal-btn cancel-btn"
+                onClick={() => {
+                  setShowConfirm(null);
+                  setBulkRejectComment("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Single-reject modal for a single selectedRejectId */}
       {selectedRejectId && (
         <div className="reject-modal">
           <div className="modal-card">
@@ -289,6 +477,7 @@ const OrganizersPage = () => {
         </div>
       )}
 
+      {/* Detail modal */}
       {selectedApp && (
         <div className="modal-overlay">
           <div className="detail-modal" ref={modalRef}>

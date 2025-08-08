@@ -12,11 +12,14 @@ const ProfessorsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
-  const [rejectAllOpen, setRejectAllOpen] = useState(false);
   const [bulkComment, setBulkComment] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
   const modalRef = useRef(null);
+  const selectAllRef = useRef(null);
+  const [showConfirm, setShowConfirm] = useState(null); // "approve-all", "reject-all", "approve-selected", "reject-selected"
+
+  const pendingApps = applications.filter((a) => a.status === "pending");
 
   useEffect(() => {
     fetchApplications();
@@ -25,7 +28,6 @@ const ProfessorsPage = () => {
   const fetchApplications = async () => {
     try {
       const data = await getInstructorApplications();
-      console.log("Fetched instructor applications:", data);
       setApplications(data);
     } catch (error) {
       console.error("Error fetching instructor applications:", error);
@@ -45,6 +47,14 @@ const ProfessorsPage = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [selectedApp]);
+
+  useEffect(() => {
+    if (!selectAllRef.current) return;
+    const total = pendingApps.length;
+    selectAllRef.current.indeterminate =
+      selectedIds.length > 0 && selectedIds.length < total;
+    selectAllRef.current.checked = selectedIds.length === total;
+  }, [selectedIds, pendingApps]);
 
   const handleApprove = async (id) => {
     try {
@@ -76,29 +86,90 @@ const ProfessorsPage = () => {
     }
   };
 
-  const handleApproveSelected = async () => {
+  const performApproveAll = async () => {
     try {
-      for (let id of selectedIds) {
-        await approveInstructorApplication(id);
-      }
-      fetchApplications();
+      await Promise.all(
+        pendingApps.map((a) => approveInstructorApplication(a.id))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          a.status === "pending" ? { ...a, status: "approved" } : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
       setSelectedIds([]);
-    } catch (error) {
-      console.error("Bulk approval failed:", error);
     }
   };
 
-  const handleRejectSelected = async () => {
+  const performRejectAll = async () => {
     try {
-      for (let id of selectedIds) {
-        await rejectInstructorApplication(id, bulkComment);
-      }
-      fetchApplications();
-      setSelectedIds([]);
+      await Promise.all(
+        pendingApps.map((a) => rejectInstructorApplication(a.id, bulkComment))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          a.status === "pending"
+            ? { ...a, status: "rejected", comment: bulkComment }
+            : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
       setBulkComment("");
-      setRejectAllOpen(false);
-    } catch (error) {
-      console.error("Bulk rejection failed:", error);
+      setSelectedIds([]);
+    }
+  };
+
+  const performApproveSelected = async () => {
+    try {
+      await Promise.all(
+        selectedIds.map((id) => approveInstructorApplication(id))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          selectedIds.includes(a.id) ? { ...a, status: "approved" } : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
+      setSelectedIds([]);
+    }
+  };
+
+  const performRejectSelected = async () => {
+    try {
+      await Promise.all(
+        selectedIds.map((id) => rejectInstructorApplication(id, bulkComment))
+      );
+      setApplications((prev) =>
+        prev.map((a) =>
+          selectedIds.includes(a.id)
+            ? { ...a, status: "rejected", comment: bulkComment }
+            : a
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowConfirm(null);
+      setBulkComment("");
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    const selectable = pendingApps.map((app) => app.id);
+    if (selectedIds.length === selectable.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(selectable);
     }
   };
 
@@ -122,26 +193,57 @@ const ProfessorsPage = () => {
 
   if (loading) return <div className="professors-container">Loading...</div>;
 
-  const pendingApps = applications.filter((a) => a.status === "pending");
-
   return (
     <div className="professors-container">
       <h1 className="professors-title">Professor Applications</h1>
 
-      {selectedIds.length > 0 && (
-        <div className="bulk-actions-bar">
-          <button onClick={handleApproveSelected}>Approve Selected</button>
-          <button onClick={() => setRejectAllOpen(true)}>
-            Reject Selected
-          </button>
-        </div>
-      )}
+      {/* Action bar */}
+      <div className="bulk-actions-bar">
+        {selectedIds.length === 0 ? (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve-all")}
+            >
+              ✅ Approve All ({pendingApps.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject-all")}
+            >
+              ❌ Reject All ({pendingApps.length})
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve-selected")}
+            >
+              ✅ Approve Selected ({selectedIds.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject-selected")}
+            >
+              ❌ Reject Selected ({selectedIds.length})
+            </button>
+          </>
+        )}
+      </div>
 
       <table className="professors-table">
         <thead>
           <tr>
             <th></th>
-            <th></th>
+            <th>
+              <input
+                ref={selectAllRef}
+                type="checkbox"
+                onChange={toggleSelectAll}
+                disabled={pendingApps.length === 0}
+              />
+            </th>
             <th>ID</th>
             <th>Email</th>
             <th>Dance Styles</th>
@@ -241,11 +343,14 @@ const ProfessorsPage = () => {
         </div>
       )}
 
-      {/* Bulk Reject Modal */}
-      {rejectAllOpen && (
-        <div className="reject-modal" onClick={() => setRejectAllOpen(false)}>
+      {/* Bulk Reject Modal (all or selected) */}
+      {(showConfirm === "reject-all" || showConfirm === "reject-selected") && (
+        <div className="reject-modal" onClick={() => setShowConfirm(null)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>Reject Selected Applications</h3>
+            <h3>
+              Reject {showConfirm === "reject-all" ? "All Pending" : "Selected"}{" "}
+              Applications
+            </h3>
             <textarea
               rows="4"
               placeholder="Add a comment for rejection (optional)"
@@ -255,11 +360,18 @@ const ProfessorsPage = () => {
             <div className="modal-button-group">
               <button
                 className="modal-btn cancel-btn"
-                onClick={() => setRejectAllOpen(false)}
+                onClick={() => setShowConfirm(null)}
               >
                 Cancel
               </button>
-              <button className="modal-btn" onClick={handleRejectSelected}>
+              <button
+                className="modal-btn"
+                onClick={
+                  showConfirm === "reject-all"
+                    ? performRejectAll
+                    : performRejectSelected
+                }
+              >
                 Confirm Reject
               </button>
             </div>

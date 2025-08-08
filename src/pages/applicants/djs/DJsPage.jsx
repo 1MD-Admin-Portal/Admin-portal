@@ -12,7 +12,7 @@ const DJsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
-  const [showConfirm, setShowConfirm] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(null); // approve, reject, approve-selected, reject-selected
   const [bulkRejectComment, setBulkRejectComment] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -83,25 +83,45 @@ const DJsPage = () => {
 
       {pendingApps.length > 0 && (
         <div className="pagination-controls">
-          <button
-            className="pagination-btn"
-            onClick={() => setShowConfirm("approve")}
-          >
-            ✅ Approve All
-          </button>
-          <button
-            className="pagination-btn"
-            onClick={() => setShowConfirm("reject")}
-          >
-            ❌ Reject All
-          </button>
+          {selectedIds.length === 0 ? (
+            <>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("approve")}
+              >
+                ✅ Approve All
+              </button>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("reject")}
+              >
+                ❌ Reject All
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("approve-selected")}
+              >
+                ✅ Approve Selected
+              </button>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("reject-selected")}
+              >
+                ❌ Reject Selected
+              </button>
+            </>
+          )}
         </div>
       )}
 
       <table className="professors-table">
         <thead>
           <tr>
-            {/* <th>
+            <th></th>
+            <th>
               <input
                 type="checkbox"
                 onChange={(e) => {
@@ -116,10 +136,7 @@ const DJsPage = () => {
                   pendingApps.length > 0
                 }
               />
-            </th> */}
-            <th></th>
-            <th></th>
-
+            </th>
             <th>ID</th>
             <th>Email</th>
             <th>Genres</th>
@@ -151,7 +168,6 @@ const DJsPage = () => {
                   }}
                 />
               </td>
-
               <td>{app.id}</td>
               <td>
                 <button
@@ -203,6 +219,7 @@ const DJsPage = () => {
         </tbody>
       </table>
 
+      {/* Approve All */}
       {showConfirm === "approve" && (
         <div className="dj-modal-overlay" onClick={() => setShowConfirm(null)}>
           <div
@@ -236,6 +253,7 @@ const DJsPage = () => {
         </div>
       )}
 
+      {/* Reject All */}
       {showConfirm === "reject" && (
         <div className="dj-modal-overlay" onClick={() => setShowConfirm(null)}>
           <div
@@ -259,11 +277,7 @@ const DJsPage = () => {
                 setApplications((prev) =>
                   prev.map((a) =>
                     a.status === "pending"
-                      ? {
-                          ...a,
-                          status: "rejected",
-                          comment: bulkRejectComment,
-                        }
+                      ? { ...a, status: "rejected", comment: bulkRejectComment }
                       : a
                   )
                 );
@@ -283,6 +297,89 @@ const DJsPage = () => {
         </div>
       )}
 
+      {/* Approve Selected */}
+      {showConfirm === "approve-selected" && (
+        <div className="dj-modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div
+            className="dj-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Approve {selectedIds.length} selected applications?</h3>
+            <button
+              className="dj-close-btn"
+              onClick={async () => {
+                for (const id of selectedIds) {
+                  await approveDJApplication(id);
+                }
+                setApplications((prev) =>
+                  prev.map((a) =>
+                    selectedIds.includes(a.id)
+                      ? { ...a, status: "approved" }
+                      : a
+                  )
+                );
+                setSelectedIds([]);
+                setShowConfirm(null);
+              }}
+            >
+              Yes, Approve Selected
+            </button>
+            <button
+              className="dj-close-btn"
+              onClick={() => setShowConfirm(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Selected */}
+      {showConfirm === "reject-selected" && (
+        <div className="dj-modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div
+            className="dj-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Reject {selectedIds.length} selected applications</h3>
+            <textarea
+              rows="4"
+              placeholder="Reason for rejection"
+              value={bulkRejectComment}
+              onChange={(e) => setBulkRejectComment(e.target.value)}
+            />
+            <button
+              className="dj-close-btn"
+              disabled={!bulkRejectComment.trim()}
+              onClick={async () => {
+                for (const id of selectedIds) {
+                  await rejectDJApplication(id, bulkRejectComment);
+                }
+                setApplications((prev) =>
+                  prev.map((a) =>
+                    selectedIds.includes(a.id)
+                      ? { ...a, status: "rejected", comment: bulkRejectComment }
+                      : a
+                  )
+                );
+                setSelectedIds([]);
+                setShowConfirm(null);
+                setBulkRejectComment("");
+              }}
+            >
+              Yes, Reject Selected
+            </button>
+            <button
+              className="dj-close-btn"
+              onClick={() => setShowConfirm(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Single reject modal */}
       {selectedRejectId && (
         <div
           className="dj-modal-overlay"
@@ -319,6 +416,7 @@ const DJsPage = () => {
         </div>
       )}
 
+      {/* Application details modal */}
       {selectedApplication && (
         <div
           className="dj-modal-overlay"
