@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./CreateChallengeModal.css";
 import { createChallengeService } from "../../../../services/challenge.service";
-import { uploadImageService } from "../../../../services/program.service";
+import { uploadChallengeMediaService } from "../../../../services/challenge.service";
 
 const CreateChallengeModal = ({ onClose }) => {
   const [title, setTitle] = useState("");
@@ -90,34 +90,36 @@ const CreateChallengeModal = ({ onClose }) => {
       // Upload cover image first if selected
       let uploadedImageUrl = "";
       if (imageFile) {
-        uploadedImageUrl = await uploadImageService(imageFile);
+        uploadedImageUrl = await uploadChallengeMediaService(imageFile);
       }
 
       const tasks = [];
 
       for (const group of taskGroups) {
+        // Handle "watch video" tasks
         for (const watch of group.watchVideos) {
           if (watch.title.trim()) {
             let uploadedVideoUrl = "";
             if (watch.file) {
-              uploadedVideoUrl = await uploadImageService(watch.file);
+              uploadedVideoUrl = await uploadChallengeMediaService(watch.file);
             }
             tasks.push({
               task_type: "watch_video",
               task_title: watch.title,
-              video_url: uploadedVideoUrl || "sample.mp4", // fallback
+              video_url: uploadedVideoUrl || "", // fallback if no upload
             });
           }
         }
 
-        group.uploadVideos.forEach((upload) => {
+        // Handle "upload video" tasks
+        for (const upload of group.uploadVideos) {
           if (upload.title.trim()) {
             tasks.push({
               task_type: "upload_video",
               task_title: upload.title,
             });
           }
-        });
+        }
       }
 
       const challengeData = {

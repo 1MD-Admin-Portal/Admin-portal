@@ -192,15 +192,20 @@ const Sidebar = () => {
                         <TvMinimalPlay size={18} /> Playlists
                       </Link>
                     </li>
+                    <li>
+                      <Link to="/CreateChallenge">
+                        <Swords size={18} /> Challenges
+                      </Link>
+                    </li>
                   </ul>
                 )}
               </li>
 
-              <li>
+              {/* <li>
                 <Link to="/CreateChallenge">
                   <Swords size={18} /> Challenges
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/ClassModeration">
                   <Video size={18} /> Class Listing Approval
