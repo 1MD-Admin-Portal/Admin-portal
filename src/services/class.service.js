@@ -98,16 +98,22 @@ export const approveClassService = async (id, adminNotes = "") => {
  * @param {number|string} id - Class ID
  * @param {string} adminNotes - Notes from admin
  */
-export const rejectClassService = async (id, adminNotes = "") => {
+// rejectClassService.js
+export const rejectClassService = async (id) => {
+  const body = { rejection_reason: "Rejected by admin" }; // ✅ confirmed correct
+  console.log(
+    "📤 Sending reject request:",
+    CONSTANTS.URL.CLASS_REJECT(id),
+    body
+  );
+
   try {
-    const response = await api.put(
-      CONSTANTS.URL.CLASS_REJECT(id),
-      { admin_notes: adminNotes },
-      { headers: { "Content-Type": "application/json" } }
-    );
+    const response = await api.put(CONSTANTS.URL.CLASS_REJECT(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
     return response;
   } catch (error) {
-    console.error("Class reject error:", error);
+    console.error("Class reject error:", error.response?.data || error.message);
     throw error;
   }
 };

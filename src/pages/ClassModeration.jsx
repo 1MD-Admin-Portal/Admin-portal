@@ -39,10 +39,15 @@ const ClassModeration = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch data when tab changes
+  // Fetch when tab or page changes
   useEffect(() => {
     fetchClasses();
-  }, [tab]);
+  }, [tab, page]);
+
+  const handleTabChange = (newTab) => {
+    setTab(newTab);
+    setPage(1); // Always reset to first page when switching tabs
+  };
 
   const fetchClasses = async () => {
     setLoading(true);
@@ -52,12 +57,24 @@ const ClassModeration = () => {
         setPendingClasses(data.classes || []);
         setPagination(data.pagination || {});
       } else {
-        const data = await getAllClassesService(page, limit);
-        const approvedOnly = (data.classes || []).filter(
-          (cls) => cls.status === "approved"
+        // Fetch ALL pages for approved
+        let allClasses = [];
+        let currentPage = 1;
+        let totalPages = 1;
+
+        do {
+          const data = await getAllClassesService(currentPage, limit);
+          allClasses = [...allClasses, ...(data.classes || [])];
+          totalPages = data.pagination?.totalPages || 1;
+          currentPage++;
+        } while (currentPage <= totalPages);
+
+        const approvedOnly = allClasses.filter(
+          (cls) => cls.status?.toLowerCase() === "approved"
         );
+
         setOngoingClasses(approvedOnly);
-        setPagination(data.pagination || {});
+        setPagination({ totalPages: 1, currentPage: 1 }); // no need for multi-page in UI
       }
     } catch (err) {
       console.error("Error fetching classes:", err);
@@ -66,27 +83,39 @@ const ClassModeration = () => {
     }
   };
 
-  useEffect(() => {
-    fetchClasses();
-  }, [tab, page]); // re-fetch when tab OR page changes
   const handleApprove = async (id) => {
+    console.log("🔍 handleApprove called");
+    console.log("➡ Approving Class ID:", id);
+
     try {
-      await approveClassService(id);
-      fetchClasses();
+      const result = await approveClassService(id);
+      console.log("✅ Approve Service Response:", result);
+      await fetchClasses(); // refresh list
     } catch (err) {
-      console.error("Approve error:", err);
+      console.error(
+        "❌ Approve error:",
+        err.response?.data || err.message || err
+      );
     }
+
     setOpenDropdownIndex(null);
   };
 
+  // ClassModeration.jsx
   const handleReject = async (id) => {
+    console.log("🔍 handleReject called");
+    console.log("➡ Rejecting Class ID:", id);
+
     try {
-      await rejectClassService(id);
-      fetchClasses();
+      const result = await rejectClassService(id);
+      console.log("✅ Reject Service Response:", result);
+      await fetchClasses();
     } catch (err) {
-      console.error("Reject error:", err);
+      console.error(
+        "❌ Reject error:",
+        err.response?.data || err.message || err
+      );
     }
-    setOpenDropdownIndex(null);
   };
 
   const openClassDetail = async (id) => {
@@ -111,13 +140,13 @@ const ClassModeration = () => {
       <div className="tab-buttons">
         <button
           className={tab === "pending" ? "active" : ""}
-          onClick={() => setTab("pending")}
+          onClick={() => handleTabChange("pending")}
         >
           Upcoming Classes (Require Approval)
         </button>
         <button
           className={tab === "ongoing" ? "active" : ""}
-          onClick={() => setTab("ongoing")}
+          onClick={() => handleTabChange("ongoing")}
         >
           Ongoing Classes
         </button>
@@ -258,6 +287,7 @@ const ClassModeration = () => {
           </div>
         </div>
       )}
+
       {/* Pagination Controls */}
       <div className="pagination">
         <button
