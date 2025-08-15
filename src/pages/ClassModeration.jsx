@@ -10,7 +10,7 @@ import {
 } from "../services/class.service";
 
 const ClassModeration = () => {
-  const [tab, setTab] = useState("pending"); // 'pending' or 'ongoing'
+  const [tab, setTab] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -18,14 +18,17 @@ const ClassModeration = () => {
   const [pendingClasses, setPendingClasses] = useState([]);
   const [ongoingClasses, setOngoingClasses] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-
   const [pagination, setPagination] = useState({
     page: 1,
     total: 0,
-    limit: 20,
+    limit: 10,
   });
+
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const dropdownRef = useRef(null);
 
@@ -39,14 +42,15 @@ const ClassModeration = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch when tab or page changes
   useEffect(() => {
     fetchClasses();
   }, [tab, page]);
 
   const handleTabChange = (newTab) => {
     setTab(newTab);
-    setPage(1); // Always reset to first page when switching tabs
+    setPage(1);
+    setSelectedIds([]);
+    setSelectAll(false);
   };
 
   const fetchClasses = async () => {
@@ -55,26 +59,14 @@ const ClassModeration = () => {
       if (tab === "pending") {
         const data = await getPendingClassesService(page, limit);
         setPendingClasses(data.classes || []);
-        setPagination(data.pagination || {});
+        setPagination(data.pagination || { page: 1, total: 0, limit });
       } else {
-        // Fetch ALL pages for approved
-        let allClasses = [];
-        let currentPage = 1;
-        let totalPages = 1;
-
-        do {
-          const data = await getAllClassesService(currentPage, limit);
-          allClasses = [...allClasses, ...(data.classes || [])];
-          totalPages = data.pagination?.totalPages || 1;
-          currentPage++;
-        } while (currentPage <= totalPages);
-
-        const approvedOnly = allClasses.filter(
+        const data = await getAllClassesService(page, limit);
+        const approvedOnly = (data.classes || []).filter(
           (cls) => cls.status?.toLowerCase() === "approved"
         );
-
         setOngoingClasses(approvedOnly);
-        setPagination({ totalPages: 1, currentPage: 1 }); // no need for multi-page in UI
+        setPagination(data.pagination || { page: 1, total: 0, limit });
       }
     } catch (err) {
       console.error("Error fetching classes:", err);
@@ -84,38 +76,40 @@ const ClassModeration = () => {
   };
 
   const handleApprove = async (id) => {
-    console.log("🔍 handleApprove called");
-    console.log("➡ Approving Class ID:", id);
-
     try {
-      const result = await approveClassService(id);
-      console.log("✅ Approve Service Response:", result);
-      await fetchClasses(); // refresh list
-    } catch (err) {
-      console.error(
-        "❌ Approve error:",
-        err.response?.data || err.message || err
-      );
-    }
-
-    setOpenDropdownIndex(null);
-  };
-
-  // ClassModeration.jsx
-  const handleReject = async (id) => {
-    console.log("🔍 handleReject called");
-    console.log("➡ Rejecting Class ID:", id);
-
-    try {
-      const result = await rejectClassService(id);
-      console.log("✅ Reject Service Response:", result);
+      await approveClassService(id);
       await fetchClasses();
     } catch (err) {
-      console.error(
-        "❌ Reject error:",
-        err.response?.data || err.message || err
-      );
+      console.error("Approve error:", err);
     }
+    setSelectedClass(null);
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await rejectClassService(id);
+      await fetchClasses();
+    } catch (err) {
+      console.error("Reject error:", err);
+    }
+    setSelectedClass(null);
+  };
+
+  const handleBulkAction = async (action) => {
+    const idsToProcess =
+      selectedIds.length > 0 ? selectedIds : filteredClasses.map((c) => c.id);
+
+    for (let id of idsToProcess) {
+      if (action === "approve") {
+        await approveClassService(id);
+      } else {
+        await rejectClassService(id);
+      }
+    }
+    await fetchClasses();
+    setSelectedIds([]);
+    setSelectAll(false);
+    setSelectedClass(null);
   };
 
   const openClassDetail = async (id) => {
@@ -132,6 +126,37 @@ const ClassModeration = () => {
   const filteredClasses = classesToShow.filter((classItem) =>
     classItem.class_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredClasses.map((c) => c.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const toggleSelectOne = (id) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter((sid) => sid !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
+  // Helper function to render info items in grid
+  const renderInfoGrid = (items) => {
+    return (
+      <div className="info-grid">
+        {items.map((item, index) => (
+          <div key={index} className={`info-item ${item.status || ""}`}>
+            <div className="info-label">{item.label}</div>
+            <div className="info-value">{item.value}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="class-moderation-container">
@@ -152,6 +177,21 @@ const ClassModeration = () => {
         </button>
       </div>
 
+      {tab === "pending" && (
+        <div className="bulk-actions">
+          <button onClick={() => handleBulkAction("approve")}>
+            {selectedIds.length
+              ? `Approve Selected (${selectedIds.length})`
+              : "Approve All"}
+          </button>
+          <button onClick={() => handleBulkAction("reject")}>
+            {selectedIds.length
+              ? `Reject Selected (${selectedIds.length})`
+              : "Reject All"}
+          </button>
+        </div>
+      )}
+
       <div className="class-moderation-actions">
         <div className="class-moderation-search">
           <span role="img" aria-label="search">
@@ -164,19 +204,6 @@ const ClassModeration = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
-        <select className="class-moderation-filter">
-          <option>Instructor</option>
-        </select>
-        <select className="class-moderation-filter">
-          <option>Type</option>
-        </select>
-        <select className="class-moderation-filter">
-          <option>Status</option>
-        </select>
-        <select className="class-moderation-filter">
-          <option>Date</option>
-        </select>
       </div>
 
       {loading ? (
@@ -185,6 +212,18 @@ const ClassModeration = () => {
         <table className="class-table">
           <thead>
             <tr>
+              {tab === "pending" && (
+                <>
+                  <th></th>
+                  <th>
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
+                </>
+              )}
               <th>Instructor</th>
               <th>Title</th>
               <th>Type</th>
@@ -197,13 +236,22 @@ const ClassModeration = () => {
           </thead>
           <tbody>
             {filteredClasses.map((classItem, index) => (
-              <tr
-                key={classItem.id}
-                className="clickable-row"
-                onClick={() => openClassDetail(classItem.id)}
-              >
-                <td>{classItem.instructor_name}</td>
-                <td>{classItem.class_title}</td>
+              <tr key={classItem.id} className="clickable-row">
+                {tab === "pending" && (
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(classItem.id)}
+                      onChange={() => toggleSelectOne(classItem.id)}
+                    />
+                  </td>
+                )}
+                <td onClick={() => openClassDetail(classItem.id)}>
+                  {classItem.instructor_name}
+                </td>
+                <td onClick={() => openClassDetail(classItem.id)}>
+                  {classItem.class_title}
+                </td>
                 <td>{classItem.class_type}</td>
                 <td>{classItem.max_students}</td>
                 <td>{classItem.price}</td>
@@ -236,59 +284,7 @@ const ClassModeration = () => {
         </table>
       )}
 
-      {/* Modal */}
-      {selectedClass && (
-        <div
-          className="class-popup-overlay"
-          onClick={() => setSelectedClass(null)}
-        >
-          <div
-            className="class-popup-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="popup-header">
-              <h2>{selectedClass.class_title}</h2>
-              <X
-                className="popup-close"
-                onClick={() => setSelectedClass(null)}
-              />
-            </div>
-            <p>
-              <strong>Instructor:</strong> {selectedClass.instructor_name}
-            </p>
-            <p>
-              <strong>Type:</strong> {selectedClass.class_type}
-            </p>
-            <p>
-              <strong>Capacity:</strong> {selectedClass.max_students}
-            </p>
-            <p>
-              <strong>Slots:</strong> {selectedClass.current_students}
-            </p>
-            <p>
-              <strong>Price:</strong> {selectedClass.price}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedClass.status}
-            </p>
-            <p>
-              <strong>Dance Style:</strong> {selectedClass.dance_style}
-            </p>
-            <p>
-              <strong>Skill Level:</strong> {selectedClass.skill_level}
-            </p>
-            <p>
-              <strong>Prerequisites:</strong> {selectedClass.prerequisites}
-            </p>
-            <p>
-              <strong>Equipment Needed:</strong>{" "}
-              {selectedClass.equipment_needed}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Pagination Controls */}
+      {/* Pagination */}
       <div className="pagination">
         <button
           disabled={pagination.page <= 1}
@@ -319,6 +315,82 @@ const ClassModeration = () => {
           Next
         </button>
       </div>
+
+      {/* Enhanced Detail Modal with exact DancersList structure */}
+      {selectedClass && (
+        <div
+          className="class-popup-overlay"
+          onClick={() => setSelectedClass(null)}
+        >
+          <div
+            className="class-popup-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="popup-header">
+              <h2>Class Details</h2>
+              <X
+                className="popup-close"
+                onClick={() => setSelectedClass(null)}
+              />
+            </div>
+
+            {/* Modal Body - Scrollable */}
+            <div className="modal-body">
+              {/* Basic Information Section */}
+              <div className="modal-section">
+                <h4>Basic Information</h4>
+                {renderInfoGrid([
+                  { label: "Class Title", value: selectedClass.class_title },
+                  { label: "Instructor", value: selectedClass.instructor_name },
+                  { label: "Type", value: selectedClass.class_type },
+                  { label: "Dance Style", value: selectedClass.dance_style },
+                  { label: "Skill Level", value: selectedClass.skill_level },
+                  { label: "Max Students", value: selectedClass.max_students },
+                  {
+                    label: "Current Students",
+                    value: selectedClass.current_students,
+                  },
+                  { label: "Price", value: selectedClass.price },
+                  {
+                    label: "Status",
+                    value: selectedClass.status,
+                    status:
+                      selectedClass.status?.toLowerCase() === "approved"
+                        ? "status-active"
+                        : "status-inactive",
+                  },
+                ])}
+              </div>
+
+              {/* Class Requirements Section */}
+              <div className="modal-section">
+                <h4>Class Requirements</h4>
+                {renderInfoGrid([
+                  {
+                    label: "Prerequisites",
+                    value: selectedClass.prerequisites || "None",
+                  },
+                  {
+                    label: "Equipment Needed",
+                    value: selectedClass.equipment_needed || "None",
+                  },
+                ])}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="modal-footer">
+              <button
+                className="modal-close-btn"
+                onClick={() => setSelectedClass(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
