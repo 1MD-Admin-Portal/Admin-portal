@@ -1,0 +1,272 @@
+/* ============================= */
+/* Feed Page Styles */
+/* ============================= */
+.feed-page {
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  margin-left: 270px;
+}
+
+.feed-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.feed-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.feed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.feed-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.feed-card-header img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+.feed-card-header .user-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #111827;
+}
+
+.feed-card-header .user-email {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.feed-thumbnail {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.feed-card-body {
+  padding: 12px 16px;
+}
+
+.feed-card-body .caption {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.feed-card-body .meta {
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feed-card-body .likes {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* ============================= */
+/* Modal Styles */
+/* ============================= */
+.modal-overlay-feed {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  animation: fadeInUp 0.25s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #111827;
+}
+
+.modal-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.modal-header .close-btn:hover {
+  color: #111827;
+}
+
+.modal-content-feed {
+  padding: 20px;
+}
+
+.modal-section {
+  margin-bottom: 20px;
+}
+
+.modal-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.modal-section p {
+  font-size: 14px;
+  color: #374151;
+}
+
+.meta-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.meta-item {
+  background: #f3f4f6;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.view-likes-btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.view-likes-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ============================= */
+/* Likes Modal (Analytics + List) */
+/* ============================= */
+.likes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.like-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f9fafb;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.like-user img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.like-user .info {
+  flex: 1;
+}
+
+.like-user .info .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.like-user .info .email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.like-user .badge {
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.analytics {
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+.analytics h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1f2937;
+}
+
+.analytics p {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 6px;
+}

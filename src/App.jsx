@@ -37,6 +37,7 @@ import ProfessorsListPage from "./pages/users/Professors/ProfessorsListPage.jsx"
 import OrganizerListPage from "./pages/users/organizers/OrganizerListPage.jsx";
 import DJListPage from "./pages/users/djs/DJListPage.jsx";
 import DancersList from "./pages/users/dancers/DancersList.jsx";
+import FeedPage from "./pages/Content Moderation/User Generated Content/FeedPage.jsx";
 
 function App() {
   return (
@@ -57,7 +58,7 @@ function App() {
         >
           <Route path="/home" element={<Home />} />
           <Route path="/users" element={<Users />} />
-          <Route path="/CommunityContent" element={<CommunityContent />} />
+          <Route path="/FeedPage" element={<FeedPage />} />
           <Route path="/ClassModeration" element={<ClassModeration />} />
           <Route path="/EventsPage" element={<EventsPage />} />
           <Route path="/MarketplacePage" element={<MarketplacePage />} />

@@ -46,5 +46,17 @@ export const CONSTANTS = {
     CLASS_DETAIL: (id) => `/api/v1/admin/classes/${id}`, // GET
     CLASS_APPROVE: (id) => `/api/v1/admin/classes/${id}/approve`, // PUT
     CLASS_REJECT: (id) => `/api/v1/admin/classes/${id}/reject`, // PUT
+
+    // === EVENT MANAGEMENT ===
+    GET_ALL_EVENTS_DRAFT: "/api/v1/admin/events?status=draft",
+    GET_ALL_EVENTS_APPROVED: "/api/v1/admin/events?status=published",
+    GET_EVENT_INTERESTS: (eventId) =>
+      `/api/v1/admin/events/${eventId}/interests`,
+    APPROVE_EVENT: (eventId) => `/api/v1/admin/events/${eventId}/approve`,
+    REJECT_EVENT: (eventId) => `/api/v1/admin/events/${eventId}/reject`,
+
+    // === FEED MANAGEMENT ===
+    GET_FEEDS: `/api/v1/admin/posts`,
+    GET_FEED_LIKES: (postId) => `/api/v1/admin/posts/${postId}/likes`,
   },
 };

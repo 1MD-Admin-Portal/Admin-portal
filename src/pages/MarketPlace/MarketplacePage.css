@@ -1,7 +1,7 @@
 .marketplace-container {
   padding: 20px;
   margin-left: 275px; /* Adjust based on sidebar */
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .marketplace-header {
@@ -136,8 +136,8 @@
   max-width: 440px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: "Inter", sans-serif;
 }
 
 .modal-listing h2 {
@@ -321,4 +321,27 @@
 .apply-btn {
   background-color: #dc3545;
   color: white;
+}
+.clickable {
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.modal-listing.wide {
+  max-width: 800px;
+}
+
+.marketplace-table.small th,
+.marketplace-table.small td {
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+.stats-box {
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
 }

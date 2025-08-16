@@ -1,163 +1,220 @@
-/* EventsPage.css */
+/* EventsPage.css - Modernized */
 
-.events-container {
-  padding: 20px;
-  margin-left: 275px; /* leave space for fixed sidebar */
-  font-family: sans-serif;
+/* Container */
+.event-moderation {
+  padding: 24px;
+  margin-left: 275px; /* space for sidebar */
+  font-family: "Inter", sans-serif;
+  color: #1f2937;
+  background-color: #f9fafb;
+  min-height: 100vh;
 }
 
-.events-header {
-  font-size: 28px;
-  font-weight: 600;
+/* Heading */
+.event-moderation h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111827;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
-.events-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.events-search {
-  display: flex;
-  align-items: center;
-  background-color: #f5f5f5;
-  padding: 10px 14px;
-  border-radius: 8px;
-}
-
-.events-search input {
+.tabs button {
+  padding: 8px 16px;
+  background-color: #e5e7eb;
   border: none;
-  background: transparent;
-  outline: none;
+  border-radius: 6px;
   font-size: 14px;
-  width: 200px;
-}
-
-.events-filter {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: white;
-  font-size: 14px;
-}
-
-.create-event-btn {
-  padding: 10px 16px;
-  background-color: #dc3545;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  margin-top: 10px;
+  transition: background-color 0.2s ease;
 }
 
+.tabs button:hover {
+  background-color: #d1d5db;
+}
+
+.tabs button.active {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* Table */
 .events-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .events-table thead {
-  background-color: #f7f7f7;
+  background-color: #f3f4f6;
 }
 
 .events-table th,
 .events-table td {
   text-align: left;
-  padding: 16px 12px;
-  border-bottom: 1px solid #eee;
-  vertical-align: middle;
+  padding: 14px 12px;
   font-size: 14px;
 }
 
-.events-table th:first-child,
-.events-table td:first-child {
-  width: 40px;
+.events-table th {
+  font-weight: 600;
+  color: #374151;
 }
 
-.events-action-link {
-  color: #2962ff;
-  text-decoration: none;
-  font-weight: 500;
-  cursor: pointer;
+.events-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
 }
-.clickable-row {
+
+.events-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Action buttons */
+.events-table button {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.events-table button:first-child {
+  background-color: #16a34a;
+  color: white;
+  margin-right: 6px;
+}
+
+.events-table button:first-child:hover {
+  background-color: #15803d;
+}
+
+.events-table button:last-child {
+  background-color: #dc2626;
+  color: white;
+}
+
+.events-table button:last-child:hover {
+  background-color: #b91c1c;
+}
+
+/* View Interested Button */
+.events-table button.view-btn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.events-table button.view-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  background-color: #e5e7eb;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-.clickable-row:hover {
-  background-color: #f4f4f4;
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.event-popup-overlay {
+.pagination button:hover:not(:disabled) {
+  background-color: #d1d5db;
+}
+
+/* Lock background when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Modal Overlay */
+.modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(40, 40, 40, 0.5);
+  inset: 0; /* shorthand for top/left/right/bottom: 0 */
+  background: rgba(31, 41, 55, 0.5);
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
-}
-
-.event-popup-modal {
-  background: #ffffff;
-  padding: 24px;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  position: relative;
+  padding: 20px;
   animation: fadeIn 0.2s ease-out;
 }
 
-.popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Modal Box */
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 90%;
+  max-height: 90vh; /* fit viewport */
+  overflow-y: auto; /* ✅ scroll INSIDE modal */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  animation: scaleIn 0.2s ease-out;
 }
 
-.popup-close {
-  cursor: pointer;
-  color: #555;
+.modal-content h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
+.modal-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-content li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(16px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
-.popup-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
 
-.approve-btn {
-  background-color: #16a34a;
-  color: white;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.reject-btn {
-  background-color: #dc2626;
-  color: white;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

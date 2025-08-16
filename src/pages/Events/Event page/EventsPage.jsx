@@ -1,207 +1,265 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  getAllDraftEventsService,
+  getAllApprovedEventsService,
+  getEventInterestsService,
+  approveEventService,
+  rejectEventService,
+} from "../../../services/event.service";
 import "./EventsPage.css";
-import { FiSearch } from "react-icons/fi";
-import CreateEventModal from "../Create Event Modal/CreateEventModal.jsx";
-import { X } from "lucide-react";
-
-const initialEvents = [
-  {
-    id: 101,
-    title: "Kizomba Night",
-    organizer: "DanceWorld",
-    dateTime: "Jun 10, 2025 8:00 PM",
-    location: "NYC, NY",
-    ticketType: "Paid",
-    approvalStatus: "Pending",
-  },
-  {
-    id: 102,
-    title: "Salsa Weekend",
-    organizer: "LatinMoves",
-    dateTime: "Jun 25, 2025 6:00 PM",
-    location: "Miami, FL",
-    ticketType: "Free",
-    approvalStatus: "Pending",
-  },
-  {
-    id: 103,
-    title: "Urban Beats Jam",
-    organizer: "StepUp Crew",
-    dateTime: "Jul 5, 2025 7:30 PM",
-    location: "Los Angeles",
-    ticketType: "Paid",
-    approvalStatus: "Pending",
-  },
-  {
-    id: 104,
-    title: "Urban Beats Jam",
-    organizer: "Ste Angeles, CA",
-    dateTime: "Jul 5, 2025 7:30 PM",
-    location: "Miami, FL",
-    ticketType: "Free",
-    approvalStatus: "Pending",
-  },
-];
 
 const EventsPage = () => {
-  const [events, setEvents] = useState(initialEvents);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [ticketFilter, setTicketFilter] = useState("All");
-  const [showModal, setShowModal] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [activeTab, setActiveTab] = useState("requireApproval");
+  const [loading, setLoading] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [interestedUsers, setInterestedUsers] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch = event.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      ticketFilter === "All" ||
-      event.ticketType.toLowerCase() === ticketFilter.toLowerCase();
-    return matchesSearch && matchesFilter;
-  });
+  useEffect(() => {
+    fetchEvents();
+  }, [page, activeTab]);
 
-  const handleApproval = (id, status) => {
-    const updatedEvents = events.map((event) =>
-      event.id === id ? { ...event, approvalStatus: status } : event
-    );
-    setEvents(updatedEvents);
-    setSelectedEvent(null);
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      let res;
+      if (activeTab === "requireApproval") {
+        res = await getAllDraftEventsService({ page, limit: 10 });
+      } else if (activeTab === "approved") {
+        res = await getAllApprovedEventsService({ page, limit: 10 });
+      }
+      setEvents(res?.events || []);
+      setTotalPages(res?.pagination?.totalPages || 1);
+    } catch (err) {
+      console.error("❌ Error fetching events:", err);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    if (modalOpen) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+  }, [modalOpen]);
+
+  const openEventModal = (event) => {
+    setSelectedEvent(event);
+    setInterestedUsers([]);
+    setModalOpen(true);
+  };
+
+  const fetchInterestedUsers = async (event) => {
+    setLoading(true);
+    try {
+      const res = await getEventInterestsService(event.event_id, {
+        page: 1,
+        limit: 10,
+      });
+      setSelectedEvent(res.event);
+      setInterestedUsers(res.interested_users || []);
+      setModalOpen(true);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  const handleApprove = async (eventId) => {
+    await approveEventService(eventId, "");
+    fetchEvents();
+    setModalOpen(false);
+  };
+
+  const handleReject = async (eventId) => {
+    await rejectEventService(eventId, "Rejected by Admin");
+    fetchEvents();
+    setModalOpen(false);
   };
 
   return (
-    <div className="events-container">
-      <h2 className="events-header">Events</h2>
+    <div className="event-moderation">
+      <h1>Event Moderation</h1>
 
-      <div className="events-actions">
-        <div className="events-search">
-          <FiSearch style={{ marginRight: 8 }} />
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <select
-          className="events-filter"
-          value={ticketFilter}
-          onChange={(e) => setTicketFilter(e.target.value)}
+      {/* Tabs */}
+      <div className="tabs">
+        <button
+          className={activeTab === "requireApproval" ? "active" : ""}
+          onClick={() => {
+            setActiveTab("requireApproval");
+            setPage(1);
+          }}
         >
-          <option value="All">All Tickets</option>
-          <option value="Paid">Paid</option>
-          <option value="Free">Free</option>
-        </select>
+          Require Approval
+        </button>
+        <button
+          className={activeTab === "approved" ? "active" : ""}
+          onClick={() => {
+            setActiveTab("approved");
+            setPage(1);
+          }}
+        >
+          Approved Events
+        </button>
       </div>
 
-      <table className="events-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Organizer</th>
-            <th>Date & Time</th>
-            <th>Location</th>
-            <th>Ticket Type</th>
-            <th>Status</th>
-            <th>Acts.</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredEvents.map((event) => (
-            <tr
-              key={event.id}
-              className="clickable-row"
-              onClick={() => setSelectedEvent(event)}
-            >
-              <td>{event.id}</td>
-              <td>{event.title}</td>
-              <td>{event.organizer}</td>
-              <td>{event.dateTime}</td>
-              <td>{event.location}</td>
-              <td>{event.ticketType}</td>
-              <td>{event.approvalStatus}</td>
-              <td>
-                <span className="events-action-link">View</span>
-              </td>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <table className="events-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Location</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.event_id}>
+                <td
+                  className="clickable-title"
+                  onClick={() => openEventModal(event)}
+                  style={{
+                    cursor: "pointer",
+                    color: "blue",
+                    textDecoration: "underline",
+                  }}
+                >
+                  {event.event_title}
+                </td>
+                <td>{event.event_type}</td>
+                <td>{new Date(event.event_date).toLocaleDateString()}</td>
+                <td>{event.location}</td>
+                <td>
+                  {activeTab === "requireApproval" && (
+                    <>
+                      <button
+                        className="approve-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApprove(event.event_id);
+                        }}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="reject-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReject(event.event_id);
+                        }}
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  {activeTab === "approved" && (
+                    <button
+                      className="view-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fetchInterestedUsers(event);
+                      }}
+                    >
+                      View Interested
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
-      <button className="create-event-btn" onClick={() => setShowModal(true)}>
-        Create Event
-      </button>
-
-      {showModal && <CreateEventModal onClose={() => setShowModal(false)} />}
-
-      {/* Row-Click Popup Modal */}
-      {selectedEvent && (
-        <div
-          className="event-popup-overlay"
-          onClick={() => setSelectedEvent(null)}
-        >
-          <div
-            className="event-popup-modal"
-            onClick={(e) => e.stopPropagation()}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+            Prev
+          </button>
+          <span>
+            {page} / {totalPages}
+          </span>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
           >
-            <div className="popup-header">
-              <h2>{selectedEvent.title}</h2>
-              <X
-                className="popup-close"
-                onClick={() => setSelectedEvent(null)}
-              />
-            </div>
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* Modal */}
+      {modalOpen && selectedEvent && (
+        <div className="modal" onClick={() => setModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>{selectedEvent.event_title}</h2>
             <p>
-              <strong>Organizer:</strong> {selectedEvent.organizer}
+              <strong>Type:</strong> {selectedEvent.event_type}
             </p>
             <p>
-              <strong>Date & Time:</strong> {selectedEvent.dateTime}
+              <strong>Dance Style:</strong> {selectedEvent.dance_style}
+            </p>
+            <p>
+              <strong>Skill Level:</strong> {selectedEvent.skill_level}
+            </p>
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(selectedEvent.event_date).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Time:</strong> {selectedEvent.event_time}
             </p>
             <p>
               <strong>Location:</strong> {selectedEvent.location}
             </p>
             <p>
-              <strong>Ticket Type:</strong> {selectedEvent.ticketType}
+              <strong>Price:</strong> ${selectedEvent.price}
             </p>
             <p>
-              <strong>Status:</strong> {selectedEvent.approvalStatus}
+              <strong>Description:</strong> {selectedEvent.description}
             </p>
-
-            <div className="popup-actions">
-              {selectedEvent.approvalStatus === "Pending" && (
-                <>
-                  <button
-                    className="approve-btn"
-                    onClick={() => handleApproval(selectedEvent.id, "Approved")}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="reject-btn"
-                    onClick={() => handleApproval(selectedEvent.id, "Rejected")}
-                  >
-                    Reject
-                  </button>
-                </>
-              )}
-              {selectedEvent.approvalStatus === "Approved" && (
-                <button
-                  className="reject-btn"
-                  onClick={() => handleApproval(selectedEvent.id, "Rejected")}
-                >
-                  Mark as Rejected
-                </button>
-              )}
-              {selectedEvent.approvalStatus === "Rejected" && (
+            {selectedEvent.images && (
+              <div className="event-images">
+                {JSON.parse(selectedEvent.images).map((img, i) => (
+                  <img key={i} src={img} alt="Event" />
+                ))}
+              </div>
+            )}
+            {interestedUsers.length > 0 && (
+              <>
+                <h3>Interested Users</h3>
+                <ul>
+                  {interestedUsers.map((user) => (
+                    <li key={user.interest_id}>
+                      {user.user.name} ({user.user.email})
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {activeTab === "requireApproval" && (
+              <div className="popup-actions">
                 <button
                   className="approve-btn"
-                  onClick={() => handleApproval(selectedEvent.id, "Approved")}
+                  onClick={() => handleApprove(selectedEvent.event_id)}
                 >
-                  Mark as Approved
+                  Approve
                 </button>
-              )}
-            </div>
+                <button
+                  className="reject-btn"
+                  onClick={() => handleReject(selectedEvent.event_id)}
+                >
+                  Reject
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

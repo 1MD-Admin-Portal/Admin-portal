@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import logo from "../assets/logo.png"; // Add this import - replace with your actual logo filename
 import {
   Home,
   Users,
@@ -56,10 +58,10 @@ const Sidebar = () => {
     onClick,
   }) => (
     <li className={`menu-item ${isActive ? "active" : ""}`} onClick={onClick}>
-      <a href={href} className="menu-link">
+      <Link to={href} className="menu-link">
         <Icon size={18} />
         <span>{children}</span>
-      </a>
+      </Link>
     </li>
   );
 
@@ -82,10 +84,10 @@ const Sidebar = () => {
         <ul className="submenu">
           {submenuItems.map((item, index) => (
             <li key={index} className="submenu-item">
-              <a href={item.href} className="submenu-link">
+              <Link to={item.href} className="submenu-link">
                 <item.icon size={16} />
                 <span>{item.label}</span>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -111,7 +113,7 @@ const Sidebar = () => {
   ];
 
   const contentSubmenuItems = [
-    { href: "/CommunityContent", icon: Film, label: "User Generated Content" },
+    { href: "/FeedPage", icon: Film, label: "User Generated Content" },
     { href: "/VideoPrograms", icon: Book, label: "Video Program Management" },
     { href: "/playlists", icon: Play, label: "Playlists" },
     { href: "/CreateChallenge", icon: Swords, label: "Challenges" },
@@ -172,15 +174,17 @@ const Sidebar = () => {
         .logo-icon {
           width: 48px;
           height: 48px;
-          background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
-          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 24px;
-          font-weight: 700;
-          color: #1a1a2e;
-          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+          border-radius: 12px;
+        }
+
+        .logo-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          border-radius: 12px;
         }
 
         .app-title {
@@ -394,7 +398,9 @@ const Sidebar = () => {
 
       <div className="sidebar-header">
         <div className="logo-section">
-          <div className="logo-icon">D</div>
+          <div className="logo-icon">
+            <img src={logo} alt="Dance with me Logo" className="logo-image" />
+          </div>
           <div>
             <h2 className="app-title">Dance with me</h2>
             <p className="app-subtitle">Admin Panel</p>
@@ -477,9 +483,9 @@ const Sidebar = () => {
                 Operation & Support
               </DropdownMenuItem>
 
-              <MenuItem href="/AccessLogs" icon={FileText}>
+              {/* <MenuItem href="/AccessLogs" icon={FileText}>
                 Access Logs
-              </MenuItem>
+              </MenuItem> */}
 
               <MenuItem href="/AdsManagement" icon={Megaphone}>
                 Ads Management
@@ -502,10 +508,10 @@ const Sidebar = () => {
       </div>
 
       <div className="logout-section">
-        <a href="/" className="logout-link">
+        <Link to="/" className="logout-link">
           <LogOut size={18} />
           Logout
-        </a>
+        </Link>
       </div>
     </div>
   );
