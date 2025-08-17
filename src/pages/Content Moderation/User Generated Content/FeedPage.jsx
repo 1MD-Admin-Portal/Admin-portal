@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { X, Heart, Play } from "lucide-react";
 import {
   getFeedsService,
   getFeedLikesService,
@@ -28,8 +29,10 @@ const FeedPage = () => {
   };
 
   return (
-    <div className="feed-page">
-      <h2 className="feed-title">📢 Feed Management</h2>
+    <div className="feed-page-container">
+      <div className="feed-page-header">
+        <h2 className="feed-page-title">Feed Management</h2>
+      </div>
 
       <div className="feed-grid">
         {feeds.map((feed) => (
@@ -38,132 +41,273 @@ const FeedPage = () => {
             className="feed-card"
             onClick={() => setSelectedFeed(feed)}
           >
-            <img
-              src={feed.content.video_url}
-              alt="feed-thumbnail"
-              className="feed-thumbnail"
-            />
-            <div className="feed-info">
-              <h3>{feed.user.name}</h3>
-              <p>{feed.content.caption}</p>
-              <span>
-                {feed.metadata.dance_style} | {feed.metadata.level}
-              </span>
-              <p>❤️ {feed.metadata.like_count} Likes</p>
+            <div className="feed-thumbnail-container">
+              <img
+                src={feed.content.video_url}
+                alt="feed-thumbnail"
+                className="feed-thumbnail"
+              />
+              <div className="play-overlay">
+                <Play size={24} />
+              </div>
+              <div className="likes-overlay">
+                <Heart size={16} />
+                <span>{feed.metadata.like_count}</span>
+              </div>
+            </div>
+
+            <div className="feed-card-content">
+              <div className="feed-user-info">
+                <h3 className="feed-user-name">{feed.user.name}</h3>
+                <div className="feed-meta">
+                  <span
+                    className={`dance-style-badge style-${feed.metadata.dance_style
+                      ?.toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {feed.metadata.dance_style}
+                  </span>
+                  <span
+                    className={`level-badge level-${feed.metadata.level?.toLowerCase()}`}
+                  >
+                    {feed.metadata.level}
+                  </span>
+                </div>
+              </div>
+
+              <p className="feed-caption">{feed.content.caption}</p>
+
+              <div className="feed-stats">
+                <div className="stat-item">
+                  <Heart size={16} />
+                  <span>{feed.metadata.like_count} Likes</span>
+                </div>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
+      {feeds.length === 0 && (
+        <div className="empty-state">
+          <span className="empty-icon">📱</span>
+          <span className="empty-text">No feeds found.</span>
+        </div>
+      )}
+
       {/* Pagination */}
-      <div className="pagination">
-        {pagination.hasPreviousPage && (
-          <button onClick={() => setPage(page - 1)}>Previous</button>
-        )}
-        <span>
-          Page {pagination.page} of {pagination.totalPages}
+      <div className="pagination-controls">
+        <button
+          className="pagination-btn"
+          onClick={() => setPage(page - 1)}
+          disabled={!pagination.hasPreviousPage}
+        >
+          Previous
+        </button>
+        <span className="page-indicator">
+          Page {pagination.page || 1} of {pagination.totalPages || 1}
         </span>
-        {pagination.hasNextPage && (
-          <button onClick={() => setPage(page + 1)}>Next</button>
-        )}
+        <button
+          className="pagination-btn"
+          onClick={() => setPage(page + 1)}
+          disabled={!pagination.hasNextPage}
+        >
+          Next
+        </button>
       </div>
+
       {/* Feed Details Modal */}
       {selectedFeed && (
-        <div
-          className="modal-overlay-feed"
-          onClick={() => setSelectedFeed(null)}
-        >
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setSelectedFeed(null)}>
+          <div
+            className="modal-content feed-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2>{selectedFeed.user.name} - Feed Details</h2>
+              <h2 className="modal-title">
+                {selectedFeed.user.name} - Feed Details
+              </h2>
               <button
-                className="close-btn"
+                className="modal-close-btn"
                 onClick={() => setSelectedFeed(null)}
               >
-                ✕
+                <X />
               </button>
             </div>
 
-            <div className="modal-content-feed">
-              <img
-                src={selectedFeed.content.video_url}
-                alt="feed-detail"
-                className="modal-thumbnail"
-              />
+            <div className="modal-body">
               <div className="modal-section">
-                <p>
-                  <b>Caption:</b> {selectedFeed.content.caption}
-                </p>
-                <p>
-                  <b>Dance Style:</b> {selectedFeed.metadata.dance_style}
-                </p>
-                <p>
-                  <b>Level:</b> {selectedFeed.metadata.level}
-                </p>
-                <p>
-                  <b>Likes:</b> {selectedFeed.metadata.like_count}
-                </p>
+                <div className="feed-detail-image">
+                  <img
+                    src={selectedFeed.content.video_url}
+                    alt="feed-detail"
+                    className="modal-feed-thumbnail"
+                  />
+                  <div className="feed-detail-overlay">
+                    <Play size={48} />
+                  </div>
+                </div>
               </div>
-              <button
-                className="view-likes-btn"
-                onClick={() => handleViewLikes(selectedFeed.post_id)}
-              >
-                View Likes
-              </button>
+
+              <div className="modal-section">
+                <h3 className="section-title">Content Details</h3>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <div className="info-label">Caption</div>
+                    <div className="info-value">
+                      {selectedFeed.content.caption}
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Dance Style</div>
+                    <div className="info-value">
+                      <span
+                        className={`dance-style-badge style-${selectedFeed.metadata.dance_style
+                          ?.toLowerCase()
+                          .replace(" ", "-")}`}
+                      >
+                        {selectedFeed.metadata.dance_style}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Level</div>
+                    <div className="info-value">
+                      <span
+                        className={`level-badge level-${selectedFeed.metadata.level?.toLowerCase()}`}
+                      >
+                        {selectedFeed.metadata.level}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Likes</div>
+                    <div className="info-value">
+                      <div className="likes-count">
+                        <Heart size={18} />
+                        <span>{selectedFeed.metadata.like_count}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  className="view-likes-btn"
+                  onClick={() => handleViewLikes(selectedFeed.post_id)}
+                >
+                  <Heart size={16} />
+                  View Likes
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
+      {/* Likes Modal */}
       {likesData && (
-        <div className="modal-overlay-likes" onClick={() => setLikesData(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setLikesData(null)}>
+          <div
+            className="modal-content likes-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2>👍 Likes for Post {likesData.post.id}</h2>
-              <button className="close-btn" onClick={() => setLikesData(null)}>
-                ✕
+              <h2 className="modal-title">
+                Likes for Post #{likesData.post.id}
+              </h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => setLikesData(null)}
+              >
+                <X />
               </button>
             </div>
 
-            <div className="modal-content-likes">
-              {likesData.likes.length > 0 ? (
-                <ul className="likes-list">
-                  {likesData.likes.map((like) => (
-                    <li key={like.like_id} className="like-user">
-                      <img
-                        src={
-                          like.user.profile_image ||
-                          "https://via.placeholder.com/40"
-                        }
-                        alt={like.user.name}
-                      />
-                      <div className="info">
-                        <span className="name">{like.user.name}</span>
-                        <span className="email">({like.user.skill_level})</span>
+            <div className="modal-body">
+              <div className="modal-section">
+                <h3 className="section-title">Users Who Liked</h3>
+                {likesData.likes.length > 0 ? (
+                  <div className="likes-list">
+                    {likesData.likes.map((like) => (
+                      <div key={like.like_id} className="like-user-item">
+                        <div className="user-avatar">
+                          <img
+                            src={
+                              like.user.profile_image ||
+                              "https://via.placeholder.com/40?text=U"
+                            }
+                            alt={like.user.name}
+                            className="avatar-image"
+                          />
+                        </div>
+                        <div className="user-info">
+                          <div className="user-name">{like.user.name}</div>
+                          <div className="user-skill">
+                            <span
+                              className={`level-badge level-${like.user.skill_level?.toLowerCase()}`}
+                            >
+                              {like.user.skill_level}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="like-icon">
+                          <Heart size={16} fill="currentColor" />
+                        </div>
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={{ textAlign: "center", color: "#6b7280" }}>
-                  🚫 No likes yet for this post.
-                </p>
-              )}
-
-              <div className="analytics">
-                <h4>📊 Insights</h4>
-                <p>Total Likes: {likesData.analytics.total_likes}</p>
-                <p>
-                  Most Active Skill Level:{" "}
-                  {likesData.analytics.engagement_insights
-                    ?.most_active_skill_level || "N/A"}
-                </p>
-                <p>
-                  Peak Like Date:{" "}
-                  {likesData.analytics.engagement_insights?.peak_like_date
-                    ?.like_date || "N/A"}
-                </p>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-state">
+                    <span className="empty-icon">💔</span>
+                    <span className="empty-text">
+                      No likes yet for this post.
+                    </span>
+                  </div>
+                )}
               </div>
+
+              {likesData.analytics && (
+                <div className="modal-section">
+                  <h3 className="section-title">Analytics Insights</h3>
+                  <div className="analytics-grid">
+                    <div className="analytics-card">
+                      <div className="analytics-icon">❤️</div>
+                      <div className="analytics-content">
+                        <div className="analytics-value">
+                          {likesData.analytics.total_likes}
+                        </div>
+                        <div className="analytics-label">Total Likes</div>
+                      </div>
+                    </div>
+                    <div className="analytics-card">
+                      <div className="analytics-icon">🎯</div>
+                      <div className="analytics-content">
+                        <div className="analytics-value">
+                          {likesData.analytics.engagement_insights
+                            ?.most_active_skill_level || "N/A"}
+                        </div>
+                        <div className="analytics-label">Most Active Level</div>
+                      </div>
+                    </div>
+                    <div className="analytics-card">
+                      <div className="analytics-icon">📈</div>
+                      <div className="analytics-content">
+                        <div className="analytics-value">
+                          {likesData.analytics.engagement_insights
+                            ?.peak_like_date?.like_date
+                            ? new Date(
+                                likesData.analytics.engagement_insights.peak_like_date.like_date
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </div>
+                        <div className="analytics-label">Peak Like Date</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
