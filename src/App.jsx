@@ -8,8 +8,7 @@ import ChangePassword from "./pages/Onboarding/change password/ChangePassword.js
 import DashboardLayout from "./layouts/DashboardLayout";
 import Home from "./pages/Home/Home.jsx";
 import Users from "./pages/Users";
-import CommunityContent from "./pages/Content Moderation/User Generated Content/CommunityContent";
-import ClassModeration from "./pages/ClassModeration";
+import ClassModeration from "./pages/Class listing approval/ClassModeration.jsx";
 import EventsPage from "./pages/Events/Event page/EventsPage.jsx";
 import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
 import AdsManagement from "./pages/Ads Management/AdsManagement";

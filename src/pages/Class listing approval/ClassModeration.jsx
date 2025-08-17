@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "../styles/ClassModeration.css";
+import "./ClassModeration.css";
 import { X } from "lucide-react";
 import {
   getPendingClassesService,
@@ -7,7 +7,7 @@ import {
   getClassDetailService,
   approveClassService,
   rejectClassService,
-} from "../services/class.service";
+} from "../../services/class.service";
 
 const ClassModeration = () => {
   const [tab, setTab] = useState("pending");
