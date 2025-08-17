@@ -38,6 +38,8 @@ export const CONSTANTS = {
     USERS_DJ: "/api/v1/admin/users?userType=dj&page=1&limit=10",
     USERS_PROFESSOR: "/api/v1/admin/users?userType=instructor&page=1&limit=10",
     USERS_ORGANIZER: "/api/v1/admin/users?userType=organiser&page=1&limit=10",
+    USER_BOOKED_DATES: (userId, page = 1, limit = 10) =>
+      `/api/v1/admin/users/${userId}/booked-dates?page=${page}&limit=${limit}`,
 
     // === CLASS MANAGEMENT ===
     CLASS_PENDING: "/api/v1/admin/classes/pending", // GET

@@ -31,6 +31,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -39,6 +40,12 @@ const Sidebar = () => {
   const [applicantDropdownOpen, setApplicantDropdownOpen] = useState(false);
   const [contentDropdownOpen, setContentDropdownOpen] = useState(false);
   const [activeItem, setActiveItem] = useState("/home");
+  const { logout } = useAuth(); // now this will exist ✅
+
+  const handleLogout = () => {
+    logout(); // clear token
+    navigate("/", { replace: true }); // redirect
+  };
 
   const toggleContentDropdown = () =>
     setContentDropdownOpen(!contentDropdownOpen);
@@ -508,10 +515,10 @@ const Sidebar = () => {
       </div>
 
       <div className="logout-section">
-        <Link to="/" className="logout-link">
+        <button className="logout-link" onClick={handleLogout}>
           <LogOut size={18} />
           Logout
-        </Link>
+        </button>
       </div>
     </div>
   );

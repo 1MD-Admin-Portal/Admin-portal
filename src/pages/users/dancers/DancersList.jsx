@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "../Professors/ProfessorsListPage.css"; // Assuming you have a CSS file for styling
-import { fetchUsers } from "../../../services/user.Service";
+import {
+  fetchUsers,
+  fetchUserBookedDates,
+} from "../../../services/user.Service";
 import "../Dancers/DancersList.css"; // Assuming you have a CSS file for styling
 
 const DancersList = () => {
@@ -12,6 +15,8 @@ const DancersList = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // "asc" or "desc"
   const [subscriptionFilter, setSubscriptionFilter] = useState("");
   const [skillLevelFilter, setSkillLevelFilter] = useState("");
+  const [calendarData, setCalendarData] = useState(null);
+  const [loadingCalendar, setLoadingCalendar] = useState(false);
 
   useEffect(() => {
     const loadDancers = async () => {
@@ -130,7 +135,16 @@ const DancersList = () => {
               return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
             })
             .map((dancer) => (
-              <tr key={dancer.id} onClick={() => setSelectedDancer(dancer)}>
+              <tr
+                key={dancer.id}
+                onClick={async () => {
+                  setSelectedDancer(dancer);
+                  setLoadingCalendar(true);
+                  const data = await fetchUserBookedDates(dancer.id, 1, 10);
+                  setCalendarData(data);
+                  setLoadingCalendar(false);
+                }}
+              >
                 <td>{dancer.id}</td>
                 <td>{dancer.email}</td>
                 <td>{dancer.name}</td>
@@ -382,6 +396,33 @@ const DancersList = () => {
                   <div className="empty-state">
                     No Subscription Summary Available
                   </div>
+                )}
+              </div>
+              {/* Calendar Section */}
+              <div className="modal-section">
+                <h4>Booked Dates & Slots</h4>
+                {loadingCalendar ? (
+                  <div>Loading calendar...</div>
+                ) : calendarData && calendarData.booked_dates?.length > 0 ? (
+                  calendarData.booked_dates.map((dateEntry) => (
+                    <div key={dateEntry.date} className="calendar-date-block">
+                      <strong>{dateEntry.date}</strong> ({dateEntry.total_slots}{" "}
+                      slot
+                      {dateEntry.total_slots > 1 ? "s" : ""})
+                      <ul>
+                        {dateEntry.slots.map((slot, idx) => (
+                          <li key={idx}>
+                            {slot.start_time} - {slot.end_time} (
+                            {slot.duration_minutes} mins) • Role:{" "}
+                            {slot.user_role} • Other User ID:{" "}
+                            {slot.other_user_id}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-state">No booked dates available</div>
                 )}
               </div>
             </div>
