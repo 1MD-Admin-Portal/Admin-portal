@@ -129,7 +129,6 @@ const VideoPrograms = () => {
           <thead>
             <tr>
               <th></th>
-              <th></th>
               <th>Program Title</th>
               <th>Host</th>
               <th>Level</th>
@@ -140,13 +139,13 @@ const VideoPrograms = () => {
           <tbody>
             {filteredPrograms.map((prog) => (
               <tr
-                key={prog.program_id}
-                onClick={() => setSelectedProgram(prog)}
-                className="clickable-row"
+              // key={prog.program_id}
+              // onClick={() => setSelectedProgram(prog)}
+              // className="clickable-row"
               >
-                <td>
+                {/* <td>
                   <input type="checkbox" className="program-checkbox" />
-                </td>
+                </td> */}
                 <td className="program-title">
                   <div className="program-title-content">
                     <img

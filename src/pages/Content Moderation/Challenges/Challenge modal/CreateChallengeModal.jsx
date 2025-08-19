@@ -145,135 +145,185 @@ const CreateChallengeModal = ({ onClose }) => {
   };
 
   return (
-    <div className="create-challenge-modal">
-      <div className="modal-content-challenge">
+    <div className="create-challenge-modal" onClick={onClose}>
+      <div
+        className="modal-content-challenge"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
-          <span onClick={onClose} className="back-button">
-            ← Back
-          </span>
-          <h2>Create New Challenge</h2>
+          <div className="header-content">
+            <span onClick={onClose} className="back-button">
+              ← Back
+            </span>
+            <div className="header-title">
+              <h2>Create New Challenge</h2>
+              <p>Design an engaging challenge for your community</p>
+            </div>
+          </div>
         </div>
 
         <div className="modal-body">
-          <div className="form-group">
-            <label>Challenge Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
+          <div className="form-section">
+            <h3 className="section-title">Basic Information</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Challenge Title</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter challenge title..."
+                />
+              </div>
 
-          <div className="form-group">
-            <label>Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe your challenge..."
+                  rows="4"
+                />
+              </div>
 
-          <div className="form-group">
-            <label>Upload Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImageFile(e.target.files[0])}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Dance Style</label>
-            <select
-              value={danceStyle}
-              onChange={(e) => setDanceStyle(e.target.value)}
-            >
-              <option>Salsa</option>
-              <option>Bachata</option>
-              <option>Kizomba</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Dance Level</label>
-            <select
-              value={danceLevel}
-              onChange={(e) => setDanceLevel(e.target.value)}
-            >
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advance</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Start Time</label>
-            <input
-              type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>End Time</label>
-            <input
-              type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </div>
-
-          {duration && (
-            <div className="form-group">
-              <label>Challenge Duration</label>
-              <input type="text" value={duration} readOnly />
+              <div className="form-group">
+                <label>Upload Cover Image</label>
+                <div className="file-upload-wrapper">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files[0])}
+                    id="cover-image"
+                  />
+                  <label htmlFor="cover-image" className="file-upload-label">
+                    <span className="upload-icon">📸</span>
+                    <span>
+                      {imageFile ? imageFile.name : "Choose image file..."}
+                    </span>
+                  </label>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
 
-          <div className="task-section">
-            <h4>Challenge Tasks</h4>
+          <div className="form-section">
+            <h3 className="section-title">Challenge Details</h3>
+            <div className="form-grid two-column">
+              <div className="form-group">
+                <label>Dance Style</label>
+                <select
+                  value={danceStyle}
+                  onChange={(e) => setDanceStyle(e.target.value)}
+                >
+                  <option>Salsa</option>
+                  <option>Bachata</option>
+                  <option>Kizomba</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Dance Level</label>
+                <select
+                  value={danceLevel}
+                  onChange={(e) => setDanceLevel(e.target.value)}
+                >
+                  <option>Beginner</option>
+                  <option>Intermediate</option>
+                  <option>Advance</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Start Time</label>
+                <input
+                  type="datetime-local"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>End Time</label>
+                <input
+                  type="datetime-local"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {duration && (
+              <div className="form-group duration-display">
+                <label>Challenge Duration</label>
+                <div className="duration-badge">{duration}</div>
+              </div>
+            )}
+          </div>
+
+          <div className="form-section">
+            <h3 className="section-title">Challenge Tasks</h3>
             {taskGroups.map((group, groupIndex) => (
               <div key={groupIndex} className="task-group">
-                {group.watchVideos.map((watch, watchIndex) => (
-                  <div key={watch.id} className="task-row watch-upload-row">
-                    <span className="task-type">+ Watch Video</span>
-                    <input
-                      type="text"
-                      placeholder="Video Title"
-                      value={watch.title}
-                      onChange={(e) =>
-                        handleWatchTitleChange(
-                          groupIndex,
-                          watchIndex,
-                          e.target.value
-                        )
-                      }
-                    />
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) =>
-                        handleWatchFileChange(
-                          groupIndex,
-                          watchIndex,
-                          e.target.files[0]
-                        )
-                      }
-                    />
-                    <button
-                      className="remove-task-btn"
-                      onClick={() => removeWatchVideo(groupIndex, watchIndex)}
-                    >
-                      ❌
-                    </button>
-                  </div>
-                ))}
-                <button
-                  className="add-task-btn"
-                  onClick={() => addWatchVideo(groupIndex)}
-                >
-                  + Add Watch Video
-                </button>
+                <div className="task-category">
+                  <h4>Watch Videos</h4>
+                  {group.watchVideos.map((watch, watchIndex) => (
+                    <div key={watch.id} className="task-row">
+                      <div className="task-content">
+                        <div className="task-type-badge watch">
+                          📺 Watch Video
+                        </div>
+                        <div className="task-inputs">
+                          <input
+                            type="text"
+                            placeholder="Video title..."
+                            value={watch.title}
+                            onChange={(e) =>
+                              handleWatchTitleChange(
+                                groupIndex,
+                                watchIndex,
+                                e.target.value
+                              )
+                            }
+                          />
+                          <div className="file-upload-wrapper small">
+                            <input
+                              type="file"
+                              accept="video/*"
+                              onChange={(e) =>
+                                handleWatchFileChange(
+                                  groupIndex,
+                                  watchIndex,
+                                  e.target.files[0]
+                                )
+                              }
+                              id={`watch-video-${groupIndex}-${watchIndex}`}
+                            />
+                            <label
+                              htmlFor={`watch-video-${groupIndex}-${watchIndex}`}
+                              className="file-upload-label small"
+                            >
+                              <span className="upload-icon">🎥</span>
+                              <span>Choose video</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        className="remove-task-btn"
+                        onClick={() => removeWatchVideo(groupIndex, watchIndex)}
+                        title="Remove task"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    className="add-task-btn"
+                    onClick={() => addWatchVideo(groupIndex)}
+                  >
+                    + Add Watch Video
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -284,7 +334,7 @@ const CreateChallengeModal = ({ onClose }) => {
             Cancel
           </button>
           <button className="publish-btn" onClick={handleSubmit}>
-            Publish Challenge
+            🚀 Publish Challenge
           </button>
         </div>
       </div>
