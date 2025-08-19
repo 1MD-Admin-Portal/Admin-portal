@@ -355,10 +355,11 @@ const CreateChallenge = () => {
         <table>
           <thead>
             <tr>
-              <th>
+              <th></th>
+              {/* <th>
                 <input type="checkbox" />
               </th>
-              <th>Title</th>
+              <th>Title</th> */}
               <th>Host</th>
               <th>Duration</th>
               <th>Participants</th>
@@ -373,9 +374,9 @@ const CreateChallenge = () => {
                 onClick={() => setSelectedChallenge(challenge)}
                 className="clickable-row"
               >
-                <td>
+                {/* <td>
                   <input type="checkbox" />
-                </td>
+                </td> */}
                 <td>
                   <span role="img" className="emoji">
                     🏆

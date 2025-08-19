@@ -227,7 +227,6 @@
 }
 
 .events-table th {
-  display: flex;
   align-items: center;
   gap: 0.5rem;
 }
@@ -1099,6 +1098,7 @@
   .events-table td {
     padding: 0.75rem 0.5rem;
     font-size: 0.8rem;
+    vertical-align: middle;
   }
 
   .action-buttons {
