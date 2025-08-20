@@ -12,7 +12,8 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
   const [danceStyle, setDanceStyle] = useState(danceStyles[0] || "");
   const [danceLevel, setDanceLevel] = useState("Professional");
   const [pricingType, setPricingType] = useState("paid");
-  const [price, setPrice] = useState(1399);
+  const [price, setPrice] = useState(0);
+  const [overview, setOverview] = useState("");
 
   // 🔹 Instructor states
   const [instructorId, setInstructorId] = useState("");
@@ -29,13 +30,15 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
     const loadInstructors = async () => {
       try {
         const response = await fetchProfessors();
+        console.log("📌 Fetched instructors response:", response); // 👈 add this
+
         if (Array.isArray(response?.users)) {
           setInstructors(response.users);
         } else {
           setInstructors([]);
         }
       } catch (error) {
-        console.error("Error fetching instructors:", error);
+        console.error("❌ Error fetching instructors:", error);
         setInstructors([]);
       }
     };
@@ -72,6 +75,9 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
   const handleCreateProgram = async () => {
     try {
       setLoading(true);
+
+      console.log("📌 Selected instructorId state:", instructorId);
+      console.log("📌 Instructors list:", instructors);
 
       // 1️⃣ Upload cover image
       let uploadedImageUrl = "";
@@ -117,11 +123,12 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
       const payload = {
         title,
         description,
+        overview,
         dance_style: danceStyle,
         dance_level: danceLevel,
         pricing_type: pricingType,
         price: pricingType === "paid" ? price : 0,
-        instructor_id: Number(instructorId) || null,
+        instructor_id: instructorId ? parseInt(instructorId, 10) : null,
         videos: uploadedVideos,
         image_url: uploadedImageUrl,
       };
@@ -179,6 +186,17 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter program description"
                   rows="4"
+                />
+              </div>
+              {/* 🔹 Overview */}
+              <div className="form-group full-width">
+                <label className="form-label">Overview</label>
+                <textarea
+                  className="form-textarea"
+                  value={overview}
+                  onChange={(e) => setOverview(e.target.value)}
+                  placeholder="Enter program overview"
+                  rows="3"
                 />
               </div>
 
@@ -250,13 +268,17 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
                 />
                 <select
                   className="form-select"
-                  value={instructorId}
-                  onChange={(e) => setInstructorId(e.target.value)}
+                  value={instructorId || ""}
+                  onChange={(e) =>
+                    setInstructorId(
+                      e.target.value ? Number(e.target.value) : ""
+                    )
+                  }
                 >
                   <option value="">Select Instructor</option>
                   {filteredInstructors.map((inst) => (
                     <option key={inst.id} value={inst.id}>
-                      Name- {inst.name}, E-mail- ({inst.email})
+                      {inst.name} ({inst.email})
                     </option>
                   ))}
                 </select>

@@ -61,7 +61,7 @@
   overflow: hidden;
 }
 
-.modal-header::before {
+/* .modal-header::before {
   content: "";
   position: absolute;
   top: 0;
@@ -74,7 +74,7 @@
     rgba(239, 68, 68, 0.1) 50%,
     rgba(236, 72, 153, 0.1) 100%
   );
-}
+} */
 
 .header-content {
   position: relative;

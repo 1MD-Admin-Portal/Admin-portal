@@ -54,7 +54,7 @@ const CreateChallenge = () => {
               <th>Duration</th>
               <th>Participants</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -78,7 +78,7 @@ const CreateChallenge = () => {
                     {challenge.status}
                   </span>
                 </td>
-                <td className="actions">⋯</td>
+                <td></td>
               </tr>
             ))}
             {processedChallenges.length === 0 && (

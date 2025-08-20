@@ -8,6 +8,7 @@
   margin-left: 0;
   min-height: 100vh;
   position: relative;
+  margin-left: 260px;
 }
 
 .create-challenge-page::after {
@@ -147,7 +148,7 @@
 
 /* Improved Column Widths */
 .create-challenge-table th:nth-child(1) {
-  width: 35%;
+  width: 5%;
   text-align: left;
 }
 
@@ -186,7 +187,7 @@
 
 /* Align table data with headers */
 .create-challenge-table td:nth-child(1) {
-  text-align: left;
+  text-align: center;
 }
 
 .create-challenge-table td:nth-child(2),
