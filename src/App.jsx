@@ -37,6 +37,7 @@ import OrganizerListPage from "./pages/users/organizers/OrganizerListPage.jsx";
 import DJListPage from "./pages/users/djs/DJListPage.jsx";
 import DancersList from "./pages/users/dancers/DancersList.jsx";
 import FeedPage from "./pages/Content Moderation/User Generated Content/FeedPage.jsx";
+import PlaylistsPage from "./pages/Content Moderation/Playlists/PlaylistsPage.jsx";
 
 function App() {
   return (
@@ -95,6 +96,7 @@ function App() {
           <Route path="/users/Organizers" element={<OrganizerListPage />} />
           <Route path="/users/DJs" element={<DJListPage />} />
           <Route path="/users/Dancers" element={<DancersList />} />
+          <Route path="/playlists" element={<PlaylistsPage />} />
         </Route>
       </Routes>
     </AuthProvider>

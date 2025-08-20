@@ -60,5 +60,10 @@ export const CONSTANTS = {
     // === FEED MANAGEMENT ===
     GET_FEEDS: `/api/v1/admin/posts`,
     GET_FEED_LIKES: (postId) => `/api/v1/admin/posts/${postId}/likes`,
+
+    // === PLAYLIST MANAGEMENT ===
+    GET_PLAYLISTS: "/api/v1/admin/playlists", // GET with filters
+    APPROVE_PLAYLIST: (id) => `/api/v1/admin/playlists/${id}/approve`, // PUT
+    REJECT_PLAYLIST: (id) => `/api/v1/admin/playlists/${id}/reject`, // PUT
   },
 };

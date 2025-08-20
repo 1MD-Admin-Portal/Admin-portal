@@ -214,7 +214,6 @@ const ClassModeration = () => {
             <tr>
               {tab === "pending" && (
                 <>
-                  <th></th>
                   <th>
                     <input
                       type="checkbox"
