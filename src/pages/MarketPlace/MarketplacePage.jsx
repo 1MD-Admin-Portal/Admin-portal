@@ -91,13 +91,13 @@ const MarketplacePage = () => {
     <div className="marketplace-page-container">
       <div className="marketplace-page-header">
         <h2 className="marketplace-page-title">Marketplace</h2>
-        <button
+        {/* <button
           className="create-listing-btn"
           onClick={() => setShowModal(true)}
         >
           <Plus size={18} />
           Create Listing
-        </button>
+        </button> */}
       </div>
 
       <div className="marketplace-controls">

@@ -1,14 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { createProgramService } from "../../../services/program.service";
 import { uploadMediaFile } from "../../../services/upload.service";
+import { fetchProfessors } from "../../../services/professor.service"; // ✅ fixed import
 
-const CreateProgramModal = ({
-  isOpen,
-  onClose,
-  instructorOptions,
-  danceStyles,
-}) => {
+const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
   if (!isOpen) return null;
 
   const [title, setTitle] = useState("");
@@ -17,31 +13,62 @@ const CreateProgramModal = ({
   const [danceLevel, setDanceLevel] = useState("Professional");
   const [pricingType, setPricingType] = useState("paid");
   const [price, setPrice] = useState(1399);
+
+  // 🔹 Instructor states
   const [instructorId, setInstructorId] = useState("");
+  const [instructors, setInstructors] = useState([]);
+  const [search, setSearch] = useState("");
+
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [videos, setVideos] = useState([
     { title: "", duration: "", description: "", file: null },
   ]);
 
+  useEffect(() => {
+    const loadInstructors = async () => {
+      try {
+        const response = await fetchProfessors();
+        if (Array.isArray(response?.users)) {
+          setInstructors(response.users);
+        } else {
+          setInstructors([]);
+        }
+      } catch (error) {
+        console.error("Error fetching instructors:", error);
+        setInstructors([]);
+      }
+    };
+
+    loadInstructors();
+  }, []);
+
+  // ✅ Filter instructors by search text
+  const filteredInstructors = instructors.filter((inst) =>
+    (inst?.name || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  // ✅ Handle video field changes
   const handleVideoChange = (index, field, value) => {
     const updated = [...videos];
     updated[index][field] = value;
     setVideos(updated);
   };
 
+  // ✅ Add/remove video cards
   const addVideo = () => {
     setVideos([
       ...videos,
       { title: "", duration: "", description: "", file: null },
     ]);
   };
-
   const removeVideo = (index) => {
     const updated = [...videos];
     updated.splice(index, 1);
     setVideos(updated);
   };
+
+  // ✅ Submit program
   const handleCreateProgram = async () => {
     try {
       setLoading(true);
@@ -60,26 +87,22 @@ const CreateProgramModal = ({
 
       // 2️⃣ Upload videos
       const uploadedVideos = [];
-
       for (const [index, video] of videos.entries()) {
         let videoUrl = "";
-
         if (video.file) {
           try {
             const uploadRes = await uploadMediaFile(video.file, {
               title: video.title,
               duration: video.duration,
-              program_id: 1, // Replace with actual program ID if needed
+              program_id: 1, // replace with actual program_id if needed
             });
-
             videoUrl = uploadRes?.uploadResponse?.fileURL || "";
-            console.log(`✅ Video ${index + 1} uploaded URL:`, videoUrl);
+            console.log(`✅ Video ${index + 1} uploaded:`, videoUrl);
           } catch (err) {
             console.error(`❌ Failed to upload video ${index + 1}:`, err);
           }
         } else {
           videoUrl = video.video_url || "";
-          console.log(`ℹ️ Video ${index + 1} used fallback URL:`, videoUrl);
         }
 
         uploadedVideos.push({
@@ -90,7 +113,7 @@ const CreateProgramModal = ({
         });
       }
 
-      // 3️⃣ Build payload
+      // 3️⃣ Final payload
       const payload = {
         title,
         description,
@@ -98,13 +121,12 @@ const CreateProgramModal = ({
         dance_level: danceLevel,
         pricing_type: pricingType,
         price: pricingType === "paid" ? price : 0,
-        instructor_id: Number(instructorId) || 11,
+        instructor_id: Number(instructorId) || null,
         videos: uploadedVideos,
         image_url: uploadedImageUrl,
       };
 
-      console.log("🚀 Final payload being sent to createProgramService:");
-      console.log(JSON.stringify(payload, null, 2));
+      console.log("🚀 Final payload:", payload);
 
       await createProgramService(payload);
       alert("✅ Program created successfully!");
@@ -137,6 +159,7 @@ const CreateProgramModal = ({
           <div className="modal-section">
             <h3 className="section-title">Basic Information</h3>
             <div className="form-grid">
+              {/* 🔹 Title */}
               <div className="form-group">
                 <label className="form-label">Program Title</label>
                 <input
@@ -147,6 +170,7 @@ const CreateProgramModal = ({
                 />
               </div>
 
+              {/* 🔹 Description */}
               <div className="form-group full-width">
                 <label className="form-label">Description</label>
                 <textarea
@@ -158,6 +182,7 @@ const CreateProgramModal = ({
                 />
               </div>
 
+              {/* 🔹 Dance Style */}
               <div className="form-group">
                 <label className="form-label">Dance Style</label>
                 <select
@@ -173,6 +198,7 @@ const CreateProgramModal = ({
                 </select>
               </div>
 
+              {/* 🔹 Dance Level */}
               <div className="form-group">
                 <label className="form-label">Level</label>
                 <select
@@ -187,6 +213,7 @@ const CreateProgramModal = ({
                 </select>
               </div>
 
+              {/* 🔹 Pricing */}
               <div className="form-group">
                 <label className="form-label">Pricing Type</label>
                 <select
@@ -201,33 +228,41 @@ const CreateProgramModal = ({
 
               {pricingType === "paid" && (
                 <div className="form-group">
-                  <label className="form-label">Price (₹)</label>
+                  <label className="form-label">Price (€)</label>
                   <input
                     className="form-input"
                     type="number"
                     value={price}
                     onChange={(e) => setPrice(Number(e.target.value))}
-                    placeholder="Enter price"
                   />
                 </div>
               )}
 
-              <div className="form-group">
+              {/* 🔹 Instructor Search + Dropdown */}
+              <div className="form-group full-width">
                 <label className="form-label">Instructor</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Search instructor..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
                 <select
                   className="form-select"
                   value={instructorId}
                   onChange={(e) => setInstructorId(e.target.value)}
                 >
                   <option value="">Select Instructor</option>
-                  {instructorOptions.map((inst) => (
+                  {filteredInstructors.map((inst) => (
                     <option key={inst.id} value={inst.id}>
-                      {inst.name}
+                      Name- {inst.name}, E-mail- ({inst.email})
                     </option>
                   ))}
                 </select>
               </div>
 
+              {/* 🔹 Cover Image */}
               <div className="form-group">
                 <label className="form-label">Cover Image</label>
                 <div className="file-input-container">
@@ -246,6 +281,7 @@ const CreateProgramModal = ({
             </div>
           </div>
 
+          {/* 🔹 Videos Section */}
           <div className="modal-section">
             <div className="section-header">
               <h3 className="section-title">Videos</h3>
