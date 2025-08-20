@@ -27,6 +27,11 @@ const FeedPage = () => {
     const res = await getFeedLikesService(postId);
     setLikesData(res);
   };
+  // helper function to check if url is video
+  const isVideo = (url) => {
+    if (!url) return false;
+    return url.toLowerCase().endsWith(".mp4");
+  };
 
   return (
     <div className="feed-page-container">
@@ -42,14 +47,28 @@ const FeedPage = () => {
             onClick={() => setSelectedFeed(feed)}
           >
             <div className="feed-thumbnail-container">
-              <img
-                src={feed.content.video_url}
-                alt="feed-thumbnail"
-                className="feed-thumbnail"
-              />
-              <div className="play-overlay">
-                <Play size={24} />
-              </div>
+              {isVideo(feed.content.video_url) ? (
+                <video
+                  src={feed.content.video_url}
+                  className="feed-thumbnail"
+                  muted
+                  playsInline
+                />
+              ) : (
+                <img
+                  src={feed.content.video_url}
+                  alt="feed-thumbnail"
+                  className="feed-thumbnail"
+                />
+              )}
+
+              {/* ✅ Play overlay only for thumbnail previews */}
+              {isVideo(feed.content.video_url) && (
+                <div className="play-overlay">
+                  <Play size={24} />
+                </div>
+              )}
+
               <div className="likes-overlay">
                 <Heart size={16} />
                 <span>{feed.metadata.like_count}</span>
@@ -138,14 +157,21 @@ const FeedPage = () => {
             <div className="modal-body">
               <div className="modal-section">
                 <div className="feed-detail-image">
-                  <img
-                    src={selectedFeed.content.video_url}
-                    alt="feed-detail"
-                    className="modal-feed-thumbnail"
-                  />
-                  <div className="feed-detail-overlay">
-                    <Play size={48} />
-                  </div>
+                  {isVideo(selectedFeed.content.video_url) ? (
+                    <video
+                      src={selectedFeed.content.video_url}
+                      className="modal-feed-thumbnail"
+                      controls // ✅ adds play/pause, volume, fullscreen, etc.
+                      autoPlay
+                    />
+                  ) : (
+                    <img
+                      src={selectedFeed.content.video_url}
+                      alt="feed-detail"
+                      className="modal-feed-thumbnail"
+                    />
+                  )}
+                  {/* ❌ No overlay here — let user interact with controls */}
                 </div>
               </div>
 
