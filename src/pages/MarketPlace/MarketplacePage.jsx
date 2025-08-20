@@ -427,6 +427,32 @@ const MarketplacePage = () => {
                 </div>
               ) : (
                 <>
+                  {/* Statistics */}
+                  {stats && (
+                    <div className="modal-section">
+                      <h3 className="section-title">Analytics</h3>
+                      <div className="stats-grid">
+                        <div className="stats-card">
+                          <div className="stats-icon">📊</div>
+                          <div className="stats-content">
+                            <div className="stats-value">
+                              {stats.total_purchases || purchases.length}
+                            </div>
+                            <div className="stats-label">Total Purchases</div>
+                          </div>
+                        </div>
+                        <div className="stats-card">
+                          <div className="stats-icon">💰</div>
+                          <div className="stats-content">
+                            <div className="stats-value">
+                              ${stats.total_revenue || 0}
+                            </div>
+                            <div className="stats-label">Total Revenue</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="modal-section">
                     <h3 className="section-title">Purchase History</h3>
                     <div className="purchases-table-container">
@@ -456,33 +482,6 @@ const MarketplacePage = () => {
                       </table>
                     </div>
                   </div>
-
-                  {/* Statistics */}
-                  {stats && (
-                    <div className="modal-section">
-                      <h3 className="section-title">Analytics</h3>
-                      <div className="stats-grid">
-                        <div className="stats-card">
-                          <div className="stats-icon">📊</div>
-                          <div className="stats-content">
-                            <div className="stats-value">
-                              {stats.total_purchases || purchases.length}
-                            </div>
-                            <div className="stats-label">Total Purchases</div>
-                          </div>
-                        </div>
-                        <div className="stats-card">
-                          <div className="stats-icon">💰</div>
-                          <div className="stats-content">
-                            <div className="stats-value">
-                              ${stats.total_revenue || 0}
-                            </div>
-                            <div className="stats-label">Total Revenue</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </>
               )}
             </div>
