@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  getPlaylists,
-  approvePlaylist,
-  rejectPlaylist,
+  getPlaylistsService,
+  approvePlaylistService,
+  rejectPlaylistService,
 } from "../../../services/playlist.service";
 import "./Playlist.css";
 
-const PlaylistPage = () => {
+const PlaylistsPage = () => {
   const [activeTab, setActiveTab] = useState("pending"); // "pending" or "approved"
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,15 +19,25 @@ const PlaylistPage = () => {
     limit: 10,
   });
   const [pagination, setPagination] = useState({ page: 1, total_pages: 1 });
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null); // Modal state
 
+  // Fetch playlists whenever filters or active tab change
   useEffect(() => {
     fetchPlaylists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, activeTab]);
 
   const fetchPlaylists = async () => {
     try {
       setLoading(true);
-      const res = await getPlaylists(filters);
+      const res = await getPlaylistsService(
+        filters.page,
+        filters.limit,
+        filters.status,
+        filters.playlist_type,
+        filters.search,
+        filters.sort_by
+      );
       setPlaylists(res.playlists || []);
       setPagination(res.pagination || { page: 1, total_pages: 1 });
     } catch (error) {
@@ -47,13 +57,23 @@ const PlaylistPage = () => {
   };
 
   const handleApprove = async (id) => {
-    await approvePlaylist(id, { comment: "" });
-    fetchPlaylists();
+    try {
+      await approvePlaylistService(id, "");
+      fetchPlaylists();
+      setSelectedPlaylist(null); // close modal after approve
+    } catch (err) {
+      console.error("Approve failed", err);
+    }
   };
 
   const handleReject = async (id) => {
-    await rejectPlaylist(id, { comment: "Not suitable" });
-    fetchPlaylists();
+    try {
+      await rejectPlaylistService(id, "Not suitable");
+      fetchPlaylists();
+      setSelectedPlaylist(null); // close modal after reject
+    } catch (err) {
+      console.error("Reject failed", err);
+    }
   };
 
   return (
@@ -130,12 +150,15 @@ const PlaylistPage = () => {
                 <th>Status</th>
                 <th>Songs</th>
                 <th>Duration</th>
-                {activeTab === "pending" && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
               {playlists.map((pl) => (
-                <tr key={pl.id}>
+                <tr
+                  key={pl.id}
+                  className="clickable-row"
+                  onClick={() => setSelectedPlaylist(pl)}
+                >
                   <td>
                     {pl.cover_image_url ? (
                       <img
@@ -149,33 +172,19 @@ const PlaylistPage = () => {
                   </td>
                   <td>{pl.title}</td>
                   <td>
-                    <img
-                      src={pl.dj?.avatar}
-                      alt={pl.dj?.name}
-                      className="dj-avatar"
-                    />
+                    {pl.dj?.avatar && (
+                      <img
+                        src={pl.dj?.avatar}
+                        alt={pl.dj?.name}
+                        className="dj-avatar"
+                      />
+                    )}
                     {pl.dj?.name}
                   </td>
                   <td>{pl.playlist_type}</td>
                   <td>{pl.status}</td>
                   <td>{pl.total_songs}</td>
                   <td>{pl.duration_minutes} min</td>
-                  {activeTab === "pending" && (
-                    <td>
-                      <button
-                        className="approve-btn"
-                        onClick={() => handleApprove(pl.id)}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className="reject-btn"
-                        onClick={() => handleReject(pl.id)}
-                      >
-                        Reject
-                      </button>
-                    </td>
-                  )}
                 </tr>
               ))}
             </tbody>
@@ -197,8 +206,65 @@ const PlaylistPage = () => {
           </button>
         ))}
       </div>
+
+      {/* Playlist Modal */}
+      {selectedPlaylist && (
+        <div
+          className="playlist-modal-overlay"
+          onClick={() => setSelectedPlaylist(null)}
+        >
+          <div className="playlist-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="modal-close"
+              onClick={() => setSelectedPlaylist(null)}
+            >
+              ✖
+            </button>
+            <h2>{selectedPlaylist.title}</h2>
+            {selectedPlaylist.cover_image_url && (
+              <img
+                src={selectedPlaylist.cover_image_url}
+                alt={selectedPlaylist.title}
+                className="modal-cover"
+              />
+            )}
+            <p>
+              <strong>DJ:</strong> {selectedPlaylist.dj?.name}
+            </p>
+            <p>
+              <strong>Type:</strong> {selectedPlaylist.playlist_type}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedPlaylist.status}
+            </p>
+            <p>
+              <strong>Songs:</strong> {selectedPlaylist.total_songs}
+            </p>
+            <p>
+              <strong>Duration:</strong> {selectedPlaylist.duration_minutes} min
+            </p>
+
+            {activeTab === "pending" && (
+              <div className="modal-actions">
+                <button
+                  className="approve-btn"
+                  onClick={() => handleApprove(selectedPlaylist.id)}
+                >
+                  Approve
+                </button>
+                <button
+                  className="reject-btn"
+                  onClick={() => handleReject(selectedPlaylist.id)}
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default PlaylistPage;
+export default PlaylistsPage;
