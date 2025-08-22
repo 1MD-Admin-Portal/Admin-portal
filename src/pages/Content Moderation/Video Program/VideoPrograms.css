@@ -87,7 +87,7 @@
 }
 
 .create-video-btn::before {
-  content: "";
+  /* content: ""; */
   position: absolute;
   top: 0;
   left: -100%;
@@ -194,7 +194,7 @@
 .video-programs-table td {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-  text-align: left;
+  text-align: center;
   font-size: 0.9rem;
   color: #374151;
   transition: all 0.3s ease;
@@ -207,7 +207,7 @@
   position: relative;
 }
 
-.video-programs-table tbody tr::before {
+/* .video-programs-table tbody tr::before {
   content: "";
   position: absolute;
   left: 0;
@@ -217,7 +217,7 @@
   background: linear-gradient(135deg, #ec4899, #a855f7);
   transform: scaleY(0);
   transition: transform 0.3s ease;
-}
+} */
 
 .video-programs-table tbody tr:hover {
   background: linear-gradient(
@@ -242,6 +242,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  justify-content: center;
 }
 
 .program-thumbnail {

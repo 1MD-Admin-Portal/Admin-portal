@@ -235,7 +235,6 @@ const ProfessorsPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
-            <th></th>
             <th>
               <input
                 ref={selectAllRef}

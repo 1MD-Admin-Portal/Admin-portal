@@ -128,7 +128,6 @@ const VideoPrograms = () => {
         <table className="video-programs-table">
           <thead>
             <tr>
-              <th></th>
               <th>Program Title</th>
               <th>Host</th>
               <th>Level</th>

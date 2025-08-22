@@ -51,7 +51,7 @@
   }
 }
 
-.professors-container::after {
+/* .professors-container::after {
   content: "";
   position: absolute;
   top: 0;
@@ -65,7 +65,7 @@
   );
   pointer-events: none;
   z-index: -1;
-}
+} */
 
 .professors-table {
   width: 100%;
@@ -119,8 +119,7 @@
   position: relative;
 }
 
-.professors-table tbody tr::before {
-  content: "";
+/* .professors-table tbody tr::before {
   position: absolute;
   left: 0;
   top: 0;
@@ -129,7 +128,7 @@
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   transform: scaleY(0);
   transition: transform 0.3s ease;
-}
+} */
 
 .professors-table tbody tr:hover {
   background: linear-gradient(

@@ -20,6 +20,7 @@ const PlaylistsPage = () => {
   });
   const [pagination, setPagination] = useState({ page: 1, total_pages: 1 });
   const [selectedPlaylist, setSelectedPlaylist] = useState(null); // Modal state
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Fetch playlists whenever filters or active tab change
   useEffect(() => {
@@ -78,6 +79,7 @@ const PlaylistsPage = () => {
 
   return (
     <div className="playlist-container">
+      <h2>Playlists</h2>
       {/* Tabs */}
       <div className="playlist-tabs">
         <button
@@ -135,6 +137,36 @@ const PlaylistsPage = () => {
         </select>
       </div>
 
+      {activeTab === "pending" && playlists.length > 0 && (
+        <div className="bulk-actions">
+          <button
+            onClick={async () => {
+              for (const id of selectedIds) {
+                await approvePlaylistService(id, "");
+              }
+              fetchPlaylists();
+              setSelectedIds([]);
+            }}
+            disabled={selectedIds.length === 0}
+          >
+            ✅ Approve Selected
+          </button>
+
+          <button
+            onClick={async () => {
+              for (const id of selectedIds) {
+                await rejectPlaylistService(id, "Not suitable");
+              }
+              fetchPlaylists();
+              setSelectedIds([]);
+            }}
+            disabled={selectedIds.length === 0}
+          >
+            ❌ Reject Selected
+          </button>
+        </div>
+      )}
+
       {/* Playlist Table */}
       <div className="playlist-table">
         {loading ? (
@@ -143,6 +175,29 @@ const PlaylistsPage = () => {
           <table>
             <thead>
               <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedIds(
+                          playlists
+                            .filter((pl) => pl.status === "pending_approval")
+                            .map((pl) => pl.id)
+                        );
+                      } else {
+                        setSelectedIds([]);
+                      }
+                    }}
+                    checked={
+                      selectedIds.length > 0 &&
+                      selectedIds.length ===
+                        playlists.filter(
+                          (pl) => pl.status === "pending_approval"
+                        ).length
+                    }
+                  />
+                </th>
                 <th>Cover</th>
                 <th>Title</th>
                 <th>DJ</th>
@@ -150,15 +205,29 @@ const PlaylistsPage = () => {
                 <th>Status</th>
                 <th>Songs</th>
                 <th>Duration</th>
+                <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {playlists.map((pl) => (
-                <tr
-                  key={pl.id}
-                  className="clickable-row"
-                  onClick={() => setSelectedPlaylist(pl)}
-                >
+                <tr key={pl.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(pl.id)}
+                      disabled={pl.status !== "pending_approval"}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds((prev) => [...prev, pl.id]);
+                        } else {
+                          setSelectedIds((prev) =>
+                            prev.filter((id) => id !== pl.id)
+                          );
+                        }
+                      }}
+                    />
+                  </td>
                   <td>
                     {pl.cover_image_url ? (
                       <img
@@ -185,6 +254,24 @@ const PlaylistsPage = () => {
                   <td>{pl.status}</td>
                   <td>{pl.total_songs}</td>
                   <td>{pl.duration_minutes} min</td>
+                  <td>
+                    {pl.status === "pending_approval" && (
+                      <>
+                        <button
+                          className="approve-btn"
+                          onClick={() => handleApprove(pl.id)}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="reject-btn"
+                          onClick={() => handleReject(pl.id)}
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -244,7 +331,7 @@ const PlaylistsPage = () => {
               <strong>Duration:</strong> {selectedPlaylist.duration_minutes} min
             </p>
 
-            {activeTab === "pending" && (
+            {/* {activeTab === "pending" && (
               <div className="modal-actions">
                 <button
                   className="approve-btn"
@@ -259,7 +346,7 @@ const PlaylistsPage = () => {
                   Reject
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       )}

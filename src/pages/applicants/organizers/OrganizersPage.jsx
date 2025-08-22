@@ -247,7 +247,6 @@ const OrganizersPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
-            <th></th>
             <th>
               {/* header checkbox only for pending items */}
               <input

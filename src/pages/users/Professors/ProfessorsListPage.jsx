@@ -43,7 +43,6 @@ const ProfessorsListPage = () => {
       <table className="professors-table">
         <thead>
           <tr>
-            <th></th>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>

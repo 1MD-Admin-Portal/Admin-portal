@@ -110,7 +110,7 @@
   position: relative;
 }
 
-.professors-table tbody tr::before {
+/* .professors-table tbody tr::before {
   content: "";
   position: absolute;
   left: 0;
@@ -120,7 +120,7 @@
   background: linear-gradient(135deg, #059669, #10b981);
   transform: scaleY(0);
   transition: transform 0.3s ease;
-}
+} */
 
 .professors-table tbody tr:hover {
   background: linear-gradient(
