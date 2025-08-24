@@ -252,6 +252,46 @@ const FeedPage = () => {
             </div>
 
             <div className="modal-body">
+              {likesData.analytics && (
+                <div className="modal-section">
+                  <h3 className="section-title">Analytics Insights</h3>
+                  <div className="analytics-grid">
+                    <div className="analytics-card">
+                      <div className="analytics-icon">❤️</div>
+                      <div className="analytics-content">
+                        <div className="analytics-value">
+                          {likesData.analytics.total_likes}
+                        </div>
+                        <div className="analytics-label">Total Likes</div>
+                      </div>
+                    </div>
+                    <div className="analytics-card">
+                      <div className="analytics-icon">🎯</div>
+                      <div className="analytics-content">
+                        <div className="analytics-value">
+                          {likesData.analytics.engagement_insights
+                            ?.most_active_skill_level || "N/A"}
+                        </div>
+                        <div className="analytics-label">Most Active Level</div>
+                      </div>
+                    </div>
+                    <div className="analytics-card">
+                      <div className="analytics-icon">📈</div>
+                      <div className="analytics-content">
+                        <div className="analytics-value">
+                          {likesData.analytics.engagement_insights
+                            ?.peak_like_date?.like_date
+                            ? new Date(
+                                likesData.analytics.engagement_insights.peak_like_date.like_date
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </div>
+                        <div className="analytics-label">Peak Like Date</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="modal-section">
                 <h3 className="section-title">Users Who Liked</h3>
                 {likesData.likes.length > 0 ? (
@@ -293,47 +333,6 @@ const FeedPage = () => {
                   </div>
                 )}
               </div>
-
-              {likesData.analytics && (
-                <div className="modal-section">
-                  <h3 className="section-title">Analytics Insights</h3>
-                  <div className="analytics-grid">
-                    <div className="analytics-card">
-                      <div className="analytics-icon">❤️</div>
-                      <div className="analytics-content">
-                        <div className="analytics-value">
-                          {likesData.analytics.total_likes}
-                        </div>
-                        <div className="analytics-label">Total Likes</div>
-                      </div>
-                    </div>
-                    <div className="analytics-card">
-                      <div className="analytics-icon">🎯</div>
-                      <div className="analytics-content">
-                        <div className="analytics-value">
-                          {likesData.analytics.engagement_insights
-                            ?.most_active_skill_level || "N/A"}
-                        </div>
-                        <div className="analytics-label">Most Active Level</div>
-                      </div>
-                    </div>
-                    <div className="analytics-card">
-                      <div className="analytics-icon">📈</div>
-                      <div className="analytics-content">
-                        <div className="analytics-value">
-                          {likesData.analytics.engagement_insights
-                            ?.peak_like_date?.like_date
-                            ? new Date(
-                                likesData.analytics.engagement_insights.peak_like_date.like_date
-                              ).toLocaleDateString()
-                            : "N/A"}
-                        </div>
-                        <div className="analytics-label">Peak Like Date</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

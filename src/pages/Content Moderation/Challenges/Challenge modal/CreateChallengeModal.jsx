@@ -162,7 +162,7 @@ const CreateChallengeModal = ({ onClose }) => {
           </div>
         </div>
 
-        <div className="modal-body">
+        <div className="modal-body-c">
           <div className="form-section">
             <h3 className="section-title">Basic Information</h3>
             <div className="form-grid">

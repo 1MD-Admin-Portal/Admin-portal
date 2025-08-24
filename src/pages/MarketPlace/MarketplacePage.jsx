@@ -145,7 +145,6 @@ const MarketplacePage = () => {
           <table className="marketplace-table">
             <thead>
               <tr>
-                <th></th>
                 <th>ID</th>
                 <th>Name / Title</th>
                 <th>Instructor / Organizer</th>

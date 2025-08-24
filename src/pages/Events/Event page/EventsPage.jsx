@@ -157,7 +157,6 @@ const EventsPage = () => {
           <table className="events-table">
             <thead>
               <tr>
-                <th></th>
                 <th>
                   <Calendar size={16} />
                   Event Details
