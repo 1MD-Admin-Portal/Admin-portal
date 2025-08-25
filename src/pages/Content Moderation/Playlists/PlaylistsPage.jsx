@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
+  X,
+  Heart,
+  Play,
+  Music,
+  Clock,
+  User,
+  CheckCircle,
+  XCircle,
+  Search,
+} from "lucide-react";
+import {
   getPlaylistsService,
   approvePlaylistService,
   rejectPlaylistService,
@@ -16,7 +27,7 @@ const PlaylistsPage = () => {
     search: "",
     sort_by: "newest",
     page: 1,
-    limit: 10,
+    limit: 12,
   });
   const [pagination, setPagination] = useState({ page: 1, total_pages: 1 });
   const [selectedPlaylist, setSelectedPlaylist] = useState(null); // Modal state
@@ -119,350 +130,409 @@ const PlaylistsPage = () => {
   const pendingPlaylists = playlists.filter(
     (pl) => pl.status === "pending_approval"
   );
+
   const approveButtonText =
     selectedIds.length > 0
-      ? `✅ Approve Selected (${selectedIds.length})`
-      : `✅ Approve All (${pendingPlaylists.length})`;
+      ? `Approve Selected (${selectedIds.length})`
+      : `Approve All (${pendingPlaylists.length})`;
 
   const rejectButtonText =
     selectedIds.length > 0
-      ? `❌ Reject Selected (${selectedIds.length})`
-      : `❌ Reject All (${pendingPlaylists.length})`;
+      ? `Reject Selected (${selectedIds.length})`
+      : `Reject All (${pendingPlaylists.length})`;
 
   return (
-    <div className="playlist-container">
-      <h2>Playlists</h2>
-      {/* Tabs */}
-      <div className="playlist-tabs">
-        <button
-          className={activeTab === "pending" ? "active" : ""}
-          onClick={() => handleTabChange("pending")}
-        >
-          Require Approval
-        </button>
-        <button
-          className={activeTab === "approved" ? "active" : ""}
-          onClick={() => handleTabChange("approved")}
-        >
-          Ongoing / Accepted
-        </button>
+    <div className="playlist-page-container">
+      <div className="playlist-page-header">
+        <h2 className="playlist-page-title">Playlist Management</h2>
       </div>
 
-      {/* Filters */}
-      <div className="playlist-filters">
-        <input
-          type="text"
-          placeholder="Search by title or DJ"
-          value={filters.search}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, search: e.target.value, page: 1 }))
-          }
-        />
-
-        <select
-          value={filters.playlist_type}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              playlist_type: e.target.value,
-              page: 1,
-            }))
-          }
-        >
-          <option value="all">All Types</option>
-          <option value="free">Free</option>
-          <option value="paid">Paid</option>
-        </select>
-
-        <select
-          value={filters.sort_by}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              sort_by: e.target.value,
-              page: 1,
-            }))
-          }
-        >
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-        </select>
+      {/* Enhanced Tab System */}
+      <div className="playlist-tabs-container">
+        <div className="playlist-tabs">
+          <button
+            className={`tab-button ${activeTab === "pending" ? "active" : ""}`}
+            onClick={() => handleTabChange("pending")}
+          >
+            <Clock size={18} />
+            Require Approval
+            {pendingPlaylists.length > 0 && (
+              <span className="tab-badge">{pendingPlaylists.length}</span>
+            )}
+          </button>
+          <button
+            className={`tab-button ${activeTab === "approved" ? "active" : ""}`}
+            onClick={() => handleTabChange("approved")}
+          >
+            <CheckCircle size={18} />
+            Ongoing / Accepted
+          </button>
+        </div>
       </div>
 
+      {/* Enhanced Filters */}
+      <div className="playlist-filters-container">
+        <div className="playlist-filters">
+          <div className="filter-group">
+            <Search size={18} />
+            <input
+              type="text"
+              placeholder="Search by title or DJ..."
+              value={filters.search}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  search: e.target.value,
+                  page: 1,
+                }))
+              }
+              className="search-input"
+            />
+          </div>
+
+          <div className="filter-group">
+            <select
+              value={filters.playlist_type}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  playlist_type: e.target.value,
+                  page: 1,
+                }))
+              }
+              className="filter-select"
+            >
+              <option value="all">All Types</option>
+              <option value="free">Free</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <select
+              value={filters.sort_by}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  sort_by: e.target.value,
+                  page: 1,
+                }))
+              }
+              className="filter-select"
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Bulk Actions */}
       {activeTab === "pending" && playlists.length > 0 && (
         <div className="bulk-actions">
           <button
+            className="bulk-approve-btn"
             onClick={handleBulkApprove}
             disabled={pendingPlaylists.length === 0}
           >
+            <CheckCircle size={16} />
             {approveButtonText}
           </button>
 
           <button
+            className="bulk-reject-btn"
             onClick={handleBulkReject}
             disabled={pendingPlaylists.length === 0}
           >
+            <XCircle size={16} />
             {rejectButtonText}
           </button>
         </div>
       )}
 
-      {/* Playlist Table */}
-      <div className="playlist-table">
+      {/* Enhanced Grid Layout */}
+      <div className="playlist-grid">
         {loading ? (
-          <p>Loading playlists...</p>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading playlists...</p>
+          </div>
         ) : playlists.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                {/* Only show checkbox column for pending tab */}
-                {activeTab === "pending" && (
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedIds(pendingPlaylists.map((pl) => pl.id));
-                        } else {
-                          setSelectedIds([]);
-                        }
-                      }}
-                      checked={
-                        selectedIds.length > 0 &&
-                        selectedIds.length === pendingPlaylists.length
-                      }
-                    />
-                  </th>
-                )}
-                <th>Cover</th>
-                <th>Title</th>
-                <th>DJ</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Songs</th>
-                <th>Duration</th>
-                {activeTab === "pending" && <th>Actions</th>}
-              </tr>
-            </thead>
-
-            <tbody>
-              {playlists.map((pl) => (
-                <tr
-                  key={pl.id}
-                  onClick={
-                    activeTab === "approved"
-                      ? () => setSelectedPlaylist(pl)
-                      : undefined
-                  }
-                  style={activeTab === "approved" ? { cursor: "pointer" } : {}}
-                  className={activeTab === "approved" ? "clickable-row" : ""}
+          playlists.map((playlist) => (
+            <div
+              key={playlist.id}
+              className="playlist-card"
+              onClick={() => setSelectedPlaylist(playlist)}
+            >
+              {activeTab === "pending" && (
+                <div
+                  className="card-checkbox"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {/* Only show checkbox for pending tab */}
-                  {activeTab === "pending" && (
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(pl.id)}
-                        disabled={pl.status !== "pending_approval"}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedIds((prev) => [...prev, pl.id]);
-                          } else {
-                            setSelectedIds((prev) =>
-                              prev.filter((id) => id !== pl.id)
-                            );
-                          }
-                        }}
-                      />
-                    </td>
-                  )}
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(playlist.id)}
+                    disabled={playlist.status !== "pending_approval"}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedIds((prev) => [...prev, playlist.id]);
+                      } else {
+                        setSelectedIds((prev) =>
+                          prev.filter((id) => id !== playlist.id)
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              )}
+
+              <div className="playlist-thumbnail-container">
+                {playlist.cover_image_url ? (
+                  <img
+                    src={playlist.cover_image_url}
+                    alt={playlist.title}
+                    className="playlist-thumbnail"
+                  />
+                ) : (
+                  <div className="playlist-thumbnail-placeholder">
+                    <Music size={48} />
+                  </div>
+                )}
+
+                <div className="play-overlay">
+                  <Play size={24} />
+                </div>
+
+                <div className="playlist-type-overlay">
+                  <span className={`type-badge type-${playlist.playlist_type}`}>
+                    {playlist.playlist_type}
+                  </span>
+                </div>
+
+                <div className="status-overlay">
+                  <span
+                    className={`status-badge status-${playlist.status?.replace(
+                      "_",
+                      "-"
+                    )}`}
                   >
-                    {pl.cover_image_url ? (
-                      <img
-                        src={pl.cover_image_url}
-                        alt={pl.title}
-                        className="playlist-cover"
-                      />
-                    ) : (
-                      "No Cover"
-                    )}
-                  </td>
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
-                  >
-                    {activeTab === "pending" ? (
-                      <span
-                        className="playlist-title-clickable"
-                        onClick={() => setSelectedPlaylist(pl)}
-                        style={{
-                          cursor: "pointer",
-                          color: "#007bff",
-                          textDecoration: "underline",
-                        }}
-                      >
-                        {pl.title}
-                      </span>
-                    ) : (
-                      pl.title
-                    )}
-                  </td>
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
-                  >
-                    {pl.dj?.avatar && (
-                      <img
-                        src={pl.dj?.avatar}
-                        alt={pl.dj?.name}
-                        className="dj-avatar"
-                      />
-                    )}
-                    {pl.dj?.name}
-                  </td>
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
-                  >
-                    {pl.playlist_type}
-                  </td>
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
-                  >
-                    {pl.status}
-                  </td>
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
-                  >
-                    {pl.total_songs}
-                  </td>
-                  <td
-                    onClick={
-                      activeTab === "approved"
-                        ? undefined
-                        : (e) => e.stopPropagation()
-                    }
-                  >
-                    {pl.duration_minutes} min
-                  </td>
-                  {activeTab === "pending" && (
-                    <td onClick={(e) => e.stopPropagation()}>
-                      {pl.status === "pending_approval" && (
-                        <>
-                          <button
-                            className="approve-btn"
-                            onClick={() => handleApprove(pl.id)}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className="reject-btn"
-                            onClick={() => handleReject(pl.id)}
-                          >
-                            Reject
-                          </button>
-                        </>
+                    {playlist.status === "pending_approval"
+                      ? "Pending"
+                      : "Approved"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="playlist-card-content">
+                <div className="playlist-header">
+                  <h3 className="playlist-title">{playlist.title}</h3>
+                  <div className="playlist-meta">
+                    <div className="dj-info">
+                      {playlist.dj?.avatar && (
+                        <img
+                          src={playlist.dj.avatar}
+                          alt={playlist.dj.name}
+                          className="dj-avatar"
+                        />
                       )}
-                    </td>
+                      <span className="dj-name">{playlist.dj?.name}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="playlist-stats">
+                  <div className="stat-item">
+                    <Music size={16} />
+                    <span>{playlist.total_songs} Songs</span>
+                  </div>
+                  <div className="stat-item">
+                    <Clock size={16} />
+                    <span>{playlist.duration_minutes} min</span>
+                  </div>
+                </div>
+
+                {activeTab === "pending" &&
+                  playlist.status === "pending_approval" && (
+                    <div
+                      className="card-actions"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="card-approve-btn"
+                        onClick={() => handleApprove(playlist.id)}
+                      >
+                        <CheckCircle size={16} />
+                        Approve
+                      </button>
+                      <button
+                        className="card-reject-btn"
+                        onClick={() => handleReject(playlist.id)}
+                      >
+                        <XCircle size={16} />
+                        Reject
+                      </button>
+                    </div>
                   )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </div>
+            </div>
+          ))
         ) : (
-          <p>No playlists found.</p>
+          <div className="empty-state">
+            <span className="empty-icon">🎵</span>
+            <span className="empty-text">No playlists found.</span>
+          </div>
         )}
       </div>
 
-      {/* Pagination */}
-      <div className="pagination">
-        {Array.from({ length: pagination.total_pages }, (_, i) => (
-          <button
-            key={i + 1}
-            className={pagination.page === i + 1 ? "active" : ""}
-            onClick={() => setFilters((prev) => ({ ...prev, page: i + 1 }))}
-          >
-            {i + 1}
-          </button>
-        ))}
+      {/* Enhanced Pagination */}
+      <div className="pagination-controls">
+        <button
+          className="pagination-btn"
+          onClick={() =>
+            setFilters((prev) => ({ ...prev, page: prev.page - 1 }))
+          }
+          disabled={pagination.page <= 1}
+        >
+          Previous
+        </button>
+        <span className="page-indicator">
+          Page {pagination.page || 1} of {pagination.total_pages || 1}
+        </span>
+        <button
+          className="pagination-btn"
+          onClick={() =>
+            setFilters((prev) => ({ ...prev, page: prev.page + 1 }))
+          }
+          disabled={pagination.page >= pagination.total_pages}
+        >
+          Next
+        </button>
       </div>
 
-      {/* Playlist Modal */}
+      {/* Enhanced Modal */}
       {selectedPlaylist && (
         <div
-          className="playlist-modal-overlay"
+          className="modal-overlay"
           onClick={() => setSelectedPlaylist(null)}
         >
-          <div className="playlist-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="modal-close"
-              onClick={() => setSelectedPlaylist(null)}
-            >
-              ✖
-            </button>
-            <h2>{selectedPlaylist.title}</h2>
-            {selectedPlaylist.cover_image_url && (
-              <img
-                src={selectedPlaylist.cover_image_url}
-                alt={selectedPlaylist.title}
-                className="modal-cover"
-              />
-            )}
-            <p>
-              <strong>DJ:</strong> {selectedPlaylist.dj?.name}
-            </p>
-            <p>
-              <strong>Type:</strong> {selectedPlaylist.playlist_type}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedPlaylist.status}
-            </p>
-            <p>
-              <strong>Songs:</strong> {selectedPlaylist.total_songs}
-            </p>
-            <p>
-              <strong>Duration:</strong> {selectedPlaylist.duration_minutes} min
-            </p>
+          <div
+            className="modal-content playlist-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2 className="modal-title">
+                {selectedPlaylist.title} - Playlist Details
+              </h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => setSelectedPlaylist(null)}
+              >
+                <X />
+              </button>
+            </div>
 
-            {/* {activeTab === "pending" && (
-              <div className="modal-actions">
-                <button
-                  className="approve-btn"
-                  onClick={() => handleApprove(selectedPlaylist.id)}
-                >
-                  Approve
-                </button>
-                <button
-                  className="reject-btn"
-                  onClick={() => handleReject(selectedPlaylist.id)}
-                >
-                  Reject
-                </button>
+            <div className="modal-body">
+              <div className="modal-section">
+                <div className="playlist-detail-image">
+                  {selectedPlaylist.cover_image_url ? (
+                    <img
+                      src={selectedPlaylist.cover_image_url}
+                      alt={selectedPlaylist.title}
+                      className="modal-playlist-cover"
+                    />
+                  ) : (
+                    <div className="modal-placeholder-cover">
+                      <Music size={80} />
+                      <p>No Cover Image</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            )} */}
+
+              <div className="modal-section">
+                <h3 className="section-title">Playlist Details</h3>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <div className="info-label">DJ</div>
+                    <div className="info-value">
+                      <div className="dj-detail">
+                        {selectedPlaylist.dj?.avatar && (
+                          <img
+                            src={selectedPlaylist.dj.avatar}
+                            alt={selectedPlaylist.dj.name}
+                            className="dj-avatar-large"
+                          />
+                        )}
+                        <span>{selectedPlaylist.dj?.name}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Type</div>
+                    <div className="info-value">
+                      <span
+                        className={`type-badge type-${selectedPlaylist.playlist_type}`}
+                      >
+                        {selectedPlaylist.playlist_type}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Status</div>
+                    <div className="info-value">
+                      <span
+                        className={`status-badge status-${selectedPlaylist.status?.replace(
+                          "_",
+                          "-"
+                        )}`}
+                      >
+                        {selectedPlaylist.status === "pending_approval"
+                          ? "Pending Approval"
+                          : "Approved"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Songs</div>
+                    <div className="info-value">
+                      <div className="songs-count">
+                        <Music size={18} />
+                        <span>{selectedPlaylist.total_songs}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="info-item">
+                    <div className="info-label">Duration</div>
+                    <div className="info-value">
+                      <div className="duration-count">
+                        <Clock size={18} />
+                        <span>{selectedPlaylist.duration_minutes} minutes</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {activeTab === "pending" &&
+                selectedPlaylist.status === "pending_approval" && (
+                  <div className="modal-actions">
+                    <button
+                      className="approve-action-btn"
+                      onClick={() => handleApprove(selectedPlaylist.id)}
+                    >
+                      <CheckCircle size={16} />
+                      Approve Playlist
+                    </button>
+                    <button
+                      className="reject-action-btn"
+                      onClick={() => handleReject(selectedPlaylist.id)}
+                    >
+                      <XCircle size={16} />
+                      Reject Playlist
+                    </button>
+                  </div>
+                )}
+            </div>
           </div>
         </div>
       )}

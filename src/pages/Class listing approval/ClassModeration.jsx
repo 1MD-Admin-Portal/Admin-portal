@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./ClassModeration.css";
-import { X } from "lucide-react";
+import { X, CheckCircle, XCircle } from "lucide-react";
 import {
   getPendingClassesService,
   getAllClassesService,
@@ -213,15 +213,22 @@ const ClassModeration = () => {
           <thead>
             <tr>
               {tab === "pending" && (
-                <>
-                  <th>
-                    <input
-                      type="checkbox"
-                      checked={selectAll}
-                      onChange={toggleSelectAll}
-                    />
-                  </th>
-                </>
+                <th>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedIds(filteredClasses.map((cls) => cls.id));
+                      } else {
+                        setSelectedIds([]);
+                      }
+                    }}
+                    checked={
+                      selectedIds.length === filteredClasses.length &&
+                      filteredClasses.length > 0
+                    }
+                  />
+                </th>
               )}
               <th>Instructor</th>
               <th>Title</th>
@@ -234,14 +241,23 @@ const ClassModeration = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredClasses.map((classItem, index) => (
+            {filteredClasses.map((classItem) => (
               <tr key={classItem.id} className="clickable-row">
                 {tab === "pending" && (
-                  <td onClick={(e) => e.stopPropagation()}>
+                  <td>
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(classItem.id)}
-                      onChange={() => toggleSelectOne(classItem.id)}
+                      disabled={classItem.status?.toLowerCase() !== "pending"}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds((prev) => [...prev, classItem.id]);
+                        } else {
+                          setSelectedIds((prev) =>
+                            prev.filter((id) => id !== classItem.id)
+                          );
+                        }
+                      }}
                     />
                   </td>
                 )}
@@ -256,25 +272,34 @@ const ClassModeration = () => {
                 <td>{classItem.price}</td>
                 <td>{classItem.current_students}</td>
                 <td>
-                  <span className="status-label">{classItem.status}</span>
+                  <span className={`status ${classItem.status}`}>
+                    {classItem.status}
+                  </span>
                 </td>
                 {tab === "pending" && (
-                  <td
-                    className="class-actions"
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ position: "relative" }}
-                  >
-                    <span onClick={() => setOpenDropdownIndex(index)}>⋮</span>
-                    {openDropdownIndex === index && (
-                      <div className="dropdown-menu" ref={dropdownRef}>
-                        <div onClick={() => handleApprove(classItem.id)}>
-                          Approve
-                        </div>
-                        <div onClick={() => handleReject(classItem.id)}>
-                          Reject
-                        </div>
-                      </div>
-                    )}
+                  <td className="class-actions">
+                    <CheckCircle
+                      className={`action-icon ${
+                        classItem.status !== "pending_approval"
+                          ? "disabled"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        classItem.status === "pending_approval" &&
+                        handleApprove(classItem.id)
+                      }
+                    />
+                    <XCircle
+                      className={`action-icon reject ${
+                        classItem.status !== "pending_approval"
+                          ? "disabled"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        classItem.status === "pending_approval" &&
+                        handleReject(classItem.id)
+                      }
+                    />
                   </td>
                 )}
               </tr>
