@@ -299,9 +299,9 @@ const PlaylistsPage = () => {
                   </div>
                 )}
 
-                <div className="play-overlay">
+                {/* <div className="play-overlay">
                   <Play size={24} />
-                </div>
+                </div> */}
 
                 <div className="playlist-type-overlay">
                   <span className={`type-badge type-${playlist.playlist_type}`}>
