@@ -1,184 +1,473 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./EarningsPage.css";
+import {
+  getEarningsOverviewService,
+  getAllEarningsService,
+  getUserEarningsDetailService,
+} from "../../../services/earning.service";
 
-const mockEarnings = [
-  {
-    id: 1,
-    name: "Prof. Sarah Lee",
-    userType: "Professor",
-    source: "1:1 Class",
-    classTitle: "Advanced Ballet",
-    amount: 80,
-    date: "2025-07-10",
-  },
-  {
-    id: 2,
-    name: "DJ Pulse",
-    userType: "DJ",
-    source: "Exclusive Content",
-    classTitle: "Club Beats Vol. 1",
-    amount: 120,
-    date: "2025-07-12",
-  },
-  {
-    id: 3,
-    name: "Prof. Mark Newton",
-    userType: "Professor",
-    source: "Referral",
-    classTitle: "—",
-    amount: 25,
-    date: "2025-07-09",
-  },
-  {
-    id: 4,
-    name: "DJ Echo",
-    userType: "DJ",
-    source: "Group Class",
-    classTitle: "Remix Masterclass",
-    amount: 60,
-    date: "2025-07-11",
-  },
-  {
-    id: 5,
-    name: "Prof. Emily Chen",
-    userType: "Professor",
-    source: "Group Class",
-    classTitle: "Creative Choreography",
-    amount: 75,
-    date: "2025-07-08",
-  },
-  {
-    id: 6,
-    name: "DJ Sonic",
-    userType: "DJ",
-    source: "Referral",
-    classTitle: "—",
-    amount: 30,
-    date: "2025-07-06",
-  },
-  {
-    id: 7,
-    name: "Organizer John Max",
-    userType: "Organizer",
-    source: "Event Ticket Sale",
-    classTitle: "Dance Night 2025",
-    amount: 300,
-    date: "2025-07-05",
-  },
-  {
-    id: 8,
-    name: "Prof. Olivia Wright",
-    userType: "Professor",
-    source: "Exclusive Content",
-    classTitle: "Stretching Techniques",
-    amount: 50,
-    date: "2025-07-03",
-  },
-  {
-    id: 9,
-    name: "Organizer Lisa Moore",
-    userType: "Organizer",
-    source: "Event Ticket Sale",
-    classTitle: "Urban Moves Festival",
-    amount: 220,
-    date: "2025-07-02",
-  },
-  {
-    id: 10,
-    name: "DJ Blaze",
-    userType: "DJ",
-    source: "1:1 Class",
-    classTitle: "DJ Setup Basics",
-    amount: 90,
-    date: "2025-07-01",
-  },
-];
+import {
+  X,
+  Eye,
+  DollarSign,
+  TrendingUp,
+  Users,
+  AlertCircle,
+} from "lucide-react";
 
 const EarningsPage = () => {
-  const [search, setSearch] = useState("");
-  const [userFilter, setUserFilter] = useState("All");
-  const [sourceFilter, setSourceFilter] = useState("All");
-
-  const filtered = mockEarnings.filter((entry) => {
-    const matchesSearch =
-      entry.name.toLowerCase().includes(search.toLowerCase()) ||
-      entry.classTitle.toLowerCase().includes(search.toLowerCase());
-
-    const matchesUser = userFilter === "All" || entry.userType === userFilter;
-
-    const matchesSource =
-      sourceFilter === "All" || entry.source === sourceFilter;
-
-    return matchesSearch && matchesUser && matchesSource;
+  const [overview, setOverview] = useState({});
+  const [earnings, setEarnings] = useState([]);
+  const [pagination, setPagination] = useState({});
+  const [filters, setFilters] = useState({
+    user_type: "all",
+    source_type: "all",
+    status: "all",
   });
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
+  const [loading, setLoading] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userEarningsDetail, setUserEarningsDetail] = useState(null);
+
+  // ✅ Fetch Overview
+  const fetchOverview = async () => {
+    try {
+      setLoading(true);
+      const data = await getEarningsOverviewService();
+      setOverview(data);
+    } catch (error) {
+      console.error("Error fetching overview:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Fetch Earnings with filters
+  const fetchEarnings = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllEarningsService(page, limit, filters);
+      setEarnings(data?.earnings || []);
+      setPagination(data?.pagination || {});
+    } catch (error) {
+      console.error("Error fetching earnings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Fetch User Earnings Detail
+  const fetchUserDetail = async (userId, userType) => {
+    try {
+      const data = await getUserEarningsDetailService(userId, userType);
+      setUserEarningsDetail(data);
+    } catch (error) {
+      console.error("Error fetching user detail:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOverview();
+  }, []);
+
+  useEffect(() => {
+    fetchEarnings();
+  }, [page, filters]);
+
+  // ✅ Handle filter changes
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+    setPage(1); // reset page on filter change
+  };
+
+  // ✅ Handle row click to show user detail
+  const handleRowClick = async (earning) => {
+    setSelectedUser(earning);
+    await fetchUserDetail(earning.user.id, earning.user.type);
+  };
+
+  // ✅ Close modal
+  const closeModal = () => {
+    setSelectedUser(null);
+    setUserEarningsDetail(null);
+  };
+
+  // ✅ Calculate totals from overview
+  const getTotalRevenue = () => {
+    return (
+      overview?.overview_by_type?.reduce(
+        (total, type) => total + (type.total_revenue || 0),
+        0
+      ) || 0
+    );
+  };
+
+  const getTotalCreatorEarnings = () => {
+    return (
+      overview?.overview_by_type?.reduce(
+        (total, type) => total + (type.total_creator_earnings || 0),
+        0
+      ) || 0
+    );
+  };
+
+  const getTotalPendingPayouts = () => {
+    return (
+      overview?.overview_by_type?.reduce(
+        (total, type) => total + (type.pending_payouts || 0),
+        0
+      ) || 0
+    );
+  };
+
+  const getTotalCompletedPayouts = () => {
+    return (
+      overview?.overview_by_type?.reduce(
+        (total, type) => total + (type.completed_payouts || 0),
+        0
+      ) || 0
+    );
+  };
+
+  if (loading && earnings.length === 0) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
-    <div className="earnings-container">
-      <h1>Earnings Overview</h1>
+    <div className="earnings-page-container">
+      <h2 className="earnings-title">Earnings Management</h2>
 
+      {/* ✅ Overview Section */}
+      <div className="earnings-overview">
+        <div className="overview-card">
+          <div className="overview-icon">
+            <DollarSign size={24} />
+          </div>
+          <div className="overview-content">
+            <h3>Total Revenue</h3>
+            <p className="overview-amount">${getTotalRevenue().toFixed(2)}</p>
+          </div>
+        </div>
+
+        <div className="overview-card">
+          <div className="overview-icon">
+            <TrendingUp size={24} />
+          </div>
+          <div className="overview-content">
+            <h3>Creator Earnings</h3>
+            <p className="overview-amount">
+              ${getTotalCreatorEarnings().toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <div className="overview-card">
+          <div className="overview-icon">
+            <AlertCircle size={24} />
+          </div>
+          <div className="overview-content">
+            <h3>Pending Payouts</h3>
+            <p className="overview-amount pending">
+              ${getTotalPendingPayouts().toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <div className="overview-card">
+          <div className="overview-icon">
+            <Users size={24} />
+          </div>
+          <div className="overview-content">
+            <h3>Completed Payouts</h3>
+            <p className="overview-amount completed">
+              ${getTotalCompletedPayouts().toFixed(2)}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ✅ Top Earners Section */}
+      {overview?.top_earners && overview.top_earners.length > 0 && (
+        <div className="top-earners-section">
+          <h3>Top Earners</h3>
+          <div className="top-earners-grid">
+            {overview.top_earners.map((earner, index) => (
+              <div key={earner.user_id} className="top-earner-card">
+                <div className="earner-rank">#{index + 1}</div>
+                <div className="earner-info">
+                  <h4>{earner.user_name}</h4>
+                  <p className="earner-type">{earner.user_type}</p>
+                  <p className="earner-stats">
+                    ${earner.total_earnings} • {earner.transaction_count}{" "}
+                    transactions
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Overview by Type */}
+      {overview?.overview_by_type && overview.overview_by_type.length > 0 && (
+        <div className="overview-by-type">
+          <h3>Earnings by User Type</h3>
+          <div className="type-cards-grid">
+            {overview.overview_by_type.map((type) => (
+              <div key={type.user_type} className="type-card">
+                <h4>{type.user_type.toUpperCase()}</h4>
+                <div className="type-stats">
+                  <p>
+                    <strong>Revenue:</strong> ${type.total_revenue}
+                  </p>
+                  <p>
+                    <strong>Creator Earnings:</strong> $
+                    {type.total_creator_earnings}
+                  </p>
+                  <p>
+                    <strong>Platform Fees:</strong> ${type.total_platform_fees}
+                  </p>
+                  <p>
+                    <strong>Transactions:</strong> {type.total_transactions}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Filters */}
       <div className="earnings-filters">
-        <input
-          type="text"
-          placeholder="Search by name or class..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
         <select
-          value={userFilter}
-          onChange={(e) => setUserFilter(e.target.value)}
+          name="user_type"
+          value={filters.user_type}
+          onChange={handleFilterChange}
         >
-          <option value="All">All Roles</option>
-          <option value="Professor">Professor</option>
-          <option value="DJ">DJ</option>
-          <option value="Organizer">Organizer</option>
+          <option value="all">All User Types</option>
+          <option value="instructor">Instructor</option>
+          <option value="dj">DJ</option>
+          <option value="organiser">Organizer</option>
         </select>
+
         <select
-          value={sourceFilter}
-          onChange={(e) => setSourceFilter(e.target.value)}
+          name="source_type"
+          value={filters.source_type}
+          onChange={handleFilterChange}
         >
-          <option value="All">All Sources</option>
-          <option value="1:1 Class">1:1 Class</option>
-          <option value="Group Class">Group Class</option>
-          <option value="Exclusive Content">Exclusive Content</option>
-          <option value="Referral">Referral</option>
-          <option value="Event Ticket Sale">Event Ticket Sale</option>
+          <option value="all">All Source Types</option>
+          <option value="class_booking">Class Booking</option>
+          <option value="event_ticket">Event Ticket</option>
+        </select>
+
+        <select
+          name="status"
+          value={filters.status}
+          onChange={handleFilterChange}
+        >
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="paid">Paid</option>
         </select>
       </div>
 
-      <table className="earnings-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>User Type</th>
-            <th>Source</th>
-            <th>Class/Event</th>
-            <th>Amount ($)</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.length > 0 ? (
-            filtered.map((entry) => (
-              <tr key={entry.id}>
-                <td>{entry.id}</td>
-                <td>{entry.name}</td>
-                <td>{entry.userType}</td>
-                <td>{entry.source}</td>
-                <td>{entry.classTitle}</td>
-                <td>{entry.amount}</td>
-                <td>{entry.date}</td>
-              </tr>
-            ))
-          ) : (
+      {/* ✅ Earnings Table */}
+      <div className="earnings-table-container">
+        <table className="earnings-table">
+          <thead>
             <tr>
-              <td colSpan="7" className="no-results">
-                No earnings found.
-              </td>
+              <th>User</th>
+              <th>Type</th>
+              <th>Source</th>
+              <th>Total Amount</th>
+              <th>User Earnings</th>
+              <th>Platform Fee</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {earnings.length === 0 ? (
+              <tr>
+                <td colSpan="9" className="no-data">
+                  No earnings found
+                </td>
+              </tr>
+            ) : (
+              earnings.map((earning) => (
+                <tr key={earning.id} className="earnings-row">
+                  <td>
+                    <div className="user-info">
+                      <strong>{earning.user.name}</strong>
+                      <span className="user-type">{earning.user.type}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`user-type-badge ${earning.user.type}`}>
+                      {earning.user.type}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="source-info">
+                      <span className="source-type">
+                        {earning.source.type.replace("_", " ")}
+                      </span>
+                      <small>{earning.source.display}</small>
+                    </div>
+                  </td>
+                  <td className="amount-cell">${earning.amount.total}</td>
+                  <td className="amount-cell user-earnings">
+                    ${earning.amount.user_earnings}
+                  </td>
+                  <td className="amount-cell platform-fee">
+                    ${earning.amount.platform_fee}
+                  </td>
+                  <td>
+                    <span className={`status-badge ${earning.status}`}>
+                      {earning.status}
+                    </span>
+                  </td>
+                  <td>{new Date(earning.earned_date).toLocaleDateString()}</td>
+                  <td className="actions">
+                    <button
+                      className="view-btn"
+                      onClick={() => handleRowClick(earning)}
+                      title="View Details"
+                    >
+                      <Eye size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ✅ Pagination */}
+      <div className="pagination">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((prev) => prev - 1)}
+          className="pagination-btn"
+        >
+          Previous
+        </button>
+        <span className="pagination-info">
+          Page {page} of {pagination?.total_pages || 1}
+          {pagination?.total && ` (${pagination.total} total)`}
+        </span>
+        <button
+          disabled={page === pagination?.total_pages}
+          onClick={() => setPage((prev) => prev + 1)}
+          className="pagination-btn"
+        >
+          Next
+        </button>
+      </div>
+
+      {/* ✅ User Detail Modal */}
+      {selectedUser && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>User Earnings Details</h3>
+              <button className="modal-close" onClick={closeModal}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {userEarningsDetail ? (
+              <div className="modal-body">
+                {/* User Info */}
+                <div className="user-detail-section">
+                  <h4>User Information</h4>
+                  <div className="user-detail-grid">
+                    <p>
+                      <strong>Name:</strong> {userEarningsDetail.user?.name}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {userEarningsDetail.user?.email}
+                    </p>
+                    <p>
+                      <strong>Type:</strong> {userEarningsDetail.user?.type}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="summary-section">
+                  <h4>Earnings Summary</h4>
+                  <div className="summary-grid">
+                    <div className="summary-card">
+                      <span>Total Earnings</span>
+                      <strong>
+                        ${userEarningsDetail.summary?.total_earnings || 0}
+                      </strong>
+                    </div>
+                    <div className="summary-card">
+                      <span>Paid Earnings</span>
+                      <strong>
+                        ${userEarningsDetail.summary?.paid_earnings || 0}
+                      </strong>
+                    </div>
+                    <div className="summary-card">
+                      <span>Pending Earnings</span>
+                      <strong>
+                        ${userEarningsDetail.summary?.pending_earnings || 0}
+                      </strong>
+                    </div>
+                    <div className="summary-card">
+                      <span>Total Transactions</span>
+                      <strong>
+                        {userEarningsDetail.summary?.total_transactions || 0}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Earnings List */}
+                {userEarningsDetail.earnings &&
+                  userEarningsDetail.earnings.length > 0 && (
+                    <div className="earnings-detail-section">
+                      <h4>Recent Transactions</h4>
+                      <div className="earnings-detail-list">
+                        {userEarningsDetail.earnings.map((earning, index) => (
+                          <div key={index} className="earning-detail-item">
+                            <div className="earning-detail-info">
+                              <span className="earning-detail-source">
+                                {earning.source?.display}
+                              </span>
+                              <span className="earning-detail-date">
+                                {new Date(
+                                  earning.earned_date
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="earning-detail-amount">
+                              <span
+                                className={`earning-detail-status ${earning.status}`}
+                              >
+                                {earning.status}
+                              </span>
+                              <strong>${earning.amount?.user_earnings}</strong>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </div>
+            ) : (
+              <div className="modal-loading">Loading user details...</div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

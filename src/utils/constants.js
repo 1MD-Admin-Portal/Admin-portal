@@ -65,5 +65,11 @@ export const CONSTANTS = {
     GET_PLAYLISTS: "/api/v1/admin/playlists", // GET with filters
     APPROVE_PLAYLIST: (id) => `/api/v1/admin/playlists/${id}/approve`, // PUT
     REJECT_PLAYLIST: (id) => `/api/v1/admin/playlists/${id}/reject`, // PUT
+
+    // === EARNING MANAGEMENT ===
+    EARNINGS_OVERVIEW: "/api/v1/admin/earnings/overview",
+    EARNINGS_ALL: "/api/v1/admin/earnings/all", // ✅ Fixed: Remove function, make it a string
+    EARNINGS_USER_DETAIL: (id, type, page = 1, limit = 50) =>
+      `/api/v1/admin/earnings/users/${id}?user_type=${type}&page=${page}&limit=${limit}`,
   },
 };

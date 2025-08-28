@@ -468,10 +468,6 @@ const Sidebar = () => {
                 Marketplace
               </MenuItem>
 
-              <MenuItem href="/monetizationandtaxation" icon={Building}>
-                Monetization & Taxation
-              </MenuItem>
-
               <DropdownMenuItem
                 icon={Euro}
                 isOpen={earningDropdownOpen}
