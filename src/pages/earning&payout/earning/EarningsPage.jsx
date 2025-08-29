@@ -29,7 +29,8 @@ const EarningsPage = () => {
   const [loading, setLoading] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
-  const [userEarningsDetail, setUserEarningsDetail] = useState(null);
+  const [userEarningsDetail, setUserEarningsDetail] = useState({});
+  const [loadingUserDetail, setLoadingUserDetail] = useState(false);
 
   // ✅ Fetch Overview
   const fetchOverview = async () => {
@@ -58,13 +59,31 @@ const EarningsPage = () => {
     }
   };
 
-  // ✅ Fetch User Earnings Detail
-  const fetchUserDetail = async (userId, userType) => {
+  // ✅ Fetch User Earnings Detail for both instructor and DJ
+  const fetchUserDetail = async (userId) => {
     try {
-      const data = await getUserEarningsDetailService(userId, userType);
-      setUserEarningsDetail(data);
+      setLoadingUserDetail(true);
+      const userTypes = ["instructor", "dj"];
+      const results = {};
+
+      // Fetch data for both user types
+      for (const type of userTypes) {
+        try {
+          const data = await getUserEarningsDetailService(userId, type);
+          if (data && data.earnings && data.earnings.length > 0) {
+            results[type] = data;
+          }
+        } catch (error) {
+          console.log(`No ${type} earnings found for user ${userId}`);
+        }
+      }
+
+      setUserEarningsDetail(results);
     } catch (error) {
       console.error("Error fetching user detail:", error);
+      setUserEarningsDetail({});
+    } finally {
+      setLoadingUserDetail(false);
     }
   };
 
@@ -85,13 +104,13 @@ const EarningsPage = () => {
   // ✅ Handle row click to show user detail
   const handleRowClick = async (earning) => {
     setSelectedUser(earning);
-    await fetchUserDetail(earning.user.id, earning.user.type);
+    await fetchUserDetail(earning.user.id);
   };
 
   // ✅ Close modal
   const closeModal = () => {
     setSelectedUser(null);
-    setUserEarningsDetail(null);
+    setUserEarningsDetail({});
   };
 
   // ✅ Calculate totals from overview
@@ -373,7 +392,10 @@ const EarningsPage = () => {
       {/* ✅ User Detail Modal */}
       {selectedUser && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content user-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
               <h3>User Earnings Details</h3>
               <button className="modal-close" onClick={closeModal}>
@@ -381,89 +403,156 @@ const EarningsPage = () => {
               </button>
             </div>
 
-            {userEarningsDetail ? (
+            {loadingUserDetail ? (
+              <div className="modal-loading">Loading user details...</div>
+            ) : (
               <div className="modal-body">
-                {/* User Info */}
+                {/* User Basic Info */}
                 <div className="user-detail-section">
                   <h4>User Information</h4>
                   <div className="user-detail-grid">
                     <p>
-                      <strong>Name:</strong> {userEarningsDetail.user?.name}
+                      <strong>Name:</strong> {selectedUser.user?.name}
                     </p>
                     <p>
-                      <strong>Email:</strong> {userEarningsDetail.user?.email}
+                      <strong>User ID:</strong> {selectedUser.user?.id}
                     </p>
                     <p>
-                      <strong>Type:</strong> {userEarningsDetail.user?.type}
+                      <strong>Primary Type:</strong> {selectedUser.user?.type}
                     </p>
                   </div>
                 </div>
 
-                {/* Summary */}
-                <div className="summary-section">
-                  <h4>Earnings Summary</h4>
-                  <div className="summary-grid">
-                    <div className="summary-card">
-                      <span>Total Earnings</span>
-                      <strong>
-                        ${userEarningsDetail.summary?.total_earnings || 0}
-                      </strong>
-                    </div>
-                    <div className="summary-card">
-                      <span>Paid Earnings</span>
-                      <strong>
-                        ${userEarningsDetail.summary?.paid_earnings || 0}
-                      </strong>
-                    </div>
-                    <div className="summary-card">
-                      <span>Pending Earnings</span>
-                      <strong>
-                        ${userEarningsDetail.summary?.pending_earnings || 0}
-                      </strong>
-                    </div>
-                    <div className="summary-card">
-                      <span>Total Transactions</span>
-                      <strong>
-                        {userEarningsDetail.summary?.total_transactions || 0}
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Earnings List */}
-                {userEarningsDetail.earnings &&
-                  userEarningsDetail.earnings.length > 0 && (
-                    <div className="earnings-detail-section">
-                      <h4>Recent Transactions</h4>
-                      <div className="earnings-detail-list">
-                        {userEarningsDetail.earnings.map((earning, index) => (
-                          <div key={index} className="earning-detail-item">
-                            <div className="earning-detail-info">
-                              <span className="earning-detail-source">
-                                {earning.source?.display}
-                              </span>
-                              <span className="earning-detail-date">
-                                {new Date(
-                                  earning.earned_date
-                                ).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <div className="earning-detail-amount">
-                              <span
-                                className={`earning-detail-status ${earning.status}`}
-                              >
-                                {earning.status}
-                              </span>
-                              <strong>${earning.amount?.user_earnings}</strong>
-                            </div>
-                          </div>
-                        ))}
+                {/* Earnings by Type */}
+                {Object.keys(userEarningsDetail).length > 0 ? (
+                  Object.entries(userEarningsDetail).map(([userType, data]) => (
+                    <div key={userType} className="earnings-type-section">
+                      <div className="earnings-type-header">
+                        <h4>
+                          {userType.charAt(0).toUpperCase() + userType.slice(1)}{" "}
+                          Earnings
+                        </h4>
+                        <span className={`user-type-badge ${userType}`}>
+                          {userType}
+                        </span>
                       </div>
+
+                      {/* User Info for this type */}
+                      <div className="user-type-info">
+                        <div className="user-detail-grid">
+                          <p>
+                            <strong>Email:</strong> {data.user?.email}
+                          </p>
+                          <p>
+                            <strong>Account Type:</strong> {data.user?.type}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Summary for this type */}
+                      <div className="summary-section">
+                        <h5>Summary</h5>
+                        <div className="summary-grid">
+                          <div className="summary-card">
+                            <span>Total Earnings</span>
+                            <strong>
+                              ${data.summary?.total_earnings || 0}
+                            </strong>
+                          </div>
+                          <div className="summary-card">
+                            <span>Paid Earnings</span>
+                            <strong>${data.summary?.paid_earnings || 0}</strong>
+                          </div>
+                          <div className="summary-card">
+                            <span>Pending Earnings</span>
+                            <strong>
+                              ${data.summary?.pending_earnings || 0}
+                            </strong>
+                          </div>
+                          <div className="summary-card">
+                            <span>Processing</span>
+                            <strong>
+                              ${data.summary?.processing_earnings || 0}
+                            </strong>
+                          </div>
+                          <div className="summary-card">
+                            <span>Total Transactions</span>
+                            <strong>
+                              {data.summary?.total_transactions || 0}
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Earnings List for this type */}
+                      {data.earnings && data.earnings.length > 0 && (
+                        <div className="earnings-detail-section">
+                          <h5>Recent Transactions ({userType})</h5>
+                          <div className="earnings-detail-list">
+                            {data.earnings.map((earning) => (
+                              <div
+                                key={earning.id}
+                                className="earning-detail-item"
+                              >
+                                <div className="earning-detail-info">
+                                  <span className="earning-detail-source">
+                                    {earning.source_title}
+                                  </span>
+                                  <span className="earning-detail-type">
+                                    {earning.source_type
+                                      .replace("_", " ")
+                                      .toUpperCase()}
+                                  </span>
+                                  <span className="earning-detail-date">
+                                    {new Date(
+                                      earning.earned_at
+                                    ).toLocaleDateString()}
+                                    {earning.payout_date &&
+                                      ` • Paid: ${new Date(
+                                        earning.payout_date
+                                      ).toLocaleDateString()}`}
+                                  </span>
+                                </div>
+                                <div className="earning-detail-amount">
+                                  <span
+                                    className={`earning-detail-status ${earning.status}`}
+                                  >
+                                    {earning.status}
+                                  </span>
+                                  <div className="amount-breakdown">
+                                    <div className="user-earning">
+                                      <small>Your Earning</small>
+                                      <strong>${earning.user_earnings}</strong>
+                                    </div>
+                                    <div className="total-amount">
+                                      <small>Total Amount</small>
+                                      <span>${earning.total_amount}</span>
+                                    </div>
+                                    <div className="platform-fee">
+                                      <small>Platform Fee</small>
+                                      <span>${earning.platform_fee}</span>
+                                    </div>
+                                    <div className="commission-rate">
+                                      <small>Commission Rate</small>
+                                      <span>
+                                        {earning.commission_rate * 100}%
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))
+                ) : (
+                  <div className="no-earnings-found">
+                    <p>No earnings found for this user as instructor or DJ.</p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="modal-loading">Loading user details...</div>
             )}
           </div>
         </div>

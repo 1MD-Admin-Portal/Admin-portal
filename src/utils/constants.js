@@ -5,10 +5,13 @@ export const CONSTANTS = {
     // BASE_URL: "",
 
     LOGIN: "/api/v1/admin/login",
+    FORGOT_PASSWORD: "/api/v1/admin-auth/forgot-password",
+    RESET_PASSWORD: "/api/v1/admin-auth/reset-password",
     UPLOAD_MEDIA: "/api/v1/file/upload",
     DASHBOARD: "/dashboard",
     PROFILE: "/profile",
     USERS: "/users",
+    CHANGE_PASSWORD: "/api/v1/admin-auth/change-password",
 
     // === PROGRAM MANAGEMENT ===
     GET_PROGRAMS: "/api/v1/admin/program",

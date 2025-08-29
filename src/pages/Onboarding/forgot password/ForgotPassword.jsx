@@ -1,70 +1,176 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Mail,
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 import "./ForgotPassword.css";
+import { forgotPasswordService } from "../../../services/auth.service";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
-  const [showOtpBox, setShowOtpBox] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState(1); // 1: email, 2: success message
+  const [formData, setFormData] = useState({
+    email: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+
   const navigate = useNavigate();
 
-  const handleSendOtp = () => {
-    if (!email) {
-      alert("Please enter your email.");
-      return;
-    }
-
-    // Simulate always valid for test
-    alert("OTP sent to your email.");
-    setShowOtpBox(true);
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  const handleVerifyOtp = () => {
-    if (otp === "123") {
-      alert("OTP verified!");
-      navigate("/change-password", { state: { email } });
-    } else {
-      setError("Invalid OTP. Please try again.");
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.email) {
+      errors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      errors.email = "Please enter a valid email";
     }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
+    // Clear field error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+
+    // Clear general error
+    if (error) setError("");
+  };
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await forgotPasswordService(formData.email);
+
+      if (response.status === 200) {
+        setStep(2);
+        // Navigate to reset password with email after a short delay
+        setTimeout(() => {
+          navigate("/reset-password", {
+            state: { email: formData.email },
+          });
+        }, 2000);
+      } else {
+        setError(
+          response.data?.message || "Failed to send OTP. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Forgot password error:", error);
+
+      if (error.response?.status === 404) {
+        setError("Email not found. Please check your email address.");
+      } else if (error.response?.status === 429) {
+        setError(
+          "Too many requests. Please wait a moment before trying again."
+        );
+      } else {
+        setError(
+          error.response?.data?.message ||
+            "Failed to send OTP. Please try again."
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    navigate("/");
   };
 
   return (
     <div className="forgot-container">
       <div className="forgot-box">
-        <h2>Forgot Password</h2>
+        <button className="back-button" onClick={handleBack}>
+          <ArrowLeft size={18} />
+          Back to Login
+        </button>
 
-        {!showOtpBox && (
-          <>
-            <label>Email</label>
-            <input
-              type="text"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <button className="forgot-button" onClick={handleSendOtp}>
-              Send OTP
-            </button>
-          </>
+        <div className="forgot-header">
+          <h2>Forgot Password</h2>
+          {step === 1 && <p>No worries, we'll send you reset instructions.</p>}
+        </div>
+
+        {error && (
+          <div className="error-alert">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
         )}
 
-        {showOtpBox && (
-          <>
-            <p className="otp-info">
-              OTP has been sent to <strong>{email}</strong>
-            </p>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-            <button className="forgot-button" onClick={handleVerifyOtp}>
-              Verify OTP
+        {step === 1 && (
+          <form onSubmit={handleSendOtp} className="forgot-form">
+            <div className="input-group">
+              <label htmlFor="email">Email</label>
+              <div
+                className={`input-wrapper ${fieldErrors.email ? "error" : ""}`}
+              >
+                <Mail size={18} className="input-icon" />
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              {fieldErrors.email && (
+                <span className="field-error">{fieldErrors.email}</span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="forgot-button"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 size={18} className="spinner" />
+                  Sending OTP...
+                </>
+              ) : (
+                "Send Reset Instructions"
+              )}
             </button>
-            {error && <p className="otp-error">{error}</p>}
-          </>
+          </form>
+        )}
+
+        {step === 2 && (
+          <div className="success-message">
+            <div className="success-icon">
+              <CheckCircle size={48} />
+            </div>
+            <h3>Check your email</h3>
+            <p>
+              We sent a reset link to <strong>{formData.email}</strong>
+            </p>
+            <p className="redirect-info">
+              Redirecting to reset password page...
+            </p>
+          </div>
         )}
       </div>
     </div>

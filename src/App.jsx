@@ -4,7 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Onboarding/login/Login.jsx";
 import ForgotPassword from "./pages/Onboarding/forgot password/ForgotPassword.jsx";
-import ChangePassword from "./pages/Onboarding/change password/ChangePassword.jsx";
+import ResetPassword from "./pages/Onboarding/reset password/ResetPassword.jsx";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Home from "./pages/Home/Home.jsx";
 import Users from "./pages/Users";
@@ -46,7 +46,7 @@ function App() {
         {/* Public routes */}
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Protected routes */}
         <Route
