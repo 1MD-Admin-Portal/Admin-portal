@@ -74,5 +74,14 @@ export const CONSTANTS = {
     EARNINGS_ALL: "/api/v1/admin/earnings/all", // ✅ Fixed: Remove function, make it a string
     EARNINGS_USER_DETAIL: (id, type, page = 1, limit = 50) =>
       `/api/v1/admin/earnings/users/${id}?user_type=${type}&page=${page}&limit=${limit}`,
+
+    // === PAYOUTS MANAGEMENT ===
+    PAYOUTS_PENDING: "/api/v1/admin/earnings/payouts/pending",
+    PROCESS_PAYOUT: (payoutId) =>
+      `/api/v1/admin/earnings/payouts/${payoutId}/process`,
+    UPLOAD_TRANSFER_PROOF: (payoutId) =>
+      `/api/v1/admin/earnings/payouts/${payoutId}/transfer-proof`,
+    MARK_DISPUTE_RESOLVED: (payoutId) =>
+      `/api/v1/admin/earnings/payouts/${payoutId}/complete`,
   },
 };

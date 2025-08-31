@@ -16,7 +16,7 @@ import NotificationPage from "./pages/Notification/NotificationPage";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
-import PayoutsPage from "./pages/earning&payout/payouts/PayoutsPage.jsx";
+import PayoutsPage from "./pages/earning&payout/payouts/PendingPayouts.jsx";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
 import VideoPrograms from "./pages/Content Moderation/Video Program/VideoPrograms.jsx";
 import CreateChallenge from "./pages/Content Moderation/Challenges/Challenge page/CreateChallenge.jsx";
@@ -38,6 +38,7 @@ import DJListPage from "./pages/users/djs/DJListPage.jsx";
 import DancersList from "./pages/users/dancers/DancersList.jsx";
 import FeedPage from "./pages/Content Moderation/User Generated Content/FeedPage.jsx";
 import PlaylistsPage from "./pages/Content Moderation/Playlists/PlaylistsPage.jsx";
+import PendingPayouts from "./pages/earning&payout/payouts/PendingPayouts.jsx";
 
 function App() {
   return (
@@ -67,7 +68,7 @@ function App() {
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/Applicants/Professors" element={<ProfessorsPage />} />
-          <Route path="/payouts/payouts" element={<PayoutsPage />} />
+          <Route path="/payouts/payouts" element={<PendingPayouts />} />
           <Route path="/payouts/disputes" element={<DisputesPage />} />
           <Route path="/payouts/earnings" element={<EarningsPage />} />
           <Route
