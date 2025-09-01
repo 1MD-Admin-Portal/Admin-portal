@@ -12,7 +12,7 @@ import ClassModeration from "./pages/Class listing approval/ClassModeration.jsx"
 import EventsPage from "./pages/Events/Event page/EventsPage.jsx";
 import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
 import AdsManagement from "./pages/Ads Management/AdsManagement";
-import NotificationPage from "./pages/Notification/NotificationPage";
+import NotificationPage from "./pages/Notification/NotificationManagement.jsx";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
@@ -39,6 +39,7 @@ import DancersList from "./pages/users/dancers/DancersList.jsx";
 import FeedPage from "./pages/Content Moderation/User Generated Content/FeedPage.jsx";
 import PlaylistsPage from "./pages/Content Moderation/Playlists/PlaylistsPage.jsx";
 import PendingPayouts from "./pages/earning&payout/payouts/PendingPayouts.jsx";
+import NotificationManagement from "./pages/Notification/NotificationManagement.jsx";
 
 function App() {
   return (
@@ -64,7 +65,10 @@ function App() {
           <Route path="/EventsPage" element={<EventsPage />} />
           <Route path="/MarketplacePage" element={<MarketplacePage />} />
           <Route path="/AdsManagement" element={<AdsManagement />} />
-          <Route path="/NotificationPage" element={<NotificationPage />} />
+          <Route
+            path="/NotificationPage"
+            element={<NotificationManagement />}
+          />
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/Applicants/Professors" element={<ProfessorsPage />} />

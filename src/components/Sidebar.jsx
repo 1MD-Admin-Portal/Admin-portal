@@ -6,8 +6,10 @@ import {
   Users,
   Video,
   Euro,
+  Send,
   Megaphone,
   FileText,
+  BadgeCheck,
   Bell,
   Cog,
   User,
@@ -486,9 +488,13 @@ const Sidebar = () => {
                 Operation & Support
               </DropdownMenuItem>
 
-              {/* <MenuItem href="/AccessLogs" icon={FileText}>
-                Access Logs
-              </MenuItem> */}
+              <MenuItem href="/badges" icon={BadgeCheck}>
+                Badges
+              </MenuItem>
+
+              <MenuItem href="/referrals" icon={Send}>
+                Referrals
+              </MenuItem>
 
               <MenuItem href="/AdsManagement" icon={Megaphone}>
                 Ads Management

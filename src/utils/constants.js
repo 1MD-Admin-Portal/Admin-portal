@@ -83,5 +83,11 @@ export const CONSTANTS = {
       `/api/v1/admin/earnings/payouts/${payoutId}/transfer-proof`,
     MARK_DISPUTE_RESOLVED: (payoutId) =>
       `/api/v1/admin/earnings/payouts/${payoutId}/complete`,
+
+    // === NOTIFICATION MANAGEMENT ===
+    GET_NOTIFICATIONS: "/api/v1/admin/notifications",
+    CREATE_NOTIFICATION: "/api/v1/admin/notifications",
+    GET_NOTIFICATION_DETAILS: (id) => `/api/v1/admin/notifications/${id}`,
+    CANCEL_NOTIFICATION: (id) => `/api/v1/admin/notifications/${id}/cancel`,
   },
 };
