@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchProfessors } from "../../../services/professor.service";
 import "./ProfessorsListPage.css";
 import { fetchUserBookedDates } from "../../../services/user.Service";
+import { getUserBadgesService } from "../../../services/badge.service";
 
 const ProfessorsListPage = () => {
   const [professors, setProfessors] = useState([]);
@@ -11,6 +12,8 @@ const ProfessorsListPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
+  const [userBadges, setUserBadges] = useState(null);
+  const [loadingBadges, setLoadingBadges] = useState(false);
 
   useEffect(() => {
     loadProfessors(page);

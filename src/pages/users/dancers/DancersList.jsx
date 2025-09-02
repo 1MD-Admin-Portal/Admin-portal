@@ -5,6 +5,7 @@ import {
   fetchUserBookedDates,
 } from "../../../services/user.Service";
 import "../Dancers/DancersList.css"; // Assuming you have a CSS file for styling
+import { getUserBadgesService } from "../../../services/badge.service";
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
@@ -17,6 +18,8 @@ const DancersList = () => {
   const [skillLevelFilter, setSkillLevelFilter] = useState("");
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
+  const [userBadges, setUserBadges] = useState(null);
+  const [loadingBadges, setLoadingBadges] = useState(false);
 
   useEffect(() => {
     const loadDancers = async () => {
@@ -138,10 +141,28 @@ const DancersList = () => {
                 key={dancer.id}
                 onClick={async () => {
                   setSelectedDancer(dancer);
+
+                  // Reset states immediately
+                  setCalendarData(null);
+                  setUserBadges(null);
+
+                  // Fetch Booked Dates
                   setLoadingCalendar(true);
-                  const data = await fetchUserBookedDates(dancer.id, 1, 10);
-                  setCalendarData(data);
-                  setLoadingCalendar(false);
+                  try {
+                    const data = await fetchUserBookedDates(dancer.id, 1, 10);
+                    setCalendarData(data);
+                  } finally {
+                    setLoadingCalendar(false);
+                  }
+
+                  // Fetch User Badges
+                  setLoadingBadges(true);
+                  try {
+                    const badgesData = await getUserBadgesService(dancer.id);
+                    setUserBadges(badgesData || {});
+                  } finally {
+                    setLoadingBadges(false);
+                  }
                 }}
               >
                 <td>{dancer.id}</td>
@@ -424,6 +445,44 @@ const DancersList = () => {
                   <div className="empty-state">No booked dates available</div>
                 )}
               </div>
+            </div>
+
+            <div className="modal-section">
+              <h4>User Badges</h4>
+              {loadingBadges ? (
+                <div>Loading badges...</div>
+              ) : !userBadges ? (
+                <div>No badges loaded</div>
+              ) : userBadges.user_personas?.length > 0 ? (
+                userBadges.user_personas.map((persona) => (
+                  <div key={persona}>
+                    <h5>Persona: {persona}</h5>
+                    <div className="badge-grid">
+                      {userBadges.badges_by_persona[persona]?.map(
+                        (badge, idx) => (
+                          <div key={idx} className="badge-card">
+                            <span className="badge-emoji">
+                              {badge.badge_emoji}
+                            </span>
+                            <div>{badge.badge_name}</div>
+                            <small>Level {badge.level}</small>
+                          </div>
+                        )
+                      )}
+                    </div>
+                    {userBadges.next_badges?.[persona] && (
+                      <div className="next-badge">
+                        <strong>Next Badge:</strong>{" "}
+                        {userBadges.next_badges[persona].badge_name}{" "}
+                        {userBadges.next_badges[persona].badge_emoji} (Level{" "}
+                        {userBadges.next_badges[persona].level})
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">No badges found</div>
+              )}
             </div>
 
             {/* Modal Footer */}

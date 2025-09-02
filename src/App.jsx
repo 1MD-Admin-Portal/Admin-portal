@@ -19,7 +19,7 @@ import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
 import PayoutsPage from "./pages/earning&payout/payouts/PendingPayouts.jsx";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
 import VideoPrograms from "./pages/Content Moderation/Video Program/VideoPrograms.jsx";
-import CreateChallenge from "./pages/Content Moderation/Challenges/Challenge page/CreateChallenge.jsx";
+import CreateChallenge from "./pages/Content Moderation/Challenges/Challenge page/ChallengePage.jsx";
 import AppBrandingPage from "./components/AppBrandingPage";
 import SubscriptionPlansPage from "./components/SubscriptionPlansPage";
 import LegalContentPage from "./components/LegalContentPage";
@@ -40,6 +40,8 @@ import FeedPage from "./pages/Content Moderation/User Generated Content/FeedPage
 import PlaylistsPage from "./pages/Content Moderation/Playlists/PlaylistsPage.jsx";
 import PendingPayouts from "./pages/earning&payout/payouts/PendingPayouts.jsx";
 import NotificationManagement from "./pages/Notification/NotificationManagement.jsx";
+import BadgesPage from "./pages/Badges/BadgesPage.jsx";
+import ChallengePage from "./pages/Content Moderation/Challenges/Challenge page/ChallengePage.jsx";
 
 function App() {
   return (
@@ -82,7 +84,7 @@ function App() {
           <Route path="/AccessLogs" element={<AccessLogs />} />
           <Route path="/support/ticket-raise" element={<TicketRaisePage />} />
           <Route path="/VideoPrograms" element={<VideoPrograms />} />
-          <Route path="/CreateChallenge" element={<CreateChallenge />} />
+          <Route path="/CreateChallenge" element={<ChallengePage />} />
           <Route path="/settings/app-branding" element={<AppBrandingPage />} />
           <Route
             path="/settings/subscription-plans"
@@ -102,6 +104,7 @@ function App() {
           <Route path="/users/DJs" element={<DJListPage />} />
           <Route path="/users/Dancers" element={<DancersList />} />
           <Route path="/playlists" element={<PlaylistsPage />} />
+          <Route path="/badges" element={<BadgesPage />} />
         </Route>
       </Routes>
     </AuthProvider>

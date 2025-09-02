@@ -18,8 +18,12 @@ export const CONSTANTS = {
     CREATE_PROGRAM: "/api/v1/admin/program",
 
     // === CHALLENGE MANAGEMENT ===
-    GET_CHALLENGES: "/api/v1/admin/challenge?page=1&limit=20",
-    CHALLENGE_CREATE: "/api/v1/admin/challenge",
+    CREATE_CHALLENGE: "/api/v1/admin/challenge",
+    GET_CHALLENGES: "/api/v1/admin/challenge",
+    GET_CHALLENGE_BY_ID: (id) => `/api/v1/admin/challenge/${id}`,
+    UPDATE_CHALLENGE: (id) => `/api/v1/admin/challenge/${id}`,
+    DELETE_CHALLENGE: (id) => `/api/v1/admin/challenge/${id}`,
+    UPDATE_CHALLENGE_STATUS: (id) => `/api/v1/admin/challenge/${id}/status`,
 
     // === INSTRUCTOR MANAGEMENT ===
     APPROVE_INSTRUCTOR: "/api/v1/admin/approveInstructorApplication",
@@ -89,5 +93,9 @@ export const CONSTANTS = {
     CREATE_NOTIFICATION: "/api/v1/admin/notifications",
     GET_NOTIFICATION_DETAILS: (id) => `/api/v1/admin/notifications/${id}`,
     CANCEL_NOTIFICATION: (id) => `/api/v1/admin/notifications/${id}/cancel`,
+
+    // Badges APIs
+    GET_ALL_BADGES: () => `/api/v1/admin/badges/all`,
+    GET_USER_BADGES: (userId) => `/api/v1/admin/users/${userId}/badges`,
   },
 };

@@ -1,39 +1,23 @@
 // services/upload.service.js
-import axios from "axios";
 import { CONSTANTS } from "../utils/constants";
+import api from "../api/api"; // assuming you have a base axios instance
 
-const BASE_URL = CONSTANTS.URL.BASE_URL;
-const UPLOAD_ENDPOINT = "/api/v1/file/upload";
-
-export const uploadMediaFile = async (file, metadata = {}) => {
+export const uploadMediaFile = async (file) => {
   try {
-    const token = localStorage.getItem("token");
-
     const formData = new FormData();
     formData.append("attachment", file);
 
-    // Append extra fields
-    if (metadata.title) formData.append("title", metadata.title);
-    if (metadata.duration) formData.append("duration", metadata.duration);
-    if (metadata.program_id) formData.append("program_id", metadata.program_id);
+    const token = localStorage.getItem("token");
+    const response = await api.post(CONSTANTS.URL.UPLOAD_MEDIA, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-    const response = await axios.post(
-      `${BASE_URL}${UPLOAD_ENDPOINT}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    return response.data;
+    return response.data.url; // adjust if backend returns differently
   } catch (error) {
-    console.error(
-      "Media upload failed:",
-      error.response?.data || error.message
-    );
+    console.error("❌ Media upload error:", error?.response?.data || error);
     throw error;
   }
 };
