@@ -1,6 +1,6 @@
 // services/upload.service.js
 import { CONSTANTS } from "../utils/constants";
-import api from "../api/api"; // assuming you have a base axios instance
+import api from "../api/api"; // ✅ your axios instance
 
 export const uploadMediaFile = async (file) => {
   try {
@@ -15,7 +15,10 @@ export const uploadMediaFile = async (file) => {
       },
     });
 
-    return response.data.url; // adjust if backend returns differently
+    console.log("✅ Upload response:", response.data);
+
+    // ✅ use fileURL returned by backend
+    return response.data?.uploadResponse?.fileURL || null;
   } catch (error) {
     console.error("❌ Media upload error:", error?.response?.data || error);
     throw error;

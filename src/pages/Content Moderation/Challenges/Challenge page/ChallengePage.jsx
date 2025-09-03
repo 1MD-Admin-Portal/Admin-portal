@@ -8,7 +8,7 @@ import {
   deleteChallengeService,
   updateChallengeStatusService,
 } from "../../../../services/challenge.service";
-import { uploadMediaFile } from "../../../../services/upload.service"; // ✅ reuse upload service
+import { uploadMediaFile } from "../../../../services/upload.service";
 
 const ChallengePage = () => {
   const [challenges, setChallenges] = useState([]);
@@ -21,7 +21,7 @@ const ChallengePage = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newChallenge, setNewChallenge] = useState({
     title: "",
-    challenger_type: "Public",
+    challenger_type: "",
     description: "",
     image_url: "",
     dance_style: "",
@@ -30,7 +30,8 @@ const ChallengePage = () => {
     end_date: "",
     prize_details: "",
     max_participants: "",
-    tasks: [],
+    status: "draft",
+    tasks: [{ task_type: "watch_video", task_title: "", video_url: "" }],
   });
 
   const [page, setPage] = useState(1);
@@ -70,17 +71,20 @@ const ChallengePage = () => {
     }
   };
 
-  // 🔹 Upload media (image/video)
   const handleFileUpload = async (file, field, taskIndex = null) => {
     try {
-      const url = await uploadMediaFile(file);
+      const url = await uploadMediaFile(file); // ✅ returns fileURL directly
+
+      if (!url) {
+        console.error("❌ Upload returned no URL");
+        return;
+      }
+
       if (taskIndex !== null) {
-        // update video_url inside a specific task
         const updatedTasks = [...newChallenge.tasks];
         updatedTasks[taskIndex].video_url = url;
         setNewChallenge({ ...newChallenge, tasks: updatedTasks });
       } else {
-        // update top-level challenge image
         setNewChallenge({ ...newChallenge, [field]: url });
       }
     } catch (err) {
@@ -106,20 +110,56 @@ const ChallengePage = () => {
     setNewChallenge({ ...newChallenge, tasks: updatedTasks });
   };
 
-  // 🔹 Create challenge
+  // 🔹 Reset form after creating challenge
+  const resetForm = () => {
+    setNewChallenge({
+      title: "",
+      challenger_type: "",
+      description: "",
+      image_url: "",
+      dance_style: "",
+      dance_level: "",
+      start_date: "",
+      end_date: "",
+      prize_details: "",
+      max_participants: "",
+      status: "draft",
+      tasks: [{ task_type: "watch_video", task_title: "", video_url: "" }],
+    });
+  };
+
   const handleCreateChallenge = async () => {
     try {
-      await createChallengeService(newChallenge);
+      const payload = {
+        title: newChallenge.title,
+        challenger_type: newChallenge.challenger_type,
+        description: newChallenge.description,
+        image_url: newChallenge.image_url,
+        dance_style: newChallenge.dance_style,
+        dance_level: newChallenge.dance_level,
+        start_date: newChallenge.start_date
+          ? new Date(newChallenge.start_date).toISOString()
+          : null,
+        end_date: newChallenge.end_date
+          ? new Date(newChallenge.end_date).toISOString()
+          : null,
+        prize_details: newChallenge.prize_details || null,
+        max_participants: newChallenge.max_participants
+          ? parseInt(newChallenge.max_participants, 10)
+          : null,
+        tasks: newChallenge.tasks.map((task) => ({
+          task_type: task.task_type,
+          task_title: task.task_title || "",
+          video_url: task.video_url || null,
+        })),
+      };
+
+      console.log("📤 Challenge Payload:", payload);
+
+      await createChallengeService(payload);
+
       setCreateModalOpen(false);
-      setNewChallenge({
-        title: "",
-        challenger_type: "Public",
-        description: "",
-        image_url: "",
-        dance_style: "",
-        dance_level: "",
-        tasks: [],
-      });
+      resetForm(); // ✅ will now work
       fetchChallenges();
     } catch (error) {
       console.error("❌ Error creating challenge:", error);
@@ -307,6 +347,44 @@ const ChallengePage = () => {
                 })
               }
             />
+            <input
+              type="date"
+              value={newChallenge.start_date}
+              onChange={(e) =>
+                setNewChallenge({ ...newChallenge, start_date: e.target.value })
+              }
+            />
+            <input
+              type="date"
+              value={newChallenge.end_date}
+              onChange={(e) =>
+                setNewChallenge({ ...newChallenge, end_date: e.target.value })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Prize Details"
+              value={newChallenge.prize_details}
+              onChange={(e) =>
+                setNewChallenge({
+                  ...newChallenge,
+                  prize_details: e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="number"
+              placeholder="Max Participants"
+              value={newChallenge.max_participants}
+              onChange={(e) =>
+                setNewChallenge({
+                  ...newChallenge,
+                  max_participants: e.target.value,
+                })
+              }
+            />
 
             <select
               value={newChallenge.challenger_type}
@@ -317,8 +395,8 @@ const ChallengePage = () => {
                 })
               }
             >
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
             </select>
 
             {/* Image Upload */}
