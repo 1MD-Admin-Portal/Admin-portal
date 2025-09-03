@@ -311,12 +311,111 @@ const ChallengePage = () => {
       {modalOpen && selectedChallenge && (
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>{selectedChallenge.title}</h2>
-            <p>{selectedChallenge.description}</p>
-            <p>Status: {selectedChallenge.status}</p>
-            <p>Start Date: {selectedChallenge.startDate}</p>
-            <p>End Date: {selectedChallenge.endDate}</p>
-            <button onClick={() => setModalOpen(false)}>Close</button>
+            <h2 className="text-xl font-bold mb-2">
+              {selectedChallenge.title}
+            </h2>
+
+            <p>
+              <strong>ID:</strong> {selectedChallenge.id}
+            </p>
+            <p>
+              <strong>Description:</strong> {selectedChallenge.description}
+            </p>
+            <p>
+              <strong>Challenger Type:</strong>{" "}
+              {selectedChallenge.challenger_type}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedChallenge.status}
+            </p>
+            <p>
+              <strong>Dance Style:</strong> {selectedChallenge.dance_style}
+            </p>
+            <p>
+              <strong>Dance Level:</strong> {selectedChallenge.dance_level}
+            </p>
+            <p>
+              <strong>Prize:</strong> {selectedChallenge.prize_details}
+            </p>
+            <p>
+              <strong>Max Participants:</strong>{" "}
+              {selectedChallenge.max_participants}
+            </p>
+            <p>
+              <strong>Total Participants:</strong>{" "}
+              {selectedChallenge.total_participants}
+            </p>
+            <p>
+              <strong>Total Submissions:</strong>{" "}
+              {selectedChallenge.total_submissions}
+            </p>
+            <p>
+              <strong>Pending Submissions:</strong>{" "}
+              {selectedChallenge.pending_submissions}
+            </p>
+            <p>
+              <strong>Approved Submissions:</strong>{" "}
+              {selectedChallenge.approved_submissions}
+            </p>
+            <p>
+              <strong>Rejected Submissions:</strong>{" "}
+              {selectedChallenge.rejected_submissions}
+            </p>
+
+            <p>
+              <strong>Start Date:</strong>{" "}
+              {new Date(selectedChallenge.start_date).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>End Date:</strong>{" "}
+              {new Date(selectedChallenge.end_date).toLocaleDateString()}
+            </p>
+
+            {/* 🔹 Show Challenge Image */}
+            {selectedChallenge.image_url && (
+              <div className="my-3">
+                <strong>Image:</strong>
+                <img
+                  src={selectedChallenge.image_url}
+                  alt={selectedChallenge.title}
+                  className="rounded-lg mt-2 max-h-60 object-cover"
+                />
+              </div>
+            )}
+
+            {/* 🔹 Show Tasks (with videos if available) */}
+            {selectedChallenge.tasks && selectedChallenge.tasks.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Tasks:</h3>
+                {selectedChallenge.tasks.map((task) => (
+                  <div key={task.id} className="mb-3">
+                    <p>
+                      <strong>Task Title:</strong> {task.task_title}
+                    </p>
+                    <p>
+                      <strong>Task Type:</strong> {task.task_type}
+                    </p>
+
+                    {task.video_url && (
+                      <video
+                        controls
+                        className="rounded-lg mt-2 w-full max-h-72"
+                      >
+                        <source src={task.video_url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => setModalOpen(false)}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
