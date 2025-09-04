@@ -84,7 +84,7 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
       if (imageFile) {
         try {
           const uploadRes = await uploadMediaFile(imageFile);
-          uploadedImageUrl = uploadRes?.uploadResponse?.fileURL || "";
+          uploadedImageUrl = uploadRes || "";
           console.log("✅ Uploaded image URL:", uploadedImageUrl);
         } catch (err) {
           console.error("❌ Image upload failed:", err);
@@ -97,12 +97,9 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
         let videoUrl = "";
         if (video.file) {
           try {
-            const uploadRes = await uploadMediaFile(video.file, {
-              title: video.title,
-              duration: video.duration,
-              program_id: 1, // replace with actual program_id if needed
-            });
-            videoUrl = uploadRes?.uploadResponse?.fileURL || "";
+            const uploadRes = await uploadMediaFile(video.file);
+            videoUrl = uploadRes || "";
+
             console.log(`✅ Video ${index + 1} uploaded:`, videoUrl);
           } catch (err) {
             console.error(`❌ Failed to upload video ${index + 1}:`, err);

@@ -22,6 +22,7 @@ import {
   uploadNotificationImageService,
 } from "../../services/notification.service";
 import "./NotificationManagement.css";
+import { uploadMediaFile } from "../../services/upload.service";
 
 const NotificationManagement = () => {
   const [notifications, setNotifications] = useState([]);
@@ -81,10 +82,9 @@ const NotificationManagement = () => {
 
   const SUBSCRIPTION_TYPES_OPTIONS = [
     { value: "all", label: "All Plans" },
-    { value: "free", label: "Free Plan" },
+    { value: "douceur", label: "Free Plan/Douceur" },
     { value: "fiver", label: "Fiver Plan" },
     { value: "ginga", label: "Ginga Plan" },
-    { value: "premium", label: "Premium Plan" },
   ];
 
   const PRIORITY_LEVELS_OPTIONS = [
@@ -153,40 +153,51 @@ const NotificationManagement = () => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     try {
-      setUploading(true);
-      const imageUrl = await uploadNotificationImageService(file);
-      setFormData((prev) => ({
-        ...prev,
-        image_url: imageUrl,
-      }));
-      setImageFile(file);
+      const fileURL = await uploadMediaFile(file); // ✅ directly get the URL
+      setFormData((prev) => ({ ...prev, image_url: fileURL }));
     } catch (error) {
-      console.error("Failed to upload image:", error);
-      alert("Failed to upload image. Please try again.");
-    } finally {
-      setUploading(false);
+      console.error("Error uploading image:", error);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let submitData = {
+      title: formData.title,
+      body: formData.body,
+      type: formData.type,
+      target_audience: formData.target_audience,
+      image_url: formData.image_url || null,
+      action_url: formData.action_url || null,
+      data:
+        formData.data && Object.keys(formData.data).length > 0
+          ? formData.data
+          : null,
+      send_immediately: formData.send_immediately,
+      scheduled_at: formData.scheduled_at
+        ? new Date(formData.scheduled_at).toISOString()
+        : null,
+      priority: formData.priority,
+    };
+
+    // ✅ Conditionally add fields based on target_audience
+    if (formData.target_audience === "user_types") {
+      submitData.user_types = formData.user_types || [];
+    } else if (formData.target_audience === "subscription_types") {
+      submitData.subscription_types = formData.subscription_types || [];
+    } else if (formData.target_audience === "specific_users") {
+      submitData.specific_user_ids = Array.isArray(formData.specific_user_ids)
+        ? formData.specific_user_ids.map((id) => Number(id))
+        : [];
+    }
+
+    console.log("📤 Final Payload sending:", submitData);
+
     try {
-      setLoading(true);
-
-      // Prepare data for submission
-      const submitData = {
-        ...formData,
-        data: formData.data ? JSON.parse(JSON.stringify(formData.data)) : {},
-        specific_user_ids: formData.specific_user_ids
-          .filter((id) => id !== "")
-          .map(Number),
-      };
-
       await createNotificationService(submitData);
-
-      // Reset form and refresh notifications
+      fetchNotifications();
+      setShowCreateForm(false);
       setFormData({
         title: "",
         body: "",
@@ -202,15 +213,8 @@ const NotificationManagement = () => {
         scheduled_at: "",
         priority: "normal",
       });
-      setImageFile(null);
-      setShowCreateForm(false);
-      fetchNotifications();
-      alert("Notification sent successfully!");
     } catch (error) {
       console.error("Failed to create notification:", error);
-      alert("Failed to send notification. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -330,7 +334,7 @@ const NotificationManagement = () => {
               />
             </div>
 
-            <div className="form-row form-row-three">
+            <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Target Audience</label>
                 <select
@@ -346,9 +350,12 @@ const NotificationManagement = () => {
                   ))}
                 </select>
               </div>
+            </div>
 
+            {/* ✅ Conditionally render audience-specific fields */}
+            {formData.target_audience === "user_types" && (
               <div className="form-group">
-                <label className="form-label">User Types</label>
+                <label className="form-label">User Types *</label>
                 <div className="multi-select-container">
                   <div className="selected-tags">
                     {formData.user_types.map((selectedType) => {
@@ -398,9 +405,11 @@ const NotificationManagement = () => {
                   </select>
                 </div>
               </div>
+            )}
 
+            {formData.target_audience === "subscription_types" && (
               <div className="form-group">
-                <label className="form-label">Subscription Types</label>
+                <label className="form-label">Subscription Types *</label>
                 <div className="multi-select-container">
                   <div className="selected-tags">
                     {formData.subscription_types.map((selectedType) => {
@@ -453,11 +462,11 @@ const NotificationManagement = () => {
                   </select>
                 </div>
               </div>
-            </div>
+            )}
 
             {formData.target_audience === "specific" && (
               <div className="form-group">
-                <label className="form-label">Specific User IDs</label>
+                <label className="form-label">Specific User IDs *</label>
                 <div className="multi-select-container">
                   <div className="selected-tags">
                     {formData.specific_user_ids.map((userId, index) => (

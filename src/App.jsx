@@ -12,14 +12,11 @@ import ClassModeration from "./pages/Class listing approval/ClassModeration.jsx"
 import EventsPage from "./pages/Events/Event page/EventsPage.jsx";
 import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
 import AdsManagement from "./pages/Ads Management/AdsManagement";
-import NotificationPage from "./pages/Notification/NotificationManagement.jsx";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
-import PayoutsPage from "./pages/earning&payout/payouts/PendingPayouts.jsx";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
 import VideoPrograms from "./pages/Content Moderation/Video Program/VideoPrograms.jsx";
-import CreateChallenge from "./pages/Content Moderation/Challenges/Challenge page/ChallengePage.jsx";
 import AppBrandingPage from "./components/AppBrandingPage";
 import SubscriptionPlansPage from "./components/SubscriptionPlansPage";
 import LegalContentPage from "./components/LegalContentPage";
@@ -29,7 +26,6 @@ import ReportManagement from "./pages/ReportManagement";
 import DisputesPage from "./pages/earning&payout/Disputes/DisputesPage";
 import EarningsPage from "./pages/earning&payout/earning/EarningsPage";
 import ClassDisputesPage from "./pages/operation&support/classrelateddispute/ClassDisputesPage";
-import TicketRaisePage from "./pages/operation&support/ticketraise/TicketRaisePage";
 import OrganizersPage from "./pages/applicants/organizers/OrganizersPage.jsx";
 import DJsPage from "./pages/applicants/djs/DJsPage.jsx";
 import ProfessorsListPage from "./pages/users/Professors/ProfessorsListPage.jsx";
@@ -42,6 +38,8 @@ import PendingPayouts from "./pages/earning&payout/payouts/PendingPayouts.jsx";
 import NotificationManagement from "./pages/Notification/NotificationManagement.jsx";
 import BadgesPage from "./pages/Badges/BadgesPage.jsx";
 import ChallengePage from "./pages/Content Moderation/Challenges/Challenge page/ChallengePage.jsx";
+import ReportsPage from "./pages/operation&support/ticketraise/ReportsPage.jsx";
+import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
 
 function App() {
   return (
@@ -76,13 +74,14 @@ function App() {
           <Route path="/Applicants/Professors" element={<ProfessorsPage />} />
           <Route path="/payouts/payouts" element={<PendingPayouts />} />
           <Route path="/payouts/disputes" element={<DisputesPage />} />
+          <Route path="/referrals" element={<ReferralsPage />} />
           <Route path="/payouts/earnings" element={<EarningsPage />} />
           <Route
             path="/support/class-disputes"
             element={<ClassDisputesPage />}
           />
           <Route path="/AccessLogs" element={<AccessLogs />} />
-          <Route path="/support/ticket-raise" element={<TicketRaisePage />} />
+          <Route path="/support/ticket-raise" element={<ReportsPage />} />
           <Route path="/VideoPrograms" element={<VideoPrograms />} />
           <Route path="/CreateChallenge" element={<ChallengePage />} />
           <Route path="/settings/app-branding" element={<AppBrandingPage />} />

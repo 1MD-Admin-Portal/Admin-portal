@@ -97,5 +97,20 @@ export const CONSTANTS = {
     // Badges APIs
     GET_ALL_BADGES: () => `/api/v1/admin/badges/all`,
     GET_USER_BADGES: (userId) => `/api/v1/admin/users/${userId}/badges`,
+
+    // Reports
+    GET_REPORTS: "/api/v1/admin/reports",
+    UPDATE_REPORT_STATUS: (reportId) =>
+      `/api/v1/admin/reports/${reportId}/status`,
+
+    // Blocks
+    GET_BLOCKS: "/api/v1/admin/blocks",
+
+    REFERRALS: {
+      LEADERBOARD: "/api/v1/admin/referrals/leaderboard",
+      STATS: "/api/v1/admin/referrals/stats",
+      USER_REFERRALS: (userId, page, limit) =>
+        `/api/v1/admin/referrals/users/${userId}?page=${page}&limit=${limit}`,
+    },
   },
 };
