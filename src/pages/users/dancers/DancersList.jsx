@@ -5,7 +5,6 @@ import {
   fetchUserBookedDates,
 } from "../../../services/user.Service";
 import "../Dancers/DancersList.css"; // Assuming you have a CSS file for styling
-import { getUserBadgesService } from "../../../services/badge.service";
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
@@ -18,8 +17,6 @@ const DancersList = () => {
   const [skillLevelFilter, setSkillLevelFilter] = useState("");
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
-  const [userBadges, setUserBadges] = useState(null);
-  const [loadingBadges, setLoadingBadges] = useState(false);
 
   useEffect(() => {
     const loadDancers = async () => {
@@ -445,44 +442,60 @@ const DancersList = () => {
                   <div className="empty-state">No booked dates available</div>
                 )}
               </div>
-            </div>
+              {/* Badges Section */}
+              <div className="modal-section">
+                <h4>Badges</h4>
+                {selectedDancer.current_badges &&
+                Object.values(selectedDancer.current_badges).some(
+                  (badge) => badge !== null
+                ) ? (
+                  renderInfoGrid([
+                    {
+                      label: "Dancer badge",
+                      value: selectedDancer.current_badges.dancer || "None",
+                    },
+                    {
+                      label: "Professor badge",
+                      value: selectedDancer.current_badges.instructor || "None",
+                    },
+                    {
+                      label: "DJ badge",
+                      value: selectedDancer.current_badges.dj || "None",
+                    },
+                    {
+                      label: "Organizer badge",
+                      value: selectedDancer.current_badges.organizer || "None",
+                    },
+                  ])
+                ) : (
+                  <div className="empty-state">No Badge Available</div>
+                )}
+              </div>
 
-            <div className="modal-section">
-              <h4>User Badges</h4>
-              {loadingBadges ? (
-                <div>Loading badges...</div>
-              ) : !userBadges ? (
-                <div>No badges loaded</div>
-              ) : userBadges.user_personas?.length > 0 ? (
-                userBadges.user_personas.map((persona) => (
-                  <div key={persona}>
-                    <h5>Persona: {persona}</h5>
-                    <div className="badge-grid">
-                      {userBadges.badges_by_persona[persona]?.map(
-                        (badge, idx) => (
-                          <div key={idx} className="badge-card">
-                            <span className="badge-emoji">
-                              {badge.badge_emoji}
-                            </span>
-                            <div>{badge.badge_name}</div>
-                            <small>Level {badge.level}</small>
-                          </div>
-                        )
-                      )}
-                    </div>
-                    {userBadges.next_badges?.[persona] && (
-                      <div className="next-badge">
-                        <strong>Next Badge:</strong>{" "}
-                        {userBadges.next_badges[persona].badge_name}{" "}
-                        {userBadges.next_badges[persona].badge_emoji} (Level{" "}
-                        {userBadges.next_badges[persona].level})
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="empty-state">No badges found</div>
-              )}
+              {/* Badge summary Section */}
+              <div className="modal-section">
+                <h4>Badge summary</h4>
+                {selectedDancer.badge_summary ? (
+                  renderInfoGrid([
+                    {
+                      label: "Total badges",
+                      value: selectedDancer.badge_summary.total_badges,
+                    },
+
+                    {
+                      label: "Highest Level",
+                      value: selectedDancer.badge_summary.highest_level,
+                    },
+
+                    {
+                      label: "Best Commission Rate",
+                      value: selectedDancer.badge_summary.best_commission_rate,
+                    },
+                  ])
+                ) : (
+                  <div className="empty-state">No Badge summary available</div>
+                )}
+              </div>
             </div>
 
             {/* Modal Footer */}

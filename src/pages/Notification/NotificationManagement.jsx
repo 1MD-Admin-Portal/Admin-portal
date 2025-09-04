@@ -59,9 +59,9 @@ const NotificationManagement = () => {
   // Dropdown options
   const NOTIFICATION_TYPES = [
     { value: "general", label: "General" },
-    { value: "promotional", label: "Promotional" },
+    { value: "promotion", label: "Promotional" },
     { value: "announcement", label: "Announcement" },
-    { value: "reminder", label: "Reminder" },
+    { value: "alert", label: "Reminder" },
     { value: "update", label: "Update" },
   ];
 
@@ -89,9 +89,7 @@ const NotificationManagement = () => {
 
   const PRIORITY_LEVELS_OPTIONS = [
     { value: "low", label: "Low Priority" },
-    { value: "normal", label: "Normal Priority" },
     { value: "high", label: "High Priority" },
-    { value: "urgent", label: "Urgent Priority" },
   ];
 
   // Load notifications on component mount

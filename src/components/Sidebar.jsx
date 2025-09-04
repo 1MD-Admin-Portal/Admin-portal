@@ -30,8 +30,10 @@ import {
   Building,
   Search,
   BarChart,
+  Download,
   ChevronDown,
   ChevronRight,
+  PersonStanding,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -126,6 +128,16 @@ const Sidebar = () => {
     { href: "/VideoPrograms", icon: Book, label: "Video Program Management" },
     { href: "/playlists", icon: Play, label: "Playlists" },
     { href: "/CreateChallenge", icon: Swords, label: "Challenges" },
+    {
+      href: "/Challenge-Submissions",
+      icon: Download,
+      label: "Challenge Submission",
+    },
+    {
+      href: "/Challenge-participants",
+      icon: PersonStanding,
+      label: "Challenge Participants",
+    },
   ];
 
   const earningSubmenuItems = [

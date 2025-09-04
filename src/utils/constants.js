@@ -112,5 +112,21 @@ export const CONSTANTS = {
       USER_REFERRALS: (userId, page, limit) =>
         `/api/v1/admin/referrals/users/${userId}?page=${page}&limit=${limit}`,
     },
+
+    // === CHALLENGE SUBMISSIONS MANAGEMENT ===
+    CHALLENGE_SUBMISSIONS: {
+      GET_BY_CHALLENGE: (challengeId, page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/${challengeId}/submissions?page=${page}&limit=${limit}`,
+      GET_PENDING: (page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/submissions/pending?page=${page}&limit=${limit}`,
+      GET_DETAILS: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}`,
+      APPROVE: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}/approve`,
+      REJECT: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}/reject`,
+      DELETE_SUBMISSION: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}`,
+    },
   },
 };

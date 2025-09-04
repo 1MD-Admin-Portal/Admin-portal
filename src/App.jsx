@@ -40,6 +40,7 @@ import BadgesPage from "./pages/Badges/BadgesPage.jsx";
 import ChallengePage from "./pages/Content Moderation/Challenges/Challenge page/ChallengePage.jsx";
 import ReportsPage from "./pages/operation&support/ticketraise/ReportsPage.jsx";
 import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
+import ChallengeSubmissionsPage from "./pages/Content Moderation/Challenge submission/ChallengeSubmissionsPage.jsx";
 
 function App() {
   return (
@@ -72,6 +73,10 @@ function App() {
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/Applicants/Professors" element={<ProfessorsPage />} />
+          <Route
+            path="/Challenge-Submissions"
+            element={<ChallengeSubmissionsPage />}
+          />
           <Route path="/payouts/payouts" element={<PendingPayouts />} />
           <Route path="/payouts/disputes" element={<DisputesPage />} />
           <Route path="/referrals" element={<ReferralsPage />} />
