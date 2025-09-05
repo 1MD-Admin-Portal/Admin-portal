@@ -95,7 +95,7 @@ export const CONSTANTS = {
     CANCEL_NOTIFICATION: (id) => `/api/v1/admin/notifications/${id}/cancel`,
 
     // Badges APIs
-    GET_ALL_BADGES: () => `/api/v1/admin/badges/all`,
+    GET_ALL_BADGES: "/api/v1/admin/badges/all",
     GET_USER_BADGES: (userId) => `/api/v1/admin/users/${userId}/badges`,
 
     // Reports
@@ -127,6 +127,20 @@ export const CONSTANTS = {
         `/api/v1/admin/challenge/submissions/${submissionId}/reject`,
       DELETE_SUBMISSION: (submissionId) =>
         `/api/v1/admin/challenge/submissions/${submissionId}`,
+
+      // Challenge Participants
+      GET_CHALLENGE_PARTICIPANTS: (challengeId, page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/${challengeId}/participants?page=${page}&limit=${limit}`,
+      REMOVE_PARTICIPANT: (challengeId, userId) =>
+        `/api/v1/admin/challenge/${challengeId}/participants/${userId}`,
+
+      // Challenge Analytics
+      GET_CHALLENGE_ANALYTICS: (challengeId) =>
+        `/api/v1/admin/challenge/${challengeId}/analytics`,
+
+      // Comments
+      DELETE_COMMENT: (commentId) =>
+        `/api/v1/admin/challenge/comments/${commentId}`,
     },
   },
 };
