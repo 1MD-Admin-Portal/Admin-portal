@@ -59,7 +59,7 @@ export const getDashboardMetrics = async (filters = {}) => {
 export const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "EUR",
   }).format(parseFloat(amount) || 0);
 };
 

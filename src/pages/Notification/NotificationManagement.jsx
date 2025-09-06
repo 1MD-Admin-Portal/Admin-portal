@@ -51,7 +51,7 @@ const NotificationManagement = () => {
     data: {},
     send_immediately: true,
     scheduled_at: "",
-    priority: "normal",
+    priority: "low",
   });
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
