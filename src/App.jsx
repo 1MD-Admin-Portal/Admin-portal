@@ -40,6 +40,8 @@ import BadgesPage from "./pages/Badges/BadgesPage.jsx";
 import ChallengePage from "./pages/Content Moderation/Challenges/ChallengePage.jsx";
 import ReportsPage from "./pages/operation&support/ticketraise/ReportsPage.jsx";
 import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
   return (

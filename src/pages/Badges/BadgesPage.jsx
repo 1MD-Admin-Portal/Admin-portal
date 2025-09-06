@@ -4,113 +4,124 @@ import "./BadgesPage.css";
 
 const BadgesPage = () => {
   const [badges, setBadges] = useState([]);
-  const [filteredBadges, setFilteredBadges] = useState([]);
-  const [userTypeFilter, setUserTypeFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [activeTab, setActiveTab] = useState("dancer");
+  const [loading, setLoading] = useState(true);
 
-  const pageSize = 8;
-
-  // Fetch badges
   useEffect(() => {
     const fetchBadges = async () => {
+      setLoading(true);
       const data = await getAllBadgesService();
-      setBadges(data.badges || []);
-      setFilteredBadges(data.badges || []);
+      setBadges(data);
+      setLoading(false);
     };
     fetchBadges();
   }, []);
 
-  // Apply filters
-  useEffect(() => {
-    let result = badges;
-    if (userTypeFilter !== "all") {
-      result = result.filter((badge) => badge.user_type === userTypeFilter);
-    }
-    setFilteredBadges(result);
-    setCurrentPage(1);
-  }, [userTypeFilter, badges]);
-
-  // Pagination
-  const indexOfLast = currentPage * pageSize;
-  const indexOfFirst = indexOfLast - pageSize;
-  const currentBadges = filteredBadges.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(filteredBadges.length / pageSize);
+  const filteredBadges = badges.filter((badge) => badge.user_type === activeTab);
 
   return (
-    <div className="badges-page">
-      <h2>All Badges</h2>
-
-      {/* Filters */}
-      <div className="filters">
-        <select
-          value={userTypeFilter}
-          onChange={(e) => setUserTypeFilter(e.target.value)}
-        >
-          <option value="all">All User Types</option>
-          <option value="dancer">Dancer</option>
-          <option value="instructor">Instructor</option>
-          <option value="dj">DJ</option>
-          <option value="organizer">Organizer</option>
-        </select>
+    <div className="badge-management-container">
+      <div className="badge-header-section">
+        <h2 className="badge-main-title">🎖️ Badge Levels</h2>
       </div>
 
-      {/* Badge grid */}
-      <div className="badge-grid">
-        {currentBadges.map((badge) => (
-          <div
-            key={badge.id}
-            className="badge-card"
-            onClick={() => setSelectedBadge(badge)}
-          >
-            <div className="badge-emoji">{badge.badge_emoji}</div>
-            <h4>{badge.badge_name}</h4>
-            <p>
-              {badge.user_type} - Level {badge.level}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Pagination */}
-      <div className="pagination">
-        {Array.from({ length: totalPages }, (_, idx) => (
+      {/* Navigation Tabs */}
+      <div className="badge-nav-tabs">
+        {["dancer", "instructor", "dj", "organizer"].map((tab) => (
           <button
-            key={idx}
-            className={currentPage === idx + 1 ? "active" : ""}
-            onClick={() => setCurrentPage(idx + 1)}
+            key={tab}
+            className={`badge-nav-button ${activeTab === tab ? "badge-nav-active" : ""}`}
+            onClick={() => setActiveTab(tab)}
           >
-            {idx + 1}
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
 
-      {/* Modal */}
-      {selectedBadge && (
-        <div className="modal-overlay" onClick={() => setSelectedBadge(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>
-              {selectedBadge.badge_name} {selectedBadge.badge_emoji}
-            </h3>
-            <p>
-              <b>User Type:</b> {selectedBadge.user_type}
-            </p>
-            <p>
-              <b>Level:</b> {selectedBadge.level}
-            </p>
-            <p>
-              <b>Commission Rate:</b> {selectedBadge.commission_rate}
-            </p>
-            <p>
-              <b>Description:</b> {selectedBadge.description}
-            </p>
-            {selectedBadge.special_requirements && (
-              <p>
-                <b>Special:</b> {selectedBadge.special_requirements}
-              </p>
-            )}
-            <button onClick={() => setSelectedBadge(null)}>Close</button>
-          </div>
+      {loading ? (
+        <div className="badge-loading-state">
+          <div className="badge-spinner"></div>
+          <p>Loading badges...</p>
+        </div>
+      ) : filteredBadges.length === 0 ? (
+        <div className="badge-empty-state">
+          <p>No badges found for {activeTab}</p>
+        </div>
+      ) : (
+        <div className="badge-table-wrapper">
+          <table className="badge-data-table">
+            <thead className="badge-table-header">
+              <tr>
+                <th>Emoji</th>
+                <th>Name</th>
+                <th>Level</th>
+                <th>Commission</th>
+                <th>Description</th>
+                <th>Requirements</th>
+                <th>Special</th>
+              </tr>
+            </thead>
+            <tbody className="badge-table-body">
+              {filteredBadges.map((badge) => (
+                <tr key={badge.id} className="badge-table-row">
+                  <td className="badge-emoji-cell">{badge.badge_emoji}</td>
+                  <td className="badge-name-cell">{badge.badge_name}</td>
+                  <td className="badge-level-cell">
+                    <span className="badge-level-indicator">
+                      {badge.level}
+                    </span>
+                  </td>
+                  <td className="badge-commission-cell">
+                    <span className="badge-commission-value">
+                      {(parseFloat(badge.commission_rate) * 100).toFixed(0)}%
+                    </span>
+                  </td>
+                  <td className="badge-description-cell">{badge.description}</td>
+                  <td className="badge-requirements-cell">
+                    <div className="badge-requirements-list">
+                      {badge.videos_required > 0 && (
+                        <span className="badge-requirement-item">🎥 {badge.videos_required} videos</span>
+                      )}
+                      {badge.followers_required > 0 && (
+                        <span className="badge-requirement-item">👥 {badge.followers_required} followers</span>
+                      )}
+                      {badge.reviews_required > 0 && (
+                        <span className="badge-requirement-item">⭐ {badge.reviews_required} reviews</span>
+                      )}
+                      {badge.referrals_required > 0 && (
+                        <span className="badge-requirement-item">🤝 {badge.referrals_required} referrals</span>
+                      )}
+                      {badge.classes_taken > 0 && (
+                        <span className="badge-requirement-item">📚 {badge.classes_taken} classes</span>
+                      )}
+                      {badge.programs_bought > 0 && (
+                        <span className="badge-requirement-item">🛒 {badge.programs_bought} programs</span>
+                      )}
+                      {badge.classes_taught > 0 && (
+                        <span className="badge-requirement-item">🎓 {badge.classes_taught} taught</span>
+                      )}
+                      {badge.tracks_sold > 0 && (
+                        <span className="badge-requirement-item">🎶 {badge.tracks_sold} tracks</span>
+                      )}
+                      {badge.tickets_sold > 0 && (
+                        <span className="badge-requirement-item">🎟️ {badge.tickets_sold} tickets</span>
+                      )}
+                      {badge.events_hosted > 0 && (
+                        <span className="badge-requirement-item">🎤 {badge.events_hosted} events</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="badge-special-cell">
+                    {badge.special_requirements ? (
+                      <span className="badge-special-text">{badge.special_requirements}</span>
+                    ) : (
+                      <span className="badge-no-special">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

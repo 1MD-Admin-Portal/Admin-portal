@@ -61,119 +61,155 @@ const ReferralsPage = () => {
   };
 
   return (
-    <div className="referrals-page">
-      <h2>Referral Management</h2>
+    <div className="referral-management-container">
+      <h2 className="referral-main-title">Referral Management</h2>
 
       {/* Tabs */}
-      <div className="tabs">
+      <div className="referral-tab-navigation">
         <button
-          className={activeTab === "leaderboard" ? "active" : ""}
+          className={`referral-tab-button ${activeTab === "leaderboard" ? "referral-tab-active" : ""}`}
           onClick={() => setActiveTab("leaderboard")}
         >
           Leaderboard
         </button>
         <button
-          className={activeTab === "stats" ? "active" : ""}
+          className={`referral-tab-button ${activeTab === "stats" ? "referral-tab-active" : ""}`}
           onClick={() => setActiveTab("stats")}
         >
           Stats
         </button>
-        <button
-          className={activeTab === "user" ? "active" : ""}
+        {/* <button
+          className={`referral-tab-button ${activeTab === "user" ? "referral-tab-active" : ""}`}
           onClick={() => setActiveTab("user")}
         >
           User Referrals
-        </button>
+        </button> */}
       </div>
 
-      {loading && <p className="loading">Loading...</p>}
+      {loading && <p className="referral-loading-message">Loading...</p>}
 
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (
-        <table className="custom-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Referral Code</th>
-              <th>Total Referrals</th>
-              <th>Paid Referrals</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboard.map((user) => (
-              <tr key={user.referral_code}>
-                <td>{user.rank}</td>
-                <td>{user.name}</td>
-                <td>{user.referral_code}</td>
-                <td>{user.total_referrals}</td>
-                <td>{user.paid_referrals}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* Stats Tab */}
-      {activeTab === "stats" && stats && !loading && (
-        <div className="stats-container">
-          <h3>Overall Stats</h3>
-          <ul>
-            <li>Total Referrals: {stats.overall.total_referrals}</li>
-            <li>Paid Referrals: {stats.overall.paid_referrals}</li>
-            <li>Unpaid Referrals: {stats.overall.unpaid_referrals}</li>
-            <li>Active Referrers: {stats.overall.active_referrers}</li>
-            <li>
-              Conversion Rate: {stats.overall.conversion_rate.toFixed(2)}%
-            </li>
-          </ul>
-
-          <h3>Monthly Trends</h3>
-          <table className="custom-table">
+        <div className="referral-content-section">
+          <table className="referral-data-table">
             <thead>
               <tr>
-                <th>Month</th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Referral Code</th>
                 <th>Total Referrals</th>
                 <th>Paid Referrals</th>
-                <th>Conversion Rate</th>
               </tr>
             </thead>
             <tbody>
-              {stats.monthly_trends.map((m, idx) => (
-                <tr key={idx}>
-                  <td>{m.month}</td>
-                  <td>{m.total_referrals}</td>
-                  <td>{m.paid_referrals}</td>
-                  <td>{m.conversion_rate}%</td>
+              {leaderboard.map((user) => (
+                <tr key={user.referral_code}>
+                  <td className="referral-rank-cell">{user.rank}</td>
+                  <td>{user.name}</td>
+                  <td className="referral-code-cell">{user.referral_code}</td>
+                  <td>{user.total_referrals}</td>
+                  <td>{user.paid_referrals}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
 
-          <h3>Top Referrer</h3>
-          <p>
-            {stats.top_referrer.name} ({stats.top_referrer.email}) -{" "}
-            {stats.top_referrer.total_referrals} referrals (
-            {stats.top_referrer.paid_referrals} paid)
-          </p>
+      {/* Stats Tab */}
+      {activeTab === "stats" && stats && !loading && (
+        <div className="referral-content-section">
+          <div className="referral-stats-overview">
+            <h3 className="referral-section-title">Overall Stats</h3>
+            <div className="referral-stats-grid">
+              <div className="referral-stat-card">
+                <div className="referral-stat-number">{stats.overall.total_referrals}</div>
+                <div className="referral-stat-label">Total Referrals</div>
+              </div>
+              <div className="referral-stat-card">
+                <div className="referral-stat-number">{stats.overall.paid_referrals}</div>
+                <div className="referral-stat-label">Paid Referrals</div>
+              </div>
+              <div className="referral-stat-card">
+                <div className="referral-stat-number">{stats.overall.unpaid_referrals}</div>
+                <div className="referral-stat-label">Unpaid Referrals</div>
+              </div>
+              <div className="referral-stat-card">
+                <div className="referral-stat-number">{stats.overall.active_referrers}</div>
+                <div className="referral-stat-label">Active Referrers</div>
+              </div>
+              <div className="referral-stat-card">
+                <div className="referral-stat-number">{stats.overall.conversion_rate.toFixed(2)}%</div>
+                <div className="referral-stat-label">Conversion Rate</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="referral-trends-section">
+            <h3 className="referral-section-title">Monthly Trends</h3>
+            <table className="referral-data-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Total Referrals</th>
+                  <th>Paid Referrals</th>
+                  <th>Conversion Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.monthly_trends.map((m, idx) => (
+                  <tr key={idx}>
+                    <td>{m.month}</td>
+                    <td>{m.total_referrals}</td>
+                    <td>{m.paid_referrals}</td>
+                    <td>{m.conversion_rate}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="referral-top-performer">
+            <h3 className="referral-section-title">Top Referrer</h3>
+            <div className="referral-performer-card">
+              <div className="referral-performer-info">
+                <div className="referral-performer-name">{stats.top_referrer.name}</div>
+                <div className="referral-performer-email">{stats.top_referrer.email}</div>
+              </div>
+              <div className="referral-performer-stats">
+                <span className="referral-performer-metric">
+                  {stats.top_referrer.total_referrals} total referrals
+                </span>
+                <span className="referral-performer-metric">
+                  ({stats.top_referrer.paid_referrals} paid)
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {/* User Referrals Tab */}
       {activeTab === "user" && !loading && (
-        <div className="user-referrals">
-          <input
-            type="text"
-            placeholder="Enter User ID"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-          />
-          <button onClick={() => fetchUserReferrals(userId, 1)}>
-            Fetch Referrals
-          </button>
+        <div className="referral-content-section">
+          <div className="referral-user-search">
+            <input
+              type="text"
+              placeholder="Enter User ID"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              className="referral-search-input"
+            />
+            <button 
+              onClick={() => fetchUserReferrals(userId, 1)}
+              className="referral-search-button"
+            >
+              Fetch Referrals
+            </button>
+          </div>
 
           {userReferrals.length > 0 && (
-            <table className="custom-table">
+            <table className="referral-data-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -196,20 +232,22 @@ const ReferralsPage = () => {
           )}
 
           {pagination.total > 0 && (
-            <div className="pagination">
+            <div className="referral-pagination-controls">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
+                className="referral-pagination-button"
               >
                 Prev
               </button>
-              <span>
+              <span className="referral-pagination-info">
                 Page {pagination.current_page || page} of{" "}
                 {pagination.last_page || 1}
               </span>
               <button
                 disabled={page >= (pagination.last_page || 1)}
                 onClick={() => setPage((p) => p + 1)}
+                className="referral-pagination-button"
               >
                 Next
               </button>

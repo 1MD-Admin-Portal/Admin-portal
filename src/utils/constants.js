@@ -7,8 +7,8 @@ export const CONSTANTS = {
     LOGIN: "/api/v1/admin/login",
     FORGOT_PASSWORD: "/api/v1/admin-auth/forgot-password",
     RESET_PASSWORD: "/api/v1/admin-auth/reset-password",
+    DASHBOARD: "/api/v1/admin/dashboard",
     UPLOAD_MEDIA: "/api/v1/file/upload",
-    DASHBOARD: "/dashboard",
     PROFILE: "/profile",
     USERS: "/users",
     CHANGE_PASSWORD: "/api/v1/admin-auth/change-password",
@@ -143,4 +143,90 @@ export const CONSTANTS = {
         `/api/v1/admin/challenge/comments/${commentId}`,
     },
   },
+};
+// KPI Cards configuration
+export const KPI_CARDS = [
+  {
+    key: "total_users",
+    title: "Total Users",
+    icon: "👥",
+    color: "blue",
+    format: "number",
+  },
+  {
+    key: "active_subscriptions",
+    title: "Active Subscriptions",
+    icon: "📊",
+    color: "green",
+    format: "number",
+  },
+  {
+    key: "total_revenue",
+    title: "Total Revenue",
+    icon: "💰",
+    color: "purple",
+    format: "currency",
+  },
+  {
+    key: "active_challenges",
+    title: "Active Challenges",
+    icon: "🏆",
+    color: "orange",
+    format: "number",
+  },
+  {
+    key: "ongoing_classes",
+    title: "Ongoing Classes",
+    icon: "📚",
+    color: "red",
+    format: "number",
+  },
+  {
+    key: "active_events",
+    title: "Active Events",
+    icon: "🎉",
+    color: "teal",
+    format: "number",
+  },
+  {
+    key: "active_programs",
+    title: "Active Programs",
+    icon: "🎬",
+    color: "indigo",
+    format: "number",
+  },
+];
+
+// Year options for filter
+export const YEAR_OPTIONS = [
+  { value: "all", label: "All Years" },
+  { value: "2025", label: "2025" },
+  { value: "2024", label: "2024" },
+  { value: "2023", label: "2023" },
+  { value: "2022", label: "2022" },
+];
+
+// Month options for filter
+export const MONTH_OPTIONS = [
+  { value: "all", label: "All Months" },
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
+// Loading states
+export const LOADING_STATES = {
+  IDLE: "idle",
+  LOADING: "loading",
+  SUCCESS: "success",
+  ERROR: "error",
 };

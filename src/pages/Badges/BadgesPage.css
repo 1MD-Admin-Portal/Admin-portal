@@ -1,77 +1,264 @@
-.badges-page {
-  padding: 20px;
+/* Main Container */
+.badge-management-container {
+  padding: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
   margin-left: 265px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.filters {
-  margin-bottom: 15px;
+/* Header Section */
+.badge-header-section {
+  margin-bottom: 32px;
 }
 
-.filters select {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+.badge-main-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.025em;
 }
 
-.badge-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 15px;
+/* Navigation Tabs */
+.badge-nav-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: fit-content;
 }
 
-.badge-card {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.badge-card:hover {
-  transform: scale(1.05);
-}
-
-.badge-emoji {
-  font-size: 30px;
-}
-
-.pagination {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.pagination button {
-  margin: 0 5px;
-  padding: 8px 12px;
+.badge-nav-button {
+  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
-  background: #ddd;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: capitalize;
+  letter-spacing: 0.025em;
 }
 
-.pagination button.active {
-  background: #007bff;
+.badge-nav-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.badge-nav-button.badge-nav-active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading State */
+.badge-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
   color: white;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.badge-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: badge-spin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
-.modal-content {
+@keyframes badge-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.badge-loading-state p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Empty State */
+.badge-empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+}
+
+/* Table Wrapper */
+.badge-table-wrapper {
   background: white;
-  padding: 25px;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Table Styles */
+.badge-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.badge-table-header th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 24px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+}
+
+.badge-table-body .badge-table-row {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.badge-table-body .badge-table-row:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: scale(1.005);
+}
+
+.badge-table-body .badge-table-row:last-child {
+  border-bottom: none;
+}
+
+.badge-data-table td {
+  padding: 20px 24px;
+  vertical-align: top;
+  color: #374151;
+  line-height: 1.5;
+}
+
+/* Specific Cell Styles */
+.badge-emoji-cell {
+  font-size: 24px;
+  text-align: center;
+  width: 60px;
+}
+
+.badge-name-cell {
+  font-weight: 600;
+  color: #111827;
+  min-width: 120px;
+}
+
+.badge-level-indicator {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge-commission-value {
+  display: inline-block;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.badge-description-cell {
+  max-width: 200px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.badge-requirements-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 250px;
+}
+
+.badge-requirement-item {
+  display: inline-block;
+  background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-special-text {
+  color: #dc2626;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.badge-no-special {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .badge-management-container {
+    margin-left: 0;
+    padding: 24px;
+  }
+  
+  .badge-main-title {
+    font-size: 28px;
+  }
+  
+  .badge-table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .badge-data-table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .badge-management-container {
+    padding: 16px;
+  }
+  
+  .badge-main-title {
+    font-size: 24px;
+  }
+  
+  .badge-nav-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .badge-nav-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .badge-data-table th,
+  .badge-data-table td {
+    padding: 16px 12px;
+  }
 }

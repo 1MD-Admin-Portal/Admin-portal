@@ -128,16 +128,16 @@ const Sidebar = () => {
     { href: "/VideoPrograms", icon: Book, label: "Video Program Management" },
     { href: "/playlists", icon: Play, label: "Playlists" },
     { href: "/CreateChallenge", icon: Swords, label: "Challenges" },
-    {
-      href: "/Challenge-Submissions",
-      icon: Download,
-      label: "Challenge Submission",
-    },
-    {
-      href: "/Challenge-participants",
-      icon: PersonStanding,
-      label: "Challenge Participants",
-    },
+    // {
+    //   href: "/Challenge-Submissions",
+    //   icon: Download,
+    //   label: "Challenge Submission",
+    // },
+    // {
+    //   href: "/Challenge-participants",
+    //   icon: PersonStanding,
+    //   label: "Challenge Participants",
+    // },
   ];
 
   const earningSubmenuItems = [
@@ -508,9 +508,9 @@ const Sidebar = () => {
                 Referrals
               </MenuItem>
 
-              <MenuItem href="/AdsManagement" icon={Megaphone}>
+              {/* <MenuItem href="/AdsManagement" icon={Megaphone}>
                 Ads Management
-              </MenuItem>
+              </MenuItem> */}
             </ul>
           </div>
 

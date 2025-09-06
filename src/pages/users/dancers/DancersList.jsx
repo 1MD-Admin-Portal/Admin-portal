@@ -56,7 +56,7 @@ const DancersList = () => {
     <div className="professors-container">
       <h2 className="professors-title">Dancers List</h2>
       <div className="filters-container">
-        <input
+        {/* <input
           type="text"
           placeholder="Search by name or location"
           value={searchTerm}
@@ -86,7 +86,7 @@ const DancersList = () => {
           onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
         >
           Sort by Date: {sortOrder === "asc" ? "Oldest First" : "Newest First"}
-        </button>
+        </button> */}
       </div>
 
       <table className="professors-table">
