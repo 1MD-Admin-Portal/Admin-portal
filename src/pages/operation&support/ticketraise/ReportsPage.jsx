@@ -91,15 +91,35 @@ const ReportsPage = () => {
         <div className="header-stats">
           <div className="stat-card-r">
             <span className="stat-number">
-              {summary.status_breakdown.pending || 0}
+              {summary?.status_breakdown?.pending || 0}
             </span>
             <span className="stat-label-r">Pending</span>
           </div>
           <div className="stat-card-r">
             <span className="stat-number">
-              {summary.status_breakdown.resolved || 0}
+              {summary?.status_breakdown?.resolved || 0}
             </span>
             <span className="stat-label-r">Resolved</span>
+          </div>
+        </div>
+        {/* Reason Breakdown Section */}
+        <div className="reason-breakdown">
+          <h3 className="reason-breakdown-title">Reason Breakdown</h3>
+          <div className="reason-cards">
+            {summary?.reason_breakdown ? (
+              Object.entries(summary.reason_breakdown).map(
+                ([reason, count]) => (
+                  <div key={reason} className="reason-card">
+                    <span className="reason-label">
+                      {reason.replace(/_/g, " ")}
+                    </span>
+                    <span className="reason-count">{count}</span>
+                  </div>
+                )
+              )
+            ) : (
+              <p>No reason breakdown available</p>
+            )}
           </div>
         </div>
       </div>

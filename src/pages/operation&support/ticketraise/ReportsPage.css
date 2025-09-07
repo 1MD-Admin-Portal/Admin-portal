@@ -1,7 +1,8 @@
 /* Reports Dashboard - Modern UI */
 .reports-dashboard {
   padding: 32px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", sans-serif;
   margin-left: 265px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: calc(100vh - 64px);
@@ -155,8 +156,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -196,7 +201,11 @@
 }
 
 .table-body .table-row:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.02) 0%,
+    rgba(118, 75, 162, 0.02) 100%
+  );
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -582,13 +591,13 @@
     margin-left: 0;
     padding: 20px;
   }
-  
+
   .dashboard-header {
     flex-direction: column;
     gap: 20px;
     text-align: center;
   }
-  
+
   .header-stats {
     justify-content: center;
   }
@@ -598,35 +607,35 @@
   .page-title {
     font-size: 2rem;
   }
-  
+
   .users-section {
     grid-template-columns: 1fr;
   }
-  
+
   .detail-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 4px;
   }
-  
+
   .action-btn {
     width: 100%;
     text-align: center;
   }
-  
+
   .pagination-controls {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .modal-container {
     width: 95%;
     margin: 20px;
   }
-  
+
   .modal-header,
   .modal-body,
   .modal-footer {
@@ -638,44 +647,90 @@
   .reports-dashboard {
     padding: 16px;
   }
-  
+
   .dashboard-header {
     padding: 20px;
   }
-  
+
   .page-title {
     font-size: 1.75rem;
   }
-  
+
   .stat-card-r {
     min-width: 100px;
     padding: 16px;
   }
-  
+
   .stat-number {
     font-size: 1.5rem;
   }
-  
+
   .card-header {
     padding: 20px;
     flex-direction: column;
     gap: 12px;
     text-align: center;
   }
-  
+
   .table-cell {
     padding: 12px 8px;
     font-size: 0.8rem;
   }
-  
+
   .user-info-cell {
     flex-direction: column;
     gap: 8px;
     text-align: center;
   }
-  
+
   .user-avatar {
     width: 32px;
     height: 32px;
   }
+}
+
+/* Reason Breakdown Section Styling */
+.reason-breakdown {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reason-breakdown-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.reason-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.reason-card {
+  background-color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  min-width: 150px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.reason-label {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #555;
+  text-transform: capitalize;
+  margin-bottom: 6px;
+}
+
+.reason-count {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #111;
 }
