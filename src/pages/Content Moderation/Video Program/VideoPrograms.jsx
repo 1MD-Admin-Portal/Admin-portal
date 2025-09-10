@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./VideoPrograms.css";
 import CreateProgramModal from "./CreateProgramModal";
-import { X } from "lucide-react";
-import { getProgramsService } from "../../../services/program.service";
+import { X, Check, XCircle, Clock } from "lucide-react";
+import {
+  getProgramsService,
+  getPendingProgramsService,
+  approveProgramService,
+  rejectProgramService,
+} from "../../../services/program.service";
 
 const VideoPrograms = () => {
   const [programs, setPrograms] = useState([]);
+  const [pendingPrograms, setPendingPrograms] = useState([]);
+  const [currentView, setCurrentView] = useState("all"); // "all" or "pending"
   const [searchQuery, setSearchQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState("");
   const [videoFilter, setVideoFilter] = useState("");
@@ -14,25 +21,109 @@ const VideoPrograms = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [action, setAction] = useState(null);
   const [reason, setReason] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
 
   useEffect(() => {
-    const loadPrograms = async () => {
-      try {
-        const res = await getProgramsService();
-        console.log("Loaded programs response:", res);
-        if (Array.isArray(res)) {
-          setPrograms(res);
-        } else if (res && Array.isArray(res.programs)) {
-          setPrograms(res.programs);
-        } else {
-          setPrograms([]); // fallback
-        }
-      } catch (e) {
-        console.error("Failed to load programs", e);
+    if (currentView === "all") {
+      loadPrograms();
+    } else {
+      loadPendingPrograms();
+    }
+  }, [currentView, pagination.page]);
+
+  const loadPrograms = async () => {
+    try {
+      setLoading(true);
+      const res = await getProgramsService();
+      console.log("Loaded programs response:", res);
+      if (Array.isArray(res)) {
+        setPrograms(res);
+      } else if (res && Array.isArray(res.programs)) {
+        setPrograms(res.programs);
+      } else {
+        setPrograms([]); // fallback
       }
-    };
-    loadPrograms();
-  }, []);
+    } catch (e) {
+      console.error("Failed to load programs", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPendingPrograms = async () => {
+    try {
+      setLoading(true);
+      const res = await getPendingProgramsService(
+        pagination.page,
+        pagination.limit
+      );
+      console.log("Loaded pending programs response:", res);
+      setPendingPrograms(res.programs || []);
+      setPagination((prev) => ({
+        ...prev,
+        total: res.pagination?.total || 0,
+        totalPages: res.pagination?.totalPages || 1,
+      }));
+    } catch (e) {
+      console.error("Failed to load pending programs", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApproveProgram = async (programId, adminNotes) => {
+    try {
+      setLoading(true);
+      const result = await approveProgramService(programId, adminNotes);
+      console.log("Program approved:", result);
+
+      // Refresh the pending programs list
+      await loadPendingPrograms();
+
+      // Close modal and reset state
+      setSelectedProgram(null);
+      setAction(null);
+      setReason("");
+
+      // You might want to show a success message here
+      alert("Program approved successfully!");
+    } catch (error) {
+      console.error("Failed to approve program:", error);
+      alert("Failed to approve program. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectProgram = async (programId, rejectionReason) => {
+    try {
+      setLoading(true);
+      const result = await rejectProgramService(programId, rejectionReason);
+      console.log("Program rejected:", result);
+
+      // Refresh the pending programs list
+      await loadPendingPrograms();
+
+      // Close modal and reset state
+      setSelectedProgram(null);
+      setAction(null);
+      setReason("");
+
+      // You might want to show a success message here
+      alert("Program rejected successfully!");
+    } catch (error) {
+      console.error("Failed to reject program:", error);
+      alert("Failed to reject program. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filterVideos = (prog) => {
     const matchesSearch = prog.title
@@ -40,7 +131,7 @@ const VideoPrograms = () => {
       .includes(searchQuery.toLowerCase());
     const matchesLevel = !levelFilter || prog.dance_level === levelFilter;
     const matchesStatus = !statusFilter || prog.status === statusFilter;
-    const videoCount = prog.videos.length;
+    const videoCount = prog.videos?.length || 0;
     const matchesVideoCount = (() => {
       switch (videoFilter) {
         case "0":
@@ -62,13 +153,133 @@ const VideoPrograms = () => {
     return matchesSearch && matchesLevel && matchesStatus && matchesVideoCount;
   };
 
-  const filteredPrograms = programs.filter(filterVideos);
+  const currentPrograms = currentView === "all" ? programs : pendingPrograms;
+  const filteredPrograms = currentPrograms.filter(filterVideos);
+
+  const getStatusDisplay = (program) => {
+    if (currentView === "pending") {
+      return (
+        <span className="status status-pending">
+          <Clock size={14} className="inline mr-1" />
+          Pending Approval
+        </span>
+      );
+    }
+    return (
+      <span
+        className={`status status-${
+          program.status?.toLowerCase() || "published"
+        }`}
+      >
+        {program.status || "Published"}
+      </span>
+    );
+  };
+
+  const renderActionButtons = () => {
+    if (currentView === "pending" && selectedProgram) {
+      return (
+        <div className="program-actions">
+          <button
+            className="action-btn success-btn"
+            onClick={() => setAction("Approve")}
+            disabled={loading}
+          >
+            <Check size={16} className="inline mr-1" />
+            Approve
+          </button>
+          <button
+            className="action-btn danger-btn"
+            onClick={() => setAction("Reject")}
+            disabled={loading}
+          >
+            <XCircle size={16} className="inline mr-1" />
+            Reject
+          </button>
+        </div>
+      );
+    }
+
+    // Original action buttons for regular programs
+    return (
+      <div className="program-actions">
+        <button
+          className="action-btn danger-btn"
+          onClick={() => setAction("Delete")}
+        >
+          Delete
+        </button>
+        <button
+          className="action-btn warning-btn"
+          onClick={() => setAction("Retire")}
+        >
+          Retire
+        </button>
+        <button
+          className="action-btn pause-btn"
+          onClick={() => setAction("Pause")}
+        >
+          Pause
+        </button>
+      </div>
+    );
+  };
+
+  const handleSubmitAction = async () => {
+    if (!selectedProgram || !reason.trim()) return;
+
+    if (action === "Approve") {
+      await handleApproveProgram(selectedProgram.program_id, reason);
+    } else if (action === "Reject") {
+      await handleRejectProgram(selectedProgram.program_id, reason);
+    } else {
+      // Handle other actions (Delete, Retire, Pause) as before
+      console.log(
+        `${action} program ${selectedProgram.title} for reason: ${reason}`
+      );
+      setSelectedProgram(null);
+      setAction(null);
+      setReason("");
+    }
+  };
+
+  const getActionPlaceholder = () => {
+    switch (action) {
+      case "Approve":
+        return "Add admin notes for this approval...";
+      case "Reject":
+        return "Provide detailed reason for rejection...";
+      default:
+        return `Why do you want to ${action?.toLowerCase()} this program?`;
+    }
+  };
 
   return (
     <div className="video-programs-container">
-      {/* header and filters */}
+      {/* header and view toggle */}
       <div className="video-programs-header">
-        <h1 className="video-programs-title">Video Programs Management</h1>
+        <div className="header-left">
+          <h1 className="video-programs-title">Video Programs Management</h1>
+          <div className="view-toggle">
+            <button
+              className={`toggle-btn ${currentView === "all" ? "active" : ""}`}
+              onClick={() => setCurrentView("all")}
+            >
+              All Programs
+            </button>
+            <button
+              className={`toggle-btn ${
+                currentView === "pending" ? "active" : ""
+              }`}
+              onClick={() => setCurrentView("pending")}
+            >
+              Pending Approval
+              {pendingPrograms.length > 0 && (
+                <span className="pending-badge">{pendingPrograms.length}</span>
+              )}
+            </button>
+          </div>
+        </div>
         <button
           className="create-video-btn"
           onClick={() => setIsModalOpen(true)}
@@ -89,7 +300,7 @@ const VideoPrograms = () => {
           <select
             className="filter-select"
             onChange={(e) => setLevelFilter(e.target.value)}
-            defaultValue=""
+            value={levelFilter}
           >
             <option value="">All Levels</option>
             <option value="Beginner">Beginner</option>
@@ -100,7 +311,7 @@ const VideoPrograms = () => {
           <select
             className="filter-select"
             onChange={(e) => setVideoFilter(e.target.value)}
-            defaultValue=""
+            value={videoFilter}
           >
             <option value="">All Videos</option>
             <option value="0">0</option>
@@ -110,91 +321,127 @@ const VideoPrograms = () => {
             <option value="50-100">50 - 100</option>
             <option value="100+">100+</option>
           </select>
-          <select
-            className="filter-select"
-            onChange={(e) => setStatusFilter(e.target.value)}
-            defaultValue=""
-          >
-            <option value="">All Status</option>
-            <option value="Published">Published</option>
-            <option value="Draft">Draft</option>
-            <option value="Flagged">Flagged</option>
-          </select>
+          {currentView === "all" && (
+            <select
+              className="filter-select"
+              onChange={(e) => setStatusFilter(e.target.value)}
+              value={statusFilter}
+            >
+              <option value="">All Status</option>
+              <option value="Published">Published</option>
+              <option value="Draft">Draft</option>
+              <option value="Flagged">Flagged</option>
+            </select>
+          )}
         </div>
       </div>
 
       {/* table */}
       <div className="video-programs-table-container">
-        <table className="video-programs-table">
-          <thead>
-            <tr>
-              <th>Program Title</th>
-              <th>Host</th>
-              <th>Level</th>
-              <th>Videos</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPrograms.map((prog) => (
-              <tr
-              // key={prog.program_id}
-              // onClick={() => setSelectedProgram(prog)}
-              // className="clickable-row"
-              >
-                {/* <td>
-                  <input type="checkbox" className="program-checkbox" />
-                </td> */}
-                <td className="program-title">
-                  <div className="program-title-content">
-                    <img
-                      src={
-                        prog.image_url ||
-                        "https://via.placeholder.com/40?text=No+Image"
-                      }
-                      alt="thumbnail"
-                      className="program-thumbnail"
-                    />
-                    <span className="program-name">{prog.title}</span>
-                  </div>
-                </td>
-                <td className="program-host">
-                  {prog.instructor_name || `Instructor #${prog.instructor_id}`}
-                </td>
-                <td className="program-level">
-                  <span
-                    className={`level-badge level-${prog.dance_level?.toLowerCase()}`}
-                  >
-                    {prog.dance_level}
-                  </span>
-                </td>
-                <td className="program-videos">
-                  <span className="video-count">{prog.videos.length}</span>
-                </td>
-                <td className="program-status">
-                  <span
-                    className={`status status-${
-                      prog.status?.toLowerCase() || "published"
-                    }`}
-                  >
-                    Published
-                  </span>
-                </td>
-              </tr>
-            ))}
-            {filteredPrograms.length === 0 && (
+        {loading ? (
+          <div className="loading-state">Loading programs...</div>
+        ) : (
+          <table className="video-programs-table">
+            <thead>
               <tr>
-                <td colSpan="6" className="no-programs">
-                  <div className="empty-state">
-                    <span className="empty-icon">📹</span>
-                    <span className="empty-text">No programs found.</span>
-                  </div>
-                </td>
+                <th>Program Title</th>
+                <th>Host</th>
+                <th>Level</th>
+                <th>Videos</th>
+                <th>Status</th>
+                {currentView === "pending" && <th>Submitted</th>}
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredPrograms.map((prog) => (
+                <tr
+                  key={prog.program_id}
+                  onClick={() => setSelectedProgram(prog)}
+                  className="clickable-row"
+                >
+                  <td className="program-title">
+                    <div className="program-title-content">
+                      <img
+                        src={
+                          prog.image_url ||
+                          "https://via.placeholder.com/40?text=No+Image"
+                        }
+                        alt="thumbnail"
+                        className="program-thumbnail"
+                      />
+                      <span className="program-name">{prog.title}</span>
+                    </div>
+                  </td>
+                  <td className="program-host">
+                    {prog.instructor_name ||
+                      `Instructor #${prog.instructor_id}`}
+                  </td>
+                  <td className="program-level">
+                    <span
+                      className={`level-badge level-${prog.dance_level?.toLowerCase()}`}
+                    >
+                      {prog.dance_level}
+                    </span>
+                  </td>
+                  <td className="program-videos">
+                    <span className="video-count">
+                      {prog.videos?.length || 0}
+                    </span>
+                  </td>
+                  <td className="program-status">{getStatusDisplay(prog)}</td>
+                  {currentView === "pending" && (
+                    <td className="program-submitted">
+                      {new Date(prog.created_at).toLocaleDateString()}
+                    </td>
+                  )}
+                </tr>
+              ))}
+              {filteredPrograms.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={currentView === "pending" ? "6" : "5"}
+                    className="no-programs"
+                  >
+                    <div className="empty-state">
+                      <span className="empty-icon">📹</span>
+                      <span className="empty-text">
+                        {currentView === "pending"
+                          ? "No pending programs found."
+                          : "No programs found."}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {/* Pagination for pending programs */}
+      {currentView === "pending" && pagination.totalPages > 1 && (
+        <div className="pagination">
+          <button
+            disabled={pagination.page === 1}
+            onClick={() =>
+              setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+            }
+          >
+            Previous
+          </button>
+          <span>
+            Page {pagination.page} of {pagination.totalPages}
+          </span>
+          <button
+            disabled={pagination.page === pagination.totalPages}
+            onClick={() =>
+              setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+            }
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* create modal */}
       <CreateProgramModal
@@ -266,28 +513,55 @@ const VideoPrograms = () => {
                   <div className="info-item">
                     <div className="info-label">Status</div>
                     <div className="info-value">
-                      <span className="status status-published">Published</span>
+                      {getStatusDisplay(selectedProgram)}
                     </div>
                   </div>
                   <div className="info-item">
                     <div className="info-label">Total Videos</div>
                     <div className="info-value">
                       <span className="video-count">
-                        {selectedProgram.videos.length}
+                        {selectedProgram.videos?.length || 0}
                       </span>
                     </div>
                   </div>
+                  {currentView === "pending" && (
+                    <>
+                      <div className="info-item">
+                        <div className="info-label">Dance Style</div>
+                        <div className="info-value">
+                          {selectedProgram.dance_style}
+                        </div>
+                      </div>
+                      <div className="info-item">
+                        <div className="info-label">Price</div>
+                        <div className="info-value">
+                          {selectedProgram.pricing_type === "paid"
+                            ? `$${selectedProgram.price}`
+                            : "Free"}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {selectedProgram.description && currentView === "pending" && (
+                <div className="popup-section">
+                  <h3 className="section-title">Description</h3>
+                  <p className="program-description">
+                    {selectedProgram.description}
+                  </p>
+                </div>
+              )}
 
               <div className="popup-section">
                 <h3 className="section-title">Videos</h3>
                 <div className="videos-list">
-                  {selectedProgram.videos.map((video) => (
+                  {selectedProgram.videos?.map((video) => (
                     <div key={video.id} className="video-item">
                       <div className="video-info">
                         <div className="video-title">{video.title}</div>
-                        <div className="video-duration">{video.duration}</div>
+                        <div className="video-duration">{video.duration}s</div>
                       </div>
                       <a
                         href={video.video_url}
@@ -302,49 +576,29 @@ const VideoPrograms = () => {
                 </div>
               </div>
 
-              <div className="program-actions">
-                <button
-                  className="action-btn danger-btn"
-                  onClick={() => setAction("Delete")}
-                >
-                  Delete
-                </button>
-                <button
-                  className="action-btn warning-btn"
-                  onClick={() => setAction("Retire")}
-                >
-                  Retire
-                </button>
-                <button
-                  className="action-btn pause-btn"
-                  onClick={() => setAction("Pause")}
-                >
-                  Pause
-                </button>
-              </div>
+              {renderActionButtons()}
 
               {action && (
                 <div className="reason-form">
-                  <h4 className="reason-title">{action} Reason:</h4>
+                  <h4 className="reason-title">
+                    {action === "Approve"
+                      ? "Admin Notes:"
+                      : action === "Reject"
+                      ? "Rejection Reason:"
+                      : `${action} Reason:`}
+                  </h4>
                   <textarea
                     className="reason-textarea"
-                    placeholder={`Why do you want to ${action.toLowerCase()} this program?`}
+                    placeholder={getActionPlaceholder()}
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                   />
                   <button
                     className="submit-reason"
-                    onClick={() => {
-                      console.log(
-                        `${action} program ${selectedProgram.title} for reason: ${reason}`
-                      );
-                      setSelectedProgram(null);
-                      setAction(null);
-                      setReason("");
-                    }}
-                    disabled={!reason.trim()}
+                    onClick={handleSubmitAction}
+                    disabled={!reason.trim() || loading}
                   >
-                    Submit
+                    {loading ? "Processing..." : "Submit"}
                   </button>
                 </div>
               )}

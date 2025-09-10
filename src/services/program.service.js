@@ -35,6 +35,7 @@ export const createProgramService = async (programData) => {
     throw error;
   }
 };
+
 export const uploadImageService = async (file) => {
   try {
     const formData = new FormData();
@@ -51,6 +52,58 @@ export const uploadImageService = async (file) => {
     return response.data.url; // adjust if your backend returns differently
   } catch (error) {
     console.error("Image upload error:", error?.response?.data || error);
+    throw error;
+  }
+};
+
+// === NEW PENDING PROGRAMS APIs ===
+
+export const getPendingProgramsService = async (page = 1, limit = 10) => {
+  try {
+    const response = await api.get(
+      `${CONSTANTS.URL.GET_PENDING_PROGRAMS}?page=${page}&limit=${limit}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Pending programs fetch error:",
+      error?.response?.data || error
+    );
+    throw error;
+  }
+};
+
+export const approveProgramService = async (programId, adminNotes) => {
+  try {
+    const response = await api.post(
+      `${CONSTANTS.URL.APPROVE_PROGRAM}/${programId}/approve`,
+      { admin_notes: adminNotes },
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Program approval error:", error?.response?.data || error);
+    throw error;
+  }
+};
+
+export const rejectProgramService = async (programId, rejectionReason) => {
+  try {
+    const response = await api.post(
+      `${CONSTANTS.URL.REJECT_PROGRAM}/${programId}/reject`,
+      { rejection_reason: rejectionReason },
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Program rejection error:", error?.response?.data || error);
     throw error;
   }
 };

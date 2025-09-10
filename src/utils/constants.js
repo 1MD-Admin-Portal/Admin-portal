@@ -1,7 +1,7 @@
 export const CONSTANTS = {
   URL: {
     BASE_URL:
-      "https://dancewithme-b9gadtdhbjdya5c5.westus-01.azurewebsites.net",
+      "https://uat-dancewithme-dye9ftbrbdeybfg2.francecentral-01.azurewebsites.net",
     // BASE_URL: "",
 
     LOGIN: "/api/v1/admin/login",
@@ -16,6 +16,9 @@ export const CONSTANTS = {
     // === PROGRAM MANAGEMENT ===
     GET_PROGRAMS: "/api/v1/admin/program",
     CREATE_PROGRAM: "/api/v1/admin/program",
+    GET_PENDING_PROGRAMS: "/api/v1/admin/programs/pending",
+    APPROVE_PROGRAM: "/api/v1/admin/programs", // will append /{id}/approve
+    REJECT_PROGRAM: "/api/v1/admin/programs", // will append /{id}/reject
 
     // === CHALLENGE MANAGEMENT ===
     CREATE_CHALLENGE: "/api/v1/admin/challenge",
@@ -67,6 +70,12 @@ export const CONSTANTS = {
     // === FEED MANAGEMENT ===
     GET_FEEDS: `/api/v1/admin/posts`,
     GET_FEED_LIKES: (postId) => `/api/v1/admin/posts/${postId}/likes`,
+
+    // === CONTENT MODERATION ===
+    GET_REPORTED_POSTS: `/api/v1/admin/content/reports`,
+    MODERATE_REPORT: (reportId) =>
+      `/api/v1/admin/content/reports/${reportId}/moderate`,
+    GET_MODERATION_STATS: `/api/v1/admin/content/moderation-stats`,
 
     // === PLAYLIST MANAGEMENT ===
     GET_PLAYLISTS: "/api/v1/admin/playlists", // GET with filters
