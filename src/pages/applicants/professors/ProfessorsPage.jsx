@@ -198,7 +198,7 @@ const ProfessorsPage = () => {
       <h1 className="professors-title">Professor Applications</h1>
 
       {/* Action bar */}
-      <div className="bulk-actions-bar">
+      {/* <div className="bulk-actions-bar">
         {selectedIds.length === 0 ? (
           <>
             <button
@@ -230,19 +230,19 @@ const ProfessorsPage = () => {
             </button>
           </>
         )}
-      </div>
+      </div> */}
 
       <table className="professors-table">
         <thead>
           <tr>
-            <th>
+            {/* <th>
               <input
                 ref={selectAllRef}
                 type="checkbox"
                 onChange={toggleSelectAll}
                 disabled={pendingApps.length === 0}
               />
-            </th>
+            </th> */}
             <th>ID</th>
             <th>Email</th>
             <th>Dance Styles</th>
@@ -257,7 +257,7 @@ const ProfessorsPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
-              <td>
+              {/* <td>
                 {app.status === "pending" && (
                   <input
                     type="checkbox"
@@ -265,7 +265,7 @@ const ProfessorsPage = () => {
                     onChange={() => toggleSelect(app.id)}
                   />
                 )}
-              </td>
+              </td> */}
               <td>{app.id}</td>
               <td
                 className="clickable-email"

@@ -53,9 +53,9 @@ const OrganizerListPage = () => {
             <th>Name</th>
             <th>Location</th>
             <th>Skill Level</th>
-            <th>User Type</th>
+            {/* <th>User Type</th>
             <th>Provider</th>
-            <th>Created At</th>
+            <th>Created At</th> */}
             <th>Roles</th>
             <th>Subscription</th>
           </tr>
@@ -68,9 +68,9 @@ const OrganizerListPage = () => {
               <td>{user.name || "N/A"}</td>
               <td>{user.location || "N/A"}</td>
               <td>{user.skill_level || "N/A"}</td>
-              <td>{user.profile_user_type || "N/A"}</td>
+              {/* <td>{user.profile_user_type || "N/A"}</td>
               <td>{user.provider || "N/A"}</td>
-              <td>{new Date(user.created_at).toLocaleString()}</td>
+              <td>{new Date(user.created_at).toLocaleString()}</td> */}
               <td>{user.roles?.join(", ") || "N/A"}</td>
               <td>{user.active_subscription?.subscription_name || "None"}</td>
             </tr>

@@ -210,7 +210,7 @@ const OrganizersPage = () => {
           - If nothing selected -> show Approve All / Reject All
           - If something selected -> show Approve Selected / Reject Selected (only)
       */}
-      <div className="bulk-actions-bar">
+      {/* <div className="bulk-actions-bar">
         {selectedIds.length === 0 ? (
           <>
             <button
@@ -242,21 +242,21 @@ const OrganizersPage = () => {
             </button>
           </>
         )}
-      </div>
+      </div> */}
 
       <table className="professors-table">
         <thead>
           <tr>
-            <th>
-              {/* header checkbox only for pending items */}
-              <input
+            {/* <th> */}
+            {/* header checkbox only for pending items */}
+            {/* <input
                 ref={selectAllRef}
                 type="checkbox"
-                onChange={toggleSelectAll}
-                // checked/indeterminate handled via useEffect
-                disabled={pendingApps.length === 0}
-              />
-            </th>
+                onChange={toggleSelectAll} */}
+            {/* // checked/indeterminate handled via useEffect */}
+            {/* disabled={pendingApps.length === 0} */}
+            {/* /> */}
+            {/* </th> */}
             <th>ID</th>
             <th>Email</th>
             <th>Event Types</th>
@@ -271,14 +271,14 @@ const OrganizersPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
-              <td>
+              {/* <td>
                 <input
                   type="checkbox"
                   onChange={() => toggleSelect(app.id)}
                   checked={selectedIds.includes(app.id)}
                   disabled={app.status !== "pending"}
                 />
-              </td>
+              </td> */}
 
               <td>{app.id}</td>
 

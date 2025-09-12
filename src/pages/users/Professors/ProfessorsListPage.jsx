@@ -52,7 +52,7 @@ const ProfessorsListPage = () => {
             <th>Location</th>
             <th>Skill Level</th>
             <th>Roles</th>
-            <th>Active Subscription</th>
+            {/* <th>Active Subscription</th> */}
             <th>Subscription Name</th>
           </tr>
         </thead>
@@ -82,11 +82,11 @@ const ProfessorsListPage = () => {
               <td>{prof.location}</td>
               <td>{prof.skill_level}</td>
               <td>{prof.roles.join(", ")}</td>
-              <td>
+              {/* <td>
                 {prof.active_subscription?.payment_status === "paid"
                   ? "Yes"
                   : "No"}
-              </td>
+              </td> */}
               <td>{prof.active_subscription?.subscription_name || "-"}</td>
             </tr>
           ))}

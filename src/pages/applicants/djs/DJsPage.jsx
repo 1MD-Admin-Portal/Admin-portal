@@ -80,6 +80,7 @@ const DJsPage = () => {
   return (
     <div className="professors-container">
       <h2 className="professors-title">DJ Applications</h2>
+      {/* <h2 className="professors-title">DJ Applications</h2>
 
       {pendingApps.length > 0 && (
         <div className="pagination-controls">
@@ -115,12 +116,12 @@ const DJsPage = () => {
             </>
           )}
         </div>
-      )}
+      )} */}
 
       <table className="professors-table">
         <thead>
           <tr>
-            <th>
+            {/* <th>
               <input
                 type="checkbox"
                 onChange={(e) => {
@@ -135,11 +136,11 @@ const DJsPage = () => {
                   pendingApps.length > 0
                 }
               />
-            </th>
+            </th> */}
             <th>ID</th>
             <th>Email</th>
             <th>Genres</th>
-            <th>DJ Type</th>
+            {/* <th>DJ Type</th> */}
             <th>Experience</th>
             <th>Frequency</th>
             <th>Document</th>
@@ -151,7 +152,7 @@ const DJsPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
-              <td>
+              {/* <td>
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(app.id)}
@@ -166,7 +167,7 @@ const DJsPage = () => {
                     }
                   }}
                 />
-              </td>
+              </td> */}
               <td>{app.id}</td>
               <td>
                 <button
@@ -177,7 +178,7 @@ const DJsPage = () => {
                 </button>
               </td>
               <td>{formatField(app.genres)}</td>
-              <td>{app.dj_type}</td>
+              {/* <td>{app.dj_type}</td> */}
               <td>{app.dj_experience}</td>
               <td>{formatField(app.performance_frequency)}</td>
               <td>
