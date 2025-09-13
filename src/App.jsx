@@ -12,7 +12,6 @@ import ClassModeration from "./pages/Class listing approval/ClassModeration.jsx"
 import EventsPage from "./pages/Events/Event page/EventsPage.jsx";
 import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
 import AdsManagement from "./pages/Ads Management/AdsManagement";
-import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
@@ -40,8 +39,7 @@ import BadgesPage from "./pages/Badges/BadgesPage.jsx";
 import ChallengePage from "./pages/Content Moderation/Challenges/ChallengePage.jsx";
 import ReportsPage from "./pages/operation&support/ticketraise/ReportsPage.jsx";
 import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
-import 'bootstrap/dist/css/bootstrap.min.css';
-
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
@@ -71,7 +69,6 @@ function App() {
             path="/NotificationPage"
             element={<NotificationManagement />}
           />
-          <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/SettingsPage" element={<SettingsPage />} />
           <Route path="/Applicants/Professors" element={<ProfessorsPage />} />
           <Route path="/payouts/payouts" element={<PendingPayouts />} />
