@@ -142,26 +142,32 @@ const PlaylistsPage = () => {
       : `Reject All (${pendingPlaylists.length})`;
 
   return (
-    <div className="playlist-page-container">
-      <div className="playlist-page-header">
-        <h2 className="playlist-page-title">Playlist Management</h2>
+    <div className="plmgmt-main-container">
+      <div className="plmgmt-header-section">
+        <h2 className="plmgmt-main-title">Playlist Management</h2>
       </div>
 
       {/* Enhanced Tab System */}
-      <div className="playlist-tabs-container">
-        <div className="playlist-tabs">
+      <div className="plmgmt-tabs-wrapper">
+        <div className="plmgmt-tab-controls">
           <button
-            className={`tab-button ${activeTab === "pending" ? "active" : ""}`}
+            className={`plmgmt-tab-btn ${
+              activeTab === "pending" ? "plmgmt-tab-active" : ""
+            }`}
             onClick={() => handleTabChange("pending")}
           >
             <Clock size={18} />
             Require Approval
             {pendingPlaylists.length > 0 && (
-              <span className="tab-badge">{pendingPlaylists.length}</span>
+              <span className="plmgmt-tab-counter">
+                {pendingPlaylists.length}
+              </span>
             )}
           </button>
           <button
-            className={`tab-button ${activeTab === "approved" ? "active" : ""}`}
+            className={`plmgmt-tab-btn ${
+              activeTab === "approved" ? "plmgmt-tab-active" : ""
+            }`}
             onClick={() => handleTabChange("approved")}
           >
             <CheckCircle size={18} />
@@ -171,9 +177,9 @@ const PlaylistsPage = () => {
       </div>
 
       {/* Enhanced Filters */}
-      <div className="playlist-filters-container">
-        <div className="playlist-filters">
-          <div className="filter-group">
+      <div className="plmgmt-filter-wrapper">
+        <div className="plmgmt-filter-controls">
+          <div className="plmgmt-filter-item">
             <Search size={18} />
             <input
               type="text"
@@ -186,11 +192,11 @@ const PlaylistsPage = () => {
                   page: 1,
                 }))
               }
-              className="search-input"
+              className="plmgmt-search-field"
             />
           </div>
 
-          <div className="filter-group">
+          <div className="plmgmt-filter-item">
             <select
               value={filters.playlist_type}
               onChange={(e) =>
@@ -200,7 +206,7 @@ const PlaylistsPage = () => {
                   page: 1,
                 }))
               }
-              className="filter-select"
+              className="plmgmt-dropdown"
             >
               <option value="all">All Types</option>
               <option value="free">Free</option>
@@ -208,7 +214,7 @@ const PlaylistsPage = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className="plmgmt-filter-item">
             <select
               value={filters.sort_by}
               onChange={(e) =>
@@ -218,7 +224,7 @@ const PlaylistsPage = () => {
                   page: 1,
                 }))
               }
-              className="filter-select"
+              className="plmgmt-dropdown"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -229,9 +235,9 @@ const PlaylistsPage = () => {
 
       {/* Bulk Actions */}
       {activeTab === "pending" && playlists.length > 0 && (
-        <div className="bulk-actions">
+        <div className="plmgmt-bulk-controls">
           <button
-            className="bulk-approve-btn"
+            className="plmgmt-bulk-approve"
             onClick={handleBulkApprove}
             disabled={pendingPlaylists.length === 0}
           >
@@ -240,7 +246,7 @@ const PlaylistsPage = () => {
           </button>
 
           <button
-            className="bulk-reject-btn"
+            className="plmgmt-bulk-reject"
             onClick={handleBulkReject}
             disabled={pendingPlaylists.length === 0}
           >
@@ -251,22 +257,22 @@ const PlaylistsPage = () => {
       )}
 
       {/* Enhanced Grid Layout */}
-      <div className="playlist-grid">
+      <div className="plmgmt-cards-grid">
         {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
+          <div className="plmgmt-loading-display">
+            <div className="plmgmt-loading-spinner"></div>
             <p>Loading playlists...</p>
           </div>
         ) : playlists.length > 0 ? (
           playlists.map((playlist) => (
             <div
               key={playlist.id}
-              className="playlist-card"
+              className="plmgmt-playlist-card"
               onClick={() => setSelectedPlaylist(playlist)}
             >
               {activeTab === "pending" && (
                 <div
-                  className="card-checkbox"
+                  className="plmgmt-card-checkbox"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <input
@@ -286,32 +292,30 @@ const PlaylistsPage = () => {
                 </div>
               )}
 
-              <div className="playlist-thumbnail-container">
+              <div className="plmgmt-thumbnail-wrapper">
                 {playlist.cover_image_url ? (
                   <img
                     src={playlist.cover_image_url}
                     alt={playlist.title}
-                    className="playlist-thumbnail"
+                    className="plmgmt-cover-image"
                   />
                 ) : (
-                  <div className="playlist-thumbnail-placeholder">
+                  <div className="plmgmt-cover-placeholder">
                     <Music size={48} />
                   </div>
                 )}
 
-                {/* <div className="play-overlay">
-                  <Play size={24} />
-                </div> */}
-
-                <div className="playlist-type-overlay">
-                  <span className={`type-badge type-${playlist.playlist_type}`}>
+                <div className="plmgmt-type-badge-overlay">
+                  <span
+                    className={`plmgmt-type-label plmgmt-type-${playlist.playlist_type}`}
+                  >
                     {playlist.playlist_type}
                   </span>
                 </div>
 
-                <div className="status-overlay">
+                <div className="plmgmt-status-badge-overlay">
                   <span
-                    className={`status-badge status-${playlist.status?.replace(
+                    className={`plmgmt-status-label plmgmt-status-${playlist.status?.replace(
                       "_",
                       "-"
                     )}`}
@@ -323,29 +327,31 @@ const PlaylistsPage = () => {
                 </div>
               </div>
 
-              <div className="playlist-card-content">
-                <div className="playlist-header">
-                  <h3 className="playlist-title">{playlist.title}</h3>
-                  <div className="playlist-meta">
-                    <div className="dj-info">
+              <div className="plmgmt-card-details">
+                <div className="plmgmt-card-header">
+                  <h3 className="plmgmt-card-title">{playlist.title}</h3>
+                  <div className="plmgmt-card-meta">
+                    <div className="plmgmt-dj-info">
                       {playlist.dj?.avatar && (
                         <img
                           src={playlist.dj.avatar}
                           alt={playlist.dj.name}
-                          className="dj-avatar"
+                          className="plmgmt-dj-avatar"
                         />
                       )}
-                      <span className="dj-name">{playlist.dj?.name}</span>
+                      <span className="plmgmt-dj-name">
+                        {playlist.dj?.name}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="playlist-stats">
-                  <div className="stat-item">
+                <div className="plmgmt-card-stats">
+                  <div className="plmgmt-stat-item">
                     <Music size={16} />
                     <span>{playlist.total_songs} Songs</span>
                   </div>
-                  <div className="stat-item">
+                  <div className="plmgmt-stat-item">
                     <Clock size={16} />
                     <span>{playlist.duration_minutes} min</span>
                   </div>
@@ -354,18 +360,18 @@ const PlaylistsPage = () => {
                 {activeTab === "pending" &&
                   playlist.status === "pending_approval" && (
                     <div
-                      className="card-actions"
+                      className="plmgmt-card-buttons"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
-                        className="card-approve-btn"
+                        className="plmgmt-approve-btn"
                         onClick={() => handleApprove(playlist.id)}
                       >
                         <CheckCircle size={16} />
                         Approve
                       </button>
                       <button
-                        className="card-reject-btn"
+                        className="plmgmt-reject-btn"
                         onClick={() => handleReject(playlist.id)}
                       >
                         <XCircle size={16} />
@@ -377,17 +383,17 @@ const PlaylistsPage = () => {
             </div>
           ))
         ) : (
-          <div className="empty-state">
-            <span className="empty-icon">🎵</span>
-            <span className="empty-text">No playlists found.</span>
+          <div className="plmgmt-empty-display">
+            <span className="plmgmt-empty-icon">🎵</span>
+            <span className="plmgmt-empty-message">No playlists found.</span>
           </div>
         )}
       </div>
 
       {/* Enhanced Pagination */}
-      <div className="pagination-controls">
+      <div className="plmgmt-pagination-wrapper">
         <button
-          className="pagination-btn"
+          className="plmgmt-pagination-btn"
           onClick={() =>
             setFilters((prev) => ({ ...prev, page: prev.page - 1 }))
           }
@@ -395,11 +401,11 @@ const PlaylistsPage = () => {
         >
           Previous
         </button>
-        <span className="page-indicator">
+        <span className="plmgmt-page-info">
           Page {pagination.page || 1} of {pagination.total_pages || 1}
         </span>
         <button
-          className="pagination-btn"
+          className="plmgmt-pagination-btn"
           onClick={() =>
             setFilters((prev) => ({ ...prev, page: prev.page + 1 }))
           }
@@ -412,36 +418,36 @@ const PlaylistsPage = () => {
       {/* Enhanced Modal */}
       {selectedPlaylist && (
         <div
-          className="modal-overlay"
+          className="plmgmt-modal-backdrop"
           onClick={() => setSelectedPlaylist(null)}
         >
           <div
-            className="modal-content playlist-modal"
+            className="plmgmt-modal-container plmgmt-playlist-modal"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-header">
-              <h2 className="modal-title">
+            <div className="plmgmt-modal-header">
+              <h2 className="plmgmt-modal-title">
                 {selectedPlaylist.title} - Playlist Details
               </h2>
               <button
-                className="modal-close-btn"
+                className="plmgmt-modal-close"
                 onClick={() => setSelectedPlaylist(null)}
               >
                 <X />
               </button>
             </div>
 
-            <div className="modal-body">
-              <div className="modal-section">
-                <div className="playlist-detail-image">
+            <div className="plmgmt-modal-body">
+              <div className="plmgmt-modal-section">
+                <div className="plmgmt-detail-image">
                   {selectedPlaylist.cover_image_url ? (
                     <img
                       src={selectedPlaylist.cover_image_url}
                       alt={selectedPlaylist.title}
-                      className="modal-playlist-cover"
+                      className="plmgmt-modal-cover"
                     />
                   ) : (
-                    <div className="modal-placeholder-cover">
+                    <div className="plmgmt-modal-placeholder">
                       <Music size={80} />
                       <p>No Cover Image</p>
                     </div>
@@ -449,39 +455,39 @@ const PlaylistsPage = () => {
                 </div>
               </div>
 
-              <div className="modal-section">
-                <h3 className="section-title">Playlist Details</h3>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <div className="info-label">DJ</div>
-                    <div className="info-value">
-                      <div className="dj-detail">
+              <div className="plmgmt-modal-section">
+                <h3 className="plmgmt-section-title">Playlist Details</h3>
+                <div className="plmgmt-info-grid">
+                  <div className="plmgmt-info-item">
+                    <div className="plmgmt-info-label">DJ</div>
+                    <div className="plmgmt-info-value">
+                      <div className="plmgmt-dj-detail">
                         {selectedPlaylist.dj?.avatar && (
                           <img
                             src={selectedPlaylist.dj.avatar}
                             alt={selectedPlaylist.dj.name}
-                            className="dj-avatar-large"
+                            className="plmgmt-dj-avatar-large"
                           />
                         )}
                         <span>{selectedPlaylist.dj?.name}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="info-item">
-                    <div className="info-label">Type</div>
-                    <div className="info-value">
+                  <div className="plmgmt-info-item">
+                    <div className="plmgmt-info-label">Type</div>
+                    <div className="plmgmt-info-value">
                       <span
-                        className={`type-badge type-${selectedPlaylist.playlist_type}`}
+                        className={`plmgmt-type-label plmgmt-type-${selectedPlaylist.playlist_type}`}
                       >
                         {selectedPlaylist.playlist_type}
                       </span>
                     </div>
                   </div>
-                  <div className="info-item">
-                    <div className="info-label">Status</div>
-                    <div className="info-value">
+                  <div className="plmgmt-info-item">
+                    <div className="plmgmt-info-label">Status</div>
+                    <div className="plmgmt-info-value">
                       <span
-                        className={`status-badge status-${selectedPlaylist.status?.replace(
+                        className={`plmgmt-status-label plmgmt-status-${selectedPlaylist.status?.replace(
                           "_",
                           "-"
                         )}`}
@@ -492,19 +498,19 @@ const PlaylistsPage = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="info-item">
-                    <div className="info-label">Songs</div>
-                    <div className="info-value">
-                      <div className="songs-count">
+                  <div className="plmgmt-info-item">
+                    <div className="plmgmt-info-label">Songs</div>
+                    <div className="plmgmt-info-value">
+                      <div className="plmgmt-songs-count">
                         <Music size={18} />
                         <span>{selectedPlaylist.total_songs}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="info-item">
-                    <div className="info-label">Duration</div>
-                    <div className="info-value">
-                      <div className="duration-count">
+                  <div className="plmgmt-info-item">
+                    <div className="plmgmt-info-label">Duration</div>
+                    <div className="plmgmt-info-value">
+                      <div className="plmgmt-duration-count">
                         <Clock size={18} />
                         <span>{selectedPlaylist.duration_minutes} minutes</span>
                       </div>
@@ -515,16 +521,16 @@ const PlaylistsPage = () => {
 
               {activeTab === "pending" &&
                 selectedPlaylist.status === "pending_approval" && (
-                  <div className="modal-actions">
+                  <div className="plmgmt-modal-actions">
                     <button
-                      className="approve-action-btn"
+                      className="plmgmt-approve-action"
                       onClick={() => handleApprove(selectedPlaylist.id)}
                     >
                       <CheckCircle size={16} />
                       Approve Playlist
                     </button>
                     <button
-                      className="reject-action-btn"
+                      className="plmgmt-reject-action"
                       onClick={() => handleReject(selectedPlaylist.id)}
                     >
                       <XCircle size={16} />

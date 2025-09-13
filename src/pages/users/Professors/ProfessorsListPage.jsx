@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchProfessors } from "../../../services/professor.service";
-import "./ProfessorsListPage.css";
+import "../Dancers/DancersList.css"; // Import the dancer CSS for professor styling
 import { fetchUserBookedDates } from "../../../services/user.Service";
 import { getUserBadgesService } from "../../../services/badge.service";
 
@@ -26,13 +26,13 @@ const ProfessorsListPage = () => {
   };
 
   // Helper function to render info items in grid
-  const renderInfoGrid = (items) => {
+  const renderProfessorInfoGrid = (items) => {
     return (
-      <div className="info-grid">
+      <div className="dancer-info-grid">
         {items.map((item, index) => (
-          <div key={index} className={`info-item ${item.status || ""}`}>
-            <div className="info-label">{item.label}</div>
-            <div className="info-value">{item.value}</div>
+          <div key={index} className={`dancer-info-item ${item.status || ""}`}>
+            <div className="dancer-info-label">{item.label}</div>
+            <div className="dancer-info-value">{item.value}</div>
           </div>
         ))}
       </div>
@@ -40,10 +40,10 @@ const ProfessorsListPage = () => {
   };
 
   return (
-    <div className="professors-container">
-      <h2 className="professors-title">All Professors</h2>
+    <div className="dancers-main-container">
+      <h2 className="dancers-page-title">👨‍🏫 All Professors</h2>
 
-      <table className="professors-table">
+      <table className="dancers-data-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -52,7 +52,6 @@ const ProfessorsListPage = () => {
             <th>Location</th>
             <th>Skill Level</th>
             <th>Roles</th>
-            {/* <th>Active Subscription</th> */}
             <th>Subscription Name</th>
           </tr>
         </thead>
@@ -82,32 +81,27 @@ const ProfessorsListPage = () => {
               <td>{prof.location}</td>
               <td>{prof.skill_level}</td>
               <td>{prof.roles.join(", ")}</td>
-              {/* <td>
-                {prof.active_subscription?.payment_status === "paid"
-                  ? "Yes"
-                  : "No"}
-              </td> */}
               <td>{prof.active_subscription?.subscription_name || "-"}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="pagination-controls">
+      <div className="dancers-pagination-controls">
         <button
-          className="pagination-btn"
+          className="dancers-pagination-btn"
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
           Previous
         </button>
 
-        <span className="page-indicator">
+        <span className="dancers-page-indicator">
           Page {pagination.page} of {pagination.totalPages}
         </span>
 
         <button
-          className="pagination-btn"
+          className="dancers-pagination-btn"
           disabled={page === pagination.totalPages}
           onClick={() => setPage(page + 1)}
         >
@@ -116,274 +110,357 @@ const ProfessorsListPage = () => {
       </div>
 
       {isModalOpen && selectedProfessor && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="dancer-modal-overlay"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="dancer-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="modal-header">
-              <h2>Professor Details</h2>
+            <div className="dancer-modal-header">
+              <h3>👨‍🏫 Professor Profile Details</h3>
+              <button
+                className="dancer-modal-close-x"
+                onClick={() => setIsModalOpen(false)}
+              >
+                ✕
+              </button>
             </div>
 
-            {/* Modal Body - Scrollable */}
-            <div className="modal-body">
-              {/* Basic Information Section */}
-              <div className="modal-section">
-                <h3>Basic Information</h3>
-                {renderInfoGrid([
-                  { label: "ID", value: selectedProfessor.id },
-                  { label: "Name", value: selectedProfessor.name || "N/A" },
-                  { label: "Email", value: selectedProfessor.email },
-                  {
-                    label: "Location",
-                    value: selectedProfessor.location || "N/A",
-                  },
-                  {
-                    label: "Skill Level",
-                    value: selectedProfessor.skill_level || "N/A",
-                  },
-                  {
-                    label: "Profile User Type",
-                    value: selectedProfessor.profile_user_type || "N/A",
-                  },
-                  {
-                    label: "Provider",
-                    value: selectedProfessor.provider || "N/A",
-                  },
-                  {
-                    label: "Created At",
-                    value: new Date(
-                      selectedProfessor.created_at
-                    ).toLocaleString(),
-                  },
-                  {
-                    label: "Roles",
-                    value: selectedProfessor.roles?.join(", ") || "N/A",
-                  },
-                ])}
+            {/* Modal Body - Organized in Columns */}
+            <div className="dancer-modal-body">
+              {/* Left Column */}
+              <div className="dancer-modal-column dancer-modal-left">
+                {/* Basic Information Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">👤 Basic Information</h4>
+                  {renderProfessorInfoGrid([
+                    { label: "ID", value: selectedProfessor.id },
+                    { label: "Name", value: selectedProfessor.name || "N/A" },
+                    { label: "Email", value: selectedProfessor.email },
+                    {
+                      label: "Location",
+                      value: selectedProfessor.location || "N/A",
+                    },
+                    {
+                      label: "Skill Level",
+                      value: selectedProfessor.skill_level || "N/A",
+                    },
+                    {
+                      label: "Profile User Type",
+                      value: selectedProfessor.profile_user_type || "N/A",
+                    },
+                    {
+                      label: "Provider",
+                      value: selectedProfessor.provider || "N/A",
+                    },
+                    {
+                      label: "Created At",
+                      value: new Date(
+                        selectedProfessor.created_at
+                      ).toLocaleString(),
+                    },
+                    {
+                      label: "Roles",
+                      value: selectedProfessor.roles?.join(", ") || "N/A",
+                    },
+                  ])}
+                </div>
+
+                {/* Active Subscription Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    💳 Active Subscription
+                  </h4>
+                  {selectedProfessor.active_subscription ? (
+                    <div className="dancer-subscription-card">
+                      {renderProfessorInfoGrid([
+                        {
+                          label: "Subscription Name",
+                          value:
+                            selectedProfessor.active_subscription
+                              .subscription_name,
+                        },
+                        {
+                          label: "Status",
+                          value:
+                            selectedProfessor.active_subscription
+                              .payment_status,
+                          status: selectedProfessor.active_subscription
+                            .is_active
+                            ? "dancer-status-active"
+                            : "dancer-status-inactive",
+                        },
+                        {
+                          label: "Is Active",
+                          value: selectedProfessor.active_subscription.is_active
+                            ? "Yes"
+                            : "No",
+                          status: selectedProfessor.active_subscription
+                            .is_active
+                            ? "dancer-status-active"
+                            : "dancer-status-inactive",
+                        },
+                        {
+                          label: "Start Date",
+                          value: new Date(
+                            selectedProfessor.active_subscription.start_date
+                          ).toLocaleString(),
+                        },
+                        {
+                          label: "End Date",
+                          value: new Date(
+                            selectedProfessor.active_subscription.end_date
+                          ).toLocaleString(),
+                        },
+                        {
+                          label: "Billing Interval",
+                          value:
+                            selectedProfessor.active_subscription
+                              .billing_interval,
+                        },
+                      ])}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Active Subscription
+                    </div>
+                  )}
+                </div>
+
+                {/* Subscription History Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    📈 Subscription History
+                  </h4>
+                  {selectedProfessor.subscription_history?.length > 0 ? (
+                    <div className="dancer-history-container">
+                      {selectedProfessor.subscription_history.map(
+                        (sub, idx) => (
+                          <div
+                            key={sub.id || idx}
+                            className="dancer-history-card"
+                          >
+                            <div className="dancer-history-header">
+                              <span className="dancer-history-name">
+                                {sub.subscription_name}
+                              </span>
+                              <span
+                                className={`dancer-history-status ${
+                                  sub.is_active
+                                    ? "dancer-status-active"
+                                    : "dancer-status-inactive"
+                                }`}
+                              >
+                                {sub.payment_status}
+                              </span>
+                            </div>
+                            <div className="dancer-history-details">
+                              <div className="dancer-history-item">
+                                <span>Period:</span>{" "}
+                                {new Date(sub.start_date).toLocaleDateString()}{" "}
+                                - {new Date(sub.end_date).toLocaleDateString()}
+                              </div>
+                              <div className="dancer-history-item">
+                                <span>Billing:</span> {sub.billing_interval}
+                              </div>
+                              <div className="dancer-history-item">
+                                <span>ID:</span> {sub.id}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Subscription History
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Active Subscription Section */}
-              <div className="modal-section">
-                <h3>Active Subscription</h3>
-                {selectedProfessor.active_subscription ? (
-                  renderInfoGrid([
+              {/* Right Column */}
+              <div className="dancer-modal-column dancer-modal-right">
+                {/* Calendar Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    📅 Booked Dates & Slots
+                  </h4>
+                  {loadingCalendar ? (
+                    <div className="dancer-loading-state">
+                      Loading calendar...
+                    </div>
+                  ) : calendarData && calendarData.booked_dates?.length > 0 ? (
+                    <div className="dancer-calendar-list">
+                      {calendarData.booked_dates.map((dateEntry) => (
+                        <div
+                          key={dateEntry.date}
+                          className="dancer-calendar-card"
+                        >
+                          <div className="dancer-calendar-date">
+                            {dateEntry.date} ({dateEntry.total_slots} slot
+                            {dateEntry.total_slots > 1 ? "s" : ""})
+                          </div>
+                          <div className="dancer-calendar-slots">
+                            {dateEntry.slots.map((slot, idx) => (
+                              <div key={idx} className="dancer-slot-item">
+                                <span className="dancer-slot-time">
+                                  {slot.start_time} - {slot.end_time}
+                                </span>
+                                <span className="dancer-slot-duration">
+                                  ({slot.duration_minutes} mins)
+                                </span>
+                                <span className="dancer-slot-role">
+                                  Role: {slot.user_role}
+                                </span>
+                                <span className="dancer-slot-user">
+                                  Other User: {slot.other_user_id}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No booked dates available
+                    </div>
+                  )}
+                </div>
+
+                {/* Professor Specific Information Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">🎓 Professor Details</h4>
+                  {renderProfessorInfoGrid([
                     {
-                      label: "Subscription Name",
-                      value:
-                        selectedProfessor.active_subscription.subscription_name,
-                    },
-                    {
-                      label: "Status",
-                      value:
-                        selectedProfessor.active_subscription.payment_status,
-                      status: selectedProfessor.active_subscription.is_active
-                        ? "status-active"
-                        : "status-inactive",
-                    },
-                    {
-                      label: "Is Active",
-                      value: selectedProfessor.active_subscription.is_active
-                        ? "Yes"
-                        : "No",
-                      status: selectedProfessor.active_subscription.is_active
-                        ? "status-active"
-                        : "status-inactive",
-                    },
-                    {
-                      label: "ID",
-                      value: selectedProfessor.active_subscription.id,
+                      label: "Professor ID",
+                      value: selectedProfessor.active_subscription?.id || "N/A",
                     },
                     {
                       label: "Stripe Subscription ID",
                       value:
                         selectedProfessor.active_subscription
-                          .stripe_subscription_id,
+                          ?.stripe_subscription_id || "N/A",
                     },
                     {
                       label: "Stripe Customer ID",
                       value:
                         selectedProfessor.active_subscription
-                          .stripe_customer_id,
+                          ?.stripe_customer_id || "N/A",
                     },
                     {
                       label: "Price ID",
-                      value: selectedProfessor.active_subscription.price_id,
-                    },
-                    {
-                      label: "Start Date",
-                      value: new Date(
-                        selectedProfessor.active_subscription.start_date
-                      ).toLocaleString(),
-                    },
-                    {
-                      label: "End Date",
-                      value: new Date(
-                        selectedProfessor.active_subscription.end_date
-                      ).toLocaleString(),
-                    },
-                    {
-                      label: "Billing Interval",
                       value:
-                        selectedProfessor.active_subscription.billing_interval,
+                        selectedProfessor.active_subscription?.price_id ||
+                        "N/A",
                     },
                     {
                       label: "Payment Reference",
                       value:
-                        selectedProfessor.active_subscription.payment_reference,
+                        selectedProfessor.active_subscription
+                          ?.payment_reference || "N/A",
                     },
-                    {
-                      label: "Created At",
-                      value: new Date(
-                        selectedProfessor.active_subscription.created_at
-                      ).toLocaleString(),
-                    },
-                  ])
-                ) : (
-                  <div className="empty-state">No Active Subscription</div>
-                )}
-              </div>
+                  ])}
+                </div>
 
-              {/* Subscription History Section */}
-              <div className="modal-section">
-                <h3>Subscription History</h3>
-                {selectedProfessor.subscription_history?.length > 0 ? (
-                  selectedProfessor.subscription_history.map((sub, idx) => (
-                    <div
-                      key={sub.id || idx}
-                      className="subscription-history-block"
-                    >
-                      {renderInfoGrid([
+                {/* Current Badges Section (if available) */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">🏆 Current Badges</h4>
+                  {selectedProfessor.current_badges &&
+                  Object.values(selectedProfessor.current_badges).some(
+                    (badge) => badge !== null
+                  ) ? (
+                    <div className="dancer-badges-grid">
+                      {renderProfessorInfoGrid([
                         {
-                          label: "Subscription Name",
-                          value: sub.subscription_name,
+                          label: "Dancer Badge",
+                          value:
+                            selectedProfessor.current_badges.dancer || "None",
                         },
                         {
-                          label: "Status",
-                          value: sub.payment_status,
-                          status: sub.is_active
-                            ? "status-active"
-                            : "status-inactive",
-                        },
-                        { label: "ID", value: sub.id },
-                        {
-                          label: "Is Active",
-                          value: sub.is_active ? "Yes" : "No",
-                          status: sub.is_active
-                            ? "status-active"
-                            : "status-inactive",
+                          label: "Instructor Badge",
+                          value:
+                            selectedProfessor.current_badges.instructor ||
+                            "None",
                         },
                         {
-                          label: "Start Date",
-                          value: new Date(sub.start_date).toLocaleString(),
+                          label: "DJ Badge",
+                          value: selectedProfessor.current_badges.dj || "None",
                         },
                         {
-                          label: "End Date",
-                          value: new Date(sub.end_date).toLocaleString(),
-                        },
-                        {
-                          label: "Billing Interval",
-                          value: sub.billing_interval,
-                        },
-                        {
-                          label: "Stripe Customer ID",
-                          value: sub.stripe_customer_id,
-                        },
-                        {
-                          label: "Stripe Subscription ID",
-                          value: sub.stripe_subscription_id,
-                        },
-                        { label: "Price ID", value: sub.price_id },
-                        {
-                          label: "Created At",
-                          value: new Date(sub.created_at).toLocaleString(),
-                        },
-                        {
-                          label: "Payment Reference",
-                          value: sub.payment_reference,
+                          label: "Organizer Badge",
+                          value:
+                            selectedProfessor.current_badges.organizer ||
+                            "None",
                         },
                       ])}
                     </div>
-                  ))
-                ) : (
-                  <div className="empty-state">No Subscription History</div>
-                )}
-              </div>
-
-              {/* Subscription Summary Section */}
-              <div className="modal-section">
-                <h3>Subscription Summary</h3>
-                {selectedProfessor.subscription_summary ? (
-                  renderInfoGrid([
-                    {
-                      label: "Total Subscriptions",
-                      value:
-                        selectedProfessor.subscription_summary
-                          .subscription_count,
-                    },
-                    {
-                      label: "Active Subscriptions",
-                      value:
-                        selectedProfessor.subscription_summary
-                          .active_subscriptions,
-                    },
-                    {
-                      label: "Has Paid Subscription",
-                      value: selectedProfessor.subscription_summary
-                        .has_paid_subscription
-                        ? "Yes"
-                        : "No",
-                      status: selectedProfessor.subscription_summary
-                        .has_paid_subscription
-                        ? "status-active"
-                        : "status-inactive",
-                    },
-                    {
-                      label: "Latest Subscription Date",
-                      value: selectedProfessor.subscription_summary
-                        .latest_subscription_date
-                        ? new Date(
-                            selectedProfessor.subscription_summary.latest_subscription_date
-                          ).toLocaleString()
-                        : "N/A",
-                    },
-                  ])
-                ) : (
-                  <div className="empty-state">
-                    No Subscription Summary Available
-                  </div>
-                )}
-              </div>
-              {/* Calendar Section */}
-              <div className="modal-section">
-                <h3>Booked Dates & Slots</h3>
-                {loadingCalendar ? (
-                  <div>Loading calendar...</div>
-                ) : calendarData && calendarData.booked_dates?.length > 0 ? (
-                  calendarData.booked_dates.map((dateEntry) => (
-                    <div key={dateEntry.date} className="calendar-date-block">
-                      <strong>{dateEntry.date}</strong> ({dateEntry.total_slots}{" "}
-                      slot
-                      {dateEntry.total_slots > 1 ? "s" : ""})
-                      <ul>
-                        {dateEntry.slots.map((slot, idx) => (
-                          <li key={idx}>
-                            {slot.start_time} - {slot.end_time} (
-                            {slot.duration_minutes} mins) • Role:{" "}
-                            {slot.user_role} • Other User: {slot.other_user_id}
-                          </li>
-                        ))}
-                      </ul>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Badges Available
                     </div>
-                  ))
-                ) : (
-                  <div className="empty-state">No booked dates available</div>
-                )}
+                  )}
+                </div>
+
+                {/* Subscription Summary Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    📋 Subscription Summary
+                  </h4>
+                  {selectedProfessor.subscription_summary ? (
+                    <div className="dancer-summary-card">
+                      {renderProfessorInfoGrid([
+                        {
+                          label: "Total Subscriptions",
+                          value:
+                            selectedProfessor.subscription_summary
+                              .subscription_count,
+                        },
+                        {
+                          label: "Active Subscriptions",
+                          value:
+                            selectedProfessor.subscription_summary
+                              .active_subscriptions,
+                        },
+                        {
+                          label: "Has Paid Subscription",
+                          value: selectedProfessor.subscription_summary
+                            .has_paid_subscription
+                            ? "Yes"
+                            : "No",
+                          status: selectedProfessor.subscription_summary
+                            .has_paid_subscription
+                            ? "dancer-status-active"
+                            : "dancer-status-inactive",
+                        },
+                        {
+                          label: "Latest Subscription Date",
+                          value: selectedProfessor.subscription_summary
+                            .latest_subscription_date
+                            ? new Date(
+                                selectedProfessor.subscription_summary.latest_subscription_date
+                              ).toLocaleString()
+                            : "N/A",
+                        },
+                      ])}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Subscription Summary Available
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="modal-footer">
+            <div className="dancer-modal-footer">
               <button
-                className="modal-close-btn"
+                className="dancer-modal-close-btn"
                 onClick={() => setIsModalOpen(false)}
               >
                 Close

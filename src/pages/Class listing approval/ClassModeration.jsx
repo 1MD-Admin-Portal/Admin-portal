@@ -147,11 +147,14 @@ const ClassModeration = () => {
   // Helper function to render info items in grid
   const renderInfoGrid = (items) => {
     return (
-      <div className="info-grid">
+      <div className="class-mod-info-grid">
         {items.map((item, index) => (
-          <div key={index} className={`info-item ${item.status || ""}`}>
-            <div className="info-label">{item.label}</div>
-            <div className="info-value">{item.value}</div>
+          <div
+            key={index}
+            className={`class-mod-info-item ${item.status || ""}`}
+          >
+            <div className="class-mod-info-label">{item.label}</div>
+            <div className="class-mod-info-value">{item.value}</div>
           </div>
         ))}
       </div>
@@ -159,18 +162,18 @@ const ClassModeration = () => {
   };
 
   return (
-    <div className="class-moderation-container">
-      <h1 className="class-moderation-header">Class Moderation</h1>
+    <div className="class-mod-container">
+      <h1 className="class-mod-header">Class Moderation</h1>
 
-      <div className="tab-buttons">
+      <div className="class-mod-tab-buttons">
         <button
-          className={tab === "pending" ? "active" : ""}
+          className={tab === "pending" ? "class-mod-tab-active" : ""}
           onClick={() => handleTabChange("pending")}
         >
           Upcoming Classes (Require Approval)
         </button>
         <button
-          className={tab === "ongoing" ? "active" : ""}
+          className={tab === "ongoing" ? "class-mod-tab-active" : ""}
           onClick={() => handleTabChange("ongoing")}
         >
           Ongoing Classes
@@ -178,7 +181,7 @@ const ClassModeration = () => {
       </div>
 
       {tab === "pending" && (
-        <div className="bulk-actions">
+        <div className="class-mod-bulk-actions">
           <button onClick={() => handleBulkAction("approve")}>
             {selectedIds.length
               ? `Approve Selected (${selectedIds.length})`
@@ -192,8 +195,8 @@ const ClassModeration = () => {
         </div>
       )}
 
-      <div className="class-moderation-actions">
-        <div className="class-moderation-search">
+      <div className="class-mod-actions">
+        <div className="class-mod-search">
           <span role="img" aria-label="search">
             🔍
           </span>
@@ -209,7 +212,7 @@ const ClassModeration = () => {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <table className="class-table">
+        <table className="class-mod-table">
           <thead>
             <tr>
               {tab === "pending" && (
@@ -242,7 +245,7 @@ const ClassModeration = () => {
           </thead>
           <tbody>
             {filteredClasses.map((classItem) => (
-              <tr key={classItem.id} className="clickable-row">
+              <tr key={classItem.id} className="class-mod-clickable-row">
                 {tab === "pending" && (
                   <td>
                     <input
@@ -272,16 +275,16 @@ const ClassModeration = () => {
                 <td>{classItem.price}</td>
                 <td>{classItem.current_students}</td>
                 <td>
-                  <span className={`status ${classItem.status}`}>
+                  <span className={`class-mod-status ${classItem.status}`}>
                     {classItem.status}
                   </span>
                 </td>
                 {tab === "pending" && (
-                  <td className="class-actions">
+                  <td className="class-mod-table-actions">
                     <CheckCircle
-                      className={`action-icon ${
+                      className={`class-mod-action-icon ${
                         classItem.status !== "pending_approval"
-                          ? "disabled"
+                          ? "class-mod-action-disabled"
                           : ""
                       }`}
                       onClick={() =>
@@ -290,9 +293,9 @@ const ClassModeration = () => {
                       }
                     />
                     <XCircle
-                      className={`action-icon reject ${
+                      className={`class-mod-action-icon class-mod-reject ${
                         classItem.status !== "pending_approval"
-                          ? "disabled"
+                          ? "class-mod-action-disabled"
                           : ""
                       }`}
                       onClick={() =>
@@ -309,7 +312,7 @@ const ClassModeration = () => {
       )}
 
       {/* Pagination */}
-      <div className="pagination">
+      <div className="class-mod-pagination">
         <button
           disabled={pagination.page <= 1}
           onClick={() => setPage((prev) => prev - 1)}
@@ -322,7 +325,9 @@ const ClassModeration = () => {
           (_, i) => (
             <button
               key={i + 1}
-              className={pagination.page === i + 1 ? "active" : ""}
+              className={
+                pagination.page === i + 1 ? "class-mod-pagination-active" : ""
+              }
               onClick={() => setPage(i + 1)}
             >
               {i + 1}
@@ -343,26 +348,26 @@ const ClassModeration = () => {
       {/* Enhanced Detail Modal with exact DancersList structure */}
       {selectedClass && (
         <div
-          className="class-popup-overlay"
+          className="class-mod-popup-overlay"
           onClick={() => setSelectedClass(null)}
         >
           <div
-            className="class-popup-modal"
+            className="class-mod-popup-modal"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="popup-header">
+            <div className="class-mod-popup-header">
               <h2>Class Details</h2>
               <X
-                className="popup-close"
+                className="class-mod-popup-close"
                 onClick={() => setSelectedClass(null)}
               />
             </div>
 
             {/* Modal Body - Scrollable */}
-            <div className="modal-body">
+            <div className="class-mod-modal-body">
               {/* Basic Information Section */}
-              <div className="modal-section">
+              <div className="class-mod-modal-section">
                 <h4>Basic Information</h4>
                 {renderInfoGrid([
                   { label: "Class Title", value: selectedClass.class_title },
@@ -381,14 +386,14 @@ const ClassModeration = () => {
                     value: selectedClass.status,
                     status:
                       selectedClass.status?.toLowerCase() === "approved"
-                        ? "status-active"
-                        : "status-inactive",
+                        ? "class-mod-status-active"
+                        : "class-mod-status-inactive",
                   },
                 ])}
               </div>
 
               {/* Class Requirements Section */}
-              <div className="modal-section">
+              <div className="class-mod-modal-section">
                 <h4>Class Requirements</h4>
                 {renderInfoGrid([
                   {
@@ -404,9 +409,9 @@ const ClassModeration = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="modal-footer">
+            <div className="class-mod-modal-footer">
               <button
-                className="modal-close-btn"
+                className="class-mod-modal-close-btn"
                 onClick={() => setSelectedClass(null)}
               >
                 Close

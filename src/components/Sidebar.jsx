@@ -143,22 +143,22 @@ const Sidebar = () => {
   const earningSubmenuItems = [
     { href: "/payouts/earnings", icon: Wallet, label: "Earnings" },
     { href: "/payouts/payouts", icon: Banknote, label: "Payouts" },
-    { href: "/payouts/disputes", icon: Gavel, label: "Disputes" },
-    { href: "/payouts/payoutslabs", icon: BarChart, label: "Payout Slabs" },
+    // { href: "/payouts/disputes", icon: Gavel, label: "Disputes" },
+    // { href: "/payouts/payoutslabs", icon: BarChart, label: "Payout Slabs" },
   ];
 
   const operationSubmenuItems = [
-    {
-      href: "/support/class-disputes",
-      icon: GraduationCap,
-      label: "Class Related Dispute",
-    },
+    // {
+    //   href: "/support/class-disputes",
+    //   icon: GraduationCap,
+    //   label: "Class Related Dispute",
+    // },
     { href: "/support/ticket-raise", icon: FileEdit, label: "Ticket Raise" },
-    {
-      href: "/support/redemption-spotlight",
-      icon: Search,
-      label: "Redemption & Spotlight",
-    },
+    // {
+    //   href: "/support/redemption-spotlight",
+    //   icon: Search,
+    //   label: "Redemption & Spotlight",
+    // },
   ];
 
   return (

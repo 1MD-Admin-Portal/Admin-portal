@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchDJs } from "../../../services/dj.service";
 import "../Professors/ProfessorsListPage.css";
+import "../Dancers/DancersList.css"; // Import the dancer CSS for DJ styling
 
 const DJListPage = () => {
   const [djs, setDJs] = useState([]);
@@ -19,13 +20,13 @@ const DJListPage = () => {
   };
 
   // Helper function to render info items in grid
-  const renderInfoGrid = (items) => {
+  const renderDJInfoGrid = (items) => {
     return (
-      <div className="info-grid">
+      <div className="dancer-info-grid">
         {items.map((item, index) => (
-          <div key={index} className={`info-item ${item.status || ""}`}>
-            <div className="info-label">{item.label}</div>
-            <div className="info-value">{item.value}</div>
+          <div key={index} className={`dancer-info-item ${item.status || ""}`}>
+            <div className="dancer-info-label">{item.label}</div>
+            <div className="dancer-info-value">{item.value}</div>
           </div>
         ))}
       </div>
@@ -33,9 +34,9 @@ const DJListPage = () => {
   };
 
   return (
-    <div className="professors-container">
-      <h2 className="professors-title">DJ List</h2>
-      <table className="professors-table">
+    <div className="dancers-main-container">
+      <h2 className="dancers-page-title">🎧 DJ List</h2>
+      <table className="dancers-data-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -49,7 +50,7 @@ const DJListPage = () => {
         <tbody>
           {djs.length === 0 ? (
             <tr>
-              <td colSpan="4">No DJs found.</td>
+              <td colSpan="6">No DJs found.</td>
             </tr>
           ) : (
             djs.map((user) => (
@@ -71,19 +72,19 @@ const DJListPage = () => {
       </table>
 
       {/* Pagination */}
-      <div className="pagination-controls">
+      <div className="dancers-pagination-controls">
         <button
-          className="pagination-btn"
+          className="dancers-pagination-btn"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
         >
           Previous
         </button>
-        <span className="page-indicator">
+        <span className="dancers-page-indicator">
           Page {pagination.page || page} of {pagination.totalPages || 1}
         </span>
         <button
-          className="pagination-btn"
+          className="dancers-pagination-btn"
           onClick={() => setPage((prev) => prev + 1)}
           disabled={page === pagination.totalPages}
         >
@@ -92,226 +93,321 @@ const DJListPage = () => {
       </div>
 
       {selectedUser && (
-        <div className="modal-overlay" onClick={() => setSelectedUser(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="dancer-modal-overlay"
+          onClick={() => setSelectedUser(null)}
+        >
+          <div
+            className="dancer-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="modal-header">
-              <h2>DJ Details</h2>
+            <div className="dancer-modal-header">
+              <h3>🎧 DJ Profile Details</h3>
+              <button
+                className="dancer-modal-close-x"
+                onClick={() => setSelectedUser(null)}
+              >
+                ✕
+              </button>
             </div>
 
-            {/* Modal Body - Scrollable */}
-            <div className="modal-body">
-              {/* Basic Information Section */}
-              <div className="modal-section">
-                <h3>Basic Information</h3>
-                {renderInfoGrid([
-                  { label: "ID", value: selectedUser.id },
-                  { label: "Name", value: selectedUser.name || "N/A" },
-                  { label: "Email", value: selectedUser.email },
-                  { label: "Location", value: selectedUser.location || "N/A" },
-                  {
-                    label: "Skill Level",
-                    value: selectedUser.skill_level || "N/A",
-                  },
-                  {
-                    label: "User Type",
-                    value: selectedUser.profile_user_type || "N/A",
-                  },
-                  { label: "Provider", value: selectedUser.provider || "N/A" },
-                  {
-                    label: "Created At",
-                    value: new Date(selectedUser.created_at).toLocaleString(),
-                  },
-                  {
-                    label: "Roles",
-                    value: selectedUser.roles?.join(", ") || "N/A",
-                  },
-                ])}
+            {/* Modal Body - Organized in Columns */}
+            <div className="dancer-modal-body">
+              {/* Left Column */}
+              <div className="dancer-modal-column dancer-modal-left">
+                {/* Basic Information Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">👤 Basic Information</h4>
+                  {renderDJInfoGrid([
+                    { label: "ID", value: selectedUser.id },
+                    { label: "Name", value: selectedUser.name || "N/A" },
+                    { label: "Email", value: selectedUser.email },
+                    {
+                      label: "Location",
+                      value: selectedUser.location || "N/A",
+                    },
+                    {
+                      label: "Skill Level",
+                      value: selectedUser.skill_level || "N/A",
+                    },
+                    {
+                      label: "User Type",
+                      value: selectedUser.profile_user_type || "N/A",
+                    },
+                    {
+                      label: "Provider",
+                      value: selectedUser.provider || "N/A",
+                    },
+                    {
+                      label: "Created At",
+                      value: new Date(selectedUser.created_at).toLocaleString(),
+                    },
+                    {
+                      label: "Roles",
+                      value: selectedUser.roles?.join(", ") || "N/A",
+                    },
+                  ])}
+                </div>
+
+                {/* Active Subscription Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    💳 Active Subscription
+                  </h4>
+                  {selectedUser.active_subscription ? (
+                    <div className="dancer-subscription-card">
+                      {renderDJInfoGrid([
+                        {
+                          label: "Subscription Name",
+                          value:
+                            selectedUser.active_subscription.subscription_name,
+                        },
+                        {
+                          label: "Status",
+                          value:
+                            selectedUser.active_subscription.payment_status,
+                          status: selectedUser.active_subscription.is_active
+                            ? "dancer-status-active"
+                            : "dancer-status-inactive",
+                        },
+                        {
+                          label: "Is Active",
+                          value: selectedUser.active_subscription.is_active
+                            ? "Yes"
+                            : "No",
+                          status: selectedUser.active_subscription.is_active
+                            ? "dancer-status-active"
+                            : "dancer-status-inactive",
+                        },
+                        {
+                          label: "Start Date",
+                          value: new Date(
+                            selectedUser.active_subscription.start_date
+                          ).toLocaleString(),
+                        },
+                        {
+                          label: "End Date",
+                          value: new Date(
+                            selectedUser.active_subscription.end_date
+                          ).toLocaleString(),
+                        },
+                        {
+                          label: "Billing Interval",
+                          value:
+                            selectedUser.active_subscription.billing_interval,
+                        },
+                      ])}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Active Subscription
+                    </div>
+                  )}
+                </div>
+
+                {/* Subscription History Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    📈 Subscription History
+                  </h4>
+                  {selectedUser.subscription_history?.length > 0 ? (
+                    <div className="dancer-history-container">
+                      {selectedUser.subscription_history.map((sub, idx) => (
+                        <div
+                          key={sub.id || idx}
+                          className="dancer-history-card"
+                        >
+                          <div className="dancer-history-header">
+                            <span className="dancer-history-name">
+                              {sub.subscription_name}
+                            </span>
+                            <span
+                              className={`dancer-history-status ${
+                                sub.is_active
+                                  ? "dancer-status-active"
+                                  : "dancer-status-inactive"
+                              }`}
+                            >
+                              {sub.payment_status}
+                            </span>
+                          </div>
+                          <div className="dancer-history-details">
+                            <div className="dancer-history-item">
+                              <span>Period:</span>{" "}
+                              {new Date(sub.start_date).toLocaleDateString()} -{" "}
+                              {new Date(sub.end_date).toLocaleDateString()}
+                            </div>
+                            <div className="dancer-history-item">
+                              <span>Billing:</span> {sub.billing_interval}
+                            </div>
+                            <div className="dancer-history-item">
+                              <span>ID:</span> {sub.id}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Subscription History
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Active Subscription Section */}
-              <div className="modal-section">
-                <h3>Active Subscription</h3>
-                {selectedUser.active_subscription ? (
-                  renderInfoGrid([
+              {/* Right Column */}
+              <div className="dancer-modal-column dancer-modal-right">
+                {/* DJ Specific Information Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">🎵 DJ Details</h4>
+                  {renderDJInfoGrid([
                     {
-                      label: "Subscription Name",
-                      value: selectedUser.active_subscription.subscription_name,
+                      label: "DJ ID",
+                      value: selectedUser.active_subscription?.id || "N/A",
                     },
-                    {
-                      label: "Status",
-                      value: selectedUser.active_subscription.payment_status,
-                      status: selectedUser.active_subscription.is_active
-                        ? "status-active"
-                        : "status-inactive",
-                    },
-                    {
-                      label: "Is Active",
-                      value: selectedUser.active_subscription.is_active
-                        ? "Yes"
-                        : "No",
-                      status: selectedUser.active_subscription.is_active
-                        ? "status-active"
-                        : "status-inactive",
-                    },
-                    { label: "ID", value: selectedUser.active_subscription.id },
                     {
                       label: "Stripe Subscription ID",
                       value:
-                        selectedUser.active_subscription.stripe_subscription_id,
+                        selectedUser.active_subscription
+                          ?.stripe_subscription_id || "N/A",
                     },
                     {
                       label: "Stripe Customer ID",
                       value:
-                        selectedUser.active_subscription.stripe_customer_id,
+                        selectedUser.active_subscription?.stripe_customer_id ||
+                        "N/A",
                     },
                     {
                       label: "Price ID",
-                      value: selectedUser.active_subscription.price_id,
-                    },
-                    {
-                      label: "Start Date",
-                      value: new Date(
-                        selectedUser.active_subscription.start_date
-                      ).toLocaleString(),
-                    },
-                    {
-                      label: "End Date",
-                      value: new Date(
-                        selectedUser.active_subscription.end_date
-                      ).toLocaleString(),
-                    },
-                    {
-                      label: "Billing Interval",
-                      value: selectedUser.active_subscription.billing_interval,
+                      value:
+                        selectedUser.active_subscription?.price_id || "N/A",
                     },
                     {
                       label: "Payment Reference",
-                      value: selectedUser.active_subscription.payment_reference,
+                      value:
+                        selectedUser.active_subscription?.payment_reference ||
+                        "N/A",
                     },
-                    {
-                      label: "Created At",
-                      value: new Date(
-                        selectedUser.active_subscription.created_at
-                      ).toLocaleString(),
-                    },
-                  ])
-                ) : (
-                  <div className="empty-state">No Active Subscription</div>
-                )}
-              </div>
+                  ])}
+                </div>
 
-              {/* Subscription History Section */}
-              <div className="modal-section">
-                <h3>Subscription History</h3>
-                {selectedUser.subscription_history?.length > 0 ? (
-                  selectedUser.subscription_history.map((sub, idx) => (
-                    <div
-                      key={sub.id || idx}
-                      className="subscription-history-block"
-                    >
-                      {renderInfoGrid([
+                {/* Current Badges Section (if available) */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">🏆 Current Badges</h4>
+                  {selectedUser.current_badges &&
+                  Object.values(selectedUser.current_badges).some(
+                    (badge) => badge !== null
+                  ) ? (
+                    <div className="dancer-badges-grid">
+                      {renderDJInfoGrid([
                         {
-                          label: "Subscription Name",
-                          value: sub.subscription_name,
+                          label: "Dancer Badge",
+                          value: selectedUser.current_badges.dancer || "None",
                         },
                         {
-                          label: "Status",
-                          value: sub.payment_status,
-                          status: sub.is_active
-                            ? "status-active"
-                            : "status-inactive",
-                        },
-                        { label: "ID", value: sub.id },
-                        {
-                          label: "Is Active",
-                          value: sub.is_active ? "Yes" : "No",
-                          status: sub.is_active
-                            ? "status-active"
-                            : "status-inactive",
+                          label: "Instructor Badge",
+                          value:
+                            selectedUser.current_badges.instructor || "None",
                         },
                         {
-                          label: "Start Date",
-                          value: new Date(sub.start_date).toLocaleString(),
+                          label: "DJ Badge",
+                          value: selectedUser.current_badges.dj || "None",
                         },
                         {
-                          label: "End Date",
-                          value: new Date(sub.end_date).toLocaleString(),
-                        },
-                        {
-                          label: "Billing Interval",
-                          value: sub.billing_interval,
-                        },
-                        {
-                          label: "Stripe Customer ID",
-                          value: sub.stripe_customer_id,
-                        },
-                        {
-                          label: "Stripe Subscription ID",
-                          value: sub.stripe_subscription_id,
-                        },
-                        { label: "Price ID", value: sub.price_id },
-                        {
-                          label: "Created At",
-                          value: new Date(sub.created_at).toLocaleString(),
-                        },
-                        {
-                          label: "Payment Reference",
-                          value: sub.payment_reference,
+                          label: "Organizer Badge",
+                          value:
+                            selectedUser.current_badges.organizer || "None",
                         },
                       ])}
                     </div>
-                  ))
-                ) : (
-                  <div className="empty-state">No Subscription History</div>
-                )}
-              </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Badges Available
+                    </div>
+                  )}
+                </div>
 
-              {/* Subscription Summary Section */}
-              <div className="modal-section">
-                <h3>Subscription Summary</h3>
-                {selectedUser.subscription_summary ? (
-                  renderInfoGrid([
-                    {
-                      label: "Total Subscriptions",
-                      value:
-                        selectedUser.subscription_summary.subscription_count,
-                    },
-                    {
-                      label: "Active Subscriptions",
-                      value:
-                        selectedUser.subscription_summary.active_subscriptions,
-                    },
-                    {
-                      label: "Has Paid Subscription",
-                      value: selectedUser.subscription_summary
-                        .has_paid_subscription
-                        ? "Yes"
-                        : "No",
-                      status: selectedUser.subscription_summary
-                        .has_paid_subscription
-                        ? "status-active"
-                        : "status-inactive",
-                    },
-                    {
-                      label: "Latest Subscription Date",
-                      value: new Date(
-                        selectedUser.subscription_summary.latest_subscription_date
-                      ).toLocaleString(),
-                    },
-                  ])
-                ) : (
-                  <div className="empty-state">
-                    No Subscription Summary Available
-                  </div>
-                )}
+                {/* Badge Summary Section (if available) */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">📊 Badge Summary</h4>
+                  {selectedUser.badge_summary ? (
+                    <div className="dancer-summary-card">
+                      {renderDJInfoGrid([
+                        {
+                          label: "Total Badges",
+                          value: selectedUser.badge_summary.total_badges,
+                        },
+                        {
+                          label: "Highest Level",
+                          value: selectedUser.badge_summary.highest_level,
+                        },
+                        {
+                          label: "Best Commission Rate",
+                          value:
+                            selectedUser.badge_summary.best_commission_rate,
+                        },
+                      ])}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Badge summary available
+                    </div>
+                  )}
+                </div>
+
+                {/* Subscription Summary Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    📋 Subscription Summary
+                  </h4>
+                  {selectedUser.subscription_summary ? (
+                    <div className="dancer-summary-card">
+                      {renderDJInfoGrid([
+                        {
+                          label: "Total Subscriptions",
+                          value:
+                            selectedUser.subscription_summary
+                              .subscription_count,
+                        },
+                        {
+                          label: "Active Subscriptions",
+                          value:
+                            selectedUser.subscription_summary
+                              .active_subscriptions,
+                        },
+                        {
+                          label: "Has Paid Subscription",
+                          value: selectedUser.subscription_summary
+                            .has_paid_subscription
+                            ? "Yes"
+                            : "No",
+                          status: selectedUser.subscription_summary
+                            .has_paid_subscription
+                            ? "dancer-status-active"
+                            : "dancer-status-inactive",
+                        },
+                        {
+                          label: "Latest Subscription Date",
+                          value: new Date(
+                            selectedUser.subscription_summary.latest_subscription_date
+                          ).toLocaleString(),
+                        },
+                      ])}
+                    </div>
+                  ) : (
+                    <div className="dancer-empty-state">
+                      No Subscription Summary Available
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="modal-footer">
+            <div className="dancer-modal-footer">
               <button
-                className="modal-close-btn"
+                className="dancer-modal-close-btn"
                 onClick={() => setSelectedUser(null)}
               >
                 Close

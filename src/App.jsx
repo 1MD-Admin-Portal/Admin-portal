@@ -9,7 +9,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import Home from "./pages/Home/Home.jsx";
 import Users from "./pages/Users";
 import ClassModeration from "./pages/Class listing approval/ClassModeration.jsx";
-import EventsPage from "./pages/Events/Event page/EventsPage.jsx";
+import EventsPage from "./pages/Events/EventsPage.jsx";
 import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
 import AdsManagement from "./pages/Ads Management/AdsManagement";
 import SettingsPage from "./pages/SettingsPage";

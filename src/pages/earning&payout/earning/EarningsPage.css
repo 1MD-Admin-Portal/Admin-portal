@@ -1,5 +1,5 @@
-/* ===== EARNINGS PAGE STYLES ===== */
-.earnings-page-container {
+/* ===== EARNINGS MANAGEMENT PAGE STYLES ===== */
+.earnings-mgmt-container {
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
@@ -9,7 +9,7 @@
   max-width: 100%;
 }
 
-.earnings-title {
+.earnings-mgmt-title {
   color: white;
   font-size: 2.5rem;
   font-weight: 700;
@@ -18,7 +18,7 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.loading {
+.earnings-mgmt-loading {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,14 +28,14 @@
 }
 
 /* ===== OVERVIEW CARDS ===== */
-.earnings-overview {
+.earnings-mgmt-overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 2rem;
 }
 
-.overview-card {
+.earnings-mgmt-overview-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -48,12 +48,12 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.overview-card:hover {
+.earnings-mgmt-overview-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
-.overview-icon {
+.earnings-mgmt-overview-icon {
   width: 60px;
   height: 60px;
   border-radius: 12px;
@@ -65,7 +65,7 @@
   flex-shrink: 0;
 }
 
-.overview-content h3 {
+.earnings-mgmt-overview-content h3 {
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   font-weight: 600;
@@ -74,40 +74,40 @@
   letter-spacing: 0.5px;
 }
 
-.overview-amount {
+.earnings-mgmt-overview-amount {
   font-size: 2rem;
   font-weight: 700;
   color: white;
   margin: 0;
 }
 
-.overview-amount.pending {
+.earnings-mgmt-overview-amount.earnings-mgmt-pending {
   color: #ffd93d;
 }
 
-.overview-amount.completed {
+.earnings-mgmt-overview-amount.earnings-mgmt-completed {
   color: #6bcf7f;
 }
 
 /* ===== TOP EARNERS SECTION ===== */
-.top-earners-section {
+.earnings-mgmt-top-earners-section {
   margin-bottom: 2rem;
 }
 
-.top-earners-section h3 {
+.earnings-mgmt-top-earners-section h3 {
   color: white;
   font-size: 1.5rem;
   margin-bottom: 1rem;
   font-weight: 600;
 }
 
-.top-earners-grid {
+.earnings-mgmt-top-earners-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
 }
 
-.top-earner-card {
+.earnings-mgmt-top-earner-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -119,11 +119,11 @@
   transition: transform 0.3s ease;
 }
 
-.top-earner-card:hover {
+.earnings-mgmt-top-earner-card:hover {
   transform: translateY(-2px);
 }
 
-.earner-rank {
+.earnings-mgmt-earner-rank {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -136,20 +136,20 @@
   flex-shrink: 0;
 }
 
-.earner-info h4 {
+.earnings-mgmt-earner-info h4 {
   color: white;
   margin: 0 0 4px 0;
   font-size: 1.1rem;
 }
 
-.earner-type {
+.earnings-mgmt-earner-type {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.85rem;
   margin: 0 0 8px 0;
   text-transform: capitalize;
 }
 
-.earner-stats {
+.earnings-mgmt-earner-stats {
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   margin: 0;
@@ -157,24 +157,24 @@
 }
 
 /* ===== OVERVIEW BY TYPE ===== */
-.overview-by-type {
+.earnings-mgmt-overview-by-type {
   margin-bottom: 2rem;
 }
 
-.overview-by-type h3 {
+.earnings-mgmt-overview-by-type h3 {
   color: white;
   font-size: 1.5rem;
   margin-bottom: 1rem;
   font-weight: 600;
 }
 
-.type-cards-grid {
+.earnings-mgmt-type-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
 }
 
-.type-card {
+.earnings-mgmt-type-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -183,32 +183,32 @@
   transition: transform 0.3s ease;
 }
 
-.type-card:hover {
+.earnings-mgmt-type-card:hover {
   transform: translateY(-2px);
 }
 
-.type-card h4 {
+.earnings-mgmt-type-card h4 {
   color: white;
   margin: 0 0 16px 0;
   font-size: 1.2rem;
   font-weight: 700;
 }
 
-.type-stats p {
+.earnings-mgmt-type-stats p {
   color: rgba(255, 255, 255, 0.9);
   margin: 8px 0;
   font-size: 0.9rem;
 }
 
 /* ===== FILTERS ===== */
-.earnings-filters {
+.earnings-mgmt-filters {
   display: flex;
   gap: 16px;
   margin-bottom: 2rem;
   flex-wrap: wrap;
 }
 
-.earnings-filters select {
+.earnings-mgmt-filter-select {
   padding: 12px 16px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
@@ -220,19 +220,19 @@
   transition: all 0.3s ease;
 }
 
-.earnings-filters select:focus {
+.earnings-mgmt-filter-select:focus {
   outline: none;
   border-color: #ffd93d;
   box-shadow: 0 0 0 2px rgba(255, 217, 61, 0.3);
 }
 
-.earnings-filters select option {
+.earnings-mgmt-filter-select option {
   background: #333;
   color: white;
 }
 
 /* ===== TABLE STYLES ===== */
-.earnings-table-container {
+.earnings-mgmt-table-container {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -242,17 +242,17 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.earnings-table {
+.earnings-mgmt-table {
   width: 100%;
   border-collapse: collapse;
   background: transparent;
 }
 
-.earnings-table thead {
+.earnings-mgmt-table thead {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.earnings-table th {
+.earnings-mgmt-table th {
   padding: 16px 12px;
   text-align: left;
   font-weight: 600;
@@ -263,39 +263,39 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.earnings-table td {
+.earnings-mgmt-table td {
   padding: 16px 12px;
   color: rgba(255, 255, 255, 0.9);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   vertical-align: middle;
 }
 
-.earnings-row {
+.earnings-mgmt-table-row {
   transition: background-color 0.3s ease;
 }
 
-.earnings-row:hover {
+.earnings-mgmt-table-row:hover {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.user-info {
+.earnings-mgmt-user-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.user-info strong {
+.earnings-mgmt-user-info strong {
   color: white;
   font-weight: 600;
 }
 
-.user-info .user-type {
+.earnings-mgmt-user-type-label {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.6);
   text-transform: capitalize;
 }
 
-.user-type-badge {
+.earnings-mgmt-user-type-badge {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 20px;
@@ -304,53 +304,53 @@
   text-transform: capitalize;
 }
 
-.user-type-badge.instructor {
+.earnings-mgmt-user-type-badge.earnings-mgmt-instructor {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
 }
 
-.user-type-badge.dj {
+.earnings-mgmt-user-type-badge.earnings-mgmt-dj {
   background: linear-gradient(135deg, #f093fb, #f5576c);
   color: white;
 }
 
-.user-type-badge.organiser {
+.earnings-mgmt-user-type-badge.earnings-mgmt-organiser {
   background: linear-gradient(135deg, #4facfe, #00f2fe);
   color: white;
 }
 
-.source-info {
+.earnings-mgmt-source-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.source-type {
+.earnings-mgmt-source-type {
   color: white;
   font-weight: 500;
   text-transform: capitalize;
 }
 
-.source-info small {
+.earnings-mgmt-source-info small {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.8rem;
 }
 
-.amount-cell {
+.earnings-mgmt-amount-cell {
   font-weight: 600;
   color: white;
   font-size: 1rem;
 }
 
-.amount-cell.user-earnings {
+.earnings-mgmt-amount-cell.earnings-mgmt-user-earnings {
   color: #6bcf7f;
 }
 
-.amount-cell.platform-fee {
+.earnings-mgmt-amount-cell.earnings-mgmt-platform-fee {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.status-badge {
+.earnings-mgmt-status-badge {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 20px;
@@ -359,26 +359,26 @@
   text-transform: capitalize;
 }
 
-.status-badge.pending {
+.earnings-mgmt-status-badge.earnings-mgmt-pending {
   background: linear-gradient(135deg, #ffd93d, #ffed4e);
   color: #333;
 }
 
-.status-badge.processing {
+.earnings-mgmt-status-badge.earnings-mgmt-processing {
   background: linear-gradient(135deg, #4facfe, #00f2fe);
   color: white;
 }
 
-.status-badge.paid {
+.earnings-mgmt-status-badge.earnings-mgmt-paid {
   background: linear-gradient(135deg, #6bcf7f, #7ed56f);
   color: white;
 }
 
-.actions {
+.earnings-mgmt-actions {
   text-align: center;
 }
 
-.view-btn {
+.earnings-mgmt-view-btn {
   background: linear-gradient(135deg, #667eea, #764ba2);
   border: none;
   border-radius: 8px;
@@ -391,12 +391,12 @@
   justify-content: center;
 }
 
-.view-btn:hover {
+.earnings-mgmt-view-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-.no-data {
+.earnings-mgmt-no-data {
   text-align: center;
   padding: 40px 20px;
   color: rgba(255, 255, 255, 0.7);
@@ -404,7 +404,7 @@
 }
 
 /* ===== PAGINATION ===== */
-.pagination {
+.earnings-mgmt-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -412,87 +412,115 @@
   margin-top: 2rem;
 }
 
-.pagination-btn {
+.earnings-mgmt-pagination-btn {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 10px 20px;
-  color: rgb(228, 88, 88);
+  color: white;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
 }
 
-.pagination-btn:hover:not(:disabled) {
+.earnings-mgmt-pagination-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
-.pagination-btn:disabled {
+.earnings-mgmt-pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.pagination-info {
-  color: rgb(0, 0, 0);
+.earnings-mgmt-pagination-info {
+  color: white;
   font-weight: 500;
   text-align: center;
 }
 
-/* ===== MODAL STYLES ===== */
-.modal-overlay {
+/* ===== MODERN MODAL STYLES ===== */
+.earnings-mgmt-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  animation: fadeIn 0.3s ease-out;
 }
 
-.modal-content user-detail-modal {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.earnings-mgmt-modal-content {
   background: linear-gradient(
-    135deg,
+    145deg,
     rgba(255, 255, 255, 0.1),
     rgba(255, 255, 255, 0.05)
   );
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  border-radius: 24px;
   width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.4s ease-out;
 }
 
-.modal-header {
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.earnings-mgmt-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 24px 0 24px;
-  margin-bottom: 20px;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
-.modal-header h3 {
+.earnings-mgmt-modal-header h3 {
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   margin: 0;
+  background: linear-gradient(135deg, #ffffff, #f0f8ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.modal-close {
+.earnings-mgmt-modal-close {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,32 +529,57 @@
   transition: all 0.3s ease;
 }
 
-.modal-close:hover {
+.earnings-mgmt-modal-close:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: rotate(90deg);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
-.modal-body {
-  padding: 0 24px 24px 24px;
+.earnings-mgmt-modal-body {
+  padding: 0 28px 28px 28px;
+  overflow-y: auto;
+  flex-grow: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
-.modal-loading {
-  padding: 40px 24px;
+.earnings-mgmt-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.earnings-mgmt-modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.earnings-mgmt-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.earnings-mgmt-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.earnings-mgmt-modal-loading {
+  padding: 60px 28px;
   text-align: center;
   color: white;
   font-size: 1.1rem;
 }
 
 /* ===== MODAL SECTIONS ===== */
-.user-detail-section,
-.summary-section,
-.earnings-detail-section {
-  margin-bottom: 24px;
+.earnings-mgmt-user-detail-section,
+.earnings-mgmt-modal-summary-section,
+.earnings-mgmt-modal-earnings-detail-section {
+  margin-bottom: 28px;
 }
 
-.user-detail-section h4,
-.summary-section h4,
-.earnings-detail-section h4 {
+.earnings-mgmt-user-detail-section h4,
+.earnings-mgmt-modal-summary-section h4,
+.earnings-mgmt-modal-earnings-detail-section h4,
+.earnings-mgmt-modal-summary-section h5,
+.earnings-mgmt-modal-earnings-detail-section h5 {
   color: white;
   font-size: 1.2rem;
   font-weight: 600;
@@ -535,184 +588,357 @@
   padding-bottom: 8px;
 }
 
-.user-detail-grid {
+.earnings-mgmt-user-detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-}
-
-.user-detail-grid p {
-  color: rgba(55, 0, 255, 0.9);
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.user-detail-grid strong {
-  color: white;
-}
-
-/* ===== SUMMARY GRID ===== */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
 
-.summary-card {
+.earnings-mgmt-user-detail-grid p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.earnings-mgmt-user-detail-grid strong {
+  color: white;
+  font-weight: 600;
+}
+
+/* ===== EARNINGS TYPES WRAPPER ===== */
+.earnings-mgmt-earnings-types-wrapper {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.earnings-mgmt-earnings-types-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.earnings-mgmt-earnings-types-wrapper::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.earnings-mgmt-earnings-types-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.earnings-mgmt-earnings-type-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.earnings-mgmt-earnings-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.earnings-mgmt-earnings-type-header h4 {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.earnings-mgmt-user-type-info {
+  margin-bottom: 20px;
+}
+
+/* ===== SUMMARY GRID ===== */
+.earnings-mgmt-modal-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.earnings-mgmt-modal-summary-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 16px;
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.summary-card:hover {
+.earnings-mgmt-modal-summary-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
 }
 
-.summary-card span {
+.earnings-mgmt-modal-summary-card span {
   display: block;
-  color: rgba(253, 0, 211, 0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.8rem;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
-.summary-card strong {
+.earnings-mgmt-modal-summary-card strong {
   display: block;
   color: white;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
 /* ===== EARNINGS DETAIL LIST ===== */
-.earnings-detail-list {
-  max-height: 200px;
+.earnings-mgmt-modal-earnings-detail-list {
+  max-height: 300px;
   overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.earning-detail-item {
+.earnings-mgmt-modal-earnings-detail-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.earnings-mgmt-modal-earnings-detail-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 2px;
+}
+
+.earnings-mgmt-modal-earnings-detail-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.earnings-mgmt-modal-earning-detail-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.earning-detail-item:last-child {
+.earnings-mgmt-modal-earning-detail-item:last-child {
   border-bottom: none;
 }
 
-.earning-detail-info {
+.earnings-mgmt-modal-earning-detail-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
 }
 
-.earning-detail-source {
+.earnings-mgmt-modal-earning-detail-source {
   color: white;
   font-weight: 500;
   font-size: 0.9rem;
 }
 
-.earning-detail-date {
+.earnings-mgmt-modal-earning-detail-type {
   color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.earnings-mgmt-modal-earning-detail-date {
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.8rem;
 }
 
-.earning-detail-amount {
+.earnings-mgmt-modal-earning-detail-amount {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
+  gap: 8px;
+  min-width: 200px;
 }
 
-.earning-detail-status {
+.earnings-mgmt-modal-earning-detail-status {
   font-size: 0.7rem;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
-.earning-detail-status.pending {
+.earnings-mgmt-modal-earning-detail-status.earnings-mgmt-pending {
   background: rgba(255, 217, 61, 0.2);
   color: #ffd93d;
+  border: 1px solid rgba(255, 217, 61, 0.3);
 }
 
-.earning-detail-status.processing {
+.earnings-mgmt-modal-earning-detail-status.earnings-mgmt-processing {
   background: rgba(79, 172, 254, 0.2);
   color: #4facfe;
+  border: 1px solid rgba(79, 172, 254, 0.3);
 }
 
-.earning-detail-status.paid {
+.earnings-mgmt-modal-earning-detail-status.earnings-mgmt-paid {
   background: rgba(107, 207, 127, 0.2);
   color: #6bcf7f;
+  border: 1px solid rgba(107, 207, 127, 0.3);
 }
 
-.earning-detail-amount strong {
-  color: white;
+.earnings-mgmt-modal-amount-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.earnings-mgmt-modal-user-earning,
+.earnings-mgmt-modal-total-amount,
+.earnings-mgmt-modal-platform-fee,
+.earnings-mgmt-modal-commission-rate {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.earnings-mgmt-modal-user-earning small,
+.earnings-mgmt-modal-total-amount small,
+.earnings-mgmt-modal-platform-fee small,
+.earnings-mgmt-modal-commission-rate small {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.earnings-mgmt-modal-user-earning strong {
+  color: #6bcf7f;
+  font-weight: 600;
+}
+
+.earnings-mgmt-modal-total-amount span,
+.earnings-mgmt-modal-platform-fee span,
+.earnings-mgmt-modal-commission-rate span {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.earnings-mgmt-modal-more-transactions {
+  text-align: center;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 12px;
+}
+
+.earnings-mgmt-modal-more-transactions small {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.earnings-mgmt-no-earnings-found {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.earnings-mgmt-no-earnings-found p {
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1rem;
+  margin: 0;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
-  .earnings-page-container {
+  .earnings-mgmt-container {
     padding: 16px;
+    margin-left: 0;
   }
 
-  .earnings-title {
+  .earnings-mgmt-title {
     font-size: 2rem;
   }
 
-  .earnings-overview {
+  .earnings-mgmt-overview {
     grid-template-columns: 1fr;
   }
 
-  .earnings-filters {
+  .earnings-mgmt-filters {
     flex-direction: column;
   }
 
-  .earnings-filters select {
+  .earnings-mgmt-filter-select {
     min-width: 100%;
   }
 
-  .earnings-table-container {
+  .earnings-mgmt-table-container {
     overflow-x: auto;
   }
 
-  .earnings-table {
+  .earnings-mgmt-table {
     min-width: 800px;
   }
 
-  .top-earners-grid,
-  .type-cards-grid {
+  .earnings-mgmt-top-earners-grid,
+  .earnings-mgmt-type-cards-grid {
     grid-template-columns: 1fr;
   }
 
-  .modal-content user-detail-modal {
-    margin: 20px;
-    max-width: calc(100% - 40px);
+  .earnings-mgmt-modal-content {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+    max-height: 95vh;
   }
 
-  .summary-grid {
+  .earnings-mgmt-modal-header,
+  .earnings-mgmt-modal-body {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .earnings-mgmt-modal-summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .user-detail-grid {
+  .earnings-mgmt-user-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .earnings-mgmt-modal-earning-detail-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .earnings-mgmt-modal-earning-detail-amount {
+    align-items: flex-start;
+    min-width: auto;
+  }
+
+  .earnings-mgmt-modal-amount-breakdown {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .pagination {
+  .earnings-mgmt-pagination {
     flex-direction: column;
     gap: 12px;
   }
 
-  .summary-grid {
+  .earnings-mgmt-modal-summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .earnings-mgmt-modal-content {
+    border-radius: 20px 20px 0 0;
+    max-height: 90vh;
+    margin: 0;
+    width: 100%;
   }
 }
