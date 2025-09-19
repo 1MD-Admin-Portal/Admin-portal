@@ -2614,7 +2614,6 @@ const ChallengePage = () => {
               Manage challenges, submissions, and participants
             </p>
           </div>
-
           {/* Tab Navigation */}
           <div className="card mb-4 bg-transparent border-light">
             <div className="card-body p-2">
@@ -2647,7 +2646,6 @@ const ChallengePage = () => {
               </ul>
             </div>
           </div>
-
           {/* Challenges Tab */}
           {activeTab === "challenges" && (
             <div className="tab-content">
@@ -2901,7 +2899,6 @@ const ChallengePage = () => {
               )}
             </div>
           )}
-
           {/* Pending Submissions Tab */}
           {activeTab === "pending-submissions" && (
             <div className="tab-content">
@@ -2987,9 +2984,7 @@ const ChallengePage = () => {
               </div>
             </div>
           )}
-
           {/* All your existing modals remain the same but with responsive modal classes */}
-
           {/* Create Challenge Modal */}
           {createChallengeModal && (
             <div
@@ -3340,7 +3335,6 @@ const ChallengePage = () => {
               </div>
             </div>
           )}
-
           {/* Edit Challenge Modal */}
           {editChallengeModal && (
             <div
@@ -3506,7 +3500,6 @@ const ChallengePage = () => {
               </div>
             </div>
           )}
-
           {/* Challenge Details Modal */}
           {challengeDetailsModal && selectedChallenge && (
             <div
@@ -3599,7 +3592,7 @@ const ChallengePage = () => {
                                 />
                                 <h4>
                                   {selectedChallenge.challenge
-                                    .participants_count || 0}
+                                    .total_participants || 0}
                                 </h4>
                                 <p className="text-muted mb-0">Participants</p>
                               </div>
@@ -3614,7 +3607,7 @@ const ChallengePage = () => {
                                 />
                                 <h4>
                                   {selectedChallenge.challenge
-                                    .submissions_count || 0}
+                                    .total_submissions || 0}
                                 </h4>
                                 <p className="text-muted mb-0">Submissions</p>
                               </div>
@@ -3689,10 +3682,478 @@ const ChallengePage = () => {
               </div>
             </div>
           )}
-
           {/* Continue with remaining modals - they follow the same responsive pattern */}
           {/* I'll include the key remaining modals with responsive fixes */}
+          {/* Submissions Modal */}
+          //{" "}
+          {submissionsModal && selectedChallenge && (
+            <div
+              className="modal fade show d-block"
+              tabIndex="-1"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-xl">
+                <div className="modal-content">
+                  <div className="modal-header bg-primary text-white">
+                    <h5 className="modal-title">
+                      Submissions - {selectedChallenge.title}
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close btn-close-white"
+                      onClick={() => setSubmissionsModal(false)}
+                    ></button>
+                  </div>
 
+                  <div className="modal-body">
+                    {submissions.length === 0 ? (
+                      <div className="text-center py-5">
+                        <Upload size={48} className="text-muted mb-3" />
+                        <p className="text-muted">No submissions found</p>
+                      </div>
+                    ) : (
+                      <div className="row g-3">
+                        {submissions.map((submission) => (
+                          <div key={submission.id} className="col-md-6">
+                            <div className="card h-100">
+                              <div className="card-body">
+                                <div className="d-flex align-items-center mb-3">
+                                  <img
+                                    src={
+                                      submission.profile_image_url ||
+                                      "/default-avatar.png"
+                                    }
+                                    alt={submission.username}
+                                    className="rounded-circle me-3"
+                                    width="40"
+                                    height="40"
+                                    onError={(e) => {
+                                      e.target.src = "/default-avatar.png";
+                                    }}
+                                  />
+                                  <div>
+                                    <h6 className="mb-0">
+                                      {submission.username}
+                                    </h6>
+                                    <small className="text-muted">
+                                      {new Date(
+                                        submission.submitted_at
+                                      ).toLocaleDateString()}
+                                    </small>
+                                  </div>
+                                  <span
+                                    className={`badge ms-auto ${
+                                      submission.status === "pending"
+                                        ? "bg-warning"
+                                        : submission.status === "approved"
+                                        ? "bg-success"
+                                        : "bg-danger"
+                                    }`}
+                                  >
+                                    {submission.status}
+                                  </span>
+                                </div>
+
+                                <h6>{submission.title}</h6>
+                                {submission.description && (
+                                  <p className="text-muted small">
+                                    {submission.description}
+                                  </p>
+                                )}
+
+                                {submission.video_url && (
+                                  <div className="mb-3">
+                                    <a
+                                      href={submission.video_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-sm btn-outline-primary"
+                                    >
+                                      <Play size={14} className="me-1" />
+                                      Watch Submission
+                                    </a>
+                                  </div>
+                                )}
+
+                                <div className="d-flex flex-wrap gap-1">
+                                  <button
+                                    onClick={() =>
+                                      openSubmissionDetail(submission)
+                                    }
+                                    className="btn btn-sm btn-outline-secondary"
+                                  >
+                                    <Eye size={14} className="me-1" />
+                                    View Details
+                                  </button>
+                                  {submission.status === "pending" && (
+                                    <>
+                                      <button
+                                        onClick={() =>
+                                          handleApproveSubmission(submission.id)
+                                        }
+                                        className="btn btn-sm btn-outline-success"
+                                      >
+                                        <CheckCircle
+                                          size={14}
+                                          className="me-1"
+                                        />
+                                        Approve
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleRejectSubmission(submission.id)
+                                        }
+                                        className="btn btn-sm btn-outline-danger"
+                                      >
+                                        <XCircle size={14} className="me-1" />
+                                        Reject
+                                      </button>
+                                    </>
+                                  )}
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteSubmission(submission.id)
+                                    }
+                                    className="btn btn-sm btn-outline-danger"
+                                  >
+                                    <Trash2 size={14} className="me-1" />
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      onClick={() => setSubmissionsModal(false)}
+                      className="btn btn-secondary"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Participants Modal */}
+          {participantsModal && selectedChallenge && (
+            <div
+              className="modal fade show d-block"
+              tabIndex="-1"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-lg">
+                <div className="modal-content">
+                  <div className="modal-header bg-primary text-white">
+                    <h5 className="modal-title">
+                      Participants - {selectedChallenge.title}
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close btn-close-white"
+                      onClick={() => setParticipantsModal(false)}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    {participants.length === 0 ? (
+                      <div className="text-center py-5">
+                        <Users size={48} className="text-muted mb-3" />
+                        <p className="text-muted">No participants found</p>
+                      </div>
+                    ) : (
+                      <div className="list-group">
+                        {participants.map((participant) => (
+                          <div
+                            key={participant.user_id}
+                            className="list-group-item"
+                          >
+                            <div className="d-flex justify-content-between align-items-center">
+                              <div className="d-flex align-items-center">
+                                <img
+                                  src={
+                                    participant.profile_image_url ||
+                                    "/default-avatar.png"
+                                  }
+                                  alt={participant.username}
+                                  className="rounded-circle me-3"
+                                  width="48"
+                                  height="48"
+                                  onError={(e) => {
+                                    e.target.src = "/default-avatar.png";
+                                  }}
+                                />
+                                <div>
+                                  <h6 className="mb-0">
+                                    {participant.username}
+                                  </h6>
+                                  <p className="mb-0 text-muted small">
+                                    {participant.email}
+                                  </p>
+                                  <small className="text-muted">
+                                    Joined:{" "}
+                                    {new Date(
+                                      participant.joined_at
+                                    ).toLocaleDateString()}
+                                  </small>
+                                </div>
+                              </div>
+
+                              <div className="d-flex align-items-center">
+                                <div className="me-3 text-end">
+                                  <div className="d-flex align-items-center">
+                                    <Upload
+                                      size={14}
+                                      className="me-1 text-muted"
+                                    />
+                                    <small>
+                                      {participant.submissions_count || 0}{" "}
+                                      submissions
+                                    </small>
+                                  </div>
+                                  <div className="d-flex align-items-center">
+                                    <ThumbsUp
+                                      size={14}
+                                      className="me-1 text-muted"
+                                    />
+                                    <small>
+                                      {participant.likes_received || 0} likes
+                                    </small>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    handleRemoveParticipant(
+                                      selectedChallenge.id,
+                                      participant.user_id
+                                    )
+                                  }
+                                  className="btn btn-sm btn-outline-danger"
+                                >
+                                  <UserMinus size={14} className="me-1" />
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      onClick={() => setParticipantsModal(false)}
+                      className="btn btn-secondary"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Analytics Modal */}
+          {analyticsModal && selectedChallenge && analytics && (
+            <div
+              className="modal fade show d-block"
+              tabIndex="-1"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            >
+              <div className="modal-dialog modal-xl">
+                <div className="modal-content">
+                  <div className="modal-header bg-primary text-white">
+                    <h5 className="modal-title">
+                      Analytics - {selectedChallenge.title}
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close btn-close-white"
+                      onClick={() => setAnalyticsModal(false)}
+                    ></button>
+                  </div>
+
+                  <div className="modal-body">
+                    <div className="row mb-4">
+                      <div className="col-md-12">
+                        <div className="card">
+                          <div className="card-header d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0">Overview</h5>
+                            <BarChart3 className="text-primary" />
+                          </div>
+                          <div className="card-body">
+                            <div className="row">
+                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
+                                <div className="display-6 fw-bold text-primary">
+                                  {analytics.analytics.total_participants || 0}
+                                </div>
+                                <div className="text-muted">
+                                  Total Participants
+                                </div>
+                              </div>
+                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
+                                <div className="display-6 fw-bold text-primary">
+                                  {analytics.analytics.total_submissions || 0}
+                                </div>
+                                <div className="text-muted">
+                                  Total Submissions
+                                </div>
+                              </div>
+                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
+                                <div className="display-6 fw-bold text-success">
+                                  {analytics.analytics.approved_submissions ||
+                                    0}
+                                </div>
+                                <div className="text-muted">Approved</div>
+                              </div>
+                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
+                                <div className="display-6 fw-bold text-warning">
+                                  {analytics.analytics.pending_submissions || 0}
+                                </div>
+                                <div className="text-muted">Pending</div>
+                              </div>
+                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
+                                <div className="display-6 fw-bold text-info">
+                                  {analytics.analytics.total_likes || 0}
+                                </div>
+                                <div className="text-muted">Total Likes</div>
+                              </div>
+                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
+                                <div className="display-6 fw-bold text-info">
+                                  {analytics.analytics.total_comments || 0}
+                                </div>
+                                <div className="text-muted">Total Comments</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {analytics.analytics.top_performers &&
+                      analytics.analytics.top_performers.length > 0 && (
+                        <div className="row mb-4">
+                          <div className="col-md-6">
+                            <div className="card h-100">
+                              <div className="card-header d-flex justify-content-between align-items-center">
+                                <h5 className="mb-0">Top Performers</h5>
+                                <Award className="text-primary" />
+                              </div>
+                              <div className="card-body">
+                                <div className="list-group list-group-flush">
+                                  {analytics.analytics.top_performers.map(
+                                    (performer, index) => (
+                                      <div
+                                        key={performer.user_id}
+                                        className="list-group-item d-flex align-items-center"
+                                      >
+                                        <div
+                                          className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                          style={{
+                                            width: "30px",
+                                            height: "30px",
+                                          }}
+                                        >
+                                          {index + 1}
+                                        </div>
+                                        <img
+                                          src={
+                                            performer.profile_image_url ||
+                                            "/default-avatar.png"
+                                          }
+                                          alt={performer.username}
+                                          className="rounded-circle me-3"
+                                          width="40"
+                                          height="40"
+                                          onError={(e) => {
+                                            e.target.src =
+                                              "/default-avatar.png";
+                                          }}
+                                        />
+                                        <div className="flex-grow-1">
+                                          <div className="fw-semibold">
+                                            {performer.username}
+                                          </div>
+                                          <div className="small text-muted">
+                                            {performer.likes_count} likes •{" "}
+                                            {performer.submissions_count}{" "}
+                                            submissions
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <div className="card h-100">
+                              <div className="card-header d-flex justify-content-between align-items-center">
+                                <h5 className="mb-0">Engagement Metrics</h5>
+                                <TrendingUp className="text-primary" />
+                              </div>
+                              <div className="card-body">
+                                <div className="list-group list-group-flush">
+                                  <div className="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Average Likes per Submission</span>
+                                    <span className="fw-bold">
+                                      {analytics.analytics.engagement_metrics
+                                        .avg_likes_per_submission || 0}
+                                    </span>
+                                  </div>
+                                  <div className="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Average Comments per Submission</span>
+                                    <span className="fw-bold">
+                                      {analytics.analytics.engagement_metrics
+                                        .avg_comments_per_submission || 0}
+                                    </span>
+                                  </div>
+                                  <div className="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Participation Rate</span>
+                                    <span className="fw-bold">
+                                      {analytics.engagement_metrics
+                                        .participation_rate || 0}
+                                      %
+                                    </span>
+                                  </div>
+                                  <div className="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Completion Rate</span>
+                                    <span className="fw-bold">
+                                      {analytics.engagement_metrics
+                                        .completion_rate || 0}
+                                      %
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+
+                  {/* <div className="modal-footer">
+                    <button
+                      onClick={() => setAnalyticsModal(false)}
+                      className="btn btn-secondary"
+                    >
+                      Close
+                    </button>
+                    <button className="btn btn-primary">
+                      <Download size={16} className="me-1" />
+                      Export Report
+                    </button>
+                  </div> */}
+                </div>
+              </div>
+            </div>
+          )}
           {submissionsModal && selectedChallenge && (
             <div
               className="modal fade show d-block"
