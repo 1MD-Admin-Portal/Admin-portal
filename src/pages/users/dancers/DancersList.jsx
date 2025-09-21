@@ -95,7 +95,7 @@ const DancersList = () => {
             <th>ID</th>
             <th>Email</th>
             <th>Name</th>
-            <th>Location</th>
+            {/* <th>Location</th> */}
             <th>Skill Level</th>
             {/* <th>User Type</th> */}
             <th>Created At</th>
@@ -155,7 +155,7 @@ const DancersList = () => {
                 <td>{dancer.id}</td>
                 <td>{dancer.email}</td>
                 <td>{dancer.name}</td>
-                <td>{dancer.location}</td>
+                {/* <td>{dancer.location}</td> */}
                 <td>{dancer.skill_level}</td>
                 {/* <td>{dancer.profile_user_type}</td> */}
                 <td>{new Date(dancer.created_at).toLocaleString()}</td>

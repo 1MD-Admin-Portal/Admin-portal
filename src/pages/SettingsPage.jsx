@@ -1,7 +1,14 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaPalette, FaClipboardList, FaFileContract, FaBell, FaUserShield, FaInfoCircle } from 'react-icons/fa';
-import '../styles/SettingsPage.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  FaPalette,
+  FaClipboardList,
+  FaFileContract,
+  FaBell,
+  FaUserShield,
+  FaInfoCircle,
+} from "react-icons/fa";
+import "../styles/SettingsPage.css";
 
 const settingsOptions = [
   // {
@@ -10,29 +17,29 @@ const settingsOptions = [
   //   icon: <FaPalette />,
   //   path: '/settings/app-branding',
   // },
+  // {
+  //   title: 'Subscription Plans',
+  //   description: 'Danceur, Ginga, Fiver Plans',
+  //   icon: <FaClipboardList />,
+  //   path: '/settings/subscription-plans',
+  // },
+  // {
+  //   title: 'Legal Content',
+  //   description: 'Terms & Policies',
+  //   icon: <FaFileContract />,
+  //   path: '/settings/legal-content',
+  // },
+  // {
+  //   title: 'Admin & Roles',
+  //   description: 'Role Management',
+  //   icon: <FaUserShield />,
+  //   path: '/settings/admin-roles',
+  // },
   {
-    title: 'Subscription Plans',
-    description: 'Danceur, Ginga, Fiver Plans',
-    icon: <FaClipboardList />,
-    path: '/settings/subscription-plans',
-  },
-  {
-    title: 'Legal Content',
-    description: 'Terms & Policies',
-    icon: <FaFileContract />,
-    path: '/settings/legal-content',
-  },
-  {
-    title: 'Admin & Roles',
-    description: 'Role Management',
-    icon: <FaUserShield />,
-    path: '/settings/admin-roles',
-  },
-  {
-    title: 'App Version Info',
-    description: 'Version Details',
+    title: "App Version Info",
+    description: "Version Details",
     icon: <FaInfoCircle />,
-    path: '/settings/app-version',
+    path: "/settings/app-version",
   },
 ];
 

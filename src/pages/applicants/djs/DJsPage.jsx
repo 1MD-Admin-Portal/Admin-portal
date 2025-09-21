@@ -139,12 +139,12 @@ const DJsPage = () => {
             </th> */}
             <th>ID</th>
             <th>Email</th>
-            <th>Genres</th>
+            {/* <th>Genres</th> */}
             {/* <th>DJ Type</th> */}
             <th>Experience</th>
             <th>Frequency</th>
             <th>Document</th>
-            <th>Status</th>
+            {/* <th>Status</th> */}
             <th>Comment</th>
             <th>Actions</th>
           </tr>
@@ -177,7 +177,7 @@ const DJsPage = () => {
                   {app.email}
                 </button>
               </td>
-              <td>{formatField(app.genres)}</td>
+              {/* <td>{formatField(app.genres)}</td> */}
               {/* <td>{app.dj_type}</td> */}
               <td>{app.dj_experience}</td>
               <td>{formatField(app.performance_frequency)}</td>
@@ -194,7 +194,7 @@ const DJsPage = () => {
                   "No document"
                 )}
               </td>
-              <td className={`status ${app.status}`}>{app.status}</td>
+              {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
               <td>
                 <CheckCircle

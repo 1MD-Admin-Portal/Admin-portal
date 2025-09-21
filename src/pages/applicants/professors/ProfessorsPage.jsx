@@ -245,11 +245,11 @@ const ProfessorsPage = () => {
             </th> */}
             <th>ID</th>
             <th>Email</th>
-            <th>Dance Styles</th>
+            {/* <th>Dance Styles</th> */}
             <th>Availability</th>
             <th>Experience</th>
             <th>Document</th>
-            <th>Status</th>
+            {/* <th>Status</th> */}
             <th>Comment</th>
             <th>Actions</th>
           </tr>
@@ -273,7 +273,7 @@ const ProfessorsPage = () => {
               >
                 {app.email}
               </td>
-              <td>{formatField(app.dance_style)}</td>
+              {/* <td>{formatField(app.dance_style)}</td> */}
               <td>{formatField(app.availability)}</td>
               <td>{app.experience}</td>
               <td>
@@ -289,7 +289,7 @@ const ProfessorsPage = () => {
                   "No document"
                 )}
               </td>
-              <td className={`status ${app.status}`}>{app.status}</td>
+              {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
               <td>
                 <div className="icon-actions">

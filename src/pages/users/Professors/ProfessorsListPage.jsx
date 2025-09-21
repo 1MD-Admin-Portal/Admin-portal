@@ -49,7 +49,7 @@ const ProfessorsListPage = () => {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
-            <th>Location</th>
+            {/* <th>Location</th> */}
             <th>Skill Level</th>
             <th>Roles</th>
             <th>Subscription Name</th>
@@ -78,7 +78,7 @@ const ProfessorsListPage = () => {
               <td>{prof.id}</td>
               <td>{prof.name}</td>
               <td>{prof.email}</td>
-              <td>{prof.location}</td>
+              {/* <td>{prof.location}</td> */}
               <td>{prof.skill_level}</td>
               <td>{prof.roles.join(", ")}</td>
               <td>{prof.active_subscription?.subscription_name || "-"}</td>

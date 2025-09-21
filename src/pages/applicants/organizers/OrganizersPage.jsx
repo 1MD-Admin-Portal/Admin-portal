@@ -259,11 +259,11 @@ const OrganizersPage = () => {
             {/* </th> */}
             <th>ID</th>
             <th>Email</th>
-            <th>Event Types</th>
+            {/* <th>Event Types</th> */}
             <th>Expected Size</th>
             <th>Total Events</th>
             <th>Document</th>
-            <th>Status</th>
+            {/* <th>Status</th> */}
             <th>Comment</th>
             <th>Actions</th>
           </tr>
@@ -290,7 +290,7 @@ const OrganizersPage = () => {
                 {app.email}
               </td>
 
-              <td>{formatField(app.event_types)}</td>
+              {/* <td>{formatField(app.event_types)}</td> */}
               <td>{app.expected_event_size}</td>
               <td>{app.total_organized_event}</td>
               <td>
@@ -307,7 +307,7 @@ const OrganizersPage = () => {
                   "No document"
                 )}
               </td>
-              <td className={`status ${app.status}`}>{app.status}</td>
+              {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
               <td>
                 <div className="icon-actions">

@@ -7,7 +7,6 @@ import {
   CheckCircle,
   Loader2,
 } from "lucide-react";
-import "./ForgotPassword.css";
 import { forgotPasswordService } from "../../../services/auth.service";
 
 const ForgotPassword = () => {
