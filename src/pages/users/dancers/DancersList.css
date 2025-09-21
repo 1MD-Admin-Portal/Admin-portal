@@ -1,12 +1,13 @@
-/* Enhanced UI/UX CSS for DancersList - Modern Dancer-specific Design */
+/* Enhanced UI/UX CSS for DancersList - Challenge-Style Responsive */
 
 .dancers-main-container {
-  padding: 2rem;
+  padding: clamp(1.5rem, 3vw, 2rem);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  margin-left: 265px;
+  margin-left: clamp(0px, 20vw, 280px);
   min-height: 100vh;
+  transition: margin-left 0.3s ease;
 }
 
 .dancers-data-table tbody tr {
@@ -18,7 +19,7 @@
 }
 
 .dancers-page-title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 700;
   margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
@@ -33,10 +34,10 @@
 .dancers-page-title::before {
   content: "💃";
   position: absolute;
-  left: -3rem;
+  left: clamp(-2.5rem, -4vw, -3rem);
   top: 50%;
   transform: translateY(-50%);
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
   animation: dance 2s ease-in-out infinite;
 }
 
@@ -55,7 +56,7 @@
   border-collapse: separate;
   border-spacing: 0;
   background-color: white;
-  border-radius: 20px;
+  border-radius: clamp(16px, 2vw, 20px);
   overflow: hidden;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -65,11 +66,11 @@
 }
 
 .dancers-data-table th {
-  padding: 1.5rem 1.5rem;
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem);
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   color: #475569;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 2px solid #e2e8f0;
@@ -87,10 +88,10 @@
 }
 
 .dancers-data-table td {
-  padding: 1.25rem 1.5rem;
+  padding: clamp(1rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 1.5rem);
   border-bottom: 1px solid rgba(226, 232, 240, 0.5);
   text-align: left;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
   color: #374151;
   transition: all 0.3s ease;
   position: relative;
@@ -122,27 +123,30 @@
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  padding: clamp(1rem, 2vw, 1.5rem);
   background: white;
-  border-radius: 16px;
+  border-radius: clamp(12px, 2vw, 16px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(226, 232, 240, 0.8);
+  flex-wrap: wrap;
 }
 
 .dancers-pagination-btn {
-  padding: 0.75rem 1.5rem;
+  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
   border: none;
-  border-radius: 12px;
+  border-radius: clamp(8px, 1.5vw, 12px);
   font-weight: 600;
   cursor: pointer;
   background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
   color: white;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .dancers-pagination-btn:hover {
@@ -159,11 +163,11 @@
 
 .dancers-page-indicator {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 1vw, 1rem);
   color: #374151;
-  padding: 0.5rem 1rem;
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.75rem, 1.25vw, 1rem);
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 8px;
+  border-radius: clamp(6px, 1vw, 8px);
   border: 1px solid #e2e8f0;
 }
 
@@ -181,7 +185,7 @@
   align-items: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
-  padding: 2rem;
+  padding: clamp(1rem, 3vw, 2rem);
   box-sizing: border-box;
 }
 
@@ -196,10 +200,10 @@
 
 .dancer-modal-content {
   background: white;
-  border-radius: 24px;
+  border-radius: clamp(16px, 3vw, 24px);
   width: 100%;
-  max-width: 1400px;
-  max-height: 90vh;
+  max-width: min(1400px, 95vw);
+  max-height: min(90vh, 800px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -223,7 +227,7 @@
 /* Modal Header - Fixed */
 .dancer-modal-header {
   background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
-  padding: 2rem;
+  padding: clamp(1.5rem, 3vw, 2rem);
   position: relative;
   flex-shrink: 0;
   display: flex;
@@ -233,7 +237,7 @@
 
 .dancer-modal-header h3 {
   color: white;
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
   font-weight: 700;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -243,10 +247,10 @@
   background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: clamp(36px, 5vw, 40px);
+  height: clamp(36px, 5vw, 40px);
   color: white;
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -284,13 +288,13 @@
 
 /* Modal Sections */
 .dancer-modal-section {
-  padding: 2rem;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
   border-bottom: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .dancer-section-title {
   color: #1e40af;
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 1.5vw, 1.3rem);
   font-weight: 700;
   margin: 0 0 1.5rem 0;
   padding-bottom: 0.75rem;
@@ -307,14 +311,14 @@
 /* Info Grid Layout */
 .dancer-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: clamp(0.75rem, 1.25vw, 1rem);
 }
 
 .dancer-info-item {
   background: white;
-  padding: 1rem;
-  border-radius: 12px;
+  padding: clamp(0.875rem, 1.25vw, 1rem);
+  border-radius: clamp(8px, 1.5vw, 12px);
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
@@ -347,7 +351,7 @@
 .dancer-info-label {
   font-weight: 600;
   color: #475569;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -355,7 +359,7 @@
 
 .dancer-info-value {
   color: #1e293b;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
   font-weight: 500;
   word-break: break-word;
 }
@@ -397,8 +401,8 @@
     rgba(59, 130, 246, 0.05) 0%,
     rgba(139, 92, 246, 0.05) 100%
   );
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: clamp(12px, 2vw, 16px);
+  padding: clamp(1.25rem, 2vw, 1.5rem);
   border: 1px solid rgba(59, 130, 246, 0.2);
   position: relative;
   overflow: hidden;
@@ -417,14 +421,14 @@
 
 /* Calendar Section */
 .dancer-calendar-list {
-  max-height: 400px;
+  max-height: clamp(300px, 40vh, 400px);
   overflow-y: auto;
 }
 
 .dancer-calendar-card {
   background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(1.25rem, 2vw, 1.5rem);
   margin-bottom: 1rem;
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -439,7 +443,7 @@
 .dancer-calendar-date {
   font-weight: 700;
   color: #1e40af;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 1.25vw, 1.1rem);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #e2e8f0;
@@ -453,10 +457,10 @@
 
 .dancer-slot-item {
   background: #f8fafc;
-  padding: 0.75rem;
-  border-radius: 8px;
+  padding: clamp(0.625rem, 1vw, 0.75rem);
+  border-radius: clamp(6px, 1vw, 8px);
   border-left: 4px solid #3b82f6;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -480,30 +484,22 @@
 }
 
 .dancer-badges-grid .dancer-info-value {
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
   font-weight: 600;
 }
-
-/* Full Width Section for History - REMOVED */
-/* .dancer-modal-full-section {
-  grid-column: 1 / -1;
-  padding: 2rem;
-  border-top: 2px solid #e2e8f0;
-  background: #f8fafc;
-} */
 
 .dancer-history-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-height: 400px;
+  max-height: clamp(300px, 40vh, 400px);
   overflow-y: auto;
 }
 
 .dancer-history-card {
   background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(1.25rem, 2vw, 1.5rem);
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
@@ -526,13 +522,13 @@
 .dancer-history-name {
   font-weight: 700;
   color: #1e40af;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
 }
 
 .dancer-history-status {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 0.9vw, 0.75rem);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -557,7 +553,7 @@
 .dancer-history-item {
   display: flex;
   justify-content: space-between;
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 1vw, 0.875rem);
   color: #64748b;
 }
 
@@ -568,7 +564,7 @@
 
 /* Modal Footer */
 .dancer-modal-footer {
-  padding: 1.5rem 2rem;
+  padding: clamp(1.25rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2rem);
   background: #f8fafc;
   border-top: 1px solid #e2e8f0;
   display: flex;
@@ -579,12 +575,12 @@
 .dancer-modal-close-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  padding: 0.75rem 2rem;
+  padding: clamp(0.625rem, 1vw, 0.75rem) clamp(1.5rem, 3vw, 2rem);
   border: none;
-  border-radius: 12px;
+  border-radius: clamp(8px, 1.5vw, 12px);
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
   position: relative;
@@ -600,25 +596,25 @@
 .dancer-loading-state,
 .dancer-empty-state {
   text-align: center;
-  padding: 3rem;
+  padding: clamp(2rem, 4vw, 3rem);
   color: #64748b;
   font-style: italic;
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: clamp(8px, 1.5vw, 12px);
   border: 2px dashed #cbd5e1;
 }
 
 .dancer-empty-state::before {
   content: "📭";
   display: block;
-  font-size: 3rem;
+  font-size: clamp(2rem, 4vw, 3rem);
   margin-bottom: 1rem;
 }
 
 .dancer-loading-state::before {
   content: "⏳";
   display: block;
-  font-size: 3rem;
+  font-size: clamp(2rem, 4vw, 3rem);
   margin-bottom: 1rem;
   animation: spin 2s linear infinite;
 }
@@ -636,21 +632,21 @@
 .dancer-modal-body::-webkit-scrollbar,
 .dancer-calendar-list::-webkit-scrollbar,
 .dancer-history-container::-webkit-scrollbar {
-  width: 8px;
+  width: clamp(6px, 1vw, 8px);
 }
 
 .dancer-modal-body::-webkit-scrollbar-track,
 .dancer-calendar-list::-webkit-scrollbar-track,
 .dancer-history-container::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 4px;
+  border-radius: clamp(3px, 0.5vw, 4px);
 }
 
 .dancer-modal-body::-webkit-scrollbar-thumb,
 .dancer-calendar-list::-webkit-scrollbar-thumb,
 .dancer-history-container::-webkit-scrollbar-thumb {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border-radius: 4px;
+  border-radius: clamp(3px, 0.5vw, 4px);
 }
 
 .dancer-modal-body::-webkit-scrollbar-thumb:hover,
@@ -662,7 +658,7 @@
 /* Filters Container */
 .dancers-filters-container {
   display: flex;
-  gap: 1rem;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
@@ -670,16 +666,17 @@
 .dancers-filters-container input,
 .dancers-filters-container select,
 .dancers-filters-container button {
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: clamp(6px, 1vw, 8px) clamp(10px, 1.5vw, 12px);
+  border-radius: clamp(4px, 0.8vw, 6px);
   border: 1px solid #ccc;
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
 }
 
-/* Responsive Design */
+/* Challenge-Style Responsive Breakpoints */
 @media (max-width: 1200px) {
   .dancers-main-container {
     margin-left: 0;
-    padding: 1rem;
+    padding: clamp(1rem, 2vw, 1.5rem);
   }
 
   .dancer-modal-content {
@@ -688,6 +685,10 @@
 }
 
 @media (max-width: 768px) {
+  .dancers-main-container {
+    padding: 1rem;
+  }
+
   .dancer-modal-overlay {
     padding: 1rem;
   }
@@ -740,8 +741,74 @@
     font-size: 2rem;
   }
 
-  .dancer-history-container {
+  .dancers-page-title::before {
+    left: -1.5rem;
+    font-size: 1.5rem;
+  }
+
+  .dancers-filters-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .dancers-filters-container input,
+  .dancers-filters-container select,
+  .dancers-filters-container button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .dancers-main-container {
+    padding: 0.75rem;
+  }
+
+  .dancers-page-title {
+    font-size: 1.75rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .dancers-page-title::before {
+    position: static;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .dancers-data-table {
+    font-size: 0.7rem;
+  }
+
+  .dancers-data-table th,
+  .dancers-data-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .dancer-modal-section {
+    padding: 1rem;
+  }
+
+  .dancer-info-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .dancers-pagination-controls {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .dancers-pagination-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dancers-page-indicator {
+    width: 100%;
+    text-align: center;
   }
 }
 
@@ -754,4 +821,129 @@
 
 .dancers-data-table th:hover {
   background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+}
+
+/* Focus states for accessibility */
+.dancers-pagination-btn:focus,
+.dancer-modal-close-x:focus,
+.dancer-modal-close-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Enhanced touch targets for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .dancers-pagination-btn,
+  .dancer-modal-close-x {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .dancers-data-table th,
+  .dancers-data-table td {
+    padding: 1rem 0.75rem;
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .dancers-page-title::before {
+    animation: none;
+  }
+
+  .dancers-data-table tbody tr {
+    transition: none;
+  }
+
+  .dancers-data-table tbody tr:hover {
+    transform: none;
+  }
+
+  .dancer-modal-content {
+    animation: none;
+  }
+
+  .dancer-modal-overlay {
+    animation: none;
+  }
+
+  .dancer-loading-state::before {
+    animation: none;
+  }
+
+  * {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High DPI/Retina Display Adjustments */
+@media screen and (-webkit-min-device-pixel-ratio: 2),
+  screen and (min-resolution: 192dpi) {
+  .dancers-data-table {
+    border-width: 0.5px;
+  }
+
+  .dancer-info-item {
+    border-width: 0.5px;
+  }
+
+  .dancers-pagination-btn {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  }
+
+  .dancers-data-table th::after {
+    height: 1px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dancers-main-container {
+    margin-left: 0;
+    padding: 1rem;
+    background: white;
+    color: black;
+  }
+
+  .dancers-page-title::before {
+    display: none;
+  }
+
+  .dancers-data-table {
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+
+  .dancers-data-table th {
+    background: #f5f5f5 !important;
+    color: #000 !important;
+  }
+
+  .dancers-pagination-controls {
+    display: none;
+  }
+
+  .dancer-modal-overlay {
+    display: none;
+  }
+}
+
+/* Landscape orientation adjustments for tablets */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .dancer-modal-body {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dancer-modal-left {
+    border-right: 1px solid #e2e8f0;
+    border-bottom: none;
+  }
+
+  .dancers-main-container {
+    margin-left: 0;
+    padding: 1.25rem;
+  }
 }

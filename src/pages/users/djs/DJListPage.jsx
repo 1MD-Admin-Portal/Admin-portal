@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { fetchDJs } from "../../../services/dj.service";
-import "../Professors/ProfessorsListPage.css";
 import "../Dancers/DancersList.css"; // Import the dancer CSS for DJ styling
 
 const DJListPage = () => {

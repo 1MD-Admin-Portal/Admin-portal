@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "../Professors/ProfessorsListPage.css"; // Assuming you have a CSS file for styling
 import {
   fetchUsers,
   fetchUserBookedDates,
