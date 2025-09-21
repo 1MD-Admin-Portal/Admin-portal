@@ -71,10 +71,10 @@ const Home = () => {
   // Render loading state
   if (loadingState === LOADING_STATES.LOADING) {
     return (
-      <div className="main-content">
-        <div className="loading-container">
-          <div className="loading-spinner">
-            <RefreshCw className="animate-spin" size={32} />
+      <div className="home-page-main-content">
+        <div className="home-page-loading-container">
+          <div className="home-page-loading-spinner">
+            <RefreshCw className="home-page-animate-spin" size={32} />
           </div>
           <p>Loading dashboard data...</p>
         </div>
@@ -85,12 +85,12 @@ const Home = () => {
   // Render error state
   if (loadingState === LOADING_STATES.ERROR) {
     return (
-      <div className="main-content">
-        <div className="error-container">
-          <div className="error-message">
+      <div className="home-page-main-content">
+        <div className="home-page-error-container">
+          <div className="home-page-error-message">
             <h3>Error Loading Dashboard</h3>
             <p>{error}</p>
-            <button onClick={handleRefresh} className="retry-button">
+            <button onClick={handleRefresh} className="home-page-retry-button">
               <RefreshCw size={16} />
               Retry
             </button>
@@ -104,57 +104,54 @@ const Home = () => {
   const appliedFilters = dashboardData?.filters_applied || {};
 
   return (
-    <div className="main-content">
+    <div className="home-page-main-content">
       {/* Header */}
-      <header className="main-header">
-        <div className="header-left">
-          <h1 className="dashboard-title">
+      <header className="home-page-header">
+        <div className="home-page-header-left">
+          <h1 className="home-page-dashboard-title">
             <TrendingUp size={28} />
             Dashboard
           </h1>
-          <p className="dashboard-subtitle">
+          <p className="home-page-dashboard-subtitle">
             Welcome back! Here's what's happening with your platform.
           </p>
         </div>
 
         <div
-          className="admin-profile-wrapper"
+          className="home-page-admin-profile-wrapper"
           onMouseEnter={() => setShowProfileCard(true)}
           onMouseLeave={() => setShowProfileCard(false)}
         >
           <div
-            className="admin-profile"
+            className="home-page-admin-profile"
             onClick={() => navigate("/admin-profile")}
           >
-            <div className="admin-info">
-              <span className="admin-name">Admin</span>
-              <span className="admin-status">Online</span>
+            <div className="home-page-admin-info">
+              <span className="home-page-admin-name">Admin</span>
+              <span className="home-page-admin-status">Online</span>
             </div>
             <img
               src="https://randomuser.me/api/portraits/men/75.jpg"
               alt="Admin"
-              className="admin-avatar"
+              className="home-page-admin-avatar"
             />
           </div>
 
           {showProfileCard && (
-            <div className="profile-card">
-              <div className="profile-header">
+            <div className="home-page-profile-card">
+              <div className="home-page-profile-header">
                 <img
                   src="https://randomuser.me/api/portraits/men/75.jpg"
                   alt="Admin"
                 />
-                <div className="profile-info">
-                  <h3>Mark Johnson</h3>
-                  <span className="profile-role">Super Admin</span>
+                <div className="home-page-profile-info">
+                  <h3>Admin</h3>
+                  <span className="home-page-profile-role">Admin</span>
                 </div>
               </div>
-              <div className="profile-details">
+              <div className="home-page-profile-details">
                 <p>
-                  <strong>Email:</strong> admin@local.com
-                </p>
-                <p>
-                  <strong>Last Login:</strong> Today, 9:30 AM
+                  <strong>Email:</strong> Admin
                 </p>
               </div>
             </div>
@@ -163,29 +160,29 @@ const Home = () => {
       </header>
 
       {/* Filters */}
-      <section className="filters-section">
-        <div className="filters-header">
-          <div className="filters-title">
+      <section className="home-page-filters-section">
+        <div className="home-page-filters-header">
+          <div className="home-page-filters-title">
             <Filter size={20} />
             <span>Filters</span>
           </div>
-          <button onClick={handleRefresh} className="refresh-button">
+          <button onClick={handleRefresh} className="home-page-refresh-button">
             <RefreshCw size={16} />
             Refresh
           </button>
         </div>
 
-        <div className="filters-container">
-          <div className="filter-group">
-            <label htmlFor="year-filter">
+        <div className="home-page-filters-container">
+          <div className="home-page-filter-group">
+            <label htmlFor="home-page-year-filter">
               <Calendar size={16} />
               Year
             </label>
             <select
-              id="year-filter"
+              id="home-page-year-filter"
               value={filters.year}
               onChange={(e) => handleFilterChange("year", e.target.value)}
-              className="filter-select"
+              className="home-page-filter-select"
             >
               {YEAR_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -195,16 +192,16 @@ const Home = () => {
             </select>
           </div>
 
-          <div className="filter-group">
-            <label htmlFor="month-filter">
+          <div className="home-page-filter-group">
+            <label htmlFor="home-page-month-filter">
               <Calendar size={16} />
               Month
             </label>
             <select
-              id="month-filter"
+              id="home-page-month-filter"
               value={filters.month}
               onChange={(e) => handleFilterChange("month", e.target.value)}
-              className="filter-select"
+              className="home-page-filter-select"
             >
               {MONTH_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -216,15 +213,15 @@ const Home = () => {
 
           {(appliedFilters.year !== "all" ||
             appliedFilters.month !== "all") && (
-            <div className="active-filters">
-              <span className="active-filters-label">Applied:</span>
+            <div className="home-page-active-filters">
+              <span className="home-page-active-filters-label">Applied:</span>
               {appliedFilters.year !== "all" && (
-                <span className="filter-badge">
+                <span className="home-page-filter-badge">
                   Year: {appliedFilters.year}
                 </span>
               )}
               {appliedFilters.month !== "all" && (
-                <span className="filter-badge">
+                <span className="home-page-filter-badge">
                   Month:{" "}
                   {
                     MONTH_OPTIONS.find((m) => m.value === appliedFilters.month)
@@ -238,8 +235,8 @@ const Home = () => {
       </section>
 
       {/* KPI Cards */}
-      <section className="kpi-section">
-        <div className="kpi-grid">
+      <section className="home-page-kpi-section">
+        <div className="home-page-kpi-grid">
           {KPI_CARDS.map((card) => {
             const value = metrics[card.key];
             const formattedValue = dashboardService.formatMetric(
@@ -248,22 +245,27 @@ const Home = () => {
             );
 
             return (
-              <div key={card.key} className={`kpi-card ${card.color}`}>
-                <div className="kpi-header">
-                  <div className="kpi-icon">
+              <div
+                key={card.key}
+                className={`home-page-kpi-card ${card.color}`}
+              >
+                <div className="home-page-kpi-header">
+                  <div className="home-page-kpi-icon">
                     <span>{card.icon}</span>
                   </div>
-                  <div className="kpi-trend">
+                  <div className="home-page-kpi-trend">
                     <TrendingUp size={16} />
                   </div>
                 </div>
-                <div className="kpi-content">
-                  <h2 className="kpi-value">{formattedValue || "0"}</h2>
-                  <p className="kpi-title">{card.title}</p>
+                <div className="home-page-kpi-content">
+                  <h2 className="home-page-kpi-value">
+                    {formattedValue || "0"}
+                  </h2>
+                  <p className="home-page-kpi-title">{card.title}</p>
                 </div>
-                <div className="kpi-footer">
-                  <div className="kpi-status active">
-                    <div className="status-dot"></div>
+                <div className="home-page-kpi-footer">
+                  <div className="home-page-kpi-status active">
+                    <div className="home-page-status-dot"></div>
                     <span>Active</span>
                   </div>
                 </div>
@@ -274,44 +276,47 @@ const Home = () => {
       </section>
 
       {/* Quick Actions */}
-      <section className="quick-actions-section">
-        <div className="section-header">
+      <section className="home-page-quick-actions-section">
+        <div className="home-page-section-header">
           <h3>Quick Actions</h3>
           <p>Manage your platform efficiently</p>
         </div>
 
-        <div className="quick-actions-grid">
+        <div className="home-page-quick-actions-grid">
           <div
-            className="action-card"
+            className="home-page-action-card programs"
             onClick={() => navigate("/VideoPrograms")}
           >
-            <div className="action-icon programs">
+            <div className="home-page-action-icon programs">
               <Plus size={24} />
             </div>
-            <div className="action-content">
+            <div className="home-page-action-content">
               <h4>Add New Program</h4>
               <p>Create engaging video programs</p>
             </div>
           </div>
 
           <div
-            className="action-card"
+            className="home-page-action-card challenges"
             onClick={() => navigate("/CreateChallenge")}
           >
-            <div className="action-icon challenges">
+            <div className="home-page-action-icon challenges">
               <Flag size={24} />
             </div>
-            <div className="action-content">
+            <div className="home-page-action-content">
               <h4>Create Challenge</h4>
               <p>Launch exciting challenges</p>
             </div>
           </div>
 
-          <div className="action-card" onClick={() => navigate("/EventsPage")}>
-            <div className="action-icon events">
+          <div
+            className="home-page-action-card events"
+            onClick={() => navigate("/EventsPage")}
+          >
+            <div className="home-page-action-icon events">
               <UserPlus size={24} />
             </div>
-            <div className="action-content">
+            <div className="home-page-action-content">
               <h4>Create Event</h4>
               <p>Organize community events</p>
             </div>
@@ -320,21 +325,23 @@ const Home = () => {
       </section>
 
       {/* Platform Insights */}
-      <section className="insights-section">
-        <div className="section-header">
+      <section className="home-page-insights-section">
+        <div className="home-page-section-header">
           <h3>Platform Insights</h3>
           <p>Key metrics overview</p>
         </div>
 
-        <div className="insights-grid">
-          <div className="insight-card">
-            <div className="insight-header">
+        <div className="home-page-insights-grid">
+          <div className="home-page-insight-card">
+            <div className="home-page-insight-header">
               <h4>User Engagement</h4>
             </div>
-            <div className="insight-content">
-              <div className="insight-metric">
-                <span className="metric-label">Subscription Rate</span>
-                <span className="metric-value">
+            <div className="home-page-insight-content">
+              <div className="home-page-insight-metric">
+                <span className="home-page-metric-label">
+                  Subscription Rate
+                </span>
+                <span className="home-page-metric-value">
                   {metrics.total_users > 0
                     ? Math.round(
                         (metrics.active_subscriptions / metrics.total_users) *
@@ -344,9 +351,9 @@ const Home = () => {
                   %
                 </span>
               </div>
-              <div className="insight-progress">
+              <div className="home-page-insight-progress">
                 <div
-                  className="progress-bar"
+                  className="home-page-progress-bar"
                   style={{
                     width: `${
                       metrics.total_users > 0
@@ -363,14 +370,14 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="insight-card">
-            <div className="insight-header">
+          <div className="home-page-insight-card">
+            <div className="home-page-insight-header">
               <h4>Revenue per User</h4>
             </div>
-            <div className="insight-content">
-              <div className="insight-metric">
-                <span className="metric-label">Average RPU</span>
-                <span className="metric-value">
+            <div className="home-page-insight-content">
+              <div className="home-page-insight-metric">
+                <span className="home-page-metric-label">Average RPU</span>
+                <span className="home-page-metric-value">
                   {dashboardService.formatMetric(
                     metrics.total_users > 0
                       ? parseFloat(metrics.total_revenue) / metrics.total_users
@@ -382,14 +389,16 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="insight-card">
-            <div className="insight-header">
+          <div className="home-page-insight-card">
+            <div className="home-page-insight-header">
               <h4>Content Activity</h4>
             </div>
-            <div className="insight-content">
-              <div className="insight-metric">
-                <span className="metric-label">Total Active Content</span>
-                <span className="metric-value">
+            <div className="home-page-insight-content">
+              <div className="home-page-insight-metric">
+                <span className="home-page-metric-label">
+                  Total Active Content
+                </span>
+                <span className="home-page-metric-value">
                   {(metrics.active_programs || 0) +
                     (metrics.active_events || 0) +
                     (metrics.active_challenges || 0)}

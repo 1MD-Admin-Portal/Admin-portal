@@ -48,6 +48,20 @@ const AdminProfile = () => {
     loadProfileData();
   }, []);
 
+  // Handle modal open/close body scroll
+  useEffect(() => {
+    if (showChangePassword) {
+      document.body.classList.add("admin-profile-modal-open");
+    } else {
+      document.body.classList.remove("admin-profile-modal-open");
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove("admin-profile-modal-open");
+    };
+  }, [showChangePassword]);
+
   const loadProfileData = async () => {
     try {
       setProfileLoading(true);
@@ -64,9 +78,9 @@ const AdminProfile = () => {
       console.error("Failed to load profile:", error);
       // Use fallback data or user context data
       setProfileData({
-        name: user?.name || user?.username || "Admin User",
-        email: user?.email || "admin@local.com",
-        role: user?.role || "Super Admin",
+        name: user?.name || user?.username || "Admin",
+        email: user?.email || "admin@example.com",
+        role: user?.role || "Admin",
       });
     } finally {
       setProfileLoading(false);
@@ -197,6 +211,12 @@ const AdminProfile = () => {
     setShowPasswords({ current: false, new: false, confirm: false });
   };
 
+  const handleModalOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCancelChangePassword();
+    }
+  };
+
   const getPasswordStrength = (password) => {
     if (password.length === 0) return { strength: 0, label: "" };
     if (password.length < 6) return { strength: 1, label: "Weak" };
@@ -215,80 +235,94 @@ const AdminProfile = () => {
   const passwordStrength = getPasswordStrength(passwordForm.newPassword);
 
   return (
-    <div className="admin-profile-page-container">
-      <div className="profile-header">
-        <h2>Admin Profile</h2>
-        <button
-          className="change-password-trigger"
-          onClick={() => setShowChangePassword(true)}
-          disabled={showChangePassword}
-        >
-          <Edit3 size={18} />
-          Change Password
-        </button>
-      </div>
-
-      <div className="profile-content">
-        <div className="profile-card-container">
-          {profileLoading ? (
-            <div className="profile-loading">
-              <Loader2 size={40} className="spinner" />
-              <p>Loading profile...</p>
-            </div>
-          ) : (
-            <>
-              <div className="profile-avatar">
-                <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    profileData.name
-                  )}&size=120&background=667eea&color=ffffff&bold=true`}
-                  alt="Admin Avatar"
-                />
-                <div className="avatar-badge">
-                  <Shield size={16} />
-                </div>
-              </div>
-
-              <div className="profile-info">
-                <div className="info-item">
-                  <User className="info-icon" size={18} />
-                  <div>
-                    <span className="info-label">Name</span>
-                    <span className="info-value">{profileData.name}</span>
-                  </div>
-                </div>
-
-                <div className="info-item">
-                  <Mail className="info-icon" size={18} />
-                  <div>
-                    <span className="info-label">Email</span>
-                    <span className="info-value">{profileData.email}</span>
-                  </div>
-                </div>
-
-                <div className="info-item">
-                  <Shield className="info-icon" size={18} />
-                  <div>
-                    <span className="info-label">Role</span>
-                    <span className="info-value role-badge">
-                      {profileData.role}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+    <>
+      <div className="admin-profile-container">
+        <div className="admin-profile-header">
+          <h2 className="admin-profile-title">Admin Profile</h2>
+          <button
+            className="admin-profile-change-password-trigger"
+            onClick={() => setShowChangePassword(true)}
+            disabled={showChangePassword}
+          >
+            <Edit3 size={18} />
+            Change Password
+          </button>
         </div>
 
-        {showChangePassword && (
-          <div className="change-password-card">
-            <div className="card-header">
-              <div className="header-content">
-                <Lock className="header-icon" size={20} />
-                <h3>Change Password</h3>
+        <div className="admin-profile-content">
+          <div className="admin-profile-card">
+            {profileLoading ? (
+              <div className="admin-profile-loading">
+                <Loader2 size={40} className="admin-profile-spinner" />
+                <p>Loading profile...</p>
+              </div>
+            ) : (
+              <>
+                <div className="admin-profile-avatar">
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      profileData.name
+                    )}&size=120&background=667eea&color=ffffff&bold=true`}
+                    alt="Admin Avatar"
+                  />
+                  <div className="admin-profile-avatar-badge">
+                    <Shield size={16} />
+                  </div>
+                </div>
+
+                <div className="admin-profile-info">
+                  <div className="admin-profile-info-item">
+                    <User className="admin-profile-info-icon" size={18} />
+                    <div>
+                      <span className="admin-profile-info-label">Name</span>
+                      <span className="admin-profile-info-value">
+                        {profileData.name}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="admin-profile-info-item">
+                    <Mail className="admin-profile-info-icon" size={18} />
+                    <div>
+                      <span className="admin-profile-info-label">Email</span>
+                      <span className="admin-profile-info-value">
+                        {profileData.email}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="admin-profile-info-item">
+                    <Shield className="admin-profile-info-icon" size={18} />
+                    <div>
+                      <span className="admin-profile-info-label">Role</span>
+                      <span className="admin-profile-info-value admin-profile-role-badge">
+                        {profileData.role}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Overlay for Change Password */}
+      {showChangePassword && (
+        <div
+          className={`admin-profile-modal-overlay ${
+            showChangePassword ? "active" : ""
+          }`}
+          onClick={handleModalOverlayClick}
+        >
+          <div className="admin-profile-change-password-modal">
+            <div className="admin-profile-modal-header">
+              <div className="admin-profile-modal-header-content">
+                <Lock className="admin-profile-modal-header-icon" size={20} />
+                <h3 className="admin-profile-modal-title">Change Password</h3>
               </div>
               <button
-                className="close-button"
+                className="admin-profile-modal-close-button"
                 onClick={handleCancelChangePassword}
                 disabled={isLoading}
               >
@@ -297,7 +331,7 @@ const AdminProfile = () => {
             </div>
 
             {message.text && (
-              <div className={`message ${message.type}`}>
+              <div className={`admin-profile-message ${message.type}`}>
                 {message.type === "success" ? (
                   <CheckCircle size={16} />
                 ) : (
@@ -307,11 +341,14 @@ const AdminProfile = () => {
               </div>
             )}
 
-            <form onSubmit={handleChangePassword} className="password-form">
-              <div className="form-group">
+            <form
+              onSubmit={handleChangePassword}
+              className="admin-profile-password-form"
+            >
+              <div className="admin-profile-form-group">
                 <label>Current Password</label>
                 <div
-                  className={`password-input-wrapper ${
+                  className={`admin-profile-password-input-wrapper ${
                     fieldErrors.currentPassword ? "error" : ""
                   }`}
                 >
@@ -329,7 +366,7 @@ const AdminProfile = () => {
                   />
                   <button
                     type="button"
-                    className="password-toggle-btn"
+                    className="admin-profile-password-toggle-btn"
                     onClick={() => togglePasswordVisibility("current")}
                     disabled={isLoading}
                   >
@@ -341,16 +378,16 @@ const AdminProfile = () => {
                   </button>
                 </div>
                 {fieldErrors.currentPassword && (
-                  <span className="field-error">
+                  <span className="admin-profile-field-error">
                     {fieldErrors.currentPassword}
                   </span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="admin-profile-form-group">
                 <label>New Password</label>
                 <div
-                  className={`password-input-wrapper ${
+                  className={`admin-profile-password-input-wrapper ${
                     fieldErrors.newPassword ? "error" : ""
                   }`}
                 >
@@ -365,7 +402,7 @@ const AdminProfile = () => {
                   />
                   <button
                     type="button"
-                    className="password-toggle-btn"
+                    className="admin-profile-password-toggle-btn"
                     onClick={() => togglePasswordVisibility("new")}
                     disabled={isLoading}
                   >
@@ -378,17 +415,17 @@ const AdminProfile = () => {
                 </div>
 
                 {passwordForm.newPassword && (
-                  <div className="password-strength">
-                    <div className="strength-bar">
+                  <div className="admin-profile-password-strength">
+                    <div className="admin-profile-strength-bar">
                       <div
-                        className={`strength-fill strength-${passwordStrength.strength}`}
+                        className={`admin-profile-strength-fill admin-profile-strength-${passwordStrength.strength}`}
                         style={{
                           width: `${(passwordStrength.strength / 4) * 100}%`,
                         }}
                       ></div>
                     </div>
                     <span
-                      className={`strength-label strength-${passwordStrength.strength}`}
+                      className={`admin-profile-strength-label admin-profile-strength-${passwordStrength.strength}`}
                     >
                       {passwordStrength.label}
                     </span>
@@ -396,14 +433,16 @@ const AdminProfile = () => {
                 )}
 
                 {fieldErrors.newPassword && (
-                  <span className="field-error">{fieldErrors.newPassword}</span>
+                  <span className="admin-profile-field-error">
+                    {fieldErrors.newPassword}
+                  </span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="admin-profile-form-group">
                 <label>Confirm New Password</label>
                 <div
-                  className={`password-input-wrapper ${
+                  className={`admin-profile-password-input-wrapper ${
                     fieldErrors.confirmPassword ? "error" : ""
                   }`}
                 >
@@ -421,7 +460,7 @@ const AdminProfile = () => {
                   />
                   <button
                     type="button"
-                    className="password-toggle-btn"
+                    className="admin-profile-password-toggle-btn"
                     onClick={() => togglePasswordVisibility("confirm")}
                     disabled={isLoading}
                   >
@@ -433,25 +472,29 @@ const AdminProfile = () => {
                   </button>
                 </div>
                 {fieldErrors.confirmPassword && (
-                  <span className="field-error">
+                  <span className="admin-profile-field-error">
                     {fieldErrors.confirmPassword}
                   </span>
                 )}
               </div>
 
-              <div className="form-actions">
+              <div className="admin-profile-form-actions">
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="admin-profile-cancel-btn"
                   onClick={handleCancelChangePassword}
                   disabled={isLoading}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="save-btn" disabled={isLoading}>
+                <button
+                  type="submit"
+                  className="admin-profile-save-btn"
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
-                      <Loader2 size={18} className="spinner" />
+                      <Loader2 size={18} className="admin-profile-spinner" />
                       Changing...
                     </>
                   ) : (
@@ -464,9 +507,9 @@ const AdminProfile = () => {
               </div>
             </form>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
