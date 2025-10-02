@@ -12,6 +12,19 @@ export const CONSTANTS = {
     PROFILE: "/profile",
     USERS: "/users",
     CHANGE_PASSWORD: "/api/v1/admin-auth/change-password",
+    // Add this inside CONSTANTS.URL object, after the existing DJ_EVENTS section:
+
+    DJ_EVENTS: {
+      GET_ALL: (status, playlist_type, search, page, limit) =>
+        `/api/v1/admin/dj-events?status=${status || ""}&playlist_type=${
+          playlist_type || ""
+        }&search=${search || ""}&page=${page || 1}&limit=${limit || 20}`,
+      GET_BY_ID: (id) => `/api/v1/admin/dj-events/${id}`,
+      APPROVE: (id) => `/api/v1/admin/dj-events/${id}/approve`,
+      REJECT: (id) => `/api/v1/admin/dj-events/${id}/reject`,
+      GET_PENDING: `/api/v1/admin/dj-events/pending`,
+      GET_STATISTICS: `/api/v1/admin/dj-events/statistics`,
+    },
 
     // === PROGRAM MANAGEMENT ===
     GET_PROGRAMS: "/api/v1/admin/program",

@@ -508,9 +508,9 @@ const Sidebar = () => {
                 Referrals
               </MenuItem>
 
-              {/* <MenuItem href="/AdsManagement" icon={Megaphone}>
-                Ads Management
-              </MenuItem> */}
+              <MenuItem href="/djevents" icon={Megaphone}>
+                Dj Events
+              </MenuItem>
             </ul>
           </div>
 

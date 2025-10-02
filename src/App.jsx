@@ -11,7 +11,6 @@ import Users from "./pages/Users";
 import ClassModeration from "./pages/Class listing approval/ClassModeration.jsx";
 import EventsPage from "./pages/Events/EventsPage.jsx";
 import MarketplacePage from "./pages/MarketPlace/MarketplacePage.jsx";
-import AdsManagement from "./pages/Ads Management/AdsManagement";
 import SettingsPage from "./pages/SettingsPage";
 import ProfessorsPage from "./pages/applicants/professors/ProfessorsPage";
 import AccessLogs from "./pages/Access Logs/AccessLogs";
@@ -40,6 +39,7 @@ import ChallengePage from "./pages/Content Moderation/Challenges/ChallengePage.j
 import ReportsPage from "./pages/operation&support/ticketraise/ReportsPage.jsx";
 import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
+import DJEvents from "./pages/Djevent/DJEvents.jsx";
 
 function App() {
   return (
@@ -64,7 +64,7 @@ function App() {
           <Route path="/ClassModeration" element={<ClassModeration />} />
           <Route path="/EventsPage" element={<EventsPage />} />
           <Route path="/MarketplacePage" element={<MarketplacePage />} />
-          <Route path="/AdsManagement" element={<AdsManagement />} />
+          <Route path="/djevents" element={<DJEvents />} />
           <Route
             path="/NotificationPage"
             element={<NotificationManagement />}
