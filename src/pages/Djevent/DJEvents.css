@@ -275,88 +275,88 @@
   color: #dc2626;
 }
 
-/* Action Buttons - Modern Style */
-.action-buttons {
+/* Icon-only Action Buttons */
+.action-buttons-icon {
   display: flex;
-  gap: clamp(0.5rem, 0.75vw, 0.75rem);
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.btn-icon {
-  padding: clamp(0.5rem, 0.75vw, 0.625rem);
-  border: none;
-  border-radius: clamp(10px, 1.5vw, 12px);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: center;
-  min-width: clamp(40px, 5vw, 44px);
-  min-height: clamp(40px, 5vw, 44px);
+}
+
+.btn-icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
 }
 
-.btn-icon::before {
-  content: "";
+.btn-icon-action svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+.btn-approve-icon {
+  background-color: #10b981;
+}
+
+.btn-approve-icon:hover {
+  background-color: #059669;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-approve-icon:active {
+  transform: scale(0.95);
+}
+
+.btn-reject-icon {
+  background-color: #ef4444;
+}
+
+.btn-reject-icon:hover {
+  background-color: #dc2626;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.btn-reject-icon:active {
+  transform: scale(0.95);
+}
+
+/* Tooltip effect on hover */
+.btn-icon-action::after {
+  content: attr(title);
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: linear-gradient(135deg, currentColor, currentColor);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
-}
-
-.btn-icon:hover::before {
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
   opacity: 0;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
 }
 
-.btn-icon.btn-approve {
-  background: linear-gradient(
-    135deg,
-    rgba(16, 185, 129, 0.1) 0%,
-    rgba(5, 150, 105, 0.05) 100%
-  );
-  color: #10b981;
+.btn-icon-action:hover::after {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
 }
 
-.btn-icon.btn-approve:hover {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4),
-    0 0 0 4px rgba(16, 185, 129, 0.1);
-}
-
-.btn-icon.btn-approve:active {
-  transform: translateY(-1px) scale(1.02);
-}
-
-.btn-icon.btn-reject {
-  background: linear-gradient(
-    135deg,
-    rgba(239, 68, 68, 0.1) 0%,
-    rgba(220, 38, 38, 0.05) 100%
-  );
-  color: #ef4444;
-}
-
-.btn-icon.btn-reject:hover {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4),
-    0 0 0 4px rgba(239, 68, 68, 0.1);
-}
-
-.btn-icon.btn-reject:active {
-  transform: translateY(-1px) scale(1.02);
+/* Update actions header width */
+.actions-header {
+  min-width: 100px;
 }
 
 /* Pagination */

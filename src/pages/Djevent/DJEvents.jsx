@@ -1065,29 +1065,25 @@ const DjEvents = () => {
                     <td>
                       {event.status === "pending_approval" && (
                         <div
-                          className="action-buttons"
+                          className="action-buttons-icon"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
                             onClick={(e) => handleApprove(event.id, e)}
-                            className="btn-icon btn-approve"
+                            className="btn-icon-action btn-approve-icon"
                             title="Approve"
                             aria-label="Approve event"
-                            // ensure visible icon color
-                            style={{ color: "#ffffff" }}
                           >
-                            <Check size={20} strokeWidth={2.5} />
+                            <Check size={18} strokeWidth={2.5} />
                           </button>
 
                           <button
                             onClick={(e) => handleRejectClick(event, e)}
-                            className="btn-icon btn-reject"
+                            className="btn-icon-action btn-reject-icon"
                             title="Reject"
                             aria-label="Reject event"
-                            // *** KEY FIX: force icon (text) color so the X is visible ***
-                            style={{ color: "#ffffff" }}
                           >
-                            <X size={20} strokeWidth={2.5} />
+                            <X size={18} strokeWidth={2.5} />
                           </button>
                         </div>
                       )}
