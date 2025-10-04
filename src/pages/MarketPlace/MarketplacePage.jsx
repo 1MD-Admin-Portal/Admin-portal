@@ -372,13 +372,10 @@ const MarketplacePage = () => {
                     </div>
                   </div>
                   <div className="mktplace-info-block">
-                    <div className="mktplace-info-title">Duration</div>
+                    <div className="mktplace-info-title">Date</div>
                     <div className="mktplace-info-data">
                       <Calendar size={16} />
-                      {new Date(
-                        selectedEvent.start_date
-                      ).toLocaleDateString()}{" "}
-                      - {new Date(selectedEvent.end_date).toLocaleDateString()}
+                      {new Date(selectedEvent.event_date).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
