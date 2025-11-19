@@ -1,63 +1,48 @@
 // ===== PAYOUTS.SERVICE.JS =====
-import axios from "axios";
 import { CONSTANTS } from "../utils/constants.js";
+import api from "../api/api"; // ✅ common axios instance with BASE_URL + token
+import { uploadMediaFile } from "./upload.service"; // ✅ reuse existing upload logic
 
-// ✅ Get Pending Payouts with pagination
+/**
+ * Get Pending Payouts (with pagination)
+ * GET /api/v1/admin/earnings/payouts/pending?page=&limit=
+ */
 export const getPendingPayoutsService = async (page = 1, limit = 20) => {
   try {
-    const token = localStorage.getItem("token");
-
-    // ✅ Build query string properly
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+    const res = await api.get(CONSTANTS.URL.PAYOUTS_PENDING, {
+      params: { page, limit }, // -> ?page=1&limit=20
     });
 
-    const url = `${CONSTANTS.URL.BASE_URL}${
-      CONSTANTS.URL.PAYOUTS_PENDING
-    }?${queryParams.toString()}`;
-
-    const res = await axios.get(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
+    // Expected shape:
+    // {
+    //   message: "Pending payouts retrieved successfully",
+    //   payouts: [...],
+    //   pagination: { page, limit, total }
+    // }
     return res.data;
   } catch (error) {
     console.error(
       "❌ Error fetching pending payouts:",
       error.response?.data || error.message
     );
-    return { payouts: [], pagination: {} };
+
+    return {
+      payouts: [],
+      pagination: { page: 1, limit, total: 0 },
+    };
   }
 };
 
-// ✅ Process Payout (if needed for future implementation)
-export const processPayoutService = async (
-  payoutId,
-  transferProofUrls = []
-) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await axios.put(
-      `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.PROCESS_PAYOUT(payoutId)}`,
-      { transfer_proof_urls: transferProofUrls },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    return res.data;
-  } catch (error) {
-    console.error(
-      "❌ Error processing payout:",
-      error.response?.data || error.message
-    );
-    return {};
-  }
-};
-
-// ✅ Upload Transfer Proof - Upload files first, then update payout
+/**
+ * Upload transfer proof AND complete payout (for PENDING payouts)
+ *
+ * Flow:
+ *  1) Upload files to /api/v1/file/upload → get file URLs
+ *  2) Call PUT /api/v1/admin/earnings/payouts/:payoutId/complete
+ *     (via CONSTANTS.URL.MARK_DISPUTE_RESOLVED)
+ *
+ * This is what you should call from PendingPayouts.jsx
+ */
 export const uploadTransferProofService = async (
   payoutId,
   files,
@@ -65,111 +50,112 @@ export const uploadTransferProofService = async (
   paymentReference = ""
 ) => {
   try {
-    const token = localStorage.getItem("token");
-
-    // Step 1: Upload files to get URLs (following challenge service pattern)
-    const uploadPromises = files.map(async (file) => {
-      const formData = new FormData();
-      formData.append("attachment", file);
-
-      const uploadResponse = await axios.post(
-        `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.UPLOAD_MEDIA}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Upload API response:", uploadResponse.data);
-
-      // Extract URL following the same pattern as challenge service
-      return (
-        uploadResponse.data?.uploadResponse?.fileURL ||
-        uploadResponse.data?.url ||
-        uploadResponse.data?.file_url ||
-        uploadResponse.data?.attachment_url
-      );
-    });
-
+    // 1️⃣ Upload each file and get URL using existing uploadMediaFile()
+    // Allowed types are validated in the React component (pdf + images)
+    const uploadPromises = files.map((file) => uploadMediaFile(file));
     const uploadedUrls = await Promise.all(uploadPromises);
-    console.log("Uploaded URLs:", uploadedUrls);
 
-    // Filter out any undefined URLs
-    const validUrls = uploadedUrls.filter((url) => url);
-
+    const validUrls = uploadedUrls.filter((url) => !!url);
     if (validUrls.length === 0) {
       throw new Error("No files were uploaded successfully");
     }
 
-    // Step 2: Update payout with transfer proof URLs (matching API spec exactly)
-    const requestBody = {
+    // 2️⃣ Call /complete endpoint with proof URLs
+    const body = {
       admin_notes: adminNotes,
       transfer_proof_urls: validUrls,
       payment_reference: paymentReference,
     };
 
-    console.log("Transfer proof request body:", requestBody);
-    console.log(
-      "Transfer proof URL:",
-      `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.UPLOAD_TRANSFER_PROOF(
-        payoutId
-      )}`
+    const res = await api.put(
+      CONSTANTS.URL.MARK_DISPUTE_RESOLVED(payoutId), // -> /payouts/:id/complete
+      body
     );
 
-    const res = await axios.put(
-      `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.UPLOAD_TRANSFER_PROOF(
-        payoutId
-      )}`,
-      requestBody,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
+    // Backend example response:
+    // {
+    //   "admin_notes":"",
+    //   "transfer_proof_urls":["invoice.pdf"],
+    //   "payment_reference":""
+    // }
+    // or possibly { payout, message }
     return res.data;
   } catch (error) {
     console.error(
-      "❌ Error uploading transfer proof:",
+      "❌ Error uploading transfer proof & completing payout:",
       error.response?.data || error.message
     );
-    console.error("❌ Full error:", error);
     throw error;
   }
 };
 
-// ✅ Mark Dispute as Resolved
-export const markDisputeResolvedService = async (
+/**
+ * OPTIONAL: Update transfer proof on an ALREADY COMPLETED payout
+ * (if you later build a "Completed payouts" page)
+ *
+ * Uses /payouts/:id/transfer-proof endpoint.
+ * Not used on Pending page.
+ */
+export const updateTransferProofForCompletedPayoutService = async (
   payoutId,
+  files,
+  adminNotes = "",
   paymentReference = ""
 ) => {
   try {
-    const token = localStorage.getItem("token");
+    const uploadPromises = files.map((file) => uploadMediaFile(file));
+    const uploadedUrls = await Promise.all(uploadPromises);
+    const validUrls = uploadedUrls.filter((url) => !!url);
 
-    const res = await axios.put(
-      `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.MARK_DISPUTE_RESOLVED(
-        payoutId
-      )}`,
-      {
-        payment_reference: paymentReference,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
+    if (validUrls.length === 0) {
+      throw new Error("No files were uploaded successfully");
+    }
+
+    const body = {
+      admin_notes: adminNotes,
+      transfer_proof_urls: validUrls,
+      payment_reference: paymentReference,
+    };
+
+    const res = await api.put(
+      CONSTANTS.URL.UPLOAD_TRANSFER_PROOF(payoutId), // -> /payouts/:id/transfer-proof
+      body
     );
 
     return res.data;
   } catch (error) {
     console.error(
-      "❌ Error marking dispute as resolved:",
+      "❌ Error updating transfer proof for completed payout:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+/**
+ * OPTIONAL: Manually complete payout WITHOUT uploading new proof
+ * (if you ever need a separate “Mark as paid” without file upload)
+ */
+export const processPayoutService = async (
+  payoutId,
+  { adminNotes = "", paymentReference = "", transferProofUrls = [] } = {}
+) => {
+  try {
+    const body = {
+      admin_notes: adminNotes,
+      transfer_proof_urls: transferProofUrls,
+      payment_reference: paymentReference,
+    };
+
+    const res = await api.put(
+      CONSTANTS.URL.MARK_DISPUTE_RESOLVED(payoutId), // /complete
+      body
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error(
+      "❌ Error processing payout:",
       error.response?.data || error.message
     );
     throw error;

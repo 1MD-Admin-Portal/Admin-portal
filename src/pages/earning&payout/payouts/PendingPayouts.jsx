@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   getPendingPayoutsService,
   uploadTransferProofService,
-  markDisputeResolvedService,
+  processPayoutService,
 } from "../../../services/payouts.service";
 import "./PendingPayouts.css";
 
@@ -10,26 +10,30 @@ const PendingPayouts = () => {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploadingProof, setUploadingProof] = useState({});
-  const [resolvingDispute, setResolvingDispute] = useState({});
+  const [processingPayout, setProcessingPayout] = useState({});
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: 20, // ⬅ you can change to 5 to test pagination
     total: 0,
   });
 
-  // Fetch pending payouts
+  // 🔹 Fetch pending payouts
   const fetchPayouts = async (page = 1, limit = 20) => {
     setLoading(true);
     try {
       const response = await getPendingPayoutsService(page, limit);
-      if (response.payouts) {
+
+      if (Array.isArray(response.payouts)) {
         setPayouts(response.payouts);
-        setPagination({
-          page: response.pagination?.page || page,
-          limit: response.pagination?.limit || limit,
-          total: response.pagination?.total || 0,
-        });
+      } else {
+        setPayouts([]);
       }
+
+      setPagination({
+        page: response.pagination?.page || page,
+        limit: response.pagination?.limit || limit,
+        total: response.pagination?.total || 0,
+      });
     } catch (error) {
       console.error("Error fetching payouts:", error);
     } finally {
@@ -38,57 +42,40 @@ const PendingPayouts = () => {
   };
 
   useEffect(() => {
-    fetchPayouts();
+    fetchPayouts(pagination.page, pagination.limit);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle pagination
+  // 🔹 Handle pagination click
   const handlePageChange = (newPage) => {
-    if (
-      newPage >= 1 &&
-      newPage <= Math.ceil(pagination.total / pagination.limit)
-    ) {
+    const totalPages = Math.ceil(pagination.total / pagination.limit);
+    if (newPage >= 1 && newPage <= totalPages) {
       fetchPayouts(newPage, pagination.limit);
     }
   };
 
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
+  const totalPages = Math.ceil(pagination.total / pagination.limit) || 1;
 
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  // 💶 Single currency formatter – EUR everywhere
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-GB", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount || 0);
+
+  // 🔹 Format date
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-  };
 
-  // Calculate total pages
-  const totalPages = Math.ceil(pagination.total / pagination.limit);
-
-  // Handle process payout
-  const handleProcessPayout = (payoutId) => {
-    console.log("Processing payout:", payoutId);
-    // Add your process logic here
-  };
-
-  // Handle view payout details
-  const handleViewPayout = (payoutId) => {
-    console.log("Viewing payout:", payoutId);
-    // Add your view logic here
-  };
-
-  // Handle file upload for transfer proof
+  // 🔹 Upload transfer proof
   const handleFileUpload = async (payoutId, event) => {
-    const files = Array.from(event.target.files);
+    const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
-    // Validate file types (optional)
     const allowedTypes = [
       "application/pdf",
       "image/jpeg",
@@ -108,9 +95,9 @@ const PendingPayouts = () => {
     setUploadingProof((prev) => ({ ...prev, [payoutId]: true }));
 
     try {
-      // You can add admin notes and payment reference here if needed
-      const adminNotes = ""; // Could be from a form input
-      const paymentReference = ""; // Could be from a form input
+      // Later you can add proper inputs for these (textarea, input)
+      const adminNotes = ""; // or prompt("Enter admin notes (optional):") || "";
+      const paymentReference = ""; // can be independent from complete
 
       const result = await uploadTransferProofService(
         payoutId,
@@ -119,28 +106,26 @@ const PendingPayouts = () => {
         paymentReference
       );
 
-      if (result.payout || result.message) {
-        // Update the specific payout in the list
-        setPayouts((prev) =>
-          prev.map((payout) =>
-            payout.id === parseInt(payoutId)
-              ? {
-                  ...payout,
-                  has_transfer_proof: true,
-                  transfer_proof_urls: result.payout?.transfer_proof_urls || [],
-                }
-              : payout
-          )
-        );
+      // Update payout row with new proof state
+      setPayouts((prev) =>
+        prev.map((payout) =>
+          payout.id === payoutId
+            ? {
+                ...payout,
+                has_transfer_proof: true,
+                transfer_proof_urls:
+                  result?.payout?.transfer_proof_urls ||
+                  result?.transfer_proof_urls ||
+                  payout.transfer_proof_urls,
+              }
+            : payout
+        )
+      );
 
-        alert(result.message || "Transfer proof uploaded successfully!");
-      } else {
-        throw new Error("Invalid response from server");
-      }
+      alert(result.message || "Transfer proof uploaded successfully!");
     } catch (error) {
       console.error("Upload error details:", error);
 
-      // More specific error messages
       if (error.response?.status === 404) {
         alert(
           "Payout not found. It may have already been processed or the ID is incorrect."
@@ -154,35 +139,37 @@ const PendingPayouts = () => {
       }
     } finally {
       setUploadingProof((prev) => ({ ...prev, [payoutId]: false }));
-      // Clear the file input
       event.target.value = "";
     }
   };
 
-  // Handle dispute resolution
-  const handleResolveDispute = async (payoutId) => {
-    const paymentReference = prompt("Enter payment reference (optional):");
+  // 🔹 Process payout = call PUT /complete
+  const handleProcessPayout = async (payout) => {
+    const payoutId = payout.id;
 
-    setResolvingDispute((prev) => ({ ...prev, [payoutId]: true }));
+    // Optional prompts; later can be replaced with proper inputs
+    const paymentReference =
+      prompt("Enter payment reference (optional):") || "";
+    const adminNotes = prompt("Enter admin notes (optional):") || "";
+
+    setProcessingPayout((prev) => ({ ...prev, [payoutId]: true }));
 
     try {
-      const result = await markDisputeResolvedService(
-        payoutId,
-        paymentReference || ""
-      );
+      const result = await processPayoutService(payoutId, {
+        adminNotes,
+        paymentReference,
+        transferProofUrls: payout.transfer_proof_urls || [],
+      });
 
-      if (result.message) {
-        // Remove the resolved payout from the list or mark as resolved
-        setPayouts((prev) =>
-          prev.filter((payout) => payout.id !== parseInt(payoutId))
-        );
-        alert("Dispute marked as resolved successfully!");
-      }
+      // After successful processing, remove from pending list
+      setPayouts((prev) => prev.filter((p) => p.id !== payoutId));
+
+      alert(result.message || "Payout marked as completed!");
     } catch (error) {
-      alert("Failed to resolve dispute. Please try again.");
-      console.error("Dispute resolution error:", error);
+      console.error("Error processing payout:", error);
+      alert("Failed to process payout. Please try again.");
     } finally {
-      setResolvingDispute((prev) => ({ ...prev, [payoutId]: false }));
+      setProcessingPayout((prev) => ({ ...prev, [payoutId]: false }));
     }
   };
 
@@ -193,7 +180,7 @@ const PendingPayouts = () => {
         <div className="header">
           <h1 className="main-title">Pending Payouts</h1>
           <p className="subtitle">
-            Manage and process pending payouts for instructors and organizers
+            Manage and process pending payouts for instructors and DJs
           </p>
         </div>
 
@@ -202,7 +189,7 @@ const PendingPayouts = () => {
           <div className="stat-card">
             <div className="stat-content">
               <div className="stat-icon total-pending">
-                <i className="icon-dollar">$</i>
+                <i className="icon-dollar">€</i>
               </div>
               <div className="stat-info">
                 <p className="stat-label">Total Pending</p>
@@ -242,7 +229,7 @@ const PendingPayouts = () => {
           </div>
         </div>
 
-        {/* Payouts Table */}
+        {/* Table */}
         <div className="table-container">
           {loading ? (
             <div className="loading-container">
@@ -397,7 +384,7 @@ const PendingPayouts = () => {
                                   <input
                                     type="file"
                                     multiple
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                    accept=".pdf,.jpg,.jpeg,.png"
                                     onChange={(e) =>
                                       handleFileUpload(payout.id, e)
                                     }
@@ -427,24 +414,12 @@ const PendingPayouts = () => {
                           <div className="action-buttons">
                             <button
                               className="btn btn-process"
-                              onClick={() => handleProcessPayout(payout.id)}
+                              onClick={() => handleProcessPayout(payout)}
+                              disabled={processingPayout[payout.id]}
                             >
-                              Process
-                            </button>
-                            <button
-                              className="btn btn-view"
-                              onClick={() => handleViewPayout(payout.id)}
-                            >
-                              View
-                            </button>
-                            <button
-                              className="btn btn-resolve"
-                              onClick={() => handleResolveDispute(payout.id)}
-                              disabled={resolvingDispute[payout.id]}
-                            >
-                              {resolvingDispute[payout.id]
-                                ? "Resolving..."
-                                : "Resolve Dispute"}
+                              {processingPayout[payout.id]
+                                ? "Processing..."
+                                : "Mark as Paid"}
                             </button>
                           </div>
                         </td>

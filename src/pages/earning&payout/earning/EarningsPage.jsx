@@ -32,6 +32,13 @@ const EarningsPage = () => {
   const [userEarningsDetail, setUserEarningsDetail] = useState({});
   const [loadingUserDetail, setLoadingUserDetail] = useState(false);
 
+  // 💶 Single currency formatter – EUR everywhere
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-GB", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount || 0);
+
   // ✅ Fetch Overview
   const fetchOverview = async () => {
     try {
@@ -66,7 +73,6 @@ const EarningsPage = () => {
       const userTypes = ["instructor", "dj"];
       const results = {};
 
-      // Fetch data for both user types
       for (const type of userTypes) {
         try {
           const data = await getUserEarningsDetailService(userId, type);
@@ -167,7 +173,7 @@ const EarningsPage = () => {
           <div className="earnings-mgmt-overview-content">
             <h3>Total Revenue</h3>
             <p className="earnings-mgmt-overview-amount">
-              ${getTotalRevenue().toFixed(2)}
+              {formatCurrency(getTotalRevenue())}
             </p>
           </div>
         </div>
@@ -179,7 +185,7 @@ const EarningsPage = () => {
           <div className="earnings-mgmt-overview-content">
             <h3>Creator Earnings</h3>
             <p className="earnings-mgmt-overview-amount">
-              ${getTotalCreatorEarnings().toFixed(2)}
+              {formatCurrency(getTotalCreatorEarnings())}
             </p>
           </div>
         </div>
@@ -191,7 +197,7 @@ const EarningsPage = () => {
           <div className="earnings-mgmt-overview-content">
             <h3>Pending Payouts</h3>
             <p className="earnings-mgmt-overview-amount earnings-mgmt-pending">
-              ${getTotalPendingPayouts().toFixed(2)}
+              {formatCurrency(getTotalPendingPayouts())}
             </p>
           </div>
         </div>
@@ -203,7 +209,7 @@ const EarningsPage = () => {
           <div className="earnings-mgmt-overview-content">
             <h3>Completed Payouts</h3>
             <p className="earnings-mgmt-overview-amount earnings-mgmt-completed">
-              ${getTotalCompletedPayouts().toFixed(2)}
+              {formatCurrency(getTotalCompletedPayouts())}
             </p>
           </div>
         </div>
@@ -226,8 +232,8 @@ const EarningsPage = () => {
                     {earner.user_type}
                   </p>
                   <p className="earnings-mgmt-earner-stats">
-                    ${earner.total_earnings} • {earner.transaction_count}{" "}
-                    transactions
+                    {formatCurrency(earner.total_earnings)} •{" "}
+                    {earner.transaction_count} transactions
                   </p>
                 </div>
               </div>
@@ -246,14 +252,16 @@ const EarningsPage = () => {
                 <h4>{type.user_type.toUpperCase()}</h4>
                 <div className="earnings-mgmt-type-stats">
                   <p>
-                    <strong>Revenue:</strong> ${type.total_revenue}
+                    <strong>Revenue:</strong>{" "}
+                    {formatCurrency(type.total_revenue)}
                   </p>
                   <p>
-                    <strong>Creator Earnings:</strong> $
-                    {type.total_creator_earnings}
+                    <strong>Creator Earnings:</strong>{" "}
+                    {formatCurrency(type.total_creator_earnings)}
                   </p>
                   <p>
-                    <strong>Platform Fees:</strong> ${type.total_platform_fees}
+                    <strong>Platform Fees:</strong>{" "}
+                    {formatCurrency(type.total_platform_fees)}
                   </p>
                   <p>
                     <strong>Transactions:</strong> {type.total_transactions}
@@ -267,6 +275,7 @@ const EarningsPage = () => {
 
       {/* ✅ Filters */}
       <div className="earnings-mgmt-filters">
+        {/* User Type Filter */}
         <select
           name="user_type"
           value={filters.user_type}
@@ -279,6 +288,7 @@ const EarningsPage = () => {
           <option value="organiser">Organizer</option>
         </select>
 
+        {/* Source Type Filter – UPDATED based on data */}
         <select
           name="source_type"
           value={filters.source_type}
@@ -286,10 +296,13 @@ const EarningsPage = () => {
           className="earnings-mgmt-filter-select"
         >
           <option value="all">All Source Types</option>
-          <option value="class_booking">Class Booking</option>
-          <option value="event_ticket">Event Ticket</option>
+          <option value="slot_booking">Slot Booking</option>
+          <option value="program_purchase">Program Purchase</option>
+          <option value="playlist_purchase">Playlist Purchase</option>
+          <option value="package_enrollment">Package Enrollment</option>
         </select>
 
+        {/* Status Filter (same keys as API) */}
         <select
           name="status"
           value={filters.status}
@@ -353,13 +366,13 @@ const EarningsPage = () => {
                     </div>
                   </td>
                   <td className="earnings-mgmt-amount-cell">
-                    ${earning.amount.total}
+                    {formatCurrency(earning.amount.total)}
                   </td>
                   <td className="earnings-mgmt-amount-cell earnings-mgmt-user-earnings">
-                    ${earning.amount.user_earnings}
+                    {formatCurrency(earning.amount.user_earnings)}
                   </td>
                   <td className="earnings-mgmt-amount-cell earnings-mgmt-platform-fee">
-                    ${earning.amount.platform_fee}
+                    {formatCurrency(earning.amount.platform_fee)}
                   </td>
                   <td>
                     <span
@@ -487,25 +500,33 @@ const EarningsPage = () => {
                               <div className="earnings-mgmt-modal-summary-card">
                                 <span>Total Earnings</span>
                                 <strong>
-                                  ${data.summary?.total_earnings || 0}
+                                  {formatCurrency(
+                                    data.summary?.total_earnings || 0
+                                  )}
                                 </strong>
                               </div>
                               <div className="earnings-mgmt-modal-summary-card">
                                 <span>Paid Earnings</span>
                                 <strong>
-                                  ${data.summary?.paid_earnings || 0}
+                                  {formatCurrency(
+                                    data.summary?.paid_earnings || 0
+                                  )}
                                 </strong>
                               </div>
                               <div className="earnings-mgmt-modal-summary-card">
                                 <span>Pending Earnings</span>
                                 <strong>
-                                  ${data.summary?.pending_earnings || 0}
+                                  {formatCurrency(
+                                    data.summary?.pending_earnings || 0
+                                  )}
                                 </strong>
                               </div>
                               <div className="earnings-mgmt-modal-summary-card">
                                 <span>Processing</span>
                                 <strong>
-                                  ${data.summary?.processing_earnings || 0}
+                                  {formatCurrency(
+                                    data.summary?.processing_earnings || 0
+                                  )}
                                 </strong>
                               </div>
                               <div className="earnings-mgmt-modal-summary-card">
@@ -520,9 +541,9 @@ const EarningsPage = () => {
                           {/* Earnings List for this type */}
                           {data.earnings && data.earnings.length > 0 && (
                             <div className="earnings-mgmt-modal-earnings-detail-section">
-                              <h5>Recent Transactions ({userType})</h5>
+                              <h5>All Transactions ({userType})</h5>
                               <div className="earnings-mgmt-modal-earnings-detail-list">
-                                {data.earnings.slice(0, 5).map((earning) => (
+                                {data.earnings.map((earning) => (
                                   <div
                                     key={earning.id}
                                     className="earnings-mgmt-modal-earning-detail-item"
@@ -556,16 +577,26 @@ const EarningsPage = () => {
                                         <div className="earnings-mgmt-modal-user-earning">
                                           <small>Your Earning</small>
                                           <strong>
-                                            ${earning.user_earnings}
+                                            {formatCurrency(
+                                              earning.user_earnings
+                                            )}
                                           </strong>
                                         </div>
                                         <div className="earnings-mgmt-modal-total-amount">
                                           <small>Total Amount</small>
-                                          <span>${earning.total_amount}</span>
+                                          <span>
+                                            {formatCurrency(
+                                              earning.total_amount
+                                            )}
+                                          </span>
                                         </div>
                                         <div className="earnings-mgmt-modal-platform-fee">
                                           <small>Platform Fee</small>
-                                          <span>${earning.platform_fee}</span>
+                                          <span>
+                                            {formatCurrency(
+                                              earning.platform_fee
+                                            )}
+                                          </span>
                                         </div>
                                         <div className="earnings-mgmt-modal-commission-rate">
                                           <small>Commission Rate</small>
@@ -578,14 +609,6 @@ const EarningsPage = () => {
                                   </div>
                                 ))}
                               </div>
-                              {data.earnings.length > 5 && (
-                                <div className="earnings-mgmt-modal-more-transactions">
-                                  <small>
-                                    And {data.earnings.length - 5} more
-                                    transactions...
-                                  </small>
-                                </div>
-                              )}
                             </div>
                           )}
                         </div>
