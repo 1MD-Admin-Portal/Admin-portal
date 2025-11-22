@@ -6,7 +6,7 @@ import {
   ShoppingBag,
   Calendar,
   User,
-  DollarSign,
+  Euro,
   TrendingUp,
   Eye,
 } from "lucide-react";
@@ -189,7 +189,7 @@ const MarketplacePage = () => {
                   </td>
                   <td className="mktplace-price-column">
                     <div className="mktplace-price-display">
-                      <DollarSign size={14} />
+                      <Euro size={14} />
                       {filter === "Program" ? item.price : item.price || "Free"}
                     </div>
                   </td>
@@ -357,7 +357,7 @@ const MarketplacePage = () => {
                   <div className="mktplace-info-block">
                     <div className="mktplace-info-title">Price</div>
                     <div className="mktplace-info-data">
-                      <DollarSign size={16} />
+                      <Euro size={16} />
                       {selectedEvent.price || "Free"}
                     </div>
                   </div>
@@ -424,7 +424,7 @@ const MarketplacePage = () => {
                     <span>{selectedProgram.instructor_name}</span>
                   </div>
                   <div className="mktplace-program-detail">
-                    <DollarSign size={16} />
+                    <Euro size={16} />
                     <span>{selectedProgram.price}</span>
                   </div>
                 </div>
@@ -466,7 +466,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">💰</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.total_revenue || 0}
+                              €{stats.total_revenue || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Total Revenue
@@ -477,7 +477,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">✅</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.successful_purchases || 0}
+                              €{stats.successful_purchases || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Successful Purchases
@@ -488,7 +488,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">🛒</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.pending_purchases || 0}
+                              €{stats.pending_purchases || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Pending Purchases
@@ -499,7 +499,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">🚫</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.failed_purchases || 0}
+                              €{stats.failed_purchases || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Failed Purchases
@@ -510,7 +510,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">€</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.active_purchases || 0}
+                              €{stats.active_purchases || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Active Purchases
@@ -521,7 +521,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">💵</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.average_purchase_amount || 0}
+                              €{stats.average_purchase_amount || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Average Purchase Amount
@@ -532,7 +532,7 @@ const MarketplacePage = () => {
                           <div className="mktplace-analytics-icon">📈</div>
                           <div className="mktplace-analytics-details">
                             <div className="mktplace-analytics-number">
-                              ${stats.success_rate || 0}
+                              €{stats.success_rate || 0}
                             </div>
                             <div className="mktplace-analytics-caption">
                               Success Rate

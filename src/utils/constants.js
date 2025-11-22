@@ -41,6 +41,19 @@ export const CONSTANTS = {
     DELETE_CHALLENGE: (id) => `/api/v1/admin/challenge/${id}`,
     UPDATE_CHALLENGE_STATUS: (id) => `/api/v1/admin/challenge/${id}/status`,
 
+    // === BETA TESTERS / BUGS MANAGEMENT ===
+    // === CHALLENGE SUBMISSIONS MANAGEMENT ===
+    CHALLENGE_SUBMISSIONS: {
+      // ...
+    },
+
+    // === BETA TESTER BUGS ===
+    BETA_TESTERS: {
+      DASHBOARD: "/api/v1/betaTesters/dashboard",
+      BUGS: "/api/v1/betaTesters/bugs",
+      RESOLVE: (bugId) => `/api/v1/betaTesters/bugs/${bugId}/resolve`,
+    },
+
     // === INSTRUCTOR MANAGEMENT ===
     APPROVE_INSTRUCTOR: "/api/v1/admin/approveInstructorApplication",
     REJECT_INSTRUCTOR: "/api/v1/admin/rejectInstructorApplication",

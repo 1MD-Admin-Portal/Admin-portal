@@ -6,14 +6,7 @@ import {
   getUserEarningsDetailService,
 } from "../../../services/earning.service";
 
-import {
-  X,
-  Eye,
-  DollarSign,
-  TrendingUp,
-  Users,
-  AlertCircle,
-} from "lucide-react";
+import { X, Eye, Euro, TrendingUp, Users, AlertCircle } from "lucide-react";
 
 const EarningsPage = () => {
   const [overview, setOverview] = useState({});
@@ -168,7 +161,7 @@ const EarningsPage = () => {
       <div className="earnings-mgmt-overview">
         <div className="earnings-mgmt-overview-card">
           <div className="earnings-mgmt-overview-icon">
-            <DollarSign size={24} />
+            <Euro size={24} />
           </div>
           <div className="earnings-mgmt-overview-content">
             <h3>Total Revenue</h3>

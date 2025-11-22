@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ✅ added useNavigate
 import logo from "../assets/logo.png"; // Add this import - replace with your actual logo filename
 import {
   Home,
@@ -34,6 +34,7 @@ import {
   ChevronDown,
   ChevronRight,
   PersonStanding,
+  Bug, // ✅ NEW: for Beta Tester Bugs (admin)
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -44,7 +45,8 @@ const Sidebar = () => {
   const [applicantDropdownOpen, setApplicantDropdownOpen] = useState(false);
   const [contentDropdownOpen, setContentDropdownOpen] = useState(false);
   const [activeItem, setActiveItem] = useState("/home");
-  const { logout } = useAuth(); // now this will exist ✅
+  const { logout } = useAuth();
+  const navigate = useNavigate(); // ✅ so handleLogout works
 
   const handleLogout = () => {
     logout(); // clear token
@@ -70,7 +72,7 @@ const Sidebar = () => {
   }) => (
     <li className={`menu-item ${isActive ? "active" : ""}`} onClick={onClick}>
       <Link to={href} className="menu-link">
-        <Icon size={18} />
+        <Icon size={18} className="menu-icon" />
         <span>{children}</span>
       </Link>
     </li>
@@ -85,7 +87,7 @@ const Sidebar = () => {
   }) => (
     <li className="dropdown-item">
       <div className="dropdown-trigger" onClick={onToggle}>
-        <Icon size={18} />
+        <Icon size={18} className="menu-icon" />
         <span>{children}</span>
         <div className={`chevron ${isOpen ? "open" : ""}`}>
           {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -128,16 +130,6 @@ const Sidebar = () => {
     { href: "/VideoPrograms", icon: Book, label: "Video Program Management" },
     { href: "/playlists", icon: Play, label: "Playlists" },
     { href: "/CreateChallenge", icon: Swords, label: "Challenges" },
-    // {
-    //   href: "/Challenge-Submissions",
-    //   icon: Download,
-    //   label: "Challenge Submission",
-    // },
-    // {
-    //   href: "/Challenge-participants",
-    //   icon: PersonStanding,
-    //   label: "Challenge Participants",
-    // },
   ];
 
   const earningSubmenuItems = [
@@ -394,6 +386,8 @@ const Sidebar = () => {
           font-weight: 500;
           background: rgba(255, 107, 107, 0.1);
           border: 1px solid rgba(255, 107, 107, 0.2);
+          width: 100%;
+          text-align: left;
         }
 
         .logout-link:hover {
@@ -510,6 +504,11 @@ const Sidebar = () => {
 
               <MenuItem href="/djevents" icon={Megaphone}>
                 Dj Events
+              </MenuItem>
+
+              {/* ⭐ NEW: Admin – Beta Tester Bugs */}
+              <MenuItem href="/beta-testers/bugs" icon={Bug}>
+                Beta Tester Bugs
               </MenuItem>
             </ul>
           </div>

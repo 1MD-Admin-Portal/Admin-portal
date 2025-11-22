@@ -3,7 +3,7 @@ import {
   Calendar,
   MapPin,
   Clock,
-  DollarSign,
+  Euro,
   Eye,
   CheckCircle,
   XCircle,
@@ -181,7 +181,7 @@ const EventsPage = () => {
                   Location
                 </th>
                 <th>
-                  <DollarSign size={16} />
+                  <Euro size={16} />
                   Price
                 </th>
                 <th>Actions</th>
@@ -243,7 +243,7 @@ const EventsPage = () => {
                   </td>
                   <td className="event-price-column">
                     <div className="event-price-display">
-                      <DollarSign size={14} />
+                      <Euro size={14} />
                       {formatPrice(event.price)}
                     </div>
                   </td>
@@ -403,7 +403,7 @@ const EventsPage = () => {
                       <div className="event-info-card">
                         <div className="event-info-label">Price</div>
                         <div className="event-info-value">
-                          <DollarSign size={16} />
+                          <Euro size={16} />
                           {formatPrice(selectedEvent.price)}
                         </div>
                       </div>
