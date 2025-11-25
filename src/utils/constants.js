@@ -132,6 +132,7 @@ export const CONSTANTS = {
     // Badges APIs
     GET_ALL_BADGES: "/api/v1/admin/badges/all",
     GET_USER_BADGES: (userId) => `/api/v1/admin/users/${userId}/badges`,
+    ASSIGN_BADGE: "/api/v1/levels/admin/assign-badge",
 
     // Reports
     GET_REPORTS: "/api/v1/admin/reports",

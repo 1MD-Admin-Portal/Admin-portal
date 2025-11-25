@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   fetchUsers,
   fetchUserBookedDates,
-} from "../../../services/user.Service";
-import "../Dancers/DancersList.css"; // Assuming you have a CSS file for styling
+  fetchUserBadges,
+  assignUserBadge,
+} from "../../../services/user.service";
+import "../Dancers/DancersList.css";
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
@@ -14,19 +16,32 @@ const DancersList = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // "asc" or "desc"
   const [subscriptionFilter, setSubscriptionFilter] = useState("");
   const [skillLevelFilter, setSkillLevelFilter] = useState("");
+
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
+
+  // Badge-related state
+  const [badgeDetails, setBadgeDetails] = useState(null);
+  const [loadingBadges, setLoadingBadges] = useState(false);
+  const [badgeError, setBadgeError] = useState(null);
+  const [savingBadge, setSavingBadge] = useState(false);
+
+  const [badgeForm, setBadgeForm] = useState({
+    user_type: "",
+    badge_level: "",
+    custom_commission_rate: "",
+    reason: "",
+  });
 
   useEffect(() => {
     const loadDancers = async () => {
       try {
         const data = await fetchUsers(page, 10);
-        // ask backend for page
-        if (data?.users) {
-          console.log("Fetched users:", data.users); // ✅ log fetched entries
-          console.log("Pagination info:", data.pagination); // ✅ log pagination too
+        if (data && data.users) {
+          console.log("Fetched users:", data.users);
+          console.log("Pagination info:", data.pagination);
           setDancers(data.users);
-          setPagination(data.pagination); // save pagination info
+          setPagination(data.pagination || { page, totalPages: 1 });
           window.scrollTo(0, 0);
         }
       } catch (error) {
@@ -37,6 +52,38 @@ const DancersList = () => {
     loadDancers();
   }, [page]);
 
+  const formatValueForDisplay = (value) => {
+    if (value === null || value === undefined) return "N/A";
+
+    const t = typeof value;
+
+    // Primitive values are safe
+    if (t === "string" || t === "number" || t === "boolean") {
+      return String(value);
+    }
+
+    // Arrays -> comma separated
+    if (Array.isArray(value)) {
+      return value.join(", ");
+    }
+
+    // Badge-like object (from your API)
+    if (value && typeof value === "object") {
+      if (value.badge_name) {
+        const emoji = value.badge_emoji || "";
+        const level = value.level != null ? ` (Level ${value.level})` : "";
+        return `${emoji} ${value.badge_name}${level}`;
+      }
+    }
+
+    // Fallback: stringify object
+    try {
+      return JSON.stringify(value);
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
   // Helper function to render info items in grid
   const renderDancerInfoGrid = (items) => {
     return (
@@ -44,48 +91,119 @@ const DancersList = () => {
         {items.map((item, index) => (
           <div key={index} className={`dancer-info-item ${item.status || ""}`}>
             <div className="dancer-info-label">{item.label}</div>
-            <div className="dancer-info-value">{item.value}</div>
+            <div className="dancer-info-value">
+              {formatValueForDisplay(item.value)}
+            </div>
           </div>
         ))}
       </div>
     );
   };
 
+  const loadUserBadges = async (user) => {
+    setLoadingBadges(true);
+    setBadgeError(null);
+    setBadgeDetails(null);
+
+    try {
+      const data = await fetchUserBadges(user.id);
+      if (!data) {
+        setBadgeError("Unable to load badge details.");
+        return;
+      }
+
+      // ✅ Only allow these values
+      const ALLOWED_PERSONAS = ["dancer", "instructor", "dj", "organizer"];
+
+      // Filter what backend sent
+      const personasFromApi = Array.isArray(data.user_personas)
+        ? data.user_personas.filter((p) => ALLOWED_PERSONAS.includes(p))
+        : [];
+
+      // If backend sent nothing / bad stuff, fallback to all valid personas
+      const finalPersonas =
+        personasFromApi.length > 0 ? personasFromApi : ALLOWED_PERSONAS;
+
+      // Store sanitized personas in state
+      setBadgeDetails({
+        ...data,
+        user_personas: finalPersonas,
+      });
+
+      const defaultPersona = finalPersonas[0]; // always valid now
+
+      const nextForPersona =
+        data.next_badges && data.next_badges[defaultPersona];
+
+      setBadgeForm({
+        user_type: defaultPersona,
+        badge_level:
+          nextForPersona && nextForPersona.level
+            ? String(nextForPersona.level)
+            : "",
+        custom_commission_rate:
+          nextForPersona && nextForPersona.commission_rate
+            ? String(nextForPersona.commission_rate)
+            : "",
+        reason: "",
+      });
+    } catch (err) {
+      console.error("Error loading user badges:", err);
+      setBadgeError("Failed to load badge details.");
+    } finally {
+      setLoadingBadges(false);
+    }
+  };
+
+  const handleAssignBadge = async (e) => {
+    e.preventDefault();
+    if (!selectedDancer) return;
+
+    if (!badgeForm.user_type || !badgeForm.badge_level) {
+      setBadgeError("User type and badge level are required.");
+      return;
+    }
+
+    // 👇 Try to choose the same id that your backend uses everywhere
+    const targetUserId =
+      selectedDancer.user_id != null
+        ? selectedDancer.user_id
+        : selectedDancer.id;
+
+    setSavingBadge(true);
+    setBadgeError(null);
+
+    try {
+      await assignUserBadge({
+        target_user_id: targetUserId,
+        user_type: badgeForm.user_type, // already guaranteed one of dancer/instructor/dj/organizer
+        badge_level: badgeForm.badge_level,
+        custom_commission_rate: badgeForm.custom_commission_rate,
+        reason:
+          badgeForm.reason ||
+          "Exceptional performance and contribution to platform",
+      });
+
+      await loadUserBadges(selectedDancer);
+    } catch (err) {
+      console.error("Error assigning badge:", err);
+      const backendMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to assign badge. Please try again.";
+
+      setBadgeError(backendMsg);
+    } finally {
+      setSavingBadge(false);
+    }
+  };
+
   return (
     <div className="dancers-main-container">
       <h2 className="dancers-page-title">Dancers List</h2>
       <div className="dancers-filters-container">
-        {/* <input
-          type="text"
-          placeholder="Search by name or location"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <select
-          value={subscriptionFilter}
-          onChange={(e) => setSubscriptionFilter(e.target.value)}
-        >
-          <option value="">All Subscriptions</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-
-        <select
-          value={skillLevelFilter}
-          onChange={(e) => setSkillLevelFilter(e.target.value)}
-        >
-          <option value="">All Skill Levels</option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-        </select>
-
-        <button
-          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-        >
-          Sort by Date: {sortOrder === "asc" ? "Oldest First" : "Newest First"}
-        </button> */}
+        {/* filters currently commented-out */}
       </div>
 
       <table className="dancers-data-table">
@@ -94,11 +212,8 @@ const DancersList = () => {
             <th>ID</th>
             <th>Email</th>
             <th>Name</th>
-            {/* <th>Location</th> */}
             <th>Skill Level</th>
-            {/* <th>User Type</th> */}
             <th>Created At</th>
-            {/* <th>Roles</th> */}
             <th>Subscription</th>
           </tr>
         </thead>
@@ -126,10 +241,9 @@ const DancersList = () => {
 
               return matchesSearch && matchesSubscription && matchesSkill;
             })
-
             .sort((a, b) => {
-              const dateA = new Date(a.created_at);
-              const dateB = new Date(b.created_at);
+              const dateA = new Date(a.created_at).getTime();
+              const dateB = new Date(b.created_at).getTime();
               return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
             })
             .map((dancer) => (
@@ -138,27 +252,29 @@ const DancersList = () => {
                 onClick={async () => {
                   setSelectedDancer(dancer);
 
-                  // Reset states immediately
+                  // Reset calendar & badge states
                   setCalendarData(null);
-
-                  // Fetch Booked Dates
                   setLoadingCalendar(true);
+
+                  setBadgeDetails(null);
+                  setBadgeError(null);
+
                   try {
                     const data = await fetchUserBookedDates(dancer.id, 1, 10);
                     setCalendarData(data);
                   } finally {
                     setLoadingCalendar(false);
                   }
+
+                  // Load badge details
+                  loadUserBadges(dancer);
                 }}
               >
                 <td>{dancer.id}</td>
                 <td>{dancer.email}</td>
                 <td>{dancer.name}</td>
-                {/* <td>{dancer.location}</td> */}
                 <td>{dancer.skill_level}</td>
-                {/* <td>{dancer.profile_user_type}</td> */}
                 <td>{new Date(dancer.created_at).toLocaleString()}</td>
-                {/* <td>{dancer.roles?.join(", ")}</td> */}
                 <td>
                   {dancer.active_subscription?.subscription_name || "N/A"}
                 </td>
@@ -192,7 +308,11 @@ const DancersList = () => {
       {selectedDancer && (
         <div
           className="dancer-modal-overlay"
-          onClick={() => setSelectedDancer(null)}
+          onClick={() => {
+            setSelectedDancer(null);
+            setBadgeDetails(null);
+            setBadgeError(null);
+          }}
         >
           <div
             className="dancer-modal-content"
@@ -203,13 +323,17 @@ const DancersList = () => {
               <h3>Dancer Profile Details</h3>
               <button
                 className="dancer-modal-close-x"
-                onClick={() => setSelectedDancer(null)}
+                onClick={() => {
+                  setSelectedDancer(null);
+                  setBadgeDetails(null);
+                  setBadgeError(null);
+                }}
               >
                 ✕
               </button>
             </div>
 
-            {/* Modal Body - Organized in Columns */}
+            {/* Modal Body */}
             <div className="dancer-modal-body">
               {/* Left Column */}
               <div className="dancer-modal-column dancer-modal-left">
@@ -302,7 +426,8 @@ const DancersList = () => {
                   <h4 className="dancer-section-title">
                     📈 Subscription History
                   </h4>
-                  {selectedDancer.subscription_history?.length > 0 ? (
+                  {selectedDancer.subscription_history &&
+                  selectedDancer.subscription_history.length > 0 ? (
                     <div className="dancer-history-container">
                       {selectedDancer.subscription_history.map((sub, idx) => (
                         <div
@@ -358,7 +483,9 @@ const DancersList = () => {
                     <div className="dancer-loading-state">
                       Loading calendar...
                     </div>
-                  ) : calendarData && calendarData.booked_dates?.length > 0 ? (
+                  ) : calendarData &&
+                    calendarData.booked_dates &&
+                    calendarData.booked_dates.length > 0 ? (
                     <div className="dancer-calendar-list">
                       {calendarData.booked_dates.map((dateEntry) => (
                         <div
@@ -397,7 +524,7 @@ const DancersList = () => {
                   )}
                 </div>
 
-                {/* Badges Section */}
+                {/* Current Badges Section (from list data) */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
                   {selectedDancer.current_badges &&
@@ -506,6 +633,154 @@ const DancersList = () => {
                     </div>
                   )}
                 </div>
+
+                {/* 🔥 New: Admin Badge Details / Edit Section */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    🏅 Badge Details (Admin)
+                  </h4>
+
+                  {loadingBadges && (
+                    <div className="dancer-loading-state">
+                      Loading badge details...
+                    </div>
+                  )}
+
+                  {badgeError && (
+                    <div className="dancer-error-state">{badgeError}</div>
+                  )}
+
+                  {!loadingBadges && badgeDetails && (
+                    <>
+                      {/* Show personas & next badges */}
+                      <div className="dancer-badge-personas">
+                        <strong>User Personas:</strong>{" "}
+                        {badgeDetails.user_personas &&
+                        badgeDetails.user_personas.length > 0
+                          ? badgeDetails.user_personas.join(", ")
+                          : "N/A"}
+                      </div>
+
+                      {badgeDetails.next_badges && (
+                        <div className="dancer-next-badges">
+                          {Object.entries(badgeDetails.next_badges).map(
+                            ([persona, badge]) =>
+                              badge && (
+                                <div
+                                  key={persona}
+                                  className="dancer-next-badge-card"
+                                >
+                                  <div className="dancer-next-badge-header">
+                                    <span className="dancer-next-badge-name">
+                                      {badge.badge_emoji} {badge.badge_name}
+                                    </span>
+                                    <span className="dancer-next-badge-persona">
+                                      Persona: {persona}
+                                    </span>
+                                  </div>
+                                  <div className="dancer-next-badge-body">
+                                    <div>Level: {badge.level}</div>
+                                    <div>
+                                      Commission rate: {badge.commission_rate}
+                                    </div>
+                                    <div>Description: {badge.description}</div>
+                                  </div>
+                                </div>
+                              )
+                          )}
+                        </div>
+                      )}
+
+                      {/* Assign / Update badge form */}
+                      <form
+                        className="dancer-badge-form"
+                        onSubmit={handleAssignBadge}
+                      >
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Persona / User Type
+                            <select
+                              value={badgeForm.user_type}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  user_type: e.target.value,
+                                }))
+                              }
+                            >
+                              <option value="">Select persona</option>
+                              {badgeDetails.user_personas &&
+                                badgeDetails.user_personas.map((p) => (
+                                  <option key={p} value={p}>
+                                    {p}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        </div>
+
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Badge Level
+                            <input
+                              type="number"
+                              min="1"
+                              value={badgeForm.badge_level}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  badge_level: e.target.value,
+                                }))
+                              }
+                            />
+                          </label>
+                        </div>
+
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Custom Commission Rate
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={badgeForm.custom_commission_rate}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  custom_commission_rate: e.target.value,
+                                }))
+                              }
+                              placeholder="Optional (e.g., 0.92)"
+                            />
+                          </label>
+                        </div>
+
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Reason
+                            <textarea
+                              value={badgeForm.reason}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  reason: e.target.value,
+                                }))
+                              }
+                              placeholder="Reason for assigning/updating this badge"
+                            />
+                          </label>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="dancer-badge-save-btn"
+                          disabled={savingBadge}
+                        >
+                          {savingBadge ? "Saving..." : "Assign / Update Badge"}
+                        </button>
+                      </form>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -513,7 +788,11 @@ const DancersList = () => {
             <div className="dancer-modal-footer">
               <button
                 className="dancer-modal-close-btn"
-                onClick={() => setSelectedDancer(null)}
+                onClick={() => {
+                  setSelectedDancer(null);
+                  setBadgeDetails(null);
+                  setBadgeError(null);
+                }}
               >
                 Close
               </button>

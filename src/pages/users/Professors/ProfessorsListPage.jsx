@@ -1,8 +1,60 @@
 import React, { useEffect, useState } from "react";
 import { fetchProfessors } from "../../../services/professor.service";
-import "../Dancers/DancersList.css"; // Import the dancer CSS for professor styling
+import "../Dancers/DancersList.css";
 import { fetchUserBookedDates } from "../../../services/user.Service";
-import { getUserBadgesService } from "../../../services/badge.service";
+import {
+  fetchUserBadges,
+  assignUserBadge,
+} from "../../../services/badge.service";
+
+// 🔹 Helper to safely display values (avoids object-as-child crash)
+const formatValueForDisplay = (value) => {
+  if (value === null || value === undefined) return "N/A";
+
+  const t = typeof value;
+
+  if (t === "string" || t === "number" || t === "boolean") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+
+  // Badge-like object
+  if (value && typeof value === "object") {
+    if (value.badge_name) {
+      const emoji = value.badge_emoji || "";
+      const level =
+        value.level !== undefined && value.level !== null
+          ? ` (Level ${value.level})`
+          : "";
+      return `${emoji} ${value.badge_name}${level}`;
+    }
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch (e) {
+    return "N/A";
+  }
+};
+
+// 🔹 Grid renderer using formatter
+const renderProfessorInfoGrid = (items) => {
+  return (
+    <div className="dancer-info-grid">
+      {items.map((item, index) => (
+        <div key={index} className={`dancer-info-item ${item.status || ""}`}>
+          <div className="dancer-info-label">{item.label}</div>
+          <div className="dancer-info-value">
+            {formatValueForDisplay(item.value)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ProfessorsListPage = () => {
   const [professors, setProfessors] = useState([]);
@@ -10,10 +62,22 @@ const ProfessorsListPage = () => {
   const [pagination, setPagination] = useState({});
   const [selectedProfessor, setSelectedProfessor] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
-  const [userBadges, setUserBadges] = useState(null);
+
+  // 🔹 Badge-related state
+  const [badgeDetails, setBadgeDetails] = useState(null);
   const [loadingBadges, setLoadingBadges] = useState(false);
+  const [badgeError, setBadgeError] = useState(null);
+  const [savingBadge, setSavingBadge] = useState(false);
+
+  const [badgeForm, setBadgeForm] = useState({
+    user_type: "instructor", // default persona for professors
+    badge_level: "",
+    custom_commission_rate: "",
+    reason: "",
+  });
 
   useEffect(() => {
     loadProfessors(page);
@@ -25,18 +89,108 @@ const ProfessorsListPage = () => {
     setPagination(data.pagination || {});
   };
 
-  // Helper function to render info items in grid
-  const renderProfessorInfoGrid = (items) => {
-    return (
-      <div className="dancer-info-grid">
-        {items.map((item, index) => (
-          <div key={index} className={`dancer-info-item ${item.status || ""}`}>
-            <div className="dancer-info-label">{item.label}</div>
-            <div className="dancer-info-value">{item.value}</div>
-          </div>
-        ))}
-      </div>
-    );
+  const loadProfessorBadges = async (prof) => {
+    setLoadingBadges(true);
+    setBadgeError(null);
+    setBadgeDetails(null);
+
+    try {
+      const data = await fetchUserBadges(prof.id);
+      if (!data) {
+        setBadgeError("Unable to load badge details.");
+        return;
+      }
+
+      const ALLOWED_PERSONAS = ["dancer", "instructor", "dj", "organizer"];
+
+      const personasFromApi = Array.isArray(data.user_personas)
+        ? data.user_personas.filter((p) => ALLOWED_PERSONAS.includes(p))
+        : [];
+
+      const finalPersonas =
+        personasFromApi.length > 0 ? personasFromApi : ALLOWED_PERSONAS;
+
+      setBadgeDetails({
+        ...data,
+        user_personas: finalPersonas,
+      });
+
+      // For professors, default to instructor if present, else first persona
+      const defaultPersona = finalPersonas.includes("instructor")
+        ? "instructor"
+        : finalPersonas[0];
+
+      const nextForPersona =
+        data.next_badges && data.next_badges[defaultPersona];
+
+      setBadgeForm({
+        user_type: defaultPersona,
+        badge_level:
+          nextForPersona && nextForPersona.level
+            ? String(nextForPersona.level)
+            : "",
+        custom_commission_rate:
+          nextForPersona && nextForPersona.commission_rate
+            ? String(nextForPersona.commission_rate)
+            : "",
+        reason: "",
+      });
+    } catch (err) {
+      console.error("Error loading professor badges:", err);
+      setBadgeError("Failed to load badge details.");
+    } finally {
+      setLoadingBadges(false);
+    }
+  };
+
+  const handleAssignBadge = async (e) => {
+    e.preventDefault();
+    if (!selectedProfessor) return;
+
+    if (!badgeForm.user_type || !badgeForm.badge_level) {
+      setBadgeError("User type and badge level are required.");
+      return;
+    }
+
+    const targetUserId =
+      selectedProfessor.user_id != null
+        ? selectedProfessor.user_id
+        : selectedProfessor.id;
+
+    setSavingBadge(true);
+    setBadgeError(null);
+
+    try {
+      await assignUserBadge({
+        target_user_id: targetUserId,
+        user_type: badgeForm.user_type, // e.g. "instructor"
+        badge_level: badgeForm.badge_level,
+        custom_commission_rate: badgeForm.custom_commission_rate,
+        reason:
+          badgeForm.reason ||
+          "Badge updated for instructor via admin dashboard",
+      });
+
+      await loadProfessorBadges(selectedProfessor);
+    } catch (err) {
+      console.error("Error assigning badge:", err);
+      const backendMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to assign badge. Please try again.";
+      setBadgeError(backendMsg);
+    } finally {
+      setSavingBadge(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProfessor(null);
+    setCalendarData(null);
+    setBadgeDetails(null);
+    setBadgeError(null);
   };
 
   return (
@@ -49,7 +203,6 @@ const ProfessorsListPage = () => {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
-            {/* <th>Location</th> */}
             <th>Skill Level</th>
             <th>Roles</th>
             <th>Subscription Name</th>
@@ -63,24 +216,28 @@ const ProfessorsListPage = () => {
                 setSelectedProfessor(prof);
                 setIsModalOpen(true);
 
-                // fetch calendar when modal opens
+                // Calendar
                 setLoadingCalendar(true);
+                setCalendarData(null);
                 try {
                   const data = await fetchUserBookedDates(prof.id, 1, 10);
                   setCalendarData(data);
                 } catch (err) {
                   console.error("Failed to load calendar", err);
                   setCalendarData(null);
+                } finally {
+                  setLoadingCalendar(false);
                 }
-                setLoadingCalendar(false);
+
+                // Badges
+                loadProfessorBadges(prof);
               }}
             >
               <td>{prof.id}</td>
               <td>{prof.name}</td>
               <td>{prof.email}</td>
-              {/* <td>{prof.location}</td> */}
               <td>{prof.skill_level}</td>
-              <td>{prof.roles.join(", ")}</td>
+              <td>{prof.roles?.join(", ")}</td>
               <td>{prof.active_subscription?.subscription_name || "-"}</td>
             </tr>
           ))}
@@ -110,30 +267,24 @@ const ProfessorsListPage = () => {
       </div>
 
       {isModalOpen && selectedProfessor && (
-        <div
-          className="dancer-modal-overlay"
-          onClick={() => setIsModalOpen(false)}
-        >
+        <div className="dancer-modal-overlay" onClick={closeModal}>
           <div
             className="dancer-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
+            {/* Header */}
             <div className="dancer-modal-header">
               <h3>👨‍🏫 Professor Profile Details</h3>
-              <button
-                className="dancer-modal-close-x"
-                onClick={() => setIsModalOpen(false)}
-              >
+              <button className="dancer-modal-close-x" onClick={closeModal}>
                 ✕
               </button>
             </div>
 
-            {/* Modal Body - Organized in Columns */}
+            {/* Body */}
             <div className="dancer-modal-body">
-              {/* Left Column */}
+              {/* Left column */}
               <div className="dancer-modal-column dancer-modal-left">
-                {/* Basic Information Section */}
+                {/* Basic Information */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">👤 Basic Information</h4>
                   {renderProfessorInfoGrid([
@@ -169,7 +320,7 @@ const ProfessorsListPage = () => {
                   ])}
                 </div>
 
-                {/* Active Subscription Section */}
+                {/* Active Subscription */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     💳 Active Subscription
@@ -230,12 +381,13 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* Subscription History Section */}
+                {/* Subscription History */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📈 Subscription History
                   </h4>
-                  {selectedProfessor.subscription_history?.length > 0 ? (
+                  {selectedProfessor.subscription_history &&
+                  selectedProfessor.subscription_history.length > 0 ? (
                     <div className="dancer-history-container">
                       {selectedProfessor.subscription_history.map(
                         (sub, idx) => (
@@ -282,9 +434,9 @@ const ProfessorsListPage = () => {
                 </div>
               </div>
 
-              {/* Right Column */}
+              {/* Right column */}
               <div className="dancer-modal-column dancer-modal-right">
-                {/* Calendar Section */}
+                {/* Calendar */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📅 Booked Dates & Slots
@@ -332,7 +484,7 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* Professor Specific Information Section */}
+                {/* Professor Specific Information */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">🎓 Professor Details</h4>
                   {renderProfessorInfoGrid([
@@ -367,7 +519,7 @@ const ProfessorsListPage = () => {
                   ])}
                 </div>
 
-                {/* Current Badges Section (if available) */}
+                {/* Current Badges (from list object) */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
                   {selectedProfessor.current_badges &&
@@ -406,7 +558,7 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* Subscription Summary Section */}
+                {/* Subscription Summary */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📋 Subscription Summary
@@ -454,15 +606,158 @@ const ProfessorsListPage = () => {
                     </div>
                   )}
                 </div>
+
+                {/* 🏅 Badge Details (Admin) */}
+                <div className="dancer-modal-section">
+                  <h4 className="dancer-section-title">
+                    🏅 Badge Details (Admin)
+                  </h4>
+
+                  {loadingBadges && (
+                    <div className="dancer-loading-state">
+                      Loading badge details...
+                    </div>
+                  )}
+
+                  {badgeError && (
+                    <div className="dancer-error-state">{badgeError}</div>
+                  )}
+
+                  {!loadingBadges && badgeDetails && (
+                    <>
+                      <div className="dancer-badge-personas">
+                        <strong>User Personas:</strong>{" "}
+                        {badgeDetails.user_personas &&
+                        badgeDetails.user_personas.length > 0
+                          ? badgeDetails.user_personas.join(", ")
+                          : "N/A"}
+                      </div>
+
+                      {badgeDetails.next_badges && (
+                        <div className="dancer-next-badges">
+                          {Object.entries(badgeDetails.next_badges).map(
+                            ([persona, badge]) =>
+                              badge && (
+                                <div
+                                  key={persona}
+                                  className="dancer-next-badge-card"
+                                >
+                                  <div className="dancer-next-badge-header">
+                                    <span className="dancer-next-badge-name">
+                                      {badge.badge_emoji} {badge.badge_name}
+                                    </span>
+                                    <span className="dancer-next-badge-persona">
+                                      Persona: {persona}
+                                    </span>
+                                  </div>
+                                  <div className="dancer-next-badge-body">
+                                    <div>Level: {badge.level}</div>
+                                    <div>
+                                      Commission rate: {badge.commission_rate}
+                                    </div>
+                                    <div>Description: {badge.description}</div>
+                                  </div>
+                                </div>
+                              )
+                          )}
+                        </div>
+                      )}
+
+                      <form
+                        className="dancer-badge-form"
+                        onSubmit={handleAssignBadge}
+                      >
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Persona / User Type
+                            <select
+                              value={badgeForm.user_type}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  user_type: e.target.value,
+                                }))
+                              }
+                            >
+                              <option value="">Select persona</option>
+                              {badgeDetails.user_personas &&
+                                badgeDetails.user_personas.map((p) => (
+                                  <option key={p} value={p}>
+                                    {p}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        </div>
+
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Badge Level
+                            <input
+                              type="number"
+                              min="1"
+                              value={badgeForm.badge_level}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  badge_level: e.target.value,
+                                }))
+                              }
+                            />
+                          </label>
+                        </div>
+
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Custom Commission Rate
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={badgeForm.custom_commission_rate}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  custom_commission_rate: e.target.value,
+                                }))
+                              }
+                              placeholder="Optional (e.g., 0.92)"
+                            />
+                          </label>
+                        </div>
+
+                        <div className="dancer-badge-form-row">
+                          <label>
+                            Reason
+                            <textarea
+                              value={badgeForm.reason}
+                              onChange={(e) =>
+                                setBadgeForm((prev) => ({
+                                  ...prev,
+                                  reason: e.target.value,
+                                }))
+                              }
+                              placeholder="Reason for assigning/updating this badge"
+                            />
+                          </label>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="dancer-badge-save-btn"
+                          disabled={savingBadge}
+                        >
+                          {savingBadge ? "Saving..." : "Assign / Update Badge"}
+                        </button>
+                      </form>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Modal Footer */}
+            {/* Footer */}
             <div className="dancer-modal-footer">
-              <button
-                className="dancer-modal-close-btn"
-                onClick={() => setIsModalOpen(false)}
-              >
+              <button className="dancer-modal-close-btn" onClick={closeModal}>
                 Close
               </button>
             </div>
