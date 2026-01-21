@@ -189,7 +189,7 @@ const PendingPayouts = () => {
           <div className="stat-card">
             <div className="stat-content">
               <div className="stat-icon total-pending">
-                <i className="icon-dollar">€</i>
+                <i className="icon-euro">€</i>
               </div>
               <div className="stat-info">
                 <p className="stat-label">Total Pending</p>

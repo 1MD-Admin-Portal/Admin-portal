@@ -536,7 +536,7 @@ const VideoPrograms = () => {
                         <div className="info-label">Price</div>
                         <div className="info-value">
                           {selectedProgram.pricing_type === "paid"
-                            ? `$${selectedProgram.price}`
+                            ? `€${selectedProgram.price}`
                             : "Free"}
                         </div>
                       </div>
