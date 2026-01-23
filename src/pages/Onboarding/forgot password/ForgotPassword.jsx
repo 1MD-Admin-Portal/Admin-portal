@@ -86,7 +86,7 @@ const ForgotPassword = () => {
       } else {
         setError(
           error.response?.data?.message ||
-            "Failed to send OTP. Please try again."
+          "Failed to send OTP. Please try again."
         );
       }
     } finally {
@@ -120,7 +120,7 @@ const ForgotPassword = () => {
 
         {step === 1 && (
           <form onSubmit={handleSendOtp} className="forgot-form">
-            <div className="input-group">
+            <div className="login-input-group">
               <label htmlFor="email">Email</label>
               <div
                 className={`input-wrapper ${fieldErrors.email ? "error" : ""}`}
