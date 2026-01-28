@@ -1,5 +1,9 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // ✅ added useNavigate
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+
+
+// import React, { useState } from "react";
+// import { Link, useNavigate } from "react-router-dom"; // ✅ added useNavigate
 import logo from "../assets/logo.png"; // Add this import - replace with your actual logo filename
 import {
   Home,
@@ -39,6 +43,9 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = () => {
+  const sidebarScrollRef = useRef(null);
+const location = useLocation();
+
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [earningDropdownOpen, setEarningDropdownOpen] = useState(false);
   const [operationDropdownOpen, setOperationDropdownOpen] = useState(false);
@@ -152,6 +159,29 @@ const Sidebar = () => {
     //   label: "Redemption & Spotlight",
     // },
   ];
+
+  useEffect(() => {
+  const sidebar = sidebarScrollRef.current;
+  if (!sidebar) return;
+
+  // restore scroll
+  const savedScroll = sessionStorage.getItem("sidebar-scroll");
+  if (savedScroll !== null) {
+    sidebar.scrollTop = Number(savedScroll);
+  }
+
+  // save scroll on scroll
+  const handleScroll = () => {
+    sessionStorage.setItem("sidebar-scroll", sidebar.scrollTop);
+  };
+
+  sidebar.addEventListener("scroll", handleScroll);
+
+  return () => {
+    sidebar.removeEventListener("scroll", handleScroll);
+  };
+}, [location.pathname]);
+
 
   return (
     <div className="sidebar-container">
@@ -423,7 +453,9 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="sidebar-content">
+      {/* <div className="sidebar-content"> */}
+        <div className="sidebar-content" ref={sidebarScrollRef}>
+
         <nav className="sidebar-nav">
           <div className="menu-section">
             <p className="menu-section-title">Main</p>

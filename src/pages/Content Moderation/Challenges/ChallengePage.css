@@ -1,11 +1,22 @@
 /* Challenge Page Styles */
 .challenge-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  background: #ffffff !important; 
   position: relative;
   overflow-x: hidden;
   margin-left: 270px;
 }
+/* .challenge-page {
+  min-height: 100%;       /* ✅ NOT 100vh */
+  /* */
+  /* ❌ margin-left REMOVE */
+  /* ❌ background REMOVE from here */
+ 
+/* .challenge-bg {
+  min-height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ */
 
 .challenge-page::before {
   position: absolute;
@@ -24,14 +35,28 @@
       transparent 50%
     );
   pointer-events: none;
+  display: none;
 }
 
 .challenge-content {
-  position: relative;
-  z-index: 1;
-  max-width: 1400px;
-  margin: 0 auto;
+  background: #ffffff !important;
   padding: 2rem;
+}
+
+.challenge-content .card {
+  background: white !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+.challenge-content .card-title {
+  color: #1e40af;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.challenge-content h1 {
+  color: #ff7a00 !important;
 }
 
 /* Header Styles */
@@ -43,18 +68,18 @@
 .page-title {
   font-size: 3rem;
   font-weight: 800;
-  color: white;
+  color: #ff7a00 !important;
   margin: 0 0 1rem 0;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+  text-shadow: none;
+  background:none;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: initial;
   background-clip: text;
 }
 
 .page-description {
   font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.9);
+  color:  #475569;
   margin: 0;
   font-weight: 300;
 }
@@ -68,11 +93,11 @@
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
+  background:#ffffff !important;
+  backdrop-filter: none;
   border-radius: 1rem;
   padding: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #e2e8f0;
 }
 
 .tab-button {
@@ -82,7 +107,7 @@
   padding: 0.75rem 1.5rem;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.8);
+  color: #334155;
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -112,8 +137,8 @@
 }
 
 .tab-button.active {
-  background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
-  color: #667eea;
+  background: #ff7a00;
+  color: white;
   box-shadow: 0 8px 32px rgba(255, 255, 255, 0.3);
 }
 
@@ -161,17 +186,17 @@
 .search-input {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 3rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  color: white;
+  background: #ffffff;
+  backdrop-filter: none;
+  color: #334155;
   font-size: 0.95rem;
   transition: all 0.3s ease;
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color:#94a3b8;
 }
 
 .search-input:focus {
@@ -183,11 +208,11 @@
 
 .status-filter {
   padding: 0.875rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  color: white;
+  background:#ffffff;
+  backdrop-filter: none;
+  color: #334155;
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 150px;
@@ -444,7 +469,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem 0;
-  color: white;
+  color: #334155;
 }
 
 .pagination-info p {
@@ -459,19 +484,22 @@
 
 .pagination-btn {
   padding: 0.5rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: none;
   border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: #ff7a00;
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-weight: 600;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
+  background: #e66a00;
 }
 
 .pagination-btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -622,10 +650,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1050;
   flex-direction: column;
   padding: 1rem;
   animation: fadeIn 0.3s ease;
+  position: fixed;
+  inset: 0;
 }
 
 @keyframes fadeIn {
@@ -646,6 +676,7 @@
   max-height: 90vh;
   overflow: hidden;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: auto;
 }
 
 .modal-large {
@@ -716,6 +747,51 @@
   padding: 1.5rem 2rem;
   border-top: 1px solid #e2e8f0;
   background: #f8fafc;
+}
+
+/* Pagination Styles */
+.btn-outline-light {
+  background-color: #ffffff;
+  border: 2px solid #ff7a00;
+  color: #ff7a00;
+  font-weight: 600;
+}
+
+.btn-outline-light:hover:not(:disabled) {
+  background-color: #ff7a00;
+  color: #ffffff;
+  border-color: #ff7a00;
+}
+
+.btn-outline-light:disabled {
+  background-color: #f0f0f0;
+  border-color: #cccccc;
+  color: #999999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Centered Modal */
+.modal-center {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1050 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-center .modal-dialog {
+  position: relative !important;
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 90% !important;
 }
 
 /* Form Styles */
