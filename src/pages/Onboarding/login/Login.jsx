@@ -107,7 +107,7 @@ const Login = () => {
         )}
 
         <form onSubmit={handleLogin} className="login-form-content">
-          <div className="input-group">
+          <div className="login-input-group">
             <label htmlFor="email">Email</label>
             <div
               className={`input-wrapper ${fieldErrors.email ? "error" : ""}`}
@@ -127,7 +127,7 @@ const Login = () => {
             )}
           </div>
 
-          <div className="input-group">
+          <div className="login-input-group">
             <label htmlFor="password">Password</label>
             <div
               className={`input-wrapper ${fieldErrors.password ? "error" : ""}`}

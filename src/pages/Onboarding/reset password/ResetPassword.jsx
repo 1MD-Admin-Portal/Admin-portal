@@ -103,7 +103,7 @@ const ResetPassword = () => {
       } else {
         setError(
           response.data?.message ||
-            "Failed to reset password. Please try again."
+          "Failed to reset password. Please try again."
         );
       }
     } catch (error) {
@@ -112,7 +112,7 @@ const ResetPassword = () => {
       if (error.response?.status === 400) {
         setError(
           error.response.data?.message ||
-            "Invalid OTP or request. Please try again."
+          "Invalid OTP or request. Please try again."
         );
       } else if (error.response?.status === 404) {
         setError("Invalid reset request. Please start the process again.");
@@ -174,12 +174,11 @@ const ResetPassword = () => {
 
         {step === 1 && (
           <form onSubmit={handleSubmit} className="reset-password-form">
-            <div className="input-group">
+            <div className="login-input-group">
               <label htmlFor="otp">Verification Code</label>
               <div
-                className={`input-wrapper otp-wrapper ${
-                  fieldErrors.otp ? "error" : ""
-                }`}
+                className={`input-wrapper otp-wrapper ${fieldErrors.otp ? "error" : ""
+                  }`}
               >
                 <input
                   id="otp"
@@ -201,12 +200,11 @@ const ResetPassword = () => {
               )}
             </div>
 
-            <div className="input-group">
+            <div className="login-input-group">
               <label htmlFor="newPassword">New Password</label>
               <div
-                className={`input-wrapper ${
-                  fieldErrors.newPassword ? "error" : ""
-                }`}
+                className={`input-wrapper ${fieldErrors.newPassword ? "error" : ""
+                  }`}
               >
                 <Lock size={18} className="input-icon" />
                 <input
@@ -252,12 +250,11 @@ const ResetPassword = () => {
               )}
             </div>
 
-            <div className="input-group">
+            <div className="login-input-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <div
-                className={`input-wrapper ${
-                  fieldErrors.confirmPassword ? "error" : ""
-                }`}
+                className={`input-wrapper ${fieldErrors.confirmPassword ? "error" : ""
+                  }`}
               >
                 <Lock size={18} className="input-icon" />
                 <input

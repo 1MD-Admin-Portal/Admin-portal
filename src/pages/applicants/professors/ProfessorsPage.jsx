@@ -294,17 +294,15 @@ const ProfessorsPage = () => {
               <td>
                 <div className="icon-actions">
                   <CheckCircle
-                    className={`action-icon ${
-                      app.status !== "pending" ? "disabled" : ""
-                    }`}
+                    className={`action-icon ${app.status !== "pending" ? "disabled" : ""
+                      }`}
                     onClick={() =>
                       app.status === "pending" && handleApprove(app.id)
                     }
                   />
                   <XCircle
-                    className={`action-icon reject ${
-                      app.status !== "pending" ? "disabled" : ""
-                    }`}
+                    className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
+                      }`}
                     onClick={() =>
                       app.status === "pending" && setSelectedRejectId(app.id)
                     }
@@ -382,6 +380,12 @@ const ProfessorsPage = () => {
       {selectedApp && (
         <div className="modal-overlay">
           <div className="detail-modal" ref={modalRef}>
+            <button
+              className="modal-close-icon"
+              onClick={() => setSelectedApp(null)}
+            >
+              ×
+            </button>
             <h3>Application Details</h3>
             <p>
               <strong>ID:</strong> {selectedApp.id}
