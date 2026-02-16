@@ -17,12 +17,10 @@
   left: 265px;
   right: 0;
   height: 200px;
-  background: linear-gradient(
-    135deg,
-    rgba(245, 158, 11, 0.1) 0%,
-    rgba(239, 68, 68, 0.1) 50%,
-    rgba(236, 72, 153, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(245, 158, 11, 0.1) 0%,
+      rgba(239, 68, 68, 0.1) 50%,
+      rgba(236, 72, 153, 0.1) 100%);
   pointer-events: none;
   z-index: -1;
 }
@@ -62,13 +60,16 @@
 }
 
 @keyframes eventCalendarFlip {
+
   0%,
   100% {
     transform: translateY(-50%) rotate(0deg);
   }
+
   25% {
     transform: translateY(-50%) rotate(-5deg) scale(1.1);
   }
+
   75% {
     transform: translateY(-50%) rotate(5deg) scale(1.1);
   }
@@ -114,12 +115,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(245, 158, 11, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(245, 158, 11, 0.1),
+      transparent);
   transition: left 0.3s;
 }
 
@@ -181,6 +180,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -256,11 +256,9 @@
 }
 
 .event-table-row:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(245, 158, 11, 0.02) 0%,
-    rgba(239, 68, 68, 0.02) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(245, 158, 11, 0.02) 0%,
+      rgba(239, 68, 68, 0.02) 100%);
   transform: translateY(-1px);
 }
 
@@ -334,113 +332,91 @@
 
 /* Type badges */
 .event-type-badge.event-type-workshop {
-  background: linear-gradient(
-    135deg,
-    rgba(168, 85, 247, 0.1),
-    rgba(124, 58, 237, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(168, 85, 247, 0.1),
+      rgba(124, 58, 237, 0.1));
   color: #7c3aed;
   border-color: rgba(168, 85, 247, 0.3);
 }
 
 .event-type-badge.event-type-competition {
-  background: linear-gradient(
-    135deg,
-    rgba(239, 68, 68, 0.1),
-    rgba(220, 38, 38, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(239, 68, 68, 0.1),
+      rgba(220, 38, 38, 0.1));
   color: #dc2626;
   border-color: rgba(239, 68, 68, 0.3);
 }
 
 .event-type-badge.event-type-social {
-  background: linear-gradient(
-    135deg,
-    rgba(34, 197, 94, 0.1),
-    rgba(21, 128, 61, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(34, 197, 94, 0.1),
+      rgba(21, 128, 61, 0.1));
   color: #15803d;
   border-color: rgba(34, 197, 94, 0.3);
 }
 
 .event-type-badge.event-type-performance {
-  background: linear-gradient(
-    135deg,
-    rgba(236, 72, 153, 0.1),
-    rgba(219, 39, 119, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(236, 72, 153, 0.1),
+      rgba(219, 39, 119, 0.1));
   color: #db2777;
   border-color: rgba(236, 72, 153, 0.3);
 }
 
 /* Dance style badges */
 .event-dance-badge.event-dance-salsa {
-  background: linear-gradient(
-    135deg,
-    rgba(239, 68, 68, 0.1),
-    rgba(220, 38, 38, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(239, 68, 68, 0.1),
+      rgba(220, 38, 38, 0.1));
   color: #dc2626;
   border-color: rgba(239, 68, 68, 0.3);
 }
 
 .event-dance-badge.event-dance-bachata {
-  background: linear-gradient(
-    135deg,
-    rgba(236, 72, 153, 0.1),
-    rgba(219, 39, 119, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(236, 72, 153, 0.1),
+      rgba(219, 39, 119, 0.1));
   color: #db2777;
   border-color: rgba(236, 72, 153, 0.3);
 }
 
 .event-dance-badge.event-dance-hip-hop {
-  background: linear-gradient(
-    135deg,
-    rgba(168, 85, 247, 0.1),
-    rgba(124, 58, 237, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(168, 85, 247, 0.1),
+      rgba(124, 58, 237, 0.1));
   color: #7c3aed;
   border-color: rgba(168, 85, 247, 0.3);
 }
 
 .event-dance-badge.event-dance-contemporary {
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.1),
-    rgba(37, 99, 235, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.1),
+      rgba(37, 99, 235, 0.1));
   color: #2563eb;
   border-color: rgba(59, 130, 246, 0.3);
 }
 
 /* Level badges */
 .event-level-badge.event-level-beginner {
-  background: linear-gradient(
-    135deg,
-    rgba(34, 197, 94, 0.1),
-    rgba(21, 128, 61, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(34, 197, 94, 0.1),
+      rgba(21, 128, 61, 0.1));
   color: #15803d;
   border-color: rgba(34, 197, 94, 0.3);
 }
 
 .event-level-badge.event-level-intermediate {
-  background: linear-gradient(
-    135deg,
-    rgba(251, 146, 60, 0.1),
-    rgba(234, 88, 12, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(251, 146, 60, 0.1),
+      rgba(234, 88, 12, 0.1));
   color: #ea580c;
   border-color: rgba(251, 146, 60, 0.3);
 }
 
 .event-level-badge.event-level-advanced {
-  background: linear-gradient(
-    135deg,
-    rgba(239, 68, 68, 0.1),
-    rgba(220, 38, 38, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(239, 68, 68, 0.1),
+      rgba(220, 38, 38, 0.1));
   color: #dc2626;
   border-color: rgba(239, 68, 68, 0.3);
 }
@@ -517,12 +493,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -568,7 +542,7 @@
 /* Pagination Controls */
 .event-pagination-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin-top: 2rem;
   gap: 1rem;
@@ -577,6 +551,12 @@
   border-radius: 16px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.event-pagination-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .event-pagination-btn {
@@ -604,12 +584,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -666,6 +644,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -691,6 +670,7 @@
     opacity: 0;
     transform: translateY(50px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -887,11 +867,11 @@
 
 .event-image {
   width: 100%;
-  height: 100px;
-  /* object-fit: cover; */
-  object-fit: contain;
+  height: 360px;   /* increased from 100px */
+  object-fit: cover;
   display: block;
 }
+
 
 /* Compact Users Section */
 .event-users-section {
@@ -913,11 +893,9 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: linear-gradient(
-    135deg,
-    rgba(245, 158, 11, 0.05) 0%,
-    rgba(239, 68, 68, 0.05) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(245, 158, 11, 0.05) 0%,
+      rgba(239, 68, 68, 0.05) 100%);
   border-radius: 12px;
   border: 1px solid rgba(245, 158, 11, 0.2);
   transition: all 0.3s ease;
@@ -926,11 +904,9 @@
 .event-user-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
-  background: linear-gradient(
-    135deg,
-    rgba(245, 158, 11, 0.08) 0%,
-    rgba(239, 68, 68, 0.08) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(245, 158, 11, 0.08) 0%,
+      rgba(239, 68, 68, 0.08) 100%);
 }
 
 .event-user-avatar {
@@ -1009,12 +985,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 

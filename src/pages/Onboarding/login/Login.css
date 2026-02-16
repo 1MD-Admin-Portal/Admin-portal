@@ -57,18 +57,17 @@
   font-weight: 500;
 }
 
-.input-group {
+.login-input-group {
   margin-bottom: clamp(1.5rem, 2vh, 2rem);
 }
 
-.input-group label {
+.login-input-group label {
   display: block;
-  margin-bottom: 0.875rem;
+  margin-bottom: 0.5rem;
   font-weight: 600;
   color: #374151;
   font-size: clamp(0.9rem, 1vw, 0.95rem);
   letter-spacing: 0.025em;
-  padding: 1rem;
 }
 
 .input-wrapper {
@@ -178,12 +177,12 @@
   flex-shrink: 0;
 }
 
-.remember-me input:checked ~ .checkmark {
+.remember-me input:checked~.checkmark {
   background-color: #667eea;
   border-color: #667eea;
 }
 
-.remember-me input:checked ~ .checkmark:after {
+.remember-me input:checked~.checkmark:after {
   content: "";
   position: absolute;
   left: 6px;
@@ -251,6 +250,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -421,10 +421,12 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -505,12 +507,15 @@
 .strength-1 {
   background-color: #ef4444;
 }
+
 .strength-2 {
   background-color: #f97316;
 }
+
 .strength-3 {
   background-color: #eab308;
 }
+
 .strength-4 {
   background-color: #22c55e;
 }
@@ -524,12 +529,15 @@
 .strength-label.strength-1 {
   color: #ef4444;
 }
+
 .strength-label.strength-2 {
   color: #f97316;
 }
+
 .strength-label.strength-3 {
   color: #eab308;
 }
+
 .strength-label.strength-4 {
   color: #22c55e;
 }
@@ -623,7 +631,7 @@
     margin-bottom: 2rem;
   }
 
-  .input-group {
+  .login-input-group {
     margin-bottom: 1.5rem;
   }
 
@@ -658,7 +666,7 @@
     margin-bottom: 1.5rem;
   }
 
-  .input-group {
+  .login-input-group {
     margin-bottom: 1.25rem;
   }
 
@@ -766,12 +774,12 @@
     margin-bottom: 2rem;
   }
 
-  .input-group {
+  .login-input-group {
     margin-bottom: 1.75rem;
   }
 
-  .forgot-form .input-group,
-  .reset-password-form .input-group {
+  .forgot-form .login-input-group,
+  .reset-password-form .login-input-group {
     margin-bottom: 1.75rem;
   }
 
@@ -813,7 +821,8 @@
 
 /* High DPI/Retina Display Adjustments */
 @media screen and (-webkit-min-device-pixel-ratio: 2),
-  screen and (min-resolution: 192dpi) {
+screen and (min-resolution: 192dpi) {
+
   .login-button,
   .forgot-button,
   .reset-password-button {
@@ -831,6 +840,7 @@
 
 /* Accessibility and Motion Preferences */
 @media (prefers-reduced-motion: reduce) {
+
   .login-button:hover:not(:disabled),
   .forgot-button:hover:not(:disabled),
   .reset-password-button:hover:not(:disabled) {
@@ -852,6 +862,7 @@
 
 /* Print Styles */
 @media print {
+
   .login-container,
   .forgot-container,
   .reset-password-container {
