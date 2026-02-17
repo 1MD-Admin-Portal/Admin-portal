@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   Play,
   Eye,
@@ -444,7 +443,7 @@ const ChallengePage = () => {
         <style>{`
           @media (min-width: 992px) {
             .challenge-wrapper {
-              margin-left: 280px !important;
+              margin-left: 255px !important;
               padding-left: 15px !important;
             }
           }
@@ -533,18 +532,18 @@ const ChallengePage = () => {
 
 
         <div className="challenge-content">
-          <div className="text-center mb-4 mb-md-5">
-            <h1 className="text-dark fw-bold display-6 display-md-4 mb-2">
+          <div className=" mb-4">
+            <h1 className="challenge">
               Challenge Management
             </h1>
-            <p className="text-secondary fs-6 fs-md-5">
+            {/* <p className="text-secondary fs-6 fs-md-5">
               Manage challenges, submissions, and participants
-            </p>
+            </p> */}
           </div>
           {/* Tab Navigation */}
-          <div className="card mb-4 bg-transparent border-light">
-            <div className="card-body p-2">
-              <ul className="nav nav-pills justify-content-center flex-column flex-sm-row">
+          <div className=" mb-4  ">
+            <div className="card-body p-2 plmgmt-tab-controls">
+              <ul className="nav nav-pills flex-column flex-sm-row">
                 {[
                   { id: "challenges", label: "Challenges", icon: Award },
                   {
@@ -588,7 +587,7 @@ const ChallengePage = () => {
                         />
                         <input
                           type="text"
-                          className="form-control ps-5"
+                          className="form-controls ps-5"
                           placeholder="Search challenges..."
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
@@ -622,7 +621,11 @@ const ChallengePage = () => {
               </div>
 
               {loading ? (
-                <GlobalLoader text="Loading challenges..." />
+                <div className="d-flex justify-content-center py-5">
+                  <div className="spinner-border text-light" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
               ) : (
                 <>
                   {/* Challenges Grid */}
