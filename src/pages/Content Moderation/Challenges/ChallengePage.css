@@ -744,6 +744,7 @@
   background: #f8fafc;
 }
 
+
 /* Pagination Styles */
 .btn-outline-light {
   background-color: #ffffff;
@@ -1065,6 +1066,7 @@
     text-overflow: ellipsis;
   }
 }
+
 
 /* Form Styles */
 .form-group {

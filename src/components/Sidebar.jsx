@@ -89,7 +89,7 @@ const Sidebar = () => {
 
   // Close sidebar on mobile when menu item is clicked
   const handleMenuItemClick = () => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 1024) {
       setIsSidebarOpen(false);
     }
   };
@@ -347,11 +347,26 @@ const Sidebar = () => {
             transform: translateY(-50%) scale(1.1);
           }
 
-          @media (max-width: 768px) {
-            .sidebar-close-btn {
-              display: flex;
-            }
+          
+          @media (max-width: 1024px) {
+          .sidebar-container {
+            width: 280px;
+            transform: translateX(-100%);
           }
+
+          .sidebar-container.open {
+            transform: translateX(0);
+          }
+
+          .sidebar-toggle-btn {
+            display: flex;
+          }
+
+          .sidebar-overlay {
+            display: block;
+          }
+        }
+
 
           .logo-icon {
             width: 48px;

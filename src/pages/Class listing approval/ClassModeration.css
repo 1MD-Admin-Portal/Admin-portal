@@ -13,7 +13,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+ background: linear-gradient(135deg,#3b82f6,#ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -49,10 +49,10 @@
   left: 265px;
   right: 0;
   height: 200px;
-  background: linear-gradient(
+   background: linear-gradient(
     135deg,
-    rgba(59, 130, 246, 0.1) 0%,
-    rgba(124, 58, 237, 0.1) 100%
+    rgba(59,130,246,0.08),
+    rgba(236,72,153,0.08)
   );
   pointer-events: none;
   z-index: -1;
@@ -106,7 +106,7 @@
 }
 
 .class-mod-tab-buttons button.class-mod-tab-active {
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+ background: linear-gradient(135deg,#3b82f6,#ec4899);
   color: white;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
   transform: translateY(-2px);
@@ -142,13 +142,13 @@
 }
 
 .class-mod-bulk-actions button:first-child {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg,#3b82f6,#6366f1);
   color: white;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .class-mod-bulk-actions button:last-child {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg,#ec4899,#f43f5e);
   color: white;
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
@@ -338,16 +338,17 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, #3b82f6, #ec4899);
+
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
 
 .class-mod-clickable-row:hover {
-  background: linear-gradient(
+   background: linear-gradient(
     135deg,
-    rgba(59, 130, 246, 0.05) 0%,
-    rgba(139, 92, 246, 0.05) 100%
+    rgba(59,130,246,0.05),
+    rgba(236,72,153,0.05)
   );
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
@@ -369,7 +370,8 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  background: linear-gradient(135deg,#3b82f6,#ec4899);
+
   color: white;
 }
 
@@ -570,18 +572,23 @@
 }
 
 .class-mod-popup-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: clamp(30px, 5vw, 30px);
+  height: clamp(30px, 5vw, 30px);
   color: white;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
-  padding: 0.5rem;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
 }
 
 .class-mod-popup-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
 }
 
 /* Modal Body - Scrollable */

@@ -286,7 +286,7 @@ const EventsPage = () => {
                         }}
                         title="View Interested Users"
                       >
-                        <Users size={16} />
+                        <Eye size={16} />
                       </button>
                     )}
                   </td>

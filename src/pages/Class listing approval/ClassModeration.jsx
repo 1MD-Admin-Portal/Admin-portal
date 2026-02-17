@@ -410,14 +410,14 @@ const ClassModeration = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="class-mod-modal-footer">
+            {/* <div className="class-mod-modal-footer">
               <button
                 className="class-mod-modal-close-btn"
                 onClick={() => setSelectedClass(null)}
               >
                 Close
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

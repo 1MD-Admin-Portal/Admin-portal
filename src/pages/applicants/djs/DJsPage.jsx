@@ -81,9 +81,9 @@ const DJsPage = () => {
   return (
     <div className="professors-container">
       <h2 className="professors-title">DJ Applications</h2>
-      {/* <h2 className="professors-title">DJ Applications</h2>
+      {/* //<h2 className="professors-title">DJ Applications</h2> */}
 
-      {pendingApps.length > 0 && (
+      
         <div className="pagination-controls">
           {selectedIds.length === 0 ? (
             <>
@@ -91,13 +91,13 @@ const DJsPage = () => {
                 className="pagination-btn"
                 onClick={() => setShowConfirm("approve")}
               >
-                ✅ Approve All
+                ✅ Approve All({pendingApps.length})
               </button>
               <button
                 className="pagination-btn"
                 onClick={() => setShowConfirm("reject")}
               >
-                ❌ Reject All
+                ❌ Reject All({pendingApps.length})
               </button>
             </>
           ) : (
@@ -117,7 +117,6 @@ const DJsPage = () => {
             </>
           )}
         </div>
-      )} */}
 
       <table className="professors-table">
         <thead>
@@ -153,6 +152,7 @@ const DJsPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
+
               {/* <td>
                 <input
                   type="checkbox"
@@ -169,18 +169,29 @@ const DJsPage = () => {
                   }}
                 />
               </td> */}
-              <td>{app.id}</td>
-              <td>
-                <button
-                  onClick={() => setSelectedApplication(app)}
-                  className="link-button"
-                >
-                  {app.email}
-                </button>
-              </td>
+              <td
+  onClick={() => setSelectedApplication(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.id}
+</td>
+
+              <td
+  onClick={() => setSelectedApplication(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.email}
+</td>
+
               {/* <td>{formatField(app.genres)}</td> */}
               {/* <td>{app.dj_type}</td> */}
-              <td>{app.dj_experience}</td>
+              <td
+  onClick={() => setSelectedApplication(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.dj_experience}
+</td>
+
               <td>{formatField(app.performance_frequency)}</td>
               <td>
                 {app.document_url ? (
@@ -198,20 +209,10 @@ const DJsPage = () => {
               {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
               <td>
-                <CheckCircle
-                  className={`action-icon ${app.status !== "pending" ? "disabled" : ""
-                    }`}
-                  onClick={() =>
-                    app.status === "pending" && handleApprove(app.id)
-                  }
-                />
-                <XCircle
-                  className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
-                    }`}
-                  onClick={() =>
-                    app.status === "pending" && setSelectedRejectId(app.id)
-                  }
-                />
+                <CheckCircle className={`action-icon ${app.status !== "pending" ? "disabled" : ""}`} onClick={() => app.status === "pending" && handleApprove(app.id) } />
+
+                <XCircle className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""}`} onClick={() => app.status === "pending" && setSelectedRejectId(app.id) } />
+
               </td>
             </tr>
           ))}
