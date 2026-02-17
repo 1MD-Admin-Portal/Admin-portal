@@ -150,7 +150,7 @@ const EarningsPage = () => {
   };
 
   if (loading && earnings.length === 0) {
-    return <div className="earnings-mgmt-loading">Loading...</div>;
+    return <GlobalLoader text="Loading earnings..." />;
   }
 
   return (

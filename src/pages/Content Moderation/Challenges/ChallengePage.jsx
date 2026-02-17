@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   Play,
   Eye,
@@ -48,6 +49,7 @@ import {
 import { uploadMediaFile } from "../../../services/upload.service";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "./ChallengePage.css";
 
 const ChallengePage = () => {
   // State for challenges
@@ -393,7 +395,7 @@ const ChallengePage = () => {
         marginLeft: "0",
         paddingLeft: "15px",
         paddingRight: "15px",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "#ffffff",
         minHeight: "100vh",
       }}
     >
@@ -488,12 +490,21 @@ const ChallengePage = () => {
           />
         )}
 
+        {/* <div className="challenge-page">
+  <div className="challenge-bg">
+    <div className="challenge-content">
+      {/* yahin tumhara pura Challenge UI rahega */}
+    {/* </div>
+  </div>
+</div> // */}
+
+
         <div className="challenge-content">
           <div className="text-center mb-4 mb-md-5">
-            <h1 className="text-white fw-bold display-6 display-md-4 mb-2">
+            <h1 className="text-dark fw-bold display-6 display-md-4 mb-2">
               Challenge Management
             </h1>
-            <p className="text-white-50 fs-6 fs-md-5">
+            <p className="text-secondary fs-6 fs-md-5">
               Manage challenges, submissions, and participants
             </p>
           </div>
@@ -513,8 +524,8 @@ const ChallengePage = () => {
                     <button
                       className={`nav-link ${
                         activeTab === tab.id
-                          ? "active bg-white text-primary"
-                          : "text-white"
+                          ? "active bg-primary text-white"
+                          : "text-dark"
                       }`}
                       onClick={() => setActiveTab(tab.id)}
                     >
@@ -578,20 +589,21 @@ const ChallengePage = () => {
               </div>
 
               {loading ? (
-                <div className="d-flex justify-content-center py-5">
-                  <div className="spinner-border text-light" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
+                <GlobalLoader text="Loading challenges..." />
               ) : (
                 <>
                   {/* Challenges Grid */}
-                  <div className="row g-3 g-md-4 mb-4">
-                    {filteredChallenges.map((challenge) => (
-                      <div
-                        key={challenge.id}
-                        className="col-12 col-md-6 col-xl-4"
-                      >
+                  {filteredChallenges.length > 0 ? (
+                    <>
+                      <div className="alert alert-info">
+                        Total Challenges: {challenges.length} | Filtered: {filteredChallenges.length}
+                      </div>
+                      <div className="row g-3 g-md-4 mb-4">
+                        {filteredChallenges.map((challenge) => (
+                          <div
+                            key={challenge.id}
+                            className="col-12 col-md-6 col-xl-4"
+                          >
                         <div className="card h-100 shadow-sm">
                           {challenge.image_url && (
                             <img
@@ -746,8 +758,8 @@ const ChallengePage = () => {
                   </div>
 
                   {/* Pagination */}
-                  {pagination.pages > 1 && (
-                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center text-white gap-3">
+                  {pagination.pages > 1 && filteredChallenges.length > 0 && (
+                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center text-dark gap-3">
                       <div>
                         <p className="mb-0 text-center text-sm-start">
                           Page {pagination.page} of {pagination.pages} (
@@ -778,6 +790,13 @@ const ChallengePage = () => {
                       </div>
                     </div>
                   )}
+                    </>
+                  ) : (
+                    <div className="text-center py-5">
+                      <Award size={48} className="text-muted mb-3" />
+                      <p className="text-muted fs-5">No challenges found</p>
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -785,8 +804,8 @@ const ChallengePage = () => {
           {/* Pending Submissions Tab */}
           {activeTab === "pending-submissions" && (
             <div className="tab-content">
-              <div className="card">
-                <div className="card-header">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-primary text-white">
                   <h2 className="card-title mb-0 fs-5 fs-md-4">
                     Pending Submissions
                   </h2>
@@ -871,9 +890,8 @@ const ChallengePage = () => {
           {/* Create Challenge Modal */}
           {createChallengeModal && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block modal-center"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
             >
               <div className="modal-dialog modal-lg">
                 <div className="modal-content">
@@ -1568,7 +1586,7 @@ const ChallengePage = () => {
           {/* Continue with remaining modals - they follow the same responsive pattern */}
           {/* I'll include the key remaining modals with responsive fixes */}
           {/* Submissions Modal */}
-          //{" "}
+          {" "}
           {submissionsModal && selectedChallenge && (
             <div
               className="modal fade show d-block"

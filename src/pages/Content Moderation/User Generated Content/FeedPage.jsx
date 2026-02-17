@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   X,
   Heart,
@@ -14,10 +15,8 @@ import {
 import {
   getFeedsService,
   getFeedLikesService,
-  getReportedPostsService,
-  moderateReportService,
-  getModerationStatsService,
 } from "../../../services/feed.service";
+import { useModeration } from "../../../contexts/ModerationContext";
 import "./FeedPage.css";
 
 const FeedPage = () => {
@@ -29,45 +28,40 @@ const FeedPage = () => {
 
   // Content Moderation States
   const [activeTab, setActiveTab] = useState("feeds"); // 'feeds', 'reports', 'stats'
-  const [reportedPosts, setReportedPosts] = useState([]);
-  const [reportsPagination, setReportsPagination] = useState({});
-  const [reportsPage, setReportsPage] = useState(1);
   const [selectedReport, setSelectedReport] = useState(null);
   const [selectedReportedPost, setSelectedReportedPost] = useState(null);
   const [moderationAction, setModerationAction] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
-  const [moderationStats, setModerationStats] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const {
+    reportedPosts,
+    reportsPagination,
+    reportsPage,
+    setReportsPage,
+    moderationStats,
+    isLoadingReports,
+    isLoadingStats,
+    refreshReportedPosts,
+    refreshModerationStats,
+    moderateReport,
+  } = useModeration();
 
   useEffect(() => {
     if (activeTab === "feeds") {
       fetchFeeds(page);
     } else if (activeTab === "reports") {
-      fetchReportedPosts(reportsPage);
+      refreshReportedPosts({ page: reportsPage });
     } else if (activeTab === "stats") {
-      fetchModerationStats();
+      refreshModerationStats();
     }
-  }, [page, reportsPage, activeTab]);
+  }, [page, reportsPage, activeTab, refreshModerationStats, refreshReportedPosts]);
 
   const fetchFeeds = async (page) => {
     const res = await getFeedsService(page, 12);
     setFeeds(res.posts || []);
     setPagination(res.pagination || {});
-  };
-
-  const fetchReportedPosts = async (page) => {
-    setIsLoading(true);
-    const res = await getReportedPostsService(page, 10);
-    setReportedPosts(res.reported_posts || []);
-    setReportsPagination(res.pagination || {});
-    setIsLoading(false);
-  };
-
-  const fetchModerationStats = async () => {
-    setIsLoading(true);
-    const res = await getModerationStatsService();
-    setModerationStats(res.statistics || {});
-    setIsLoading(false);
   };
 
   const handleViewLikes = async (postId) => {
@@ -77,34 +71,41 @@ const FeedPage = () => {
 
   const handleOpenModerationModal = (reportedPost) => {
     setSelectedReportedPost(reportedPost);
-    setSelectedReport(reportedPost.reports[0]); // Select first pending report
+    const firstPending = reportedPost?.reports?.find((r) => r.status === "pending");
+    setSelectedReport(firstPending || null);
     setModerationAction("");
     setAdminNotes("");
+    setError("");
   };
 
   const handleModerateReport = async () => {
-    if (!selectedReport || !moderationAction) return;
+    // 1. Client-side Validation
+    if (!moderationAction) {
+      setError("Please select a moderation action.");
+      return;
+    }
 
     try {
       setIsLoading(true);
-      await moderateReportService(
-        selectedReport.id,
-        moderationAction,
-        adminNotes
-      );
+      setError(""); // Clear previous errors
 
-      // Refresh reported posts
-      fetchReportedPosts(reportsPage);
+      await moderateReport({
+        reportId: selectedReport.id,
+        adminAction: moderationAction,
+        adminNotes,
+      });
 
-      // Close modal
+      // 2. Success Handling (Close modal only on success)
       setSelectedReport(null);
       setSelectedReportedPost(null);
       setModerationAction("");
       setAdminNotes("");
 
       alert("Report moderated successfully!");
-    } catch (error) {
-      alert("Failed to moderate report. Please try again.");
+    } catch (err) {
+      // 3. Error Handling (Keep modal open, show error)
+      console.error("Moderation Error:", err);
+      setError(err?.message || "Failed to moderate report. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -119,15 +120,16 @@ const FeedPage = () => {
   const getActionIcon = (action) => {
     switch (action) {
       case "no_action":
+      case "dismiss":
         return <Eye size={16} />;
       case "warning_sent":
+      case "send_warning":
         return <AlertTriangle size={16} />;
       case "post_hidden":
+      case "hide_post":
         return <Ban size={16} />;
-      case "post_deleted":
-        return <Trash2 size={16} />;
-      case "user_suspended":
-        return <AlertOctagon size={16} />;
+      case "resolve":
+        return <Shield size={16} />;
       default:
         return <Shield size={16} />;
     }
@@ -147,11 +149,15 @@ const FeedPage = () => {
 
   const getActionLabel = (action) => {
     const actionMap = {
-      no_action: "No Action",
+      dismiss: "Dismiss",
+      send_warning: "Send Warning",
+      hide_post: "Hide Post",
+      resolve: "Resolve",
+
+      // Backend values (for stats coming from API)
+      no_action: "Dismiss",
       warning_sent: "Send Warning",
       post_hidden: "Hide Post",
-      post_deleted: "Delete Post",
-      user_suspended: "Suspend User",
     };
     return actionMap[action] || action;
   };
@@ -164,27 +170,24 @@ const FeedPage = () => {
         {/* Tab Navigation */}
         <div className="fp-tab-nav">
           <button
-            className={`fp-nav-tab ${
-              activeTab === "feeds" ? "fp-tab-active" : ""
-            }`}
+            className={`fp-nav-tab ${activeTab === "feeds" ? "fp-tab-active" : ""
+              }`}
             onClick={() => setActiveTab("feeds")}
           >
             <Play size={16} />
             Feeds
           </button>
           <button
-            className={`fp-nav-tab ${
-              activeTab === "reports" ? "fp-tab-active" : ""
-            }`}
+            className={`fp-nav-tab ${activeTab === "reports" ? "fp-tab-active" : ""
+              }`}
             onClick={() => setActiveTab("reports")}
           >
             <AlertTriangle size={16} />
             Reported Content
           </button>
           <button
-            className={`fp-nav-tab ${
-              activeTab === "stats" ? "fp-tab-active" : ""
-            }`}
+            className={`fp-nav-tab ${activeTab === "stats" ? "fp-tab-active" : ""
+              }`}
             onClick={() => setActiveTab("stats")}
           >
             <BarChart3 size={16} />
@@ -295,8 +298,8 @@ const FeedPage = () => {
       {/* Reported Content Tab */}
       {activeTab === "reports" && (
         <div className="fp-reports-area">
-          {isLoading ? (
-            <div className="fp-loading-view">Loading reported posts...</div>
+          {isLoading || isLoadingReports ? (
+            <GlobalLoader text="Loading reported posts..." />
           ) : (
             <>
               <div className="fp-reports-grid">
@@ -327,7 +330,7 @@ const FeedPage = () => {
                       </div>
                       <div className="fp-report-counter">
                         <AlertTriangle size={20} />
-                        <span>{reportedPost.post.report_count} Reports</span>
+                        <span>{reportedPost.reports.length} Reports</span>
                       </div>
                     </div>
 
@@ -426,7 +429,7 @@ const FeedPage = () => {
       {/* Moderation Stats Tab */}
       {activeTab === "stats" && (
         <div className="fp-stats-area">
-          {isLoading ? (
+          {isLoading || isLoadingStats ? (
             <div className="fp-loading-view">Loading statistics...</div>
           ) : (
             <>
@@ -771,17 +774,10 @@ const FeedPage = () => {
                     className="fp-action-dropdown"
                   >
                     <option value="">Select Action</option>
-                    <option value="no_action">
-                      No Action - Dismiss Report
-                    </option>
-                    <option value="warning_sent">Send Warning to User</option>
-                    <option value="post_hidden">
-                      Hide Post from Public View
-                    </option>
-                    <option value="post_deleted">
-                      Delete Post Permanently
-                    </option>
-                    <option value="user_suspended">Suspend User Account</option>
+                    <option value="resolve">Resolve</option>
+                    <option value="dismiss">Dismiss</option>
+                    <option value="hide_post">Hide Post</option>
+                    <option value="send_warning">Send Warning</option>
                   </select>
                 </div>
 
@@ -796,6 +792,13 @@ const FeedPage = () => {
                   />
                 </div>
               </div>
+
+              {error && (
+                <div className="fp-error-message" style={{ color: "#ef4444", marginBottom: "1rem", textAlign: "center", fontWeight: "500" }}>
+                  <AlertOctagon size={16} style={{ display: "inline", marginRight: "5px", verticalAlign: "text-bottom" }} />
+                  {error}
+                </div>
+              )}
 
               <div className="fp-modal-actions">
                 <button
@@ -872,8 +875,8 @@ const FeedPage = () => {
                           {likesData.analytics.engagement_insights
                             ?.peak_like_date?.like_date
                             ? new Date(
-                                likesData.analytics.engagement_insights.peak_like_date.like_date
-                              ).toLocaleDateString()
+                              likesData.analytics.engagement_insights.peak_like_date.like_date
+                            ).toLocaleDateString()
                             : "N/A"}
                         </div>
                         <div className="fp-analytics-desc">Peak Like Date</div>

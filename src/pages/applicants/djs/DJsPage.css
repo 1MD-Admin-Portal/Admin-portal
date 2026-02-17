@@ -36,6 +36,7 @@
   0% {
     transform: translateY(-50%) rotate(0deg);
   }
+
   100% {
     transform: translateY(-50%) rotate(360deg);
   }
@@ -48,11 +49,9 @@
   left: 265px;
   right: 0;
   height: 200px;
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.1) 0%,
-    rgba(124, 58, 237, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(124, 58, 237, 0.1) 100%);
   pointer-events: none;
   z-index: -1;
 }
@@ -122,11 +121,9 @@
 } */
 
 .professors-table tbody tr:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.05) 0%,
-    rgba(139, 92, 246, 0.05) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(139, 92, 246, 0.05) 100%);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
 }
@@ -175,12 +172,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -234,6 +229,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -258,6 +254,7 @@
     opacity: 0;
     transform: translateY(50px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -383,12 +380,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -549,10 +544,12 @@
 
 /* Loading Animation */
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -571,6 +568,7 @@
 .professors-table th:hover {
   background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
 }
+
 .dj-modal-overlay {
   position: fixed;
   top: 0;
@@ -619,4 +617,29 @@
 
 .dj-close-btn:hover {
   background-color: #495057;
+}
+
+.modal-close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.2s;
+  z-index: 10;
+}
+
+.modal-close-icon:hover {
+  background-color: #ff0000;
+  transform: scale(1.1);
 }

@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Calendar,
 } from "lucide-react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import dashboardService from "../../services/dashboardService";
 import {
   KPI_CARDS,
@@ -72,12 +73,7 @@ const Home = () => {
   if (loadingState === LOADING_STATES.LOADING) {
     return (
       <div className="home-page-main-content">
-        <div className="home-page-loading-container">
-          <div className="home-page-loading-spinner">
-            <RefreshCw className="home-page-animate-spin" size={32} />
-          </div>
-          <p>Loading dashboard data...</p>
-        </div>
+        <GlobalLoader text="Loading dashboard data..." />
       </div>
     );
   }

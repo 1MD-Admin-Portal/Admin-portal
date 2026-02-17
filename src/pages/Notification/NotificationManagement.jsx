@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import {
   Bell,
   Send,
@@ -673,12 +674,7 @@ const NotificationManagement = () => {
         </div>
 
         {loading && !showModal ? (
-          <div className="notification-mgmt-loading-container">
-            <div className="notification-mgmt-loading-spinner"></div>
-            <p className="notification-mgmt-loading-text">
-              Loading notifications...
-            </p>
-          </div>
+          <GlobalLoader text="Loading notifications..." />
         ) : (
           <>
             <div className="notification-mgmt-table-wrapper">

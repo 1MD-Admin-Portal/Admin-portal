@@ -4,6 +4,7 @@ import {
   getOrganizerApplications,
   rejectOrganizerApplication,
 } from "../../../services/organizer.service";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import "../professors/ProfessorsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -200,7 +201,7 @@ const OrganizersPage = () => {
     }
   };
 
-  if (loading) return <div className="professors-container">Loading...</div>;
+  if (loading) return <GlobalLoader text="Loading organizer applications..." />;
 
   return (
     <div className="professors-container">
@@ -312,17 +313,15 @@ const OrganizersPage = () => {
               <td>
                 <div className="icon-actions">
                   <CheckCircle
-                    className={`action-icon ${
-                      app.status !== "pending" ? "disabled" : ""
-                    }`}
+                    className={`action-icon ${app.status !== "pending" ? "disabled" : ""
+                      }`}
                     onClick={() =>
                       app.status === "pending" && handleApprove(app.id)
                     }
                   />
                   <XCircle
-                    className={`action-icon reject ${
-                      app.status !== "pending" ? "disabled" : ""
-                    }`}
+                    className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
+                      }`}
                     onClick={() =>
                       app.status === "pending" && setSelectedRejectId(app.id)
                     }
@@ -480,6 +479,12 @@ const OrganizersPage = () => {
       {selectedApp && (
         <div className="modal-overlay">
           <div className="detail-modal" ref={modalRef}>
+            <button
+              className="modal-close-icon"
+              onClick={() => setSelectedApp(null)}
+            >
+              ×
+            </button>
             <h3>Application Details</h3>
             <p>
               <strong>ID:</strong> {selectedApp.id}

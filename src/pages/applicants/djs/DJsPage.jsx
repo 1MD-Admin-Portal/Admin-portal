@@ -4,6 +4,7 @@ import {
   approveDJApplication,
   rejectDJApplication,
 } from "../../../services/dj.service";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import "./DJsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -75,7 +76,7 @@ const DJsPage = () => {
 
   const pendingApps = applications.filter((a) => a.status === "pending");
 
-  if (loading) return <div className="professors-container">Loading...</div>;
+  if (loading) return <GlobalLoader text="Loading DJ applications..." />;
 
   return (
     <div className="professors-container">
@@ -198,17 +199,15 @@ const DJsPage = () => {
               <td>{app.comment || "-"}</td>
               <td>
                 <CheckCircle
-                  className={`action-icon ${
-                    app.status !== "pending" ? "disabled" : ""
-                  }`}
+                  className={`action-icon ${app.status !== "pending" ? "disabled" : ""
+                    }`}
                   onClick={() =>
                     app.status === "pending" && handleApprove(app.id)
                   }
                 />
                 <XCircle
-                  className={`action-icon reject ${
-                    app.status !== "pending" ? "disabled" : ""
-                  }`}
+                  className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
+                    }`}
                   onClick={() =>
                     app.status === "pending" && setSelectedRejectId(app.id)
                   }
@@ -426,6 +425,12 @@ const DJsPage = () => {
             className="dj-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              className="modal-close-icon"
+              onClick={() => setSelectedApplication(null)}
+            >
+              ×
+            </button>
             <h3>DJ Application Details</h3>
             <p>
               <strong>ID:</strong> {selectedApplication.id}
@@ -476,12 +481,6 @@ const DJsPage = () => {
             <p>
               <strong>Comment:</strong> {selectedApplication.comment || "-"}
             </p>
-            <button
-              className="dj-close-btn"
-              onClick={() => setSelectedApplication(null)}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   Bug as BugIcon,
   CheckCircle2,
@@ -557,10 +558,7 @@ const BetaTesterBugsPage = () => {
       {/* Table */}
       <div className="btb-table-wrapper">
         {loading && bugs.length === 0 ? (
-          <div className="btb-loading">
-            <div className="btb-loading__spinner" />
-            <span>Loading bugs...</span>
-          </div>
+          <GlobalLoader text="Loading bugs..." />
         ) : filteredBugs.length === 0 ? (
           <div className="btb-empty">
             <BugIcon size={32} />

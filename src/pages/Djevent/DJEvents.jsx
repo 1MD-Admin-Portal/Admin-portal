@@ -7,7 +7,7 @@
 //   getPendingDjEvents,
 //   getDjEventsStatistics,
 // } from "../../services/djEvents.service";
-// import "./DjEvents.css";
+import "./DJEvents.css";
 // import { X, Check } from "lucide-react";
 
 // const DjEvents = () => {
@@ -509,7 +509,7 @@
 //                     <strong>Type:</strong> {selectedEvent.event?.event_type}
 //                   </p>
 //                   <p>
-//                     <strong>Price:</strong> ${selectedEvent.event?.price}
+//                     <strong>Price:</strong> €{selectedEvent.event?.price}
 //                   </p>
 //                   <p>
 //                     <strong>Status:</strong>{" "}
@@ -547,7 +547,7 @@
 //                     {selectedEvent.statistics?.paid_enrollments || 0}
 //                   </p>
 //                   <p>
-//                     <strong>Total Revenue:</strong> $
+//                     <strong>Total Revenue:</strong> €
 //                     {selectedEvent.statistics?.total_revenue || 0}
 //                   </p>
 //                   <p>
@@ -585,7 +585,7 @@
 //                             <td>{enrollment.user_email}</td>
 //                             <td>{enrollment.status}</td>
 //                             <td>{enrollment.payment_status}</td>
-//                             <td>${enrollment.amount_paid}</td>
+//                             <td>€{enrollment.amount_paid}</td>
 //                           </tr>
 //                         ))}
 //                       </tbody>
@@ -919,8 +919,8 @@ const DjEvents = () => {
         </div>
       )}
 
-      {error && <div className="error-message">{error}</div>}
-      {loading && <div className="loading">Loading...</div>}
+        {error && <div className="error-message">{error}</div>}
+      {loading && <GlobalLoader text="Loading DJ events..." />}
 
       {/* Statistics View */}
       {activeTab === "statistics" && statistics && !loading && (
@@ -959,7 +959,7 @@ const DjEvents = () => {
             <div className="stat-card">
               <h3>Avg Event Price</h3>
               <p className="stat-value">
-                $
+                €
                 {(
                   statistics.overall_statistics?.average_event_price ?? 0
                 ).toFixed(2)}
@@ -1003,7 +1003,7 @@ const DjEvents = () => {
                       {dj.approved_events}
                     </p>
                   </div>
-                  <span className="avg-price">${dj.average_price}</span>
+                  <span className="avg-price">€{dj.average_price}</span>
                 </div>
               ))}
             </div>
@@ -1060,7 +1060,7 @@ const DjEvents = () => {
                         </small>
                       </div>
                     </td>
-                    <td>${event.price}</td>
+                    <td>€{event.price}</td>
                     <td>{getStatusBadge(event.status)}</td>
                     <td>
                       {event.status === "pending_approval" && (
@@ -1149,7 +1149,7 @@ const DjEvents = () => {
                     <strong>Type:</strong> {selectedEvent.event?.event_type}
                   </p>
                   <p>
-                    <strong>Price:</strong> ${selectedEvent.event?.price}
+                    <strong>Price:</strong> €{selectedEvent.event?.price}
                   </p>
                   <p>
                     <strong>Status:</strong>{" "}
@@ -1187,7 +1187,7 @@ const DjEvents = () => {
                     {selectedEvent.statistics?.paid_enrollments || 0}
                   </p>
                   <p>
-                    <strong>Total Revenue:</strong> $
+                    <strong>Total Revenue:</strong> €
                     {selectedEvent.statistics?.total_revenue || 0}
                   </p>
                   <p>
@@ -1225,7 +1225,7 @@ const DjEvents = () => {
                             <td>{enrollment.user_email}</td>
                             <td>{enrollment.status}</td>
                             <td>{enrollment.payment_status}</td>
-                            <td>${enrollment.amount_paid}</td>
+                            <td>€{enrollment.amount_paid}</td>
                           </tr>
                         ))}
                       </tbody>

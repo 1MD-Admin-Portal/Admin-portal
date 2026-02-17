@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ModerationProvider } from "./contexts/ModerationContext";
 import Login from "./pages/Onboarding/login/Login.jsx";
 import ForgotPassword from "./pages/Onboarding/forgot password/ForgotPassword.jsx";
 import ResetPassword from "./pages/Onboarding/reset password/ResetPassword.jsx";
@@ -41,6 +42,7 @@ import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DJEvents from "./pages/Djevent/DJEvents.jsx";
 import BetaTesterBugsPage from "./pages/Admin/BetaTesterBugsPage/BetaTesterBugsPage.jsx";
+import StudioManagementPage from "./pages/Studios/StudioManagementPage.jsx";
 
 function App() {
   return (
@@ -61,7 +63,7 @@ function App() {
         >
           <Route path="/home" element={<Home />} />
           <Route path="/users" element={<Users />} />
-          <Route path="/FeedPage" element={<FeedPage />} />
+          <Route path="/FeedPage" element={<ModerationProvider><FeedPage /></ModerationProvider>} />
           <Route path="/ClassModeration" element={<ClassModeration />} />
           <Route path="/EventsPage" element={<EventsPage />} />
           <Route path="/MarketplacePage" element={<MarketplacePage />} />
@@ -104,6 +106,7 @@ function App() {
           <Route path="/users/Dancers" element={<DancersList />} />
           <Route path="/playlists" element={<PlaylistsPage />} />
           <Route path="/badges" element={<BadgesPage />} />
+          <Route path="/studios" element={<StudioManagementPage />} />
 
           {/* ⭐ NEW: Beta Testers Bug Management */}
           <Route path="/beta-testers/bugs" element={<BetaTesterBugsPage />} />

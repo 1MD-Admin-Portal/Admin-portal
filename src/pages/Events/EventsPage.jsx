@@ -16,6 +16,7 @@ import {
   User,
   Mail,
 } from "lucide-react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import {
   getAllDraftEventsService,
   getAllApprovedEventsService,
@@ -104,21 +105,21 @@ const EventsPage = () => {
 
   const formatPrice = (price) => {
     if (!price || price === 0) return "Free";
-    return `$${price}`;
+    return `€${price}`;
   };
 
   return (
     <div className="event-moderation-wrapper">
       <div className="event-moderation-header">
         <h1 className="event-moderation-title">Event Moderation</h1>
+        <p className="event-moderation-subtitle">Manage and review event submissions</p>
       </div>
 
       {/* Enhanced Tabs */}
       <div className="event-moderation-tabs">
         <button
-          className={`event-tab-button ${
-            activeTab === "requireApproval" ? "event-tab-active" : ""
-          }`}
+          className={`event-tab-button ${activeTab === "requireApproval" ? "event-tab-active" : ""
+            }`}
           onClick={() => {
             setActiveTab("requireApproval");
             setPage(1);
@@ -131,9 +132,8 @@ const EventsPage = () => {
           )}
         </button>
         <button
-          className={`event-tab-button ${
-            activeTab === "approved" ? "event-tab-active" : ""
-          }`}
+          className={`event-tab-button ${activeTab === "approved" ? "event-tab-active" : ""
+            }`}
           onClick={() => {
             setActiveTab("approved");
             setPage(1);
@@ -148,10 +148,7 @@ const EventsPage = () => {
       </div>
 
       {loading ? (
-        <div className="event-loading-state">
-          <div className="event-loading-spinner"></div>
-          <span className="event-loading-text">Loading events...</span>
-        </div>
+        <GlobalLoader text="Loading events..." />
       ) : events.length === 0 ? (
         <div className="event-empty-state">
           <span className="event-empty-icon">📅</span>
@@ -162,6 +159,14 @@ const EventsPage = () => {
       ) : (
         <div className="event-table-wrapper">
           <table className="event-moderation-table">
+            <colgroup>
+              <col style={{ width: "25%" }} />
+              <col style={{ width: "15%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "10%" }} />
+            </colgroup>
             <thead>
               <tr>
                 <th>
@@ -295,25 +300,27 @@ const EventsPage = () => {
       {/* Enhanced Pagination */}
       {totalPages > 1 && (
         <div className="event-pagination-controls">
-          <button
-            className="event-pagination-btn"
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-          >
-            <ChevronLeft size={18} />
-            Previous
-          </button>
-          <span className="event-page-indicator">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            className="event-pagination-btn"
-            disabled={page === totalPages}
-            onClick={() => setPage(page + 1)}
-          >
-            Next
-            <ChevronRight size={18} />
-          </button>
+          <div className="event-pagination-info">
+            Showing page {page} of {totalPages}
+          </div>
+          <div className="event-pagination-buttons">
+            <button
+              className="event-pagination-btn"
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            <button
+              className="event-pagination-btn"
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       )}
 
