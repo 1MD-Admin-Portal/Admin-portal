@@ -4,6 +4,7 @@ import {
   approveDJApplication,
   rejectDJApplication,
 } from "../../../services/dj.service";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import "./DJsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -75,7 +76,7 @@ const DJsPage = () => {
 
   const pendingApps = applications.filter((a) => a.status === "pending");
 
-  if (loading) return <div className="professors-container">Loading...</div>;
+  if (loading) return <GlobalLoader text="Loading DJ applications..." />;
 
   return (
     <div className="professors-container">

@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Eye,
 } from "lucide-react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import "./MarketplacePage.css";
 import {
   getMarketplacePrograms,
@@ -133,10 +134,7 @@ const MarketplacePage = () => {
       </div>
 
       {loading ? (
-        <div className="mktplace-loading-container">
-          <div className="mktplace-loading-spinner"></div>
-          <span className="mktplace-loading-label">Loading marketplace...</span>
-        </div>
+        <GlobalLoader text="Loading marketplace..." />
       ) : filteredData.length === 0 ? (
         <div className="mktplace-empty-container">
           <span className="mktplace-empty-icon">🛒</span>

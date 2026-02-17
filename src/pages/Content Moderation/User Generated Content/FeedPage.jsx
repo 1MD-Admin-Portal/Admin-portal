@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   X,
   Heart,
@@ -298,7 +299,7 @@ const FeedPage = () => {
       {activeTab === "reports" && (
         <div className="fp-reports-area">
           {isLoading || isLoadingReports ? (
-            <div className="fp-loading-view">Loading reported posts...</div>
+            <GlobalLoader text="Loading reported posts..." />
           ) : (
             <>
               <div className="fp-reports-grid">

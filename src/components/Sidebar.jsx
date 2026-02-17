@@ -39,6 +39,7 @@ import {
   ChevronRight,
   PersonStanding,
   Bug, // ✅ NEW: for Beta Tester Bugs (admin)
+  Building2, // ✅ NEW: for Studio Management
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -117,7 +118,7 @@ const location = useLocation();
 
   const userSubmenuItems = [
     { href: "/users/Dancers", icon: User, label: "Dancers" },
-    { href: "/users/Professors", icon: GraduationCap, label: "Professors" },
+    { href: "/users/Professors", icon: GraduationCap, label: "Instructors" },
     { href: "/users/DJs", icon: Disc, label: "D.Js" },
     { href: "/users/Organizers", icon: FileEdit, label: "Organizers" },
   ];
@@ -126,7 +127,7 @@ const location = useLocation();
     {
       href: "/Applicants/Professors",
       icon: GraduationCap,
-      label: "Professors",
+      label: "Instructors",
     },
     { href: "/Applicants/DJs", icon: Disc, label: "D.Js" },
     { href: "/Applicants/Organizers", icon: FileEdit, label: "Organizers" },
@@ -506,6 +507,10 @@ const location = useLocation();
 
               <MenuItem href="/MarketplacePage" icon={Store}>
                 Marketplace
+              </MenuItem>
+
+              <MenuItem href="/studios" icon={Building2}>
+                Studios
               </MenuItem>
 
               <DropdownMenuItem

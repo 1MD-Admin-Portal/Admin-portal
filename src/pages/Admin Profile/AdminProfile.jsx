@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import {
   User,
   Mail,
@@ -252,10 +253,7 @@ const AdminProfile = () => {
         <div className="admin-profile-content">
           <div className="admin-profile-card">
             {profileLoading ? (
-              <div className="admin-profile-loading">
-                <Loader2 size={40} className="admin-profile-spinner" />
-                <p>Loading profile...</p>
-              </div>
+              <GlobalLoader text="Loading profile..." />
             ) : (
               <>
                 <div className="admin-profile-avatar">

@@ -785,7 +785,7 @@ const DancersList = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="dancer-modal-footer">
+            {/* <div className="dancer-modal-footer">
               <button
                 className="dancer-modal-close-btn"
                 onClick={() => {
@@ -796,7 +796,7 @@ const DancersList = () => {
               >
                 Close
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

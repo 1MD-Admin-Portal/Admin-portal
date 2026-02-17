@@ -16,6 +16,7 @@ import {
   User,
   Mail,
 } from "lucide-react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import {
   getAllDraftEventsService,
   getAllApprovedEventsService,
@@ -147,10 +148,7 @@ const EventsPage = () => {
       </div>
 
       {loading ? (
-        <div className="event-loading-state">
-          <div className="event-loading-spinner"></div>
-          <span className="event-loading-text">Loading events...</span>
-        </div>
+        <GlobalLoader text="Loading events..." />
       ) : events.length === 0 ? (
         <div className="event-empty-state">
           <span className="event-empty-icon">📅</span>

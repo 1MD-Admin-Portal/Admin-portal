@@ -10,6 +10,7 @@ import {
   XCircle,
   Search,
 } from "lucide-react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   getPlaylistsService,
   approvePlaylistService,
@@ -259,10 +260,7 @@ const PlaylistsPage = () => {
       {/* Enhanced Grid Layout */}
       <div className="plmgmt-cards-grid">
         {loading ? (
-          <div className="plmgmt-loading-display">
-            <div className="plmgmt-loading-spinner"></div>
-            <p>Loading playlists...</p>
-          </div>
+          <GlobalLoader text="Loading playlists..." />
         ) : playlists.length > 0 ? (
           playlists.map((playlist) => (
             <div

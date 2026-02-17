@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   Play,
   Eye,
@@ -621,11 +622,7 @@ const ChallengePage = () => {
               </div>
 
               {loading ? (
-                <div className="d-flex justify-content-center py-5">
-                  <div className="spinner-border text-light" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
+                <GlobalLoader text="Loading challenges..." />
               ) : (
                 <>
                   {/* Challenges Grid */}

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import "./ClassModeration.css";
 import { X, CheckCircle, XCircle } from "lucide-react";
 import {
@@ -210,7 +211,7 @@ const ClassModeration = () => {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <GlobalLoader text="Loading classes..." />
       ) : (
         <table className="class-mod-table">
           <thead>
