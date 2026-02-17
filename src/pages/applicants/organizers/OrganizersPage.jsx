@@ -211,7 +211,7 @@ const OrganizersPage = () => {
           - If nothing selected -> show Approve All / Reject All
           - If something selected -> show Approve Selected / Reject Selected (only)
       */}
-      {/* <div className="bulk-actions-bar">
+      <div className="bulk-actions-bar">
         {selectedIds.length === 0 ? (
           <>
             <button
@@ -243,7 +243,7 @@ const OrganizersPage = () => {
             </button>
           </>
         )}
-      </div> */}
+      </div>
 
       <table className="professors-table">
         <thead>
@@ -281,19 +281,37 @@ const OrganizersPage = () => {
                 />
               </td> */}
 
-              <td>{app.id}</td>
+              <td
+  onClick={() => setSelectedApp(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.id}
+</td>
+
 
               <td
-                className="clickable-email"
-                onClick={() => setSelectedApp(app)}
-                style={{ cursor: "pointer" }}
-              >
-                {app.email}
-              </td>
+  onClick={() => setSelectedApp(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.email}
+</td>
+
 
               {/* <td>{formatField(app.event_types)}</td> */}
-              <td>{app.expected_event_size}</td>
-              <td>{app.total_organized_event}</td>
+              <td
+  onClick={() => setSelectedApp(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.expected_event_size}
+</td>
+
+              <td
+  onClick={() => setSelectedApp(app)}
+  style={{ cursor: "pointer" }}
+>
+  {app.total_organized_event}
+</td>
+
               <td>
                 {app.document_url ? (
                   <a
