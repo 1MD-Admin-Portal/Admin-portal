@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import { getAllBadgesService } from "../../services/badge.service";
 import "./BadgesPage.css";
 
@@ -76,10 +77,7 @@ const BadgesPage = () => {
       </div>
 
       {loading ? (
-        <div className="badge-loading-state">
-          <div className="badge-spinner"></div>
-          <p>Loading badges...</p>
-        </div>
+        <GlobalLoader text="Loading badges..." />
       ) : filteredBadges.length === 0 ? (
         <div className="badge-empty-state">
           <p>No badges found for {activeTab}</p>

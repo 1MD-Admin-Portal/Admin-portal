@@ -147,7 +147,7 @@ const ClassDisputesPage = () => {
         >
           <option value="All">All User Types</option>
           <option value="Student">Student</option>
-          <option value="Professor">Professor</option>
+          <option value="Instructor">Instructor</option>
           <option value="DJ">DJ</option>
         </select>
         <select

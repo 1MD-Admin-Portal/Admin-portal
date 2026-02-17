@@ -4,6 +4,7 @@ import {
   getOrganizerApplications,
   rejectOrganizerApplication,
 } from "../../../services/organizer.service";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import "../professors/ProfessorsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -200,7 +201,7 @@ const OrganizersPage = () => {
     }
   };
 
-  if (loading) return <div className="professors-container">Loading...</div>;
+  if (loading) return <GlobalLoader text="Loading organizer applications..." />;
 
   return (
     <div className="professors-container">

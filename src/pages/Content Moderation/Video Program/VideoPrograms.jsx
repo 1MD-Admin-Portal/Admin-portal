@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./VideoPrograms.css";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import CreateProgramModal from "./CreateProgramModal";
 import { X, Check, XCircle, Clock } from "lucide-react";
 import {
@@ -339,7 +340,7 @@ const VideoPrograms = () => {
       {/* table */}
       <div className="video-programs-table-container">
         {loading ? (
-          <div className="loading-state">Loading programs...</div>
+          <GlobalLoader text="Loading programs..." />
         ) : (
           <table className="video-programs-table">
             <thead>

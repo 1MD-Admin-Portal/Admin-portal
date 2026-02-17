@@ -919,8 +919,8 @@ const DjEvents = () => {
         </div>
       )}
 
-      {error && <div className="error-message">{error}</div>}
-      {loading && <div className="loading">Loading...</div>}
+        {error && <div className="error-message">{error}</div>}
+      {loading && <GlobalLoader text="Loading DJ events..." />}
 
       {/* Statistics View */}
       {activeTab === "statistics" && statistics && !loading && (

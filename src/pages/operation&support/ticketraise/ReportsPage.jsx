@@ -1,5 +1,6 @@
 // pages/ReportsPage.jsx
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   getReportsService,
   updateReportStatusService,
@@ -182,10 +183,7 @@ const ReportsPage = () => {
           <div className="reports-card-badge">{reports.length} items</div>
         </div>
         {loading ? (
-          <div className="reports-loading-state">
-            <div className="reports-loading-spinner"></div>
-            <p className="reports-loading-text">Loading reports...</p>
-          </div>
+          <GlobalLoader text="Loading reports..." />
         ) : (
           <div className="reports-table-wrapper">
             <table className="reports-modern-table">

@@ -130,7 +130,7 @@ const DisputesPage = () => {
           <option value="All">All User Types</option>
           <option value="Dancer">Dancer</option>
           <option value="DJ">DJ</option>
-          <option value="Professor">Professor</option>
+          <option value="Instructor">Instructor</option>
           <option value="Organizer">Organizer</option>
         </select>
         <select

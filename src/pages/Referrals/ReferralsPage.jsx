@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import "./ReferralsPage.css";
 import {
   getReferralLeaderboardService,
@@ -86,7 +87,7 @@ const ReferralsPage = () => {
         </button> */}
       </div>
 
-      {loading && <p className="referral-loading-message">Loading...</p>}
+      {loading && <GlobalLoader text="Loading referral data..." />}
 
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (

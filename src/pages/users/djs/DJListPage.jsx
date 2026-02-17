@@ -281,10 +281,10 @@ const DJListPage = () => {
                       label: "User Type",
                       value: selectedUser.profile_user_type || "N/A",
                     },
-                    {
-                      label: "Provider",
-                      value: selectedUser.provider || "N/A",
-                    },
+                    // {
+                    //   label: "Provider",
+                    //   value: selectedUser.provider || "N/A",
+                    // },
                     {
                       label: "Created At",
                       value: new Date(selectedUser.created_at).toLocaleString(),
@@ -424,11 +424,11 @@ const DJListPage = () => {
                         selectedUser.active_subscription?.stripe_customer_id ||
                         "N/A",
                     },
-                    {
-                      label: "Price ID",
-                      value:
-                        selectedUser.active_subscription?.price_id || "N/A",
-                    },
+                    // {
+                    //   label: "Price ID",
+                    //   value:
+                    //     selectedUser.active_subscription?.price_id || "N/A",
+                    // },
                     {
                       label: "Payment Reference",
                       value:
@@ -697,11 +697,11 @@ const DJListPage = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="dancer-modal-footer">
+            {/* <div className="dancer-modal-footer">
               <button className="dancer-modal-close-btn" onClick={closeModal}>
                 Close
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

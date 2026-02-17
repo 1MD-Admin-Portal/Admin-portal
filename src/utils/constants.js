@@ -1,7 +1,8 @@
 export const CONSTANTS = {
   URL: {
     BASE_URL:
-      "https://uat-dancewithme-dye9ftbrbdeybfg2.francecentral-01.azurewebsites.net",
+      // "https://uat-dancewithme-dye9ftbrbdeybfg2.francecentral-01.azurewebsites.net"
+      "https://trilliondancers-uat-dbc8h5h7f2bpf6by.francecentral-01.azurewebsites.net",
     // BASE_URL: "",
 
     LOGIN: "/api/v1/admin/login",
@@ -52,6 +53,26 @@ export const CONSTANTS = {
       DASHBOARD: "/api/v1/betaTesters/dashboard",
       BUGS: "/api/v1/betaTesters/bugs",
       RESOLVE: (bugId) => `/api/v1/betaTesters/bugs/${bugId}/resolve`,
+    },
+
+    // === STUDIO MANAGEMENT ===
+    STUDIOS: {
+      GET_ALL: (page = 1, search = "", city = "", state = "", country = "") => {
+        const params = new URLSearchParams();
+        params.append("page", page);
+        if (search) params.append("search", search);
+        if (city) params.append("city", city);
+        if (state) params.append("state", state);
+        if (country) params.append("country", country);
+        return `/api/v1/admin/studios?${params.toString()}`;
+      },
+      GET_BY_ID: (studioId) => `/api/v1/admin/studios/${studioId}`,
+      CREATE: "/api/v1/admin/studios",
+      UPDATE: (studioId) => `/api/v1/admin/studios/${studioId}`,
+      DELETE: (studioId) => `/api/v1/admin/studios/${studioId}`,
+      GET_STATISTICS: "/api/v1/admin/studios/statistics",
+      LINK_INSTRUCTOR: "/api/v1/admin/studios/link-instructor",
+      UNLINK_INSTRUCTOR: (linkId) => `/api/v1/admin/studios/links/${linkId}`,
     },
 
     // === INSTRUCTOR MANAGEMENT ===

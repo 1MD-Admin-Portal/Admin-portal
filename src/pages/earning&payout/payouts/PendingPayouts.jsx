@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   getPendingPayoutsService,
   uploadTransferProofService,
@@ -232,10 +233,7 @@ const PendingPayouts = () => {
         {/* Table */}
         <div className="table-container">
           {loading ? (
-            <div className="loading-container">
-              <div className="spinner"></div>
-              <span className="loading-text">Loading payouts...</span>
-            </div>
+            <GlobalLoader text="Loading payouts..." />
           ) : payouts.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">📄</div>

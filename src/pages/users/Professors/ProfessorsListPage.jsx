@@ -195,7 +195,7 @@ const ProfessorsListPage = () => {
 
   return (
     <div className="dancers-main-container">
-      <h2 className="dancers-page-title">👨‍🏫 All Professors</h2>
+      <h2 className="dancers-page-title">👨‍🏫 All Instructors</h2>
 
       <table className="dancers-data-table">
         <thead>
@@ -274,7 +274,7 @@ const ProfessorsListPage = () => {
           >
             {/* Header */}
             <div className="dancer-modal-header">
-              <h3>👨‍🏫 Professor Profile Details</h3>
+              <h3>👨‍🏫 Instructor Profile Details</h3>
               <button className="dancer-modal-close-x" onClick={closeModal}>
                 ✕
               </button>
@@ -486,10 +486,10 @@ const ProfessorsListPage = () => {
 
                 {/* Professor Specific Information */}
                 <div className="dancer-modal-section">
-                  <h4 className="dancer-section-title">🎓 Professor Details</h4>
+                  <h4 className="dancer-section-title">🎓 Instructor Details</h4>
                   {renderProfessorInfoGrid([
                     {
-                      label: "Professor ID",
+                      label: "Instructor ID",
                       value: selectedProfessor.active_subscription?.id || "N/A",
                     },
                     {
@@ -756,11 +756,11 @@ const ProfessorsListPage = () => {
             </div>
 
             {/* Footer */}
-            <div className="dancer-modal-footer">
+            {/* <div className="dancer-modal-footer">
               <button className="dancer-modal-close-btn" onClick={closeModal}>
                 Close
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
