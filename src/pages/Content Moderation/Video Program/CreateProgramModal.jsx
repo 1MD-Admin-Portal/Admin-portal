@@ -1,419 +1,526 @@
-import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { X, Upload, Plus, Trash2 } from "lucide-react";
 import { createProgramService } from "../../../services/program.service";
 import { uploadMediaFile } from "../../../services/upload.service";
-import { fetchProfessors } from "../../../services/professor.service"; // ✅ fixed import
+import { fetchProfessors } from "../../../services/professor.service";
+import { getDanceStyles } from "../../../services/masterData.service";
 
-const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
-  if (!isOpen) return null;
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [danceStyle, setDanceStyle] = useState(danceStyles[0] || "");
-  const [danceLevel, setDanceLevel] = useState("Professional");
-  const [pricingType, setPricingType] = useState("paid");
-  const [price, setPrice] = useState(0);
-  const [overview, setOverview] = useState("");
-
-  // 🔹 Instructor states
-  const [instructorId, setInstructorId] = useState("");
-  const [instructors, setInstructors] = useState([]);
-  const [search, setSearch] = useState("");
-
-  const [imageFile, setImageFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [videos, setVideos] = useState([
-    { title: "", duration: "", description: "", file: null },
-  ]);
+// ─── Dance Styles Multi-Select ────────────────────────────────────────────────
+const DanceStylesSelect = ({ selected, onChange, options }) => {
+  const [open, setOpen]   = useState(false);
+  const [query, setQuery] = useState("");
+  const ref               = useRef(null);
 
   useEffect(() => {
-    const loadInstructors = async () => {
-      try {
-        const response = await fetchProfessors();
-        console.log("📌 Fetched instructors response:", response); // 👈 add this
+    if (!open) return;
+    const handler = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
 
-        if (Array.isArray(response?.users)) {
-          setInstructors(response.users);
-        } else {
-          setInstructors([]);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching instructors:", error);
-        setInstructors([]);
-      }
-    };
-
-    loadInstructors();
-  }, []);
-
-  // ✅ Filter instructors by search text
-  const filteredInstructors = instructors.filter((inst) =>
-    (inst?.name || "").toLowerCase().includes(search.toLowerCase())
-  );
-
-  // ✅ Handle video field changes
-  const handleVideoChange = (index, field, value) => {
-    const updated = [...videos];
-    updated[index][field] = value;
-    setVideos(updated);
-  };
-
-  // ✅ Add/remove video cards
-  const addVideo = () => {
-    setVideos([
-      ...videos,
-      { title: "", duration: "", description: "", file: null },
-    ]);
-  };
-  const removeVideo = (index) => {
-    const updated = [...videos];
-    updated.splice(index, 1);
-    setVideos(updated);
-  };
-
-  // ✅ Submit program
-  const handleCreateProgram = async () => {
-    try {
-      setLoading(true);
-
-      console.log("📌 Selected instructorId state:", instructorId);
-      console.log("📌 Instructors list:", instructors);
-
-      // 1️⃣ Upload cover image
-      let uploadedImageUrl = "";
-      if (imageFile) {
-        try {
-          const uploadRes = await uploadMediaFile(imageFile);
-          uploadedImageUrl = uploadRes || "";
-          console.log("✅ Uploaded image URL:", uploadedImageUrl);
-        } catch (err) {
-          console.error("❌ Image upload failed:", err);
-        }
-      }
-
-      // 2️⃣ Upload videos
-      const uploadedVideos = [];
-      for (const [index, video] of videos.entries()) {
-        let videoUrl = "";
-        if (video.file) {
-          try {
-            const uploadRes = await uploadMediaFile(video.file);
-            videoUrl = uploadRes || "";
-
-            console.log(`✅ Video ${index + 1} uploaded:`, videoUrl);
-          } catch (err) {
-            console.error(`❌ Failed to upload video ${index + 1}:`, err);
-          }
-        } else {
-          videoUrl = video.video_url || "";
-        }
-
-        uploadedVideos.push({
-          title: video.title,
-          duration: video.duration,
-          description: video.description,
-          video_url: videoUrl,
-        });
-      }
-
-      // 3️⃣ Final payload
-      const payload = {
-        title,
-        description,
-        overview,
-        dance_style: danceStyle,
-        dance_level: danceLevel,
-        pricing_type: pricingType,
-        price: pricingType === "paid" ? price : 0,
-        instructor_id: instructorId ? parseInt(instructorId, 10) : null,
-        videos: uploadedVideos,
-        image_url: uploadedImageUrl,
-      };
-
-      console.log("🚀 Final payload:", payload);
-
-      await createProgramService(payload);
-      alert("✅ Program created successfully!");
-      onClose();
-    } catch (error) {
-      console.error(
-        "❌ Error creating program:",
-        error?.response?.data || error
-      );
-      alert("Failed to create program.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const toggle   = (name) => onChange(selected.includes(name) ? selected.filter(s => s !== name) : [...selected, name]);
+  const filtered = options.filter(d => (d?.name || "").toLowerCase().includes((query || "").toLowerCase().trim()));
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-content create-modal"
-        onClick={(e) => e.stopPropagation()}
+    <div style={{ position: "relative" }} ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0.5rem 0.75rem", background: "#f8fafc",
+          border: "1.5px solid " + (open ? "#ec4899" : "#e2e8f0"),
+          borderRadius: "8px", cursor: "pointer", minHeight: "38px",
+          boxShadow: open ? "0 0 0 3px rgba(236,72,153,0.1)" : "none",
+          transition: "all 0.2s", boxSizing: "border-box",
+        }}
       >
-        <div className="modal-header">
-          <h2 className="modal-title">Create Video Program</h2>
-          <button className="modal-close-btn" onClick={onClose}>
-            <X />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", flex: 1 }}>
+          {selected.length ? selected.map(name => (
+            <span key={name} style={{
+              display: "inline-flex", alignItems: "center", gap: "3px",
+              background: "linear-gradient(135deg, rgba(108,61,232,0.1), rgba(236,72,153,0.1))",
+              border: "1px solid rgba(108,61,232,0.2)", borderRadius: "20px",
+              padding: "1px 8px 1px 10px", fontSize: "0.75rem", fontWeight: 600, color: "#6c3de8",
+            }}>
+              {name}
+              <button type="button" onClick={e => { e.stopPropagation(); onChange(selected.filter(s => s !== name)); }}
+                style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#6c3de8" }}>
+                <X size={11} />
+              </button>
+            </span>
+          )) : (
+            <span style={{ color: "#94a3b8", fontSize: "0.875rem" }}>Select dance styles</span>
+          )}
+        </div>
+        <span style={{ color: "#94a3b8", fontSize: "0.7rem", marginLeft: "6px", flexShrink: 0 }}>▾</span>
+      </button>
+
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 100,
+          background: "white", border: "1.5px solid #e2e8f0", borderRadius: "10px",
+          boxShadow: "0 8px 24px rgba(108,61,232,0.15)", overflow: "hidden",
+        }}>
+          <div style={{ padding: "8px" }}>
+            <input
+              type="text" value={query} onChange={e => setQuery(e.target.value)}
+              placeholder="Search styles..." autoFocus
+              style={{
+                width: "100%", padding: "0.45rem 0.75rem", border: "1.5px solid #e2e8f0",
+                borderRadius: "7px", fontSize: "0.8rem", outline: "none", boxSizing: "border-box",
+                fontFamily: "inherit",
+              }}
+            />
+          </div>
+          <div style={{ maxHeight: "180px", overflowY: "auto" }}>
+            {filtered.map(d => {
+              const name = d?.name || "";
+              const checked = selected.includes(name);
+              return (
+                <label key={d.id ?? name} onClick={() => toggle(name)}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "0.45rem 0.875rem", cursor: "pointer", fontSize: "0.85rem",
+                    background: checked ? "rgba(108,61,232,0.05)" : "transparent",
+                    color: checked ? "#6c3de8" : "#1e293b",
+                  }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <input type="checkbox" checked={checked} onChange={() => {}} style={{ accentColor: "#ec4899" }} />
+                    {name}
+                  </div>
+                  {checked && <span style={{ color: "#ec4899", fontSize: "0.75rem", fontWeight: 700 }}>✓</span>}
+                </label>
+              );
+            })}
+            {!options.length && <div style={{ padding: "0.75rem", color: "#94a3b8", fontSize: "0.8rem", textAlign: "center" }}>No dance styles available.</div>}
+            {!!options.length && !filtered.length && <div style={{ padding: "0.75rem", color: "#94a3b8", fontSize: "0.8rem", textAlign: "center" }}>No matches.</div>}
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px", padding: "8px", borderTop: "1px solid #f1f5f9" }}>
+            <button type="button" onClick={() => onChange([])}
+              style={{ padding: "0.35rem 0.75rem", border: "1px solid #e2e8f0", borderRadius: "6px", background: "white", fontSize: "0.78rem", cursor: "pointer", fontFamily: "inherit" }}>
+              Clear
+            </button>
+            <button type="button" onClick={() => setOpen(false)}
+              style={{ padding: "0.35rem 0.75rem", border: "none", borderRadius: "6px", background: "linear-gradient(135deg,#6c3de8,#ec4899)", color: "white", fontSize: "0.78rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Instructor Searchable Dropdown ──────────────────────────────────────────
+const InstructorSelect = ({ instructors, value, onChange }) => {
+  const [open, setOpen]   = useState(false);
+  const [query, setQuery] = useState("");
+  const ref               = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selected = instructors.find(i => i.id === value);
+  const filtered = instructors.filter(i => (i?.name || "").toLowerCase().includes(query.toLowerCase()));
+
+  return (
+    <div style={{ position: "relative" }} ref={ref}>
+      <button type="button" onClick={() => setOpen(v => !v)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0.5rem 0.75rem", background: "#f8fafc",
+          border: "1.5px solid " + (open ? "#ec4899" : "#e2e8f0"),
+          borderRadius: "8px", cursor: "pointer", minHeight: "38px", textAlign: "left",
+          boxShadow: open ? "0 0 0 3px rgba(236,72,153,0.1)" : "none",
+          fontSize: "0.875rem", color: selected ? "#1e293b" : "#94a3b8",
+          transition: "all 0.2s", boxSizing: "border-box", fontFamily: "inherit",
+        }}>
+        {selected ? `${selected.name} (${selected.email})` : "Select instructor"}
+        <span style={{ color: "#94a3b8", fontSize: "0.7rem" }}>▾</span>
+      </button>
+
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 100,
+          background: "white", border: "1.5px solid #e2e8f0", borderRadius: "10px",
+          boxShadow: "0 8px 24px rgba(108,61,232,0.15)", overflow: "hidden",
+        }}>
+          <div style={{ padding: "8px" }}>
+            <input type="text" placeholder="Search instructor..." value={query}
+              onChange={e => setQuery(e.target.value)} autoFocus
+              style={{
+                width: "100%", padding: "0.45rem 0.75rem", border: "1.5px solid #e2e8f0",
+                borderRadius: "7px", fontSize: "0.8rem", outline: "none",
+                boxSizing: "border-box", fontFamily: "inherit",
+              }}
+            />
+          </div>
+          <div style={{ maxHeight: "180px", overflowY: "auto" }}>
+            <div onClick={() => { onChange(""); setOpen(false); setQuery(""); }}
+              style={{ padding: "0.45rem 0.875rem", cursor: "pointer", fontSize: "0.85rem", color: "#94a3b8" }}>
+              — None —
+            </div>
+            {filtered.map(inst => (
+              <div key={inst.id} onClick={() => { onChange(inst.id); setOpen(false); setQuery(""); }}
+                style={{
+                  padding: "0.45rem 0.875rem", cursor: "pointer", fontSize: "0.85rem",
+                  background: inst.id === value ? "rgba(108,61,232,0.05)" : "transparent",
+                  color: inst.id === value ? "#6c3de8" : "#1e293b",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                <span>{inst.name}</span>
+                <span style={{ color: "#94a3b8", fontSize: "0.75rem" }}>{inst.email}</span>
+              </div>
+            ))}
+            {!filtered.length && (
+              <div style={{ padding: "0.75rem", color: "#94a3b8", fontSize: "0.8rem", textAlign: "center" }}>No instructors found</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Shared inline style tokens ───────────────────────────────────────────────
+const S = {
+  overlay: {
+    position: "fixed", inset: 0, background: "rgba(9,5,30,0.6)",
+    backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+    display: "flex", justifyContent: "center", alignItems: "center",
+    zIndex: 1000, padding: "1rem",
+  },
+  modal: {
+    background: "white", width: "100%", maxWidth: "620px", maxHeight: "90vh",
+    borderRadius: "16px", display: "flex", flexDirection: "column", overflow: "hidden",
+    boxShadow: "0 24px 48px -8px rgba(108,61,232,0.22)",
+  },
+  header: {
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    padding: "0.875rem 1.25rem",
+    background: "linear-gradient(135deg, #6c3de8 0%, #ec4899 100%)",
+    flexShrink: 0,
+  },
+  headerTitle: { fontSize: "1rem", fontWeight: 700, color: "white", margin: 0 },
+  closeBtn: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    width: "26px", height: "26px", borderRadius: "6px",
+    background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.3)",
+    color: "white", cursor: "pointer", flexShrink: 0, padding: 0, outline: "none",
+    appearance: "none", WebkitAppearance: "none", boxShadow: "none",
+  },
+  body: {
+    flex: 1, overflowY: "auto", background: "#f5f7fa",
+    padding: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem",
+  },
+  card: {
+    background: "white", border: "1px solid #e8edf3", borderRadius: "10px",
+    padding: "1rem", boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+  },
+  cardTitle: {
+    fontSize: "0.85rem", fontWeight: 700, color: "#1e293b",
+    margin: "0 0 0.875rem", textAlign: "left", WebkitTextFillColor: "#1e293b",
+  },
+  cardHeader: {
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    marginBottom: "0.875rem", paddingBottom: "0.625rem", borderBottom: "1px solid #f1f5f9",
+  },
+  // 2-col grid
+  grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" },
+  // full row inside grid
+  full: { gridColumn: "1 / -1" },
+  // label
+  label: { display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#412969", marginBottom: "4px" },
+  // input / select / textarea base
+  input: {
+    width: "100%", padding: "0.5rem 0.75rem", fontSize: "0.875rem", color: "#1e293b",
+    background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: "8px",
+    fontFamily: "inherit", boxSizing: "border-box", outline: "none", transition: "border-color 0.2s",
+  },
+  textarea: {
+    width: "100%", padding: "0.5rem 0.75rem", fontSize: "0.875rem", color: "#1e293b",
+    background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: "8px",
+    fontFamily: "inherit", boxSizing: "border-box", outline: "none", resize: "vertical",
+    transition: "border-color 0.2s",
+  },
+  footer: {
+    padding: "0.75rem 1.25rem", borderTop: "1px solid #e8edf3", background: "white",
+    display: "flex", justifyContent: "flex-end", gap: "0.5rem", flexShrink: 0,
+  },
+};
+
+// ─── Tiny reusable field wrapper ──────────────────────────────────────────────
+const Field = ({ label, style, children }) => (
+  <div style={style}>
+    <label style={S.label}>{label}</label>
+    {children}
+  </div>
+);
+
+// ─── Main Modal ───────────────────────────────────────────────────────────────
+const CreateProgramModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  const [title,        setTitle]        = useState("");
+  const [description,  setDescription]  = useState("");
+  const [danceStyles,  setDanceStyles]  = useState([]);
+  const [danceLevel,   setDanceLevel]   = useState("Professional");
+  const [pricingType,  setPricingType]  = useState("paid");
+  const [price,        setPrice]        = useState(0);
+  const [overview,     setOverview]     = useState("");
+  const [instructorId, setInstructorId] = useState("");
+  const [imageFile,    setImageFile]    = useState(null);
+  const [loading,      setLoading]      = useState(false);
+  const [videos,       setVideos]       = useState([{ title: "", duration: "", description: "", file: null }]);
+  const [danceStyleOptions, setDanceStyleOptions] = useState([]);
+  const [instructors,       setInstructors]       = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [stylesRes, profRes] = await Promise.all([getDanceStyles(), fetchProfessors()]);
+        setDanceStyleOptions(Array.isArray(stylesRes) ? stylesRes : []);
+        setInstructors(Array.isArray(profRes?.users) ? profRes.users : []);
+      } catch (err) { console.error("Failed to load modal data:", err); }
+    })();
+  }, []);
+
+  const handleVideoChange = (i, field, val) => {
+    const u = [...videos]; u[i][field] = val; setVideos(u);
+  };
+  const addVideo    = () => setVideos([...videos, { title: "", duration: "", description: "", file: null }]);
+  const removeVideo = (i) => setVideos(videos.filter((_, idx) => idx !== i));
+
+  const handleCreate = async () => {
+    try {
+      setLoading(true);
+      let imageUrl = "";
+      if (imageFile) {
+        try { imageUrl = (await uploadMediaFile(imageFile)) || ""; } catch (e) { console.error(e); }
+      }
+      const uploadedVideos = [];
+      for (const [i, v] of videos.entries()) {
+        let url = v.video_url || "";
+        if (v.file) { try { url = (await uploadMediaFile(v.file)) || ""; } catch (e) { console.error(e); } }
+        uploadedVideos.push({ title: v.title, duration: v.duration, description: v.description, video_url: url });
+      }
+      await createProgramService({
+        title, description, overview, dance_styles: danceStyles, dance_level: danceLevel,
+        pricing_type: pricingType, price: pricingType === "paid" ? price : 0,
+        instructor_id: instructorId ? parseInt(instructorId, 10) : null,
+        videos: uploadedVideos, image_url: imageUrl,
+      });
+      alert("Program created successfully!");
+      onClose();
+    } catch (err) {
+      console.error(err?.response?.data || err);
+      alert("Failed to create program.");
+    } finally { setLoading(false); }
+  };
+
+  const inputFocus = (e) => { e.target.style.borderColor = "#ec4899"; e.target.style.background = "white"; e.target.style.boxShadow = "0 0 0 3px rgba(236,72,153,0.1)"; };
+  const inputBlur  = (e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; };
+
+  return (
+    <div style={S.overlay} onClick={onClose}>
+      <div style={S.modal} onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div style={S.header}>
+          <h2 style={S.headerTitle}>Create Video Program</h2>
+          <button style={S.closeBtn} onClick={onClose}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.32)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.18)"}>
+            <X size={13} color="white" />
           </button>
         </div>
 
-        <div className="modal-body">
-          <div className="modal-section">
-            <h3 className="section-title">Basic Information</h3>
-            <div className="form-grid">
-              {/* 🔹 Title */}
-              <div className="form-group">
-                <label className="form-label">Program Title</label>
-                <input
-                  className="form-input"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter program title"
-                />
-              </div>
+        {/* Body */}
+        <div style={S.body}>
 
-              {/* 🔹 Description */}
-              <div className="form-group full-width">
-                <label className="form-label">Description</label>
-                <textarea
-                  className="form-textarea"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter program description"
-                  rows="4"
-                />
-              </div>
-              {/* 🔹 Overview */}
-              <div className="form-group full-width">
-                <label className="form-label">Overview</label>
-                <textarea
-                  className="form-textarea"
-                  value={overview}
-                  onChange={(e) => setOverview(e.target.value)}
-                  placeholder="Enter program overview"
-                  rows="3"
-                />
-              </div>
+          {/* ── Basic Information ── */}
+          <div style={S.card}>
+            <h3 style={S.cardTitle}>Basic Information</h3>
+            <div style={S.grid2}>
 
-              {/* 🔹 Dance Style */}
-              <div className="form-group">
-                <label className="form-label">Dance Style</label>
-                <select
-                  className="form-select"
-                  value={danceStyle}
-                  onChange={(e) => setDanceStyle(e.target.value)}
-                >
-                  {danceStyles.map((style) => (
-                    <option key={style} value={style}>
-                      {style}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Field label="Program Title">
+                <input style={S.input} value={title} onChange={e => setTitle(e.target.value)}
+                  placeholder="Enter program title" onFocus={inputFocus} onBlur={inputBlur} />
+              </Field>
 
-              {/* 🔹 Dance Level */}
-              <div className="form-group">
-                <label className="form-label">Level</label>
-                <select
-                  className="form-select"
-                  value={danceLevel}
-                  onChange={(e) => setDanceLevel(e.target.value)}
-                >
+              <Field label="Level">
+                <select style={S.input} value={danceLevel} onChange={e => setDanceLevel(e.target.value)}
+                  onFocus={inputFocus} onBlur={inputBlur}>
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advance">Advance</option>
                   <option value="Professional">Professional</option>
                 </select>
-              </div>
+              </Field>
 
-              {/* 🔹 Pricing */}
-              <div className="form-group">
-                <label className="form-label">Pricing Type</label>
-                <select
-                  className="form-select"
-                  value={pricingType}
-                  onChange={(e) => setPricingType(e.target.value)}
-                >
+              <Field label="Description" style={S.full}>
+                <textarea style={{ ...S.textarea, minHeight: "72px" }} rows={3} value={description}
+                  onChange={e => setDescription(e.target.value)} placeholder="Enter program description"
+                  onFocus={inputFocus} onBlur={inputBlur} />
+              </Field>
+
+              <Field label="Overview" style={S.full}>
+                <textarea style={{ ...S.textarea, minHeight: "56px" }} rows={2} value={overview}
+                  onChange={e => setOverview(e.target.value)} placeholder="Enter program overview"
+                  onFocus={inputFocus} onBlur={inputBlur} />
+              </Field>
+
+              <Field label="Dance Styles" style={S.full}>
+                <DanceStylesSelect selected={danceStyles} onChange={setDanceStyles} options={danceStyleOptions} />
+              </Field>
+
+              <Field label="Instructor" style={S.full}>
+                <InstructorSelect instructors={instructors} value={instructorId} onChange={setInstructorId} />
+              </Field>
+
+              {/* Cover Image + Pricing side by side */}
+              <Field label="Cover Image">
+                <label style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                  padding: "0.5rem 0.75rem", background: "#f8fafc",
+                  border: "1.5px dashed #c4b5fd", borderRadius: "8px",
+                  color: "#6c3de8", fontSize: "0.8rem", fontWeight: 600,
+                  cursor: "pointer", minHeight: "38px", boxSizing: "border-box",
+                }}>
+                  <Upload size={13} />
+                  {imageFile ? imageFile.name : "Choose cover image"}
+                  <input type="file" accept="image/*" style={{ display: "none" }}
+                    onChange={e => setImageFile(e.target.files[0])} />
+                </label>
+              </Field>
+
+              <Field label="Pricing Type">
+                <select style={S.input} value={pricingType} onChange={e => setPricingType(e.target.value)}
+                  onFocus={inputFocus} onBlur={inputBlur}>
                   <option value="free">Free</option>
                   <option value="paid">Paid</option>
                 </select>
-              </div>
+              </Field>
 
+              {/* Price only when paid — stays in grid */}
               {pricingType === "paid" && (
-                <div className="form-group">
-                  <label className="form-label">Price (€)</label>
-                  <input
-                    className="form-input"
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(Number(e.target.value))}
-                  />
-                </div>
+                <Field label="Price (€)">
+                  <input style={S.input} type="number" min={0} value={price}
+                    onChange={e => setPrice(Number(e.target.value))} placeholder="0.00"
+                    onFocus={inputFocus} onBlur={inputBlur} />
+                </Field>
               )}
 
-              {/* 🔹 Instructor Search + Dropdown */}
-              <div className="form-group full-width">
-                <label className="form-label">Instructor</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Search instructor..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <select
-                  className="form-select"
-                  value={instructorId || ""}
-                  onChange={(e) =>
-                    setInstructorId(
-                      e.target.value ? Number(e.target.value) : ""
-                    )
-                  }
-                >
-                  <option value="">Select Instructor</option>
-                  {filteredInstructors.map((inst) => (
-                    <option key={inst.id} value={inst.id}>
-                      {inst.name} ({inst.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 🔹 Cover Image */}
-              <div className="form-group">
-                <label className="form-label">Cover Image</label>
-                <div className="file-input-container">
-                  <input
-                    className="file-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files[0])}
-                    id="cover-image"
-                  />
-                  <label htmlFor="cover-image" className="file-input-label">
-                    {imageFile ? imageFile.name : "Choose cover image"}
-                  </label>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* 🔹 Videos Section */}
-          <div className="modal-section">
-            <div className="section-header">
-              <h3 className="section-title">Videos</h3>
-              <button
-                type="button"
-                className="add-video-btn"
-                onClick={addVideo}
-              >
-                + Add Video
+          {/* ── Videos ── */}
+          <div style={S.card}>
+            <div style={S.cardHeader}>
+              <h3 style={{ ...S.cardTitle, margin: 0 }}>Videos</h3>
+              <button type="button" onClick={addVideo}
+                style={{
+                  display: "flex", alignItems: "center", gap: "4px",
+                  padding: "0.35rem 0.75rem", background: "white",
+                  border: "1.5px solid #c4b5fd", borderRadius: "7px",
+                  color: "#6c3de8", fontSize: "0.75rem", fontWeight: 600,
+                  cursor: "pointer", fontFamily: "inherit",
+                }}>
+                <Plus size={12} /> Add Video
               </button>
             </div>
 
-            <div className="videos-container">
-              {videos.map((vid, index) => (
-                <div key={index} className="video-form-card">
-                  <div className="video-card-header">
-                    <span className="video-number">Video {index + 1}</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+              {videos.map((vid, idx) => (
+                <div key={idx} style={{
+                  background: "#f8fafc", border: "1.5px solid #e8edf3", borderRadius: "9px", padding: "0.875rem",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                    <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#6c3de8", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+                      Video {idx + 1}
+                    </span>
                     {videos.length > 1 && (
-                      <button
-                        type="button"
-                        className="remove-video-btn"
-                        onClick={() => removeVideo(index)}
-                      >
-                        <X size={16} />
+                      <button type="button" onClick={() => removeVideo(idx)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: "3px",
+                          background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)",
+                          borderRadius: "6px", padding: "0.25rem 0.5rem",
+                          fontSize: "0.72rem", fontWeight: 600, color: "#dc2626",
+                          cursor: "pointer", fontFamily: "inherit",
+                        }}>
+                        <Trash2 size={11} /> Remove
                       </button>
                     )}
                   </div>
 
-                  <div className="video-form-grid">
-                    <div className="form-group">
-                      <label className="form-label">Title</label>
-                      <input
-                        className="form-input"
-                        placeholder="Video title"
-                        value={vid.title}
-                        onChange={(e) =>
-                          handleVideoChange(index, "title", e.target.value)
-                        }
-                      />
-                    </div>
+                  <div style={S.grid2}>
+                    <Field label="Title">
+                      <input style={S.input} placeholder="Video title" value={vid.title}
+                        onChange={e => handleVideoChange(idx, "title", e.target.value)}
+                        onFocus={inputFocus} onBlur={inputBlur} />
+                    </Field>
 
-                    <div className="form-group">
-                      <label className="form-label">Duration</label>
-                      <input
-                        className="form-input"
-                        placeholder="e.g. 9:20"
-                        value={vid.duration}
-                        onChange={(e) =>
-                          handleVideoChange(index, "duration", e.target.value)
-                        }
-                      />
-                    </div>
+                    <Field label="Duration">
+                      <input style={S.input} placeholder="e.g. 9:20" value={vid.duration}
+                        onChange={e => handleVideoChange(idx, "duration", e.target.value)}
+                        onFocus={inputFocus} onBlur={inputBlur} />
+                    </Field>
 
-                    <div className="form-group full-width">
-                      <label className="form-label">Description</label>
-                      <textarea
-                        className="form-textarea"
-                        placeholder="Video description"
-                        value={vid.description}
-                        onChange={(e) =>
-                          handleVideoChange(
-                            index,
-                            "description",
-                            e.target.value
-                          )
-                        }
-                        rows="3"
-                      />
-                    </div>
+                    <Field label="Description" style={S.full}>
+                      <textarea style={{ ...S.textarea, minHeight: "56px" }} rows={2}
+                        placeholder="Video description" value={vid.description}
+                        onChange={e => handleVideoChange(idx, "description", e.target.value)}
+                        onFocus={inputFocus} onBlur={inputBlur} />
+                    </Field>
 
-                    <div className="form-group full-width">
-                      <label className="form-label">Video File</label>
-                      <div className="file-input-container">
-                        <input
-                          className="file-input"
-                          type="file"
-                          accept="video/*"
-                          onChange={(e) =>
-                            handleVideoChange(index, "file", e.target.files[0])
-                          }
-                          id={`video-file-${index}`}
-                        />
-                        <label
-                          htmlFor={`video-file-${index}`}
-                          className="file-input-label"
-                        >
-                          {vid.file ? vid.file.name : "Choose video file"}
-                        </label>
-                      </div>
-                    </div>
+                    <Field label="Video File" style={S.full}>
+                      <label style={{
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                        padding: "0.5rem 0.75rem", background: "white",
+                        border: "1.5px dashed #c4b5fd", borderRadius: "8px",
+                        color: "#6c3de8", fontSize: "0.8rem", fontWeight: 600,
+                        cursor: "pointer", boxSizing: "border-box",
+                      }}>
+                        <Upload size={13} />
+                        {vid.file ? vid.file.name : "Choose video file"}
+                        <input type="file" accept="video/*" style={{ display: "none" }}
+                          onChange={e => handleVideoChange(idx, "file", e.target.files[0])} />
+                      </label>
+                    </Field>
                   </div>
                 </div>
               ))}
             </div>
           </div>
+
         </div>
 
-        <div className="modal-footer">
-          <button
-            className="modal-btn cancel-btn"
-            onClick={onClose}
-            disabled={loading}
-          >
+        {/* Footer */}
+        <div style={S.footer}>
+          <button onClick={onClose} disabled={loading}
+            style={{
+              padding: "0.55rem 1.25rem", borderRadius: "8px", fontSize: "0.875rem",
+              fontWeight: 600, cursor: "pointer", border: "1.5px solid #d1d5db",
+              background: "white", color: "#374151", fontFamily: "inherit",
+            }}>
             Cancel
           </button>
-          <button
-            className="modal-btn create-btn"
-            onClick={handleCreateProgram}
-            disabled={loading}
-          >
+          <button onClick={handleCreate} disabled={loading}
+            style={{
+              padding: "0.55rem 1.25rem", borderRadius: "8px", fontSize: "0.875rem",
+              fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", border: "none",
+              background: "linear-gradient(135deg,#6c3de8,#ec4899)", color: "white",
+              boxShadow: "0 2px 8px rgba(236,72,153,0.3)", fontFamily: "inherit",
+              opacity: loading ? 0.7 : 1,
+            }}>
             {loading ? "Creating..." : "Create Program"}
           </button>
         </div>
+
       </div>
     </div>
   );

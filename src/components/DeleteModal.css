@@ -51,7 +51,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 24px 28px;
-  background: linear-gradient(135deg, #4F7CF7 0%, #8E5CF6 50%, #E84D9B 100%);
+  background: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
   border-radius: 14px 14px 0 0;
   position: relative;
   overflow: hidden;
@@ -141,9 +141,9 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #f0eefe 0%, #faf5ff 100%);
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%);
   border-radius: 10px;
-  border-left: 4px solid #8E5CF6;
+  border-left: 4px solid #8b5cf6;
   margin-top: 12px;
   animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
 }
@@ -170,7 +170,7 @@
 .delete-modal-item-name .item-value {
   font-size: 14px;
   font-weight: 600;
-  color: #8E5CF6;
+  color: #8b5cf6;
   word-break: break-all;
 }
 
@@ -214,14 +214,14 @@
 }
 
 .btn-delete {
-  background: linear-gradient(135deg, #4F7CF7 0%, #8E5CF6 50%, #E84D9B 100%);
+  background: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(142, 92, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
 }
 
 .btn-delete:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(142, 92, 246, 0.4);
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.4);
 }
 
 .btn-delete:active:not(:disabled) {

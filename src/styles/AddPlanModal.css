@@ -1,74 +1,174 @@
+/* =============================================
+   ADD PLAN MODAL — PROFESSIONAL DANCE APP STYLE
+   Blue→Purple→Pink gradient theme
+   ============================================= */
+
+:root {
+  --modal-grad: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
+  --modal-blue: #5b7cfa;
+  --modal-purple: #8b5cf6;
+  --modal-pink: #ec4899;
+  --modal-text: #374151;
+  --modal-muted: #6b7280;
+  --modal-border: #e5e7eb;
+  --modal-white: #ffffff;
+  --modal-bg: #f5f6fa;
+  --modal-shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --modal-shadow-md: 0 8px 28px rgba(0,0,0,0.10);
+  --modal-shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 1000;
+  padding: 20px;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .add-plan-modal {
-  background-color: white;
-  width: 400px;
-  padding: 1.8rem;
-  border-radius: 12px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+  background: var(--modal-white);
+  width: 100%;
+  max-width: 500px;
+  border-radius: 1.25rem;
+  box-shadow: var(--modal-shadow-lg);
+  border: 1.5px solid var(--modal-border);
+  overflow: hidden;
+  animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.add-plan-modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--modal-grad);
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  padding: 1.75rem 2rem;
+  border-bottom: 2px solid var(--modal-border);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: var(--modal-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
 }
 
 .close-btn {
   font-size: 1.5rem;
-  background: none;
-  border: none;
+  background: var(--modal-bg);
+  border: 1.5px solid var(--modal-border);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
   cursor: pointer;
+  color: var(--modal-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: var(--modal-border);
+  color: var(--modal-text);
+  transform: rotate(90deg);
 }
 
 .modal-body {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 2rem;
 }
 
 .modal-body label {
-  font-weight: 500;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--modal-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
 }
 
 .modal-body input {
-  padding: 0.6rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 0.95rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid var(--modal-border);
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
+  background: var(--modal-white);
+  font-family: inherit;
+}
+
+.modal-body input:focus {
+  outline: none;
+  border-color: var(--modal-blue);
+  box-shadow: 0 0 0 4px rgba(91,124,250,0.1);
+  transform: translateY(-1px);
 }
 
 .add-feature-btn {
   margin-top: -0.5rem;
-  padding: 0.4rem 0.8rem;
-  background-color: #e5e7eb;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--modal-bg);
+  border: 1.5px solid var(--modal-border);
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   align-self: flex-start;
+  color: var(--modal-text);
+  transition: all 0.3s ease;
 }
 
 .add-feature-btn:hover {
-  background-color: #d1d5db;
+  background: var(--modal-border);
+  border-color: var(--modal-blue);
+  color: var(--modal-blue);
+  transform: translateY(-1px);
 }
 
 .modal-actions {
@@ -76,28 +176,39 @@
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--modal-border);
 }
 
 .cancel-btn,
 .submit-btn {
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .cancel-btn {
-  background-color: #e5e7eb;
-  color: #111827;
+  background: var(--modal-white);
+  color: var(--modal-text);
+  border: 1.5px solid var(--modal-border);
+}
+
+.cancel-btn:hover {
+  background: var(--modal-bg);
+  border-color: var(--modal-muted);
 }
 
 .submit-btn {
-  background-color: #dc3545;
+  background: var(--modal-grad);
   color: white;
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
 }
 
 .submit-btn:hover {
-  background-color: #ce1515;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(91,124,250,0.4);
 }

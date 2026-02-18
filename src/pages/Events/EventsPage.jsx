@@ -203,7 +203,6 @@ const EventsPage = () => {
                       <span className="event-title-label">
                         {event.event_title}
                       </span>
-                      <Eye size={14} className="event-view-icon" />
                     </div>
                   </td>
                   <td className="event-type-column">

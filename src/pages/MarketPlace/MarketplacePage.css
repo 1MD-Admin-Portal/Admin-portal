@@ -1,82 +1,102 @@
-/* Enhanced UI/UX CSS for MarketplacePage - Modern design with unique class names */
+/* =============================================
+   MARKETPLACE PAGE — PROFESSIONAL DANCE APP STYLE
+   Blue→Purple→Pink gradient theme
+   ============================================= */
+
+:root {
+  --mktplace-grad: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
+  --mktplace-blue: #5b7cfa;
+  --mktplace-purple: #8b5cf6;
+  --mktplace-pink: #ec4899;
+  --mktplace-dark: #1a1a2e;
+  --mktplace-text: #374151;
+  --mktplace-muted: #6b7280;
+  --mktplace-border: #e5e7eb;
+  --mktplace-bg: #f5f6fa;
+  --mktplace-white: #ffffff;
+  --mktplace-shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --mktplace-shadow-md: 0 8px 28px rgba(0,0,0,0.10);
+  --mktplace-shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+}
 
 .mktplace-main-wrapper {
-  padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  
+  padding: 2.5rem 3rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--mktplace-bg);
   min-height: 100vh;
   position: relative;
 }
 
-.mktplace-main-wrapper::after {
+.mktplace-main-wrapper::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 265px;
+  left: 0;
   right: 0;
-  height: 200px;
+  height: 300px;
   background: linear-gradient(
     135deg,
-    rgba(245, 158, 11, 0.1) 0%,
-    rgba(239, 68, 68, 0.1) 50%,
-    rgba(236, 72, 153, 0.1) 100%
+    rgba(91,124,250,0.06) 0%,
+    rgba(139,92,246,0.06) 50%,
+    rgba(236,72,153,0.06) 100%
   );
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
-/* Header Styles */
+/* ── HEADER ── */
 .mktplace-top-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+ 
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--mktplace-border);
   position: relative;
+  z-index: 1;
+}
+
+.mktplace-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.mktplace-icon-wrapper {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(91,124,250,0.1) 0%, rgba(91,124,250,0.15) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mktplace-blue);
+  flex-shrink: 0;
 }
 
 .mktplace-main-title {
   font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0;
-  background: linear-gradient(135deg, #2d0cb3 0%, #6944ef 50%, #ec4899 100%);
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  background: var(--mktplace-grad);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
 }
 
-.mktplace-main-title::before {
-  content: "🛒";
-  position: absolute;
-  left: -3rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 2rem;
-  animation: cartBounce 2s ease-in-out infinite;
-}
-
-@keyframes cartBounce {
-  0%,
-  100% {
-    transform: translateY(-50%) translateX(0);
-  }
-  25% {
-    transform: translateY(-50%) translateX(-3px) rotate(-2deg);
-  }
-  75% {
-    transform: translateY(-50%) translateX(3px) rotate(2deg);
-  }
+.mktplace-header-subtitle {
+  font-size: 1rem;
+  color: var(--mktplace-muted);
+  margin: 0;
+  font-weight: 400;
 }
 
 .mktplace-create-btn {
-  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  background: var(--mktplace-grad);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
@@ -85,7 +105,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
   position: relative;
   overflow: hidden;
 }
@@ -112,21 +132,22 @@
 
 .mktplace-create-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 6px 20px rgba(91,124,250,0.4);
 }
 
-/* Controls Styles */
+/* ── CONTROLS ── */
 .mktplace-control-panel {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  background: white;
+  background: var(--mktplace-white);
   padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1.25rem;
+  box-shadow: var(--mktplace-shadow-sm);
+  border: 1.5px solid var(--mktplace-border);
+  position: relative;
+  z-index: 1;
 }
 
 .mktplace-filter-group {
@@ -165,7 +186,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(245, 158, 11, 0.1),
+    rgba(91,124,250,0.1),
     transparent
   );
   transition: left 0.3s;
@@ -176,20 +197,21 @@
 }
 
 .mktplace-filter-option.selected {
-  background: linear-gradient(135deg, #420adb 0%, #ef4444 100%);
+  background: var(--mktplace-grad);
   color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
 }
 
 .mktplace-filter-option:hover {
-  background: rgba(99, 48, 216, 0.1);
-  color: #5d15e1;
+  background: rgba(91,124,250,0.1);
+  color: var(--mktplace-blue);
 }
 
 .mktplace-filter-option.selected:hover {
-  background: linear-gradient(135deg, #3b06d9 0%, #dc2626 100%);
+  background: var(--mktplace-grad);
   color: white;
+  box-shadow: 0 6px 20px rgba(91,124,250,0.4);
 }
 
 .mktplace-search-wrapper {
@@ -222,8 +244,8 @@
 }
 
 .mktplace-search-input:focus {
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  border-color: var(--mktplace-blue);
+  box-shadow: 0 0 0 4px rgba(91,124,250,0.1);
   background: white;
 }
 
@@ -273,7 +295,7 @@
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: var(--mktplace-grad);
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
@@ -281,8 +303,9 @@
 .mktplace-data-row:hover {
   background: linear-gradient(
     135deg,
-    rgba(245, 158, 11, 0.02) 0%,
-    rgba(239, 68, 68, 0.02) 100%
+    rgba(91,124,250,0.02) 0%,
+    rgba(139,92,246,0.02) 50%,
+    rgba(236,72,153,0.02) 100%
   );
   transform: translateY(-1px);
 }
@@ -307,29 +330,19 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #3b82f6;
+  color: var(--mktplace-blue);
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .mktplace-title-wrapper:hover {
-  color: #f59e0b;
+  color: var(--mktplace-purple);
 }
 
 .mktplace-title-text {
   flex: 1;
 }
 
-.mktplace-view-icon {
-  opacity: 0;
-  transition: all 0.3s ease;
-  color: #f59e0b;
-}
-
-.mktplace-title-column.clickable-title:hover .mktplace-view-icon {
-  opacity: 1;
-  transform: scale(1.1);
-}
 
 .mktplace-instructor-column,
 .mktplace-price-column {
@@ -485,7 +498,7 @@
   width: 3rem;
   height: 3rem;
   border: 4px solid #e2e8f0;
-  border-top: 4px solid #f59e0b;
+  border-top: 4px solid var(--mktplace-blue);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   font-size: initial;
@@ -577,13 +590,23 @@
 }
 
 .mktplace-modal-header {
-  background: linear-gradient(135deg, #2d0cb3 0%,  #ec4899 100%);
-  padding: 1.5rem 2rem;
+  background: var(--mktplace-grad);
+  padding: 1.75rem 2rem;
   position: relative;
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.mktplace-modal-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
 }
 
 .mktplace-modal-heading {
@@ -641,16 +664,26 @@
 }
 
 .mktplace-section-heading {
-  color: #900bf5;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 3px solid transparent;
-  background: linear-gradient(90deg, #f59e0b, #ef4444, #ec4899);
-  background-size: 100% 3px;
-  background-repeat: no-repeat;
-  background-position: 0 100%;
+  background: var(--mktplace-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-bottom: 2px solid var(--mktplace-border);
+  position: relative;
+}
+
+.mktplace-section-heading::before {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--mktplace-grad);
 }
 
 /* Modal Options */
@@ -688,7 +721,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(245, 158, 11, 0.1),
+    rgba(91,124,250,0.1),
     transparent
   );
   transition: left 0.5s;
@@ -699,21 +732,22 @@
 }
 
 .mktplace-modal-choice:hover {
-  border-color: #6d0bf5;
+  border-color: var(--mktplace-purple);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 8px 25px rgba(139,92,246,0.15);
 }
 
 .mktplace-modal-choice.active {
-  border-color: #420fc4;
+  border-color: var(--mktplace-purple);
   background: linear-gradient(
     135deg,
-    rgba(245, 158, 11, 0.1),
-    rgba(239, 68, 68, 0.05)
+    rgba(91,124,250,0.1),
+    rgba(139,92,246,0.1),
+    rgba(236,72,153,0.05)
   );
-  color: #2d0bc3;
+  color: var(--mktplace-purple);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 8px 25px rgba(139,92,246,0.2);
 }
 
 .mktplace-modal-select {
@@ -741,8 +775,8 @@
 
 .mktplace-modal-select select:focus {
   outline: none;
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  border-color: var(--mktplace-blue);
+  box-shadow: 0 0 0 4px rgba(91,124,250,0.1);
 }
 
 /* Info Layout */
@@ -771,15 +805,15 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: var(--mktplace-grad);
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
 
 .mktplace-info-block:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15);
-  border-color: #f59e0b;
+  box-shadow: 0 8px 25px rgba(91,124,250,0.15);
+  border-color: var(--mktplace-blue);
 }
 
 .mktplace-info-block:hover::before {
@@ -868,7 +902,7 @@
 }
 
 .mktplace-purchase-table tbody tr:hover {
-  background: rgba(245, 158, 11, 0.02);
+  background: rgba(91,124,250,0.02);
 }
 
 /* Analytics Grid */
@@ -899,15 +933,15 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: var(--mktplace-grad);
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
 
 .mktplace-analytics-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15);
-  border-color: #f59e0b;
+  box-shadow: 0 8px 25px rgba(91,124,250,0.15);
+  border-color: var(--mktplace-blue);
 }
 
 .mktplace-analytics-card:hover::before {
@@ -948,14 +982,26 @@
   background: #f8fafc;
   flex-shrink: 0;
 }
-.action-button{
+.action-button {
   width: 38px;
   height: 38px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: transparent;
+  border-radius: 0.625rem;
+  border: 1.5px solid var(--mktplace-border);
+  background: var(--mktplace-white);
   cursor: pointer;
-  transform: 0.2s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mktplace-blue);
+}
+
+.action-button:hover {
+  background: var(--mktplace-grad);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
 }
 
 .mktplace-cancel-button,
@@ -984,9 +1030,9 @@
 }
 
 .mktplace-apply-button {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: var(--mktplace-grad);
   color: white;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
   position: relative;
   overflow: hidden;
 }
@@ -1013,7 +1059,7 @@
 
 .mktplace-apply-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 6px 20px rgba(91,124,250,0.4);
 }
 
 /* Custom Scrollbar */
@@ -1031,25 +1077,20 @@
 
 .mktplace-modal-content::-webkit-scrollbar-thumb,
 .mktplace-purchase-table-wrapper::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: var(--mktplace-grad);
   border-radius: 4px;
   border: 1px solid #f1f5f9;
 }
 
 .mktplace-modal-content::-webkit-scrollbar-thumb:hover,
 .mktplace-purchase-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #d97706, #dc2626);
+  background: linear-gradient(135deg, #4a6cf5, #7c3aed, #db2777);
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
   .mktplace-main-wrapper {
-    margin-left: 0;
-    padding: 1rem;
-  }
-
-  .mktplace-main-wrapper::after {
-    left: 0;
+    padding: 1.5rem;
   }
 }
 
@@ -1185,7 +1226,7 @@
 .mktplace-apply-button:focus,
 .mktplace-modal-close:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 0 4px rgba(91,124,250,0.2);
 }
 
 /* Print styles */

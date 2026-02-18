@@ -1,20 +1,52 @@
 /* ================================================
-   NOTIFICATION MANAGEMENT - MODERN UI STYLES
-   All classes prefixed with: notification-mgmt-
+   NOTIFICATION MANAGEMENT - PROFESSIONAL DANCE APP STYLE
+   Blue→Purple→Pink gradient theme
    ================================================ */
+
+:root {
+  --notif-grad: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
+  --notif-blue: #5b7cfa;
+  --notif-purple: #8b5cf6;
+  --notif-pink: #ec4899;
+  --notif-dark: #1a1a2e;
+  --notif-text: #374151;
+  --notif-muted: #6b7280;
+  --notif-border: #e5e7eb;
+  --notif-bg: #f5f6fa;
+  --notif-white: #ffffff;
+  --notif-shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --notif-shadow-md: 0 8px 28px rgba(0,0,0,0.10);
+  --notif-shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+}
 
 /* ============================================
    MAIN CONTAINER
    ============================================ */
- .notification-mgmt-container {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
- 
-   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  min-height: 100vh; } 
+.notification-mgmt-container {
+  padding: 2.5rem 3rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--notif-bg);
+  min-height: 100vh;
+  color: var(--notif-text);
+  position: relative;
+}
+
+.notification-mgmt-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background: linear-gradient(
+    135deg,
+    rgba(91,124,250,0.06) 0%,
+    rgba(139,92,246,0.06) 50%,
+    rgba(236,72,153,0.06) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+} 
  
 
  
@@ -25,10 +57,14 @@
    HEADER SECTION
    ============================================ */
 .notification-mgmt-header-section {
-  margin-bottom: 32px;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--notif-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+  z-index: 1;
   animation: notification-mgmt-fadeInDown 0.6s ease-out;
 }
 
@@ -48,25 +84,25 @@
 }
 
 .notification-mgmt-header-title {
-  font-size: 36px;
+  font-size: 2.5rem;
   font-weight: 800;
-  color: #0f172a;
   display: flex;
   align-items: center;
   margin: 0;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  letter-spacing: -0.5px;
+  background: var(--notif-grad);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .notification-mgmt-header-icon {
-  width: 36px;
-  height: 36px;
-  margin-right: 16px;
-  color: #3b82f6;
-  filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.3));
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 1rem;
+  color: var(--notif-blue);
 }
 
 .notification-mgmt-header-subtitle {
@@ -118,8 +154,9 @@
 }
 
 .notification-mgmt-btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: var(--notif-grad);
   color: white;
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
 }
 
 .notification-mgmt-btn-primary:hover:not(:disabled) {
@@ -864,15 +901,14 @@
 }
 
 .notification-mgmt-modal-title {
-  font-size: 28px;
+  font-size: 2rem;
   font-weight: 800;
-  color: #0f172a;
   margin: 0;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  letter-spacing: -0.5px;
+  background: var(--notif-grad);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .notification-mgmt-modal-close {
@@ -1364,8 +1400,7 @@
    ============================================ */
 @media (max-width: 1024px) {
   .notification-mgmt-container {
-    margin-left: 0;
-    padding: 24px;
+    padding: 1.5rem;
   }
 
   .notification-mgmt-modal-row {

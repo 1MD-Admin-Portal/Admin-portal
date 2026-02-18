@@ -1,3 +1,5 @@
+import "./ConfirmationModal.css";
+
 const ConfirmationModal = ({
   message,
   onConfirm,
@@ -5,15 +7,15 @@ const ConfirmationModal = ({
   confirmLabel = "Confirm",
 }) => {
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="confirm-modal-overlay" onClick={onCancel}>
+      <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
         <h3>Confirmation</h3>
-        <div className="modal-body">{message}</div>
-        <div className="modal-actions">
-          <button className="cancel-button" onClick={onCancel}>
+        <div className="confirm-modal-body">{message}</div>
+        <div className="confirm-modal-actions">
+          <button className="confirm-cancel-button" onClick={onCancel}>
             Cancel
           </button>
-          <button className="confirm-button" onClick={onConfirm}>
+          <button className="confirm-confirm-button" onClick={onConfirm}>
             {confirmLabel}
           </button>
         </div>

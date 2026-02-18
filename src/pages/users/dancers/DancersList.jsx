@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   fetchUsers,
@@ -210,10 +211,12 @@ const DancersList = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Email</th>
+            
             <th>Name</th>
+            <th>Email</th>
+            <th>Created Date</th>
             <th>Skill Level</th>
-            <th>Created At</th>
+        
             <th>Subscription</th>
           </tr>
         </thead>
@@ -271,10 +274,10 @@ const DancersList = () => {
                 }}
               >
                 <td>{dancer.id}</td>
-                <td>{dancer.email}</td>
                 <td>{dancer.name}</td>
-                <td>{dancer.skill_level}</td>
-                <td>{new Date(dancer.created_at).toLocaleString()}</td>
+                <td>{dancer.email}</td>
+                <td>{new Date(dancer.created_at).toLocaleDateString("fr-FR")}</td>
+                <td>{dancer.skill_level}</td>  
                 <td>
                   {dancer.active_subscription?.subscription_name || "N/A"}
                 </td>

@@ -544,9 +544,9 @@ const OrganizersPage = () => {
             <p>
               <strong>Comment:</strong> {selectedApp.comment || "-"}
             </p>
-            <button onClick={() => setSelectedApp(null)} className="close-btn">
+            {/* <button onClick={() => setSelectedApp(null)} className="close-btn">
               Close
-            </button>
+            </button> */}
           </div>
         </div>
       )}

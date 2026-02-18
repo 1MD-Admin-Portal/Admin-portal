@@ -191,7 +191,7 @@ const DJListPage = () => {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
-            <th>Location</th>
+            <th>Created Date</th>
             <th>Skill Level</th>
             <th>Subscription</th>
           </tr>
@@ -214,7 +214,12 @@ const DJListPage = () => {
                 <td>{user.id}</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td>{user.location || "N/A"}</td>
+                {/* <td>{user.created_at || "N/A"}</td> */}
+                <td>
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString("fr-FR")
+                    : "N/A"}
+                </td>
                 <td>{user.skill_level || "N/A"}</td>
                 <td>{user.active_subscription?.subscription_name || "None"}</td>
               </tr>

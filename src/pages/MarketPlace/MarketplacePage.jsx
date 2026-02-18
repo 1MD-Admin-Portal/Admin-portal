@@ -91,7 +91,15 @@ const MarketplacePage = () => {
   return (
     <div className="mktplace-main-wrapper">
       <div className="mktplace-top-header">
-        <h2 className="mktplace-main-title">Marketplace</h2>
+        <div className="mktplace-header-content">
+          {/* <div className="mktplace-icon-wrapper">
+            <ShoppingBag size={32} />
+          </div> */}
+          <div>
+            <h1 className="mktplace-main-title">Marketplace</h1>
+            <p className="mktplace-header-subtitle">Manage programs and events marketplace</p>
+          </div>
+        </div>
         {/* <button
           className="mktplace-create-btn"
           onClick={() => setShowModal(true)}
@@ -174,7 +182,6 @@ const MarketplacePage = () => {
                       <span className="mktplace-title-text">
                         {filter === "Program" ? item.title : item.event_title}
                       </span>
-                      <Eye size={14} className="mktplace-view-icon" />
                     </div>
                   </td>
                   <td className="mktplace-instructor-column">
