@@ -203,6 +203,7 @@ const ProfessorsListPage = () => {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Created Date</th>
             <th>Skill Level</th>
             <th>Roles</th>
             <th>Subscription Name</th>
@@ -236,6 +237,11 @@ const ProfessorsListPage = () => {
               <td>{prof.id}</td>
               <td>{prof.name}</td>
               <td>{prof.email}</td>
+              <td>
+                {prof.created_at
+                  ? new Date(prof.created_at).toLocaleDateString("fr-FR")
+                  : "N/A"}
+              </td>
               <td>{prof.skill_level}</td>
               <td>{prof.roles?.join(", ")}</td>
               <td>{prof.active_subscription?.subscription_name || "-"}</td>
@@ -295,6 +301,7 @@ const ProfessorsListPage = () => {
                       label: "Location",
                       value: selectedProfessor.location || "N/A",
                     },
+                    
                     {
                       label: "Skill Level",
                       value: selectedProfessor.skill_level || "N/A",

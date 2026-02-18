@@ -1,0 +1,409 @@
+/**
+ * Sidebar.css - Production-grade sidebar styles
+ * Single breakpoint: 1024px for mobile/tablet
+ * No duplicate rules
+ * Optimized animations and layouts
+ */
+
+/* ========== MAIN SIDEBAR CONTAINER ========== */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 280px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  z-index: 999;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== SIDEBAR HEADER ========== */
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f4d03f;
+  margin: 0;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* ========== SIDEBAR CONTENT ========== */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ========== MENU SECTIONS ========== */
+.menu-section {
+  margin-bottom: 32px;
+}
+
+.menu-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0 20px 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-item,
+.dropdown-item {
+  margin: 2px 12px;
+}
+
+/* ========== MENU LINKS & TRIGGERS ========== */
+.menu-link,
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  border-left: 3px solid transparent;
+}
+
+/* Hover background effect */
+.menu-link::before,
+.dropdown-trigger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(244, 208, 63, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+.menu-link:hover,
+.dropdown-trigger:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.menu-link:hover::before,
+.dropdown-trigger:hover::before {
+  opacity: 1;
+}
+
+/* ========== ACTIVE MENU ITEM ========== */
+.menu-item.active .menu-link {
+  background: linear-gradient(135deg, rgba(244, 208, 63, 0.15) 0%, rgba(212, 175, 55, 0.15) 100%);
+  color: #f4d03f;
+  border-left: 3px solid #f4d03f;
+  border-radius: 12px;
+  box-shadow: inset 0 0 20px rgba(244, 208, 63, 0.1), 0 4px 15px rgba(244, 208, 63, 0.1);
+}
+
+.menu-item.active .menu-icon {
+  color: #f4d03f;
+  filter: drop-shadow(0 0 4px rgba(244, 208, 63, 0.4));
+}
+
+/* ========== MENU ICONS ========== */
+.menu-icon {
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.menu-link:hover .menu-icon,
+.dropdown-trigger:hover .menu-icon {
+  color: #f4d03f;
+}
+
+/* ========== DROPDOWN TOGGLE ========== */
+.chevron {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.chevron.open {
+  color: #f4d03f;
+  transform: rotate(0deg);
+}
+
+/* ========== SUBMENU ========== */
+.submenu-container {
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 0;
+}
+
+.submenu-container.open {
+  max-height: 400px;
+}
+
+.submenu {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.submenu-item {
+  margin: 0;
+  position: relative;
+}
+
+.submenu-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 4px 8px;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.submenu-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+  border-left-color: rgba(244, 208, 63, 0.5);
+}
+
+/* Active Submenu Item */
+.submenu-item.active .submenu-link {
+  background: rgba(244, 208, 63, 0.15);
+  color: #f4d03f;
+  border-left: 3px solid #f4d03f;
+  margin-left: 8px;
+  margin-right: 8px;
+  padding-left: 17px;
+}
+
+/* ========== LOGOUT SECTION ========== */
+.logout-section {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.logout-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #ff6b6b;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.logout-link:hover {
+  background: rgba(255, 107, 107, 0.2);
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
+}
+
+/* ========== HAMBURGER TOGGLE BUTTON ========== */
+.sidebar-toggle-btn {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(244, 208, 63, 0.4);
+  color: #f4d03f;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(244, 208, 63, 0.1);
+  border-color: #f4d03f;
+  transform: scale(1.05);
+}
+
+/* ========== MOBILE CLOSE BUTTON ========== */
+.sidebar-close-btn {
+  display: none;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid rgba(244, 208, 63, 0.4);
+  color: #f4d03f;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(244, 208, 63, 0.1);
+  border-color: #f4d03f;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* ========== MOBILE OVERLAY ========== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ========== RESPONSIVE: TABLET & MOBILE (MAX-WIDTH: 1024px) ========== */
+@media (max-width: 1024px) {
+  /* Sidebar hidden by default on mobile */
+  .sidebar-container {
+    transform: translateX(-100%);
+  }
+
+  /* Sidebar visible when open */
+  .sidebar-container.open {
+    transform: translateX(0);
+  }
+
+  /* Show hamburger button */
+  .sidebar-toggle-btn {
+    display: flex;
+  }
+
+  /* Show overlay */
+  .sidebar-overlay {
+    display: block;
+  }
+
+  /* Show close button */
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
