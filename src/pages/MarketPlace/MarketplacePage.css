@@ -5,7 +5,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  margin-left: 265px;
+  
   min-height: 100vh;
   position: relative;
 }
@@ -40,7 +40,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #ec4899 100%);
+  background: linear-gradient(135deg, #2d0cb3 0%, #6944ef 50%, #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -176,19 +176,19 @@
 }
 
 .mktplace-filter-option.selected {
-  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  background: linear-gradient(135deg, #420adb 0%, #ef4444 100%);
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
 }
 
 .mktplace-filter-option:hover {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
+  background: rgba(99, 48, 216, 0.1);
+  color: #5d15e1;
 }
 
 .mktplace-filter-option.selected:hover {
-  background: linear-gradient(135deg, #d97706 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #3b06d9 0%, #dc2626 100%);
   color: white;
 }
 
@@ -577,7 +577,7 @@
 }
 
 .mktplace-modal-header {
-  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #ec4899 100%);
+  background: linear-gradient(135deg, #2d0cb3 0%,  #ec4899 100%);
   padding: 1.5rem 2rem;
   position: relative;
   flex-shrink: 0;
@@ -641,7 +641,7 @@
 }
 
 .mktplace-section-heading {
-  color: #f59e0b;
+  color: #900bf5;
   font-size: 1.2rem;
   font-weight: 700;
   margin: 0 0 1rem 0;
@@ -673,7 +673,7 @@
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #64748b;
+  color: #c6cad1;
   position: relative;
   overflow: hidden;
 }
@@ -699,19 +699,19 @@
 }
 
 .mktplace-modal-choice:hover {
-  border-color: #f59e0b;
+  border-color: #6d0bf5;
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15);
 }
 
 .mktplace-modal-choice.active {
-  border-color: #f59e0b;
+  border-color: #420fc4;
   background: linear-gradient(
     135deg,
     rgba(245, 158, 11, 0.1),
     rgba(239, 68, 68, 0.05)
   );
-  color: #f59e0b;
+  color: #2d0bc3;
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
 }
@@ -947,6 +947,15 @@
   border-top: 1px solid #e2e8f0;
   background: #f8fafc;
   flex-shrink: 0;
+}
+.action-button{
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: transparent;
+  cursor: pointer;
+  transform: 0.2s;
 }
 
 .mktplace-cancel-button,

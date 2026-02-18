@@ -5,7 +5,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  margin-left: 265px;
+ 
   min-height: 100vh;
 }
 
@@ -37,7 +37,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #3b82f6 100%);
+  background: linear-gradient(135deg, #2907b0 0%,  #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -74,7 +74,7 @@
 
 .create-video-btn {
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #2d0cb3 0%,  #ec4899 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -1317,27 +1317,31 @@
 
 /* Restored Toggle Button Styles */
 .view-toggle {
-  display: flex;
-  gap: 0;
-  border: 1px solid #000;
-  background: white;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  margin-top: 1rem;
+  padding: 4px;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
   width: fit-content;
+  position: relative;
+  overflow: hidden;
 }
 
 .toggle-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: white;
-  cursor: pointer;
-  font-weight: 400;
-  color: #000;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
+  padding: 0.75rem 2.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  color: #64748b;
+  font-size: 0.875rem;
   position: relative;
-  border-right: 1px solid #000;
-  border-radius: 0;
 }
 
 .toggle-btn:last-child {
@@ -1345,11 +1349,14 @@
 }
 
 .toggle-btn:hover {
-  background: #f0f0f0;
+  background: rgba(142,92,246,0.1);
+  color: #8E5CF6;
+  transform: translateY(-2px);
 }
 
 .toggle-btn.active {
-  background: #e0e0e0;
+  background: linear-gradient(135deg, #4F7CF7 0%, #8E5CF6 100%);
+  color: white;
   font-weight: 500;
 }
 

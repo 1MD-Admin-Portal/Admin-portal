@@ -5,10 +5,10 @@ import "./StudioDetailDrawer.css";
 const DAYS_OF_WEEK = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
 const formatHours = (hours) => {
-  if (!hours || hours === "closed") return null; // null = closed
+  if (!hours || hours === "closed") return null; 
   if (typeof hours === "string") {
     if (hours.toLowerCase() === "closed") return null;
-    return hours; // legacy string like "9:00 AM - 9:00 PM"
+    return hours; 
   }
   if (typeof hours === "object" && hours.open && hours.close) {
     return `${hours.open} – ${hours.close}`;

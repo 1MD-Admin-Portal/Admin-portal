@@ -66,10 +66,10 @@ const MarketplacePage = () => {
   const filteredData =
     filter === "Program"
       ? programs.filter((p) =>
-          p.title.toLowerCase().includes(search.toLowerCase())
+          p.title.toLowerCase().includes(search.toLowerCase()),
         )
       : events.filter((e) =>
-          e.event_title.toLowerCase().includes(search.toLowerCase())
+          e.event_title.toLowerCase().includes(search.toLowerCase()),
         );
 
   // Open program details (fetch purchases)
@@ -210,8 +210,16 @@ const MarketplacePage = () => {
                     </span>
                   </td>
                   <td className="mktplace-actions-column">
-                    <button className="mktplace-action-button">
-                      <TrendingUp size={14} />
+                    <button
+                      className="action-button"
+                      onClick={() =>
+                        filter === "Program"
+                          ? openProgramDetails(item)
+                          : (setSelectedEvent(item), setShowEventModal(true))
+                      }
+                    >
+                        <Eye size={16} />
+                      {/* <TrendingUp size={14} /> */}
                     </button>
                   </td>
                 </tr>
@@ -288,7 +296,7 @@ const MarketplacePage = () => {
                             ? item.title
                             : item.event_title}
                         </option>
-                      )
+                      ),
                     )}
                   </select>
                 </div>
@@ -562,7 +570,7 @@ const MarketplacePage = () => {
                               <td>{p.user?.location}</td>
                               <td>
                                 {new Date(
-                                  p.purchase_details?.created_at
+                                  p.purchase_details?.created_at,
                                 ).toLocaleDateString()}
                               </td>
                             </tr>
