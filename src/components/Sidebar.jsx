@@ -1872,12 +1872,12 @@ const Sidebar = () => {
       <div className={`vs-sidebar-panel ${!isPanelOpen ? "collapsed" : ""}`}>
         <div className="vs-panel-header">
           <p className="vs-panel-title">
-            {activePanel === "main" && "Dashboard"}
-            {activePanel === "users" && "Users"}
-            {activePanel === "content" && "Content"}
-            {activePanel === "earnings" && "Earnings"}
-            {activePanel === "operations" && "Operations"}
-            {activePanel === "settings" && "Settings"}
+            {activePanel === "main" && "ONE TRILLION DANCERS"}
+            {activePanel === "users" && "ONE TRILLION DANCERS"}
+            {activePanel === "content" && "ONE TRILLION DANCERS"}
+            {activePanel === "earnings" && "ONE TRILLION DANCERS"}
+            {activePanel === "operations" && "ONE TRILLION DANCERS"}
+            {activePanel === "settings" && "ONE TRILLION DANCERS"}
           </p>
         </div>
 

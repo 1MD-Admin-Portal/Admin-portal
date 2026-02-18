@@ -645,6 +645,229 @@
 
   .social-platform-label { display: none; }
 }
+/* ========== DANCE STYLES DROPDOWN UX FIX ========== */
+
+.dance-styles-popover {
+  width: 320px;
+  max-height: 340px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #e5e7eb;
+  animation: fadeSlide 0.18s ease;
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(-6px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+.dance-styles-search {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.dance-styles-options {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.dance-styles-options-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* OPTION ROW */
+.dance-styles-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.dance-styles-option:hover {
+  background: #f6f7fb;
+}
+
+.dance-styles-option.selected {
+  background: #f1edff;
+  border: 1px solid #8E5CF6;
+}
+
+.ds-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ds-left input {
+  accent-color: #8E5CF6;
+  width: 14px;
+  height: 14px;
+}
+
+.ds-left span {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.ds-check {
+  font-size: 12px;
+  color: #8E5CF6;
+  font-weight: bold;
+}
+
+/* ACTION BAR */
+.dance-styles-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid #eee;
+}
+
+.dance-styles-action {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.dance-styles-action--primary {
+  background: #8E5CF6;
+  color: white;
+}
+
+/* === TRIGGER BUTTON FIX === */
+
+.dance-styles-control {
+  width: 320px;
+  min-height: 44px;
+  background: white;
+  border: 1px solid #dcdfe6;
+  border-radius: 10px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  gap: 8px;
+}
+
+.dance-styles-control:hover {
+  border-color: #8E5CF6;
+}
+
+.dance-styles-control.open {
+  border-color: #8E5CF6;
+  box-shadow: 0 0 0 2px rgba(142,92,246,0.15);
+}
+.dance-styles-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+.dance-style-chip {
+  background: #f3f4f8;
+  border-radius: 6px;
+  padding: 3px 6px 3px 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dance-style-chip__remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.dance-styles-placeholder {
+  font-size: 13px;
+  color: #9aa1ac;
+}
+.dance-styles-chevron {
+  font-size: 12px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.dance-styles-control.open .dance-styles-chevron {
+  transform: rotate(180deg);
+}
+/* === SEARCH SELECT === */
+
+.search-select {
+  position: relative;
+  width: 100%;
+}
+
+.search-select-trigger {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #dcdfe6;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.search-select-dropdown {
+  position: absolute;
+  top: 105%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 8px;
+  z-index: 20;
+}
+
+.search-select-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  margin-bottom: 6px;
+}
+
+.search-select-list {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.search-select-item {
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-select-item:hover {
+  background: #f3f0ff;
+}
 
 @media (max-width: 480px) {
   .studio-modal-overlay { padding: 0; }

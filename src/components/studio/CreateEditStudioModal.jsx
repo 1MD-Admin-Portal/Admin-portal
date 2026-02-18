@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { X, Clock, Globe, Instagram, Facebook, Twitter, Youtube, Music2 } from "lucide-react";
 import "./CreateEditStudioModal.css";
+import {
+  getCountries,
+  getCitiesByCountry,
+  getDanceStyles,
+} from "../../services/masterData.service";
+
 
 const DAYS_OF_WEEK = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
@@ -13,7 +19,10 @@ const SOCIAL_PLATFORMS = [
   { key: "website", label: "Other / Website", icon: Globe, placeholder: "https://example.com", color: "#8E5CF6" },
 ];
 
+
 const DEFAULT_DAY = { open: "09:00", close: "21:00", closed: false };
+
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -22,6 +31,9 @@ const buildDefaultHours = () => {
   DAYS_OF_WEEK.forEach(day => { h[day] = { ...DEFAULT_DAY }; });
   return h;
 };
+
+
+
 
 // Accepts raw value from DB: either an object or a JSON string
 const parseHoursFromRaw = (raw) => {
@@ -201,12 +213,36 @@ const SocialMediaField = ({ links, onChange }) => {
 // ─── Main Modal ───────────────────────────────────────────────────────────────
 
 const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loading = false }) => {
+  // const [formData, setFormData] = useState({
+  //   name: "", description: "", address: "", city: "", state: "", country: "",
+  //   postal_code: "", latitude: "", longitude: "", phone: "", email: "",
+  //   website: "", logo_url: "", amenities: "", dance_styles: "",
+  //   capacity: "", established_year: "", status: "active",
+  // })
   const [formData, setFormData] = useState({
-    name: "", description: "", address: "", city: "", state: "", country: "",
-    postal_code: "", latitude: "", longitude: "", phone: "", email: "",
-    website: "", logo_url: "", amenities: "", dance_styles: "",
-    capacity: "", established_year: "", status: "active",
-  });
+  name: "", description: "", address: "",
+  city_id: "", state: "", country_id: "",
+  postal_code: "", latitude: "", longitude: "",
+  phone: "", email: "", website: "", logo_url: "",
+  amenities: "", dance_styles: [],
+  capacity: "", established_year: "", status: "active",
+});
+
+const [countries, setCountries] = useState([]);
+const [cities, setCities] = useState([]);
+const [danceStyleOptions, setDanceStyleOptions] = useState([]);
+const [danceStylesOpen, setDanceStylesOpen] = useState(false);
+const [danceStylesQuery, setDanceStylesQuery] = useState("");
+const danceStylesRef = useRef(null);
+
+const [countryOpen, setCountryOpen] = useState(false);
+const [cityOpen, setCityOpen] = useState(false);
+
+const [countryQuery, setCountryQuery] = useState("");
+const [cityQuery, setCityQuery] = useState("");
+
+const countryRef = useRef(null);
+const cityRef = useRef(null);
 
   // Structured state — no JSON string intermediary
   const [hours, setHours] = useState(buildDefaultHours);
@@ -214,41 +250,141 @@ const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loadi
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (studio) {
-      setFormData({
-        name: studio.name || "",
-        description: studio.description || "",
-        address: studio.address || "",
-        city: studio.city || "",
-        state: studio.state || "",
-        country: studio.country || "",
-        postal_code: studio.postal_code || "",
-        latitude: studio.latitude || "",
-        longitude: studio.longitude || "",
-        phone: studio.phone || "",
-        email: studio.email || "",
-        website: studio.website || "",
-        logo_url: studio.logo_url || "",
-        amenities: Array.isArray(studio.amenities) ? studio.amenities.join(", ") : "",
-        dance_styles: Array.isArray(studio.dance_styles) ? studio.dance_styles.join(", ") : "",
-        capacity: studio.capacity || "",
-        established_year: studio.established_year || "",
-        status: studio.status || "active",
-      });
-      setHours(parseHoursFromRaw(studio.operating_hours));
-      setSocialLinks(parseSocialFromRaw(studio.social_media));
-    } else {
-      setFormData({
-        name: "", description: "", address: "", city: "", state: "", country: "",
-        postal_code: "", latitude: "", longitude: "", phone: "", email: "",
-        website: "", logo_url: "", amenities: "", dance_styles: "",
-        capacity: "", established_year: "", status: "active",
-      });
-      setHours(buildDefaultHours());
-      setSocialLinks(buildDefaultSocial());
+  if (!isOpen) return;
+
+  const loadData = async () => {
+    try {
+      const [c, d] = await Promise.all([
+        getCountries(),
+        getDanceStyles()
+      ]);
+
+      setCountries(c);
+      setDanceStyleOptions(d);
+    } catch (e) {
+      console.error("Master load failed", e);
     }
-    setErrors({});
-  }, [studio, isOpen]);
+  };
+
+  loadData();
+}, [isOpen]);
+
+useEffect(() => {
+  if (!formData.country_id) return;
+
+  const loadCities = async () => {
+    try {
+      const res = await getCitiesByCountry(formData.country_id);
+      setCities(res);
+    } catch (e) {
+      console.error("City load failed", e);
+    }
+  };
+
+  loadCities();
+}, [formData.country_id]);
+
+useEffect(() => {
+  if (!danceStylesOpen) return;
+
+  const onDocMouseDown = (e) => {
+    const el = danceStylesRef.current;
+    if (!el) return;
+    if (!el.contains(e.target)) setDanceStylesOpen(false);
+  };
+
+  document.addEventListener("mousedown", onDocMouseDown);
+  return () => document.removeEventListener("mousedown", onDocMouseDown);
+}, [danceStylesOpen]);
+
+useEffect(() => {
+  const handler = (e) => {
+    if (!countryRef.current?.contains(e.target)) setCountryOpen(false);
+    if (!cityRef.current?.contains(e.target)) setCityOpen(false);
+  };
+  document.addEventListener("mousedown", handler);
+  return () => document.removeEventListener("mousedown", handler);
+}, []);
+
+
+  // useEffect(() => {
+  //   if (studio) {
+  //     setFormData({
+  //       name: studio.name || "",
+  //       description: studio.description || "",
+  //       address: studio.address || "",
+  //       city: studio.city || "",
+  //       state: studio.state || "",
+  //       country: studio.country || "",
+  //       postal_code: studio.postal_code || "",
+  //       latitude: studio.latitude || "",
+  //       longitude: studio.longitude || "",
+  //       phone: studio.phone || "",
+  //       email: studio.email || "",
+  //       website: studio.website || "",
+  //       logo_url: studio.logo_url || "",
+  //       amenities: Array.isArray(studio.amenities) ? studio.amenities.join(", ") : "",
+  //       dance_styles: Array.isArray(studio.dance_styles) ? studio.dance_styles.join(", ") : "",
+  //       capacity: studio.capacity || "",
+  //       established_year: studio.established_year || "",
+  //       status: studio.status || "active",
+  //     });
+  //     setHours(parseHoursFromRaw(studio.operating_hours));
+  //     setSocialLinks(parseSocialFromRaw(studio.social_media));
+  //   } else {
+  //     setFormData({
+  //       name: "", description: "", address: "", city: "", state: "", country: "",
+  //       postal_code: "", latitude: "", longitude: "", phone: "", email: "",
+  //       website: "", logo_url: "", amenities: "", dance_styles: "",
+  //       capacity: "", established_year: "", status: "active",
+  //     });
+  //     setHours(buildDefaultHours());
+  //     setSocialLinks(buildDefaultSocial());
+  //   }
+  //   setErrors({});
+  // }, [studio, isOpen]);
+
+  useEffect(() => {
+  if (studio) {
+    setFormData({
+      name: studio.name || "",
+      description: studio.description || "",
+      address: studio.address || "",
+      city_id: studio.city_id || "",
+      country_id: studio.country_id || "",
+      state: studio.state || "",
+      postal_code: studio.postal_code || "",
+      latitude: studio.latitude || "",
+      longitude: studio.longitude || "",
+      phone: studio.phone || "",
+      email: studio.email || "",
+      website: studio.website || "",
+      logo_url: studio.logo_url || "",
+      amenities: Array.isArray(studio.amenities) ? studio.amenities.join(", ") : "",
+      dance_styles: Array.isArray(studio.dance_styles) ? studio.dance_styles : [],
+      capacity: studio.capacity || "",
+      established_year: studio.established_year || "",
+      status: studio.status || "active",
+    });
+
+    setHours(parseHoursFromRaw(studio.operating_hours));
+    setSocialLinks(parseSocialFromRaw(studio.social_media));
+  } else {
+    setFormData({
+      name: "", description: "", address: "",
+      city_id: "", state: "", country_id: "",
+      postal_code: "", latitude: "", longitude: "",
+      phone: "", email: "", website: "", logo_url: "",
+      amenities: "", dance_styles: [],
+      capacity: "", established_year: "", status: "active",
+    });
+
+    setHours(buildDefaultHours());
+    setSocialLinks(buildDefaultSocial());
+  }
+
+  setErrors({});
+}, [studio, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -260,8 +396,9 @@ const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loadi
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Studio name is required";
     if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.city.trim()) newErrors.city = "City is required";
-    if (!formData.country.trim()) newErrors.country = "Country is required";
+    if (!formData.city_id) newErrors.city = "City is required";
+if (!formData.country_id) newErrors.country = "Country is required";
+
     if (!formData.latitude || isNaN(formData.latitude)) newErrors.latitude = "Valid latitude is required";
     if (!formData.longitude || isNaN(formData.longitude)) newErrors.longitude = "Valid longitude is required";
     if (!formData.capacity || isNaN(formData.capacity)) newErrors.capacity = "Valid capacity is required";
@@ -272,22 +409,29 @@ const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loadi
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+    
+  e.preventDefault();
+  
+  const newErrors = validateForm();
+  if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
 
-    onSubmit({
-      ...formData,
-      latitude: parseFloat(formData.latitude),
-      longitude: parseFloat(formData.longitude),
-      capacity: parseInt(formData.capacity),
-      established_year: formData.established_year ? parseInt(formData.established_year) : null,
-      amenities: formData.amenities.split(",").map(i => i.trim()).filter(Boolean),
-      dance_styles: formData.dance_styles.split(",").map(i => i.trim()).filter(Boolean),
-      operating_hours: serializeHours(hours),
-      social_media: serializeSocial(socialLinks),
-    });
-  };
+ const selectedCountry = countries.find(c => c.id == formData.country_id);
+const selectedCity = cities.find(c => c.id == formData.city_id);
+  onSubmit({
+    ...formData,
+    city: selectedCity?.name || "",
+    country: selectedCountry?.name || "",
+    latitude: parseFloat(formData.latitude),
+    longitude: parseFloat(formData.longitude),
+    capacity: parseInt(formData.capacity),
+    established_year: formData.established_year ? parseInt(formData.established_year) : null,
+    amenities: formData.amenities.split(",").map(i => i.trim()).filter(Boolean),
+    dance_styles: formData.dance_styles,
+    operating_hours: serializeHours(hours),
+    social_media: serializeSocial(socialLinks),
+  });
+};
+
 
   if (!isOpen) return null;
 
@@ -341,8 +485,55 @@ const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loadi
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="city">City <span className="required">*</span></label>
-                  <input type="text" id="city" name="city" value={formData.city}
-                    onChange={handleChange} placeholder="City" className={errors.city ? "error" : ""} />
+                  <div className="search-select" ref={cityRef}>
+  <button
+    type="button"
+    className="search-select-trigger"
+    disabled={!formData.country_id}
+    onClick={() => setCityOpen(v => !v)}
+  >
+    {cities.find(c => c.id == formData.city_id)?.name || "Select City"}
+    <span>▾</span>
+  </button>
+
+  {cityOpen && (
+    <div className="search-select-dropdown">
+      <input
+        type="text"
+        placeholder="Search city..."
+        value={cityQuery}
+        onChange={(e) => setCityQuery(e.target.value)}
+        className="search-select-input"
+        autoFocus
+      />
+
+      <div className="search-select-list">
+        {cities
+          .filter(c =>
+            c.name.toLowerCase().includes(cityQuery.toLowerCase())
+          )
+          .map(c => (
+            <div
+              key={c.id}
+              className="search-select-item"
+              onClick={() => {
+                setFormData(prev => ({
+                  ...prev,
+                  city_id: c.id
+                }));
+                setCityOpen(false);
+                setCityQuery("");
+              }}
+            >
+              {c.name}
+            </div>
+          ))}
+      </div>
+    </div>
+  )}
+</div>
+
+
                   {errors.city && <span className="error-message">{errors.city}</span>}
                 </div>
                 <div className="form-group">
@@ -354,8 +545,55 @@ const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loadi
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="country">Country <span className="required">*</span></label>
-                  <input type="text" id="country" name="country" value={formData.country}
-                    onChange={handleChange} placeholder="Country" className={errors.country ? "error" : ""} />
+                  <div className="search-select" ref={countryRef}>
+  <button
+    type="button"
+    className="search-select-trigger"
+    onClick={() => setCountryOpen(v => !v)}
+  >
+    {countries.find(c => c.id == formData.country_id)?.name || "Select Country"}
+    <span>▾</span>
+  </button>
+
+  {countryOpen && (
+    <div className="search-select-dropdown">
+      <input
+        type="text"
+        placeholder="Search country..."
+        value={countryQuery}
+        onChange={(e) => setCountryQuery(e.target.value)}
+        className="search-select-input"
+        autoFocus
+      />
+
+      <div className="search-select-list">
+        {countries
+          .filter(c =>
+            c.name.toLowerCase().includes(countryQuery.toLowerCase())
+          )
+          .map(c => (
+            <div
+              key={c.id}
+              className="search-select-item"
+              onClick={() => {
+                setFormData(prev => ({
+                  ...prev,
+                  country_id: c.id,
+                  city_id: ""
+                }));
+                setCountryOpen(false);
+                setCountryQuery("");
+              }}
+            >
+              {c.name}
+            </div>
+          ))}
+      </div>
+    </div>
+  )}
+</div>
+
+
                   {errors.country && <span className="error-message">{errors.country}</span>}
                 </div>
                 <div className="form-group">
@@ -431,10 +669,122 @@ const CreateEditStudioModal = ({ isOpen, onClose, onSubmit, studio = null, loadi
                   onChange={handleChange} placeholder="WiFi, Parking, Air Conditioning" rows="2" />
               </div>
               <div className="form-group">
-                <label htmlFor="dance_styles">Dance Styles (comma-separated)</label>
-                <textarea id="dance_styles" name="dance_styles" value={formData.dance_styles}
-                  onChange={handleChange} placeholder="Hip Hop, Contemporary, Ballet" rows="2" />
+                <label>Dance Styles</label>
+                <div className="dance-styles-field" ref={danceStylesRef}>
+                  <button
+  type="button"
+  className={`dance-styles-control ${danceStylesOpen ? "open" : ""}`}
+  onClick={() => setDanceStylesOpen((v) => !v)}
+>
+
+                    <div className="dance-styles-chips">
+                      {formData.dance_styles?.length ? (
+                        formData.dance_styles.map((name) => (
+                          <span key={name} className="dance-style-chip">
+                            <span className="dance-style-chip__label">{name}</span>
+                            <button
+                              type="button"
+                              className="dance-style-chip__remove"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  dance_styles: (prev.dance_styles || []).filter((s) => s !== name),
+                                }));
+                              }}
+                              aria-label={`Remove ${name}`}
+                            >
+                              <X size={12} />
+                            </button>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="dance-styles-placeholder">Select dance styles</span>
+                      )}
+                    </div>
+                    <span className="dance-styles-chevron">▾</span>
+                  </button>
+
+                  {danceStylesOpen && (
+                    <div className="dance-styles-popover" role="listbox" aria-label="Dance styles">
+                      <input
+                        className="dance-styles-search"
+                        type="text"
+                        value={danceStylesQuery}
+                        onChange={(e) => setDanceStylesQuery(e.target.value)}
+                        placeholder="Search styles..."
+                        autoFocus
+                      />
+
+                      <div className="dance-styles-options">
+                        
+                        {danceStyleOptions
+                          .filter((d) =>
+                            (d?.name || "")
+                              .toLowerCase()
+                              .includes((danceStylesQuery || "").toLowerCase().trim())
+                          )
+                          .map((d) => {
+                            const name = d?.name || "";
+                            const checked = (formData.dance_styles || []).includes(name);
+                            return (
+                              <label key={d.id ?? name} className={`dance-styles-option ${checked ? "selected" : ""}`}>
+  <div className="ds-left">
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={() => {
+        setFormData((prev) => {
+          const curr = prev.dance_styles || [];
+          const next = checked
+            ? curr.filter((s) => s !== name)
+            : [...curr, name];
+          return { ...prev, dance_styles: next };
+        });
+      }}
+    />
+    <span>{name}</span>
+  </div>
+
+  {checked && <span className="ds-check">✓</span>}
+</label>
+
+                            );
+                          })}
+
+                        {!danceStyleOptions?.length && (
+                          <div className="dance-styles-empty">No dance styles available.</div>
+                        )}
+                        {!!danceStyleOptions?.length &&
+                          !danceStyleOptions.some((d) =>
+                            (d?.name || "")
+                              .toLowerCase()
+                              .includes((danceStylesQuery || "").toLowerCase().trim())
+                          ) && <div className="dance-styles-empty">No matches.</div>}
+                      </div>
+
+                      <div className="dance-styles-actions">
+                        <button
+                          type="button"
+                          className="dance-styles-action"
+                          onClick={() => setFormData((prev) => ({ ...prev, dance_styles: [] }))}
+                        >
+                          Clear
+                        </button>
+                        <button
+                          type="button"
+                          className="dance-styles-action dance-styles-action--primary"
+                          onClick={() => setDanceStylesOpen(false)}
+                        >
+                          Done
+                        </button>
+                      </div>
+                    </div>
+                    
+                  )}
+                </div>
               </div>
+            
             </div>
 
             {/* Operating Hours */}

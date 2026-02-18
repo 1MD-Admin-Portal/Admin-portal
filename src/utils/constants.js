@@ -169,6 +169,16 @@ export const CONSTANTS = {
       USER_REFERRALS: (userId, page, limit) =>
         `/api/v1/admin/referrals/users/${userId}?page=${page}&limit=${limit}`,
     },
+    MASTER_DATA: {
+  COUNTRIES: (search = "", page = 1, limit = "") =>
+    `/api/v1/admin/countries?search=${search}&page=${page}&limit=${limit}`,
+
+  CITIES: (countryId, search = "", page = 1, limit = "") =>
+    `/api/v1/admin/cities?country_id=${countryId}&search=${search}&page=${page}&limit=${limit}`,
+
+  DANCE_STYLES: (search = "", page = 1, limit = 100) =>
+    `/api/v1/admin/dance-styles?search=${search}&page=${page}&limit=${limit}`,
+},
 
     // === CHALLENGE SUBMISSIONS MANAGEMENT ===
     CHALLENGE_SUBMISSIONS: {
