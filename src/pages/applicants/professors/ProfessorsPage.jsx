@@ -7,7 +7,7 @@ import {
 import GlobalLoader from "../../../components/common/GlobalLoader";
 import "./ProfessorsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
-
+import { maskEmail } from "../../../components/maskEmail";
 // ─── Confirmation Popup ───────────────────────────────────────────────────────
 const ConfirmPopup = ({ title, confirmLabel = "Confirm", onConfirm, onCancel, children }) => (
   <div style={{
@@ -201,7 +201,7 @@ const ProfessorsPage = () => {
           {applications.map(app => (
             <tr key={app.id}>
               <td>{app.id}</td>
-              <td className="clickable-email" onClick={() => setSelectedApp(app)}>{app.email}</td>
+              <td className="clickable-email" onClick={() => setSelectedApp(app)}>{maskEmail(app.email)}</td>
               <td>{formatField(app.availability)}</td>
               <td>{app.experience}</td>
               <td>
@@ -319,7 +319,7 @@ const ProfessorsPage = () => {
             <button className="modal-close-icon" onClick={() => setSelectedApp(null)}>×</button>
             <h3>Application Details</h3>
             <p><strong>ID:</strong> {selectedApp.id}</p>
-            <p><strong>Email:</strong> {selectedApp.email}</p>
+            <p><strong>Email:</strong> {maskEmail(selectedApp.email)}</p>
             <p><strong>Dance Styles:</strong> {formatField(selectedApp.dance_style)}</p>
             <p><strong>Availability:</strong> {formatField(selectedApp.availability)}</p>
             <p><strong>Experience:</strong> {selectedApp.experience}</p>

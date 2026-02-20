@@ -5,6 +5,7 @@ import {
   fetchUserBadges,
   assignUserBadge,
 } from "../../../services/badge.service";
+import { maskEmail } from "../../../components/maskEmail";
 
 // 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
@@ -213,7 +214,7 @@ const DJListPage = () => {
               >
                 <td>{user.id}</td>
                 <td>{user.name}</td>
-                <td>{user.email}</td>
+                <td>{maskEmail(user.email)}</td>
                 {/* <td>{user.created_at || "N/A"}</td> */}
                 <td>
                   {user.created_at
@@ -273,7 +274,7 @@ const DJListPage = () => {
                   {renderDJInfoGrid([
                     { label: "ID", value: selectedUser.id },
                     { label: "Name", value: selectedUser.name || "N/A" },
-                    { label: "Email", value: selectedUser.email },
+                    { label: "Email", value: maskEmail(selectedUser.email) },
                     {
                       label: "Location",
                       value: selectedUser.location || "N/A",

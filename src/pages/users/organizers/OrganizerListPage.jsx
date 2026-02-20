@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchOrganizers } from "../../../services/organizer.service";
 import "../Dancers/DancersList.css"; // Import the dancer CSS for organizer styling
-
+import { maskEmail } from "../../../components/maskEmail";
 const OrganizerListPage = () => {
   const [organizers, setOrganizers] = useState([]);
   const [pagination, setPagination] = useState({});
@@ -62,7 +62,7 @@ const OrganizerListPage = () => {
           {organizers.map((user) => (
             <tr key={user.id} onClick={() => setSelectedUser(user)}>
               <td>{user.id}</td>
-              <td>{user.email}</td>
+              <td>{maskEmail(user.email)}</td>
               <td>{user.name || "N/A"}</td>
               <td>
                 {user.created_at
@@ -128,7 +128,7 @@ const OrganizerListPage = () => {
                   {renderOrganizerInfoGrid([
                     { label: "ID", value: selectedUser.id },
                     { label: "Name", value: selectedUser.name || "N/A" },
-                    { label: "Email", value: selectedUser.email },
+                    { label: "Email", value: maskEmail(selectedUser.email) },
                     {
                       label: "Location",
                       value: selectedUser.location || "N/A",

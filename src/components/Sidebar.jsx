@@ -1086,6 +1086,7 @@ const Sidebar = () => {
   ];
 
   const operationSubmenuItems = [
+    // { href: "/support/class-disputes", icon: FileEdit, label: "Class Disputes" },
     { href: "/support/ticket-raise", icon: FileEdit, label: "Ticket Raise" },
   ];
 

@@ -7,7 +7,7 @@ import {
 import GlobalLoader from "../../../components/common/GlobalLoader";
 import "../professors/ProfessorsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
-
+import { maskEmail } from "../../../components/maskEmail";
 const OrganizersPage = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -293,7 +293,7 @@ const OrganizersPage = () => {
   onClick={() => setSelectedApp(app)}
   style={{ cursor: "pointer" }}
 >
-  {app.email}
+  {maskEmail(app.email)}
 </td>
 
 
@@ -508,7 +508,7 @@ const OrganizersPage = () => {
               <strong>ID:</strong> {selectedApp.id}
             </p>
             <p>
-              <strong>Email:</strong> {selectedApp.email}
+              <strong>Email:</strong> {maskEmail(selectedApp.email)}
             </p>
             <p>
               <strong>Event Types:</strong>{" "}

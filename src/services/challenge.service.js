@@ -322,3 +322,16 @@ export const deleteCommentService = async (commentId) => {
     throw error;
   }
 };
+  export const getFlaggedCommentsService = async (page = 1, limit = 20) => {
+  try {
+    const token = getToken();
+    const res = await axios.get(
+      `${baseURL}${CONSTANTS.URL.CHALLENGE_SUBMISSIONS.GET_FLAGGED_COMMENTS(page, limit)}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching flagged comments:", error.response?.data || error.message);
+    return { comments: [], pagination: {} };
+  }
+};

@@ -4,7 +4,7 @@
    ============================================= */
 
 :root {
-  --mktplace-grad: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
+  --mktplace-grad: linear-gradient(135deg, #4F7CFF 0%, #8B5CF6 100%);
   --mktplace-blue: #5b7cfa;
   --mktplace-purple: #8b5cf6;
   --mktplace-pink: #ec4899;

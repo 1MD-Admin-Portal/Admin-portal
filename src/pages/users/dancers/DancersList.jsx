@@ -7,6 +7,7 @@ import {
   assignUserBadge,
 } from "../../../services/user.service";
 import "../Dancers/DancersList.css";
+import { maskEmail } from "../../../components/maskEmail";
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
@@ -275,7 +276,7 @@ const DancersList = () => {
               >
                 <td>{dancer.id}</td>
                 <td>{dancer.name}</td>
-                <td>{dancer.email}</td>
+                <td>{maskEmail(dancer.email)}</td>
                 <td>{new Date(dancer.created_at).toLocaleDateString("fr-FR")}</td>
                 <td>{dancer.skill_level}</td>  
                 <td>
@@ -346,7 +347,7 @@ const DancersList = () => {
                   {renderDancerInfoGrid([
                     { label: "ID", value: selectedDancer.id },
                     { label: "Name", value: selectedDancer.name },
-                    { label: "Email", value: selectedDancer.email },
+                    { label: "Email", value: maskEmail(selectedDancer.email) },
                     { label: "Location", value: selectedDancer.location },
                     { label: "Skill Level", value: selectedDancer.skill_level },
                     {

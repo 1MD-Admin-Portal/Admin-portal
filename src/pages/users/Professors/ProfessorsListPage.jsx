@@ -6,7 +6,7 @@ import {
   fetchUserBadges,
   assignUserBadge,
 } from "../../../services/badge.service";
-
+import { maskEmail } from "../../../components/maskEmail";
 // 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
   if (value === null || value === undefined) return "N/A";
@@ -236,7 +236,8 @@ const ProfessorsListPage = () => {
             >
               <td>{prof.id}</td>
               <td>{prof.name}</td>
-              <td>{prof.email}</td>
+              <td>{maskEmail(prof.email)}</td>
+              
               <td>
                 {prof.created_at
                   ? new Date(prof.created_at).toLocaleDateString("fr-FR")
@@ -296,7 +297,7 @@ const ProfessorsListPage = () => {
                   {renderProfessorInfoGrid([
                     { label: "ID", value: selectedProfessor.id },
                     { label: "Name", value: selectedProfessor.name || "N/A" },
-                    { label: "Email", value: selectedProfessor.email },
+                    { label: "Email", value: maskEmail(selectedProfessor.email) },
                     {
                       label: "Location",
                       value: selectedProfessor.location || "N/A",

@@ -4,7 +4,7 @@
    ============================================= */
 
 :root {
-  --grad: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
+  --grad: linear-gradient(135deg, #4F7CFF 0%, #8B5CF6 100%);
   --blue: #5b7cfa;
   --purple: #8b5cf6;
   --pink: #ec4899;
@@ -48,7 +48,7 @@
   font-size: 2rem;
   font-weight: 800;
   margin: 0;
-  background: var(--grad);
+  background: linear-gradient(135deg, #4F7CFF 0%, #8B5CF6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

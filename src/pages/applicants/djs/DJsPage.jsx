@@ -7,6 +7,7 @@ import {
 import GlobalLoader from "../../../components/common/GlobalLoader";
 import "./DJsPage.css";
 import { CheckCircle, XCircle } from "lucide-react";
+import { maskEmail } from "../../../components/maskEmail";
 
 const DJsPage = () => {
   const [applications, setApplications] = useState([]);
@@ -180,7 +181,7 @@ const DJsPage = () => {
   onClick={() => setSelectedApplication(app)}
   style={{ cursor: "pointer" }}
 >
-  {app.email}
+  {maskEmail(app.email)}
 </td>
 
               {/* <td>{formatField(app.genres)}</td> */}
@@ -437,7 +438,7 @@ const DJsPage = () => {
               <strong>ID:</strong> {selectedApplication.id}
             </p>
             <p>
-              <strong>Email:</strong> {selectedApplication.email}
+              <strong>Email:</strong> {maskEmail(selectedApplication.email)}
             </p>
             <p>
               <strong>Experience:</strong> {selectedApplication.dj_experience}
