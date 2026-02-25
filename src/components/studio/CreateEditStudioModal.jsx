@@ -5,6 +5,7 @@ import {
   getCountries,
   getCitiesByCountry,
   getDanceStyles,
+  getStatesByCountryName,
 } from "../../services/masterData.service";
 
 
@@ -237,12 +238,17 @@ const danceStylesRef = useRef(null);
 
 const [countryOpen, setCountryOpen] = useState(false);
 const [cityOpen, setCityOpen] = useState(false);
+const [stateOpen, setStateOpen] = useState(false);
 
 const [countryQuery, setCountryQuery] = useState("");
 const [cityQuery, setCityQuery] = useState("");
+const [stateQuery, setStateQuery] = useState("");
 
 const countryRef = useRef(null);
 const cityRef = useRef(null);
+const stateRef = useRef(null);
+
+const [stateOptions, setStateOptions] = useState([]);
 
   // Structured state — no JSON string intermediary
   const [hours, setHours] = useState(buildDefaultHours);
@@ -285,6 +291,31 @@ useEffect(() => {
 }, [formData.country_id]);
 
 useEffect(() => {
+  if (!formData.country_id || countries.length === 0) {
+    setStateOptions([]);
+    return;
+  }
+
+  const selectedCountry = countries.find(c => c.id == formData.country_id);
+  if (!selectedCountry?.name) {
+    setStateOptions([]);
+    return;
+  }
+
+  const loadStates = async () => {
+    try {
+      const res = await getStatesByCountryName(selectedCountry.name);
+      setStateOptions(res);
+    } catch (e) {
+      console.error("State load failed", e);
+      setStateOptions([]);
+    }
+  };
+
+  loadStates();
+}, [formData.country_id, countries]);
+
+useEffect(() => {
   if (!danceStylesOpen) return;
 
   const onDocMouseDown = (e) => {
@@ -301,6 +332,7 @@ useEffect(() => {
   const handler = (e) => {
     if (!countryRef.current?.contains(e.target)) setCountryOpen(false);
     if (!cityRef.current?.contains(e.target)) setCityOpen(false);
+    if (!stateRef.current?.contains(e.target)) setStateOpen(false);
   };
   document.addEventListener("mousedown", handler);
   return () => document.removeEventListener("mousedown", handler);
@@ -538,8 +570,54 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
                 </div>
                 <div className="form-group">
                   <label htmlFor="state">State</label>
-                  <input type="text" id="state" name="state" value={formData.state}
-                    onChange={handleChange} placeholder="State" />
+                  <div className="search-select" ref={stateRef}>
+  <button
+    type="button"
+    className="search-select-trigger"
+    disabled={!formData.country_id}
+    onClick={() => setStateOpen(v => !v)}
+  >
+    {formData.state || "Select State"}
+    <span>▾</span>
+  </button>
+
+  {stateOpen && (
+    <div className="search-select-dropdown">
+      <input
+        type="text"
+        placeholder="Search state..."
+        value={stateQuery}
+        onChange={(e) => setStateQuery(e.target.value)}
+        className="search-select-input"
+        autoFocus
+      />
+
+      <div className="search-select-list">
+        {stateOptions
+          .filter(s =>
+            s.name.toLowerCase().includes(stateQuery.toLowerCase())
+          )
+          .map(s => (
+            <div
+              key={s.state_code || s.name}
+              className="search-select-item"
+              onClick={() => {
+                setFormData(prev => ({
+                  ...prev,
+                  state: s.name
+                }));
+                setStateOpen(false);
+                setStateQuery("");
+              }}
+            >
+              {s.name}
+            </div>
+          ))}
+      </div>
+    </div>
+  )}
+</div>
+
                 </div>
               </div>
               <div className="form-row">
@@ -579,7 +657,8 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
                 setFormData(prev => ({
                   ...prev,
                   country_id: c.id,
-                  city_id: ""
+                  city_id: "",
+                  state: ""
                 }));
                 setCountryOpen(false);
                 setCountryQuery("");
