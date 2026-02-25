@@ -99,7 +99,13 @@ const BadgesPage = () => {
             <tbody className="badge-table-body">
               {filteredBadges.map((badge) => (
                 <tr key={badge.id} className="badge-table-row">
-                  <td className="badge-emoji-cell">{badge.badge_emoji}</td>
+                  <td className="badge-emoji-cell">
+                    {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
+                      <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                    ) : (
+                      badge.badge_emoji
+                    )}
+                  </td>
                   <td className="badge-name-cell">{badge.badge_name}</td>
                   <td className="badge-level-cell">
                     <span className="badge-level-indicator">{badge.level}</span>

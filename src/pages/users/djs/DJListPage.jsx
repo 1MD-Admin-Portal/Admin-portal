@@ -24,11 +24,14 @@ const formatValueForDisplay = (value) => {
   // Badge-like object
   if (value && typeof value === "object") {
     if (value.badge_name) {
-      const emoji = value.badge_emoji || "";
       const level =
         value.level !== undefined && value.level !== null
           ? ` (Level ${value.level})`
           : "";
+      const emoji = value.badge_emoji || "";
+      if (emoji && emoji.startsWith("http")) {
+        return <><img src={emoji} alt={value.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} /> {value.badge_name}{level}</>;
+      }
       return `${emoji} ${value.badge_name}${level}`;
     }
   }
@@ -591,7 +594,11 @@ const DJListPage = () => {
                                 >
                                   <div className="dancer-next-badge-header">
                                     <span className="dancer-next-badge-name">
-                                      {badge.badge_emoji} {badge.badge_name}
+                                      {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
+                                        <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                                      ) : (
+                                        badge.badge_emoji
+                                      )}{" "}{badge.badge_name}
                                     </span>
                                     <span className="dancer-next-badge-persona">
                                       Persona: {persona}

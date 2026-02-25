@@ -168,12 +168,212 @@
 }
 @keyframes cp-spin { to { transform: rotate(360deg); } }
 
-/* CHALLENGES GRID */
+/* ═══════════════════════════════════════════
+   CHALLENGES GRID — MAIN FIX
+   Cards same height, no gap between stats & actions
+   ═══════════════════════════════════════════ */
+.fp-content-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+  gap: 1rem !important;
+  margin-bottom: 1.5rem !important;
+  align-items: stretch !important; /* default stretch — all cards same height in a row */
+}
+
+.fp-content-card {
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 0.875rem !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;        /* fill the grid cell */
+  cursor: pointer !important;
+}
+.fp-content-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--shadow-md) !important;
+  border-color: rgba(91,124,250,0.3) !important;
+}
+
+/* Thumbnail */
+.fp-thumbnail-wrap {
+  position: relative !important;
+  flex-shrink: 0 !important;
+}
+.fp-media-thumb {
+  width: 100% !important;
+  
+  object-fit: cover !important;
+  display: block !important;
+}
+.fp-media-placeholder {
+  width: 100% !important;
+  height: 160px !important;
+  background: linear-gradient(135deg, #f0f2ff, #e8e0ff) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #8B5CF6 !important;
+}
+.fp-likes-badge {
+  position: absolute !important;
+  top: 0.625rem !important;
+  right: 0.625rem !important;
+}
+
+/* ── Card Body ── */
+.fp-card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0.875rem 1rem 0.75rem !important;
+  gap: 0 !important;
+  flex: 1 !important;                         /* fill remaining card height */
+  justify-content: space-between !important;  /* push actions to bottom */
+}
+
+/* Top content wrapper — never grows, only shrinks to content */
+.fp-card-top {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 0 0 auto !important;
+}
+
+/* Title row */
+.fp-user-details {
+  margin-bottom: 0 !important;
+}
+.fp-username {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: var(--dark) !important;
+  margin: 0 0 0.3rem 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* ── Meta Tags — fixed min-height so 1-tag vs 2-tag cards align ── */
+.fp-meta-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  margin-bottom: 0.3rem !important;
+  min-height: 26px !important;        /* ensures 1-line cards don't collapse */
+  align-content: flex-start !important;
+}
+.fp-style-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 10px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid #ec4899 !important;
+  background: rgba(236,72,153,0.07) !important;
+  color: #ec4899 !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  white-space: nowrap !important;
+}
+.fp-level-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 10px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid #6b7280 !important;
+  background: rgba(107,114,128,0.07) !important;
+  color: #6b7280 !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  white-space: nowrap !important;
+}
+
+/* Level colors */
+.fp-level-beginner     { border-color: #10b981 !important; color: #10b981 !important; background: rgba(16,185,129,0.07) !important; }
+.fp-level-intermediate { border-color: #f59e0b !important; color: #d97706 !important; background: rgba(245,158,11,0.07) !important; }
+.fp-level-advanced     { border-color: #6c3de8 !important; color: #6c3de8 !important; background: rgba(108,61,232,0.07) !important; }
+
+/* ── Description — 3-line clamp, no flex grow ── */
+.fp-post-caption {
+  color: var(--muted) !important;
+  font-size: 0.75rem !important;
+  line-height: 1.5 !important;
+  margin: 0 0 0.3rem 0 !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  min-height: calc(0.75rem * 1.5 * 3) !important; /* 3 lines reserved always */
+}
+
+/* ── Engagement Stats — zero extra spacing ── */
+.fp-engagement-stats {
+  display: flex !important;
+  gap: 0.2rem !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0 !important;          /* NO bottom margin */
+  flex-wrap: wrap !important;
+  padding: 0 !important;
+}
+
+.fp-stat-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.1rem !important;
+  padding: 2px 6px !important;
+  min-height: 24px !important;
+  border: 1px solid rgba(91,124,250,0.35) !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg,rgba(91,124,250,0.08),rgba(236,72,153,0.08)) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  color: #ec4899 !important;
+  white-space: nowrap !important;
+}
+.fp-stat-group svg {
+  width: 12px !important;
+  height: 12px !important;
+  color: #5b7cfa !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── Card Actions — always at bottom ── */
+.challenge-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.375rem !important;
+  padding-top: 0.625rem !important;
+  margin-top: 0.625rem !important;
+  border-top: 1px solid var(--border) !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;            /* never compress */
+}
+.challenge-actions__left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  flex-shrink: 0 !important;
+}
+.challenge-actions__right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── Old grid class (keep for backward compat) ── */
 .challenges-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
   gap: 1rem !important;
   margin-bottom: 1.5rem !important;
+  align-items: stretch !important;
 }
 .challenge-card {
   background: var(--white) !important;
@@ -184,6 +384,7 @@
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s !important;
   display: flex !important;
   flex-direction: column !important;
+  height: 100% !important;
 }
 .challenge-card:hover {
   transform: translateY(-3px) !important;
@@ -202,6 +403,7 @@
   display: flex !important;
   flex-direction: column !important;
   flex: 1 !important;
+  justify-content: space-between !important;
 }
 .challenge-header-info {
   display: flex !important;
@@ -215,12 +417,12 @@
   color: var(--muted) !important;
   font-size: 0.75rem !important;
   line-height: 1.5 !important;
-  margin-bottom: 0.625rem !important;
+  margin-bottom: 0.375rem !important;
   display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
+  -webkit-line-clamp: 3 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
-  flex: 1 !important;
+  flex: 0 0 auto !important;
 }
 
 /* STATUS BADGES */
@@ -267,31 +469,6 @@
   display: block !important;
 }
 .stat-icon svg { width: 12px !important; height: 12px !important; }
-
-/* CARD ACTION ROW */
-.challenge-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 0.375rem !important;
-  padding-top: 0.625rem !important;
-  border-top: 1px solid var(--border) !important;
-  flex-wrap: nowrap !important;
-}
-.challenge-actions__left {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.35rem !important;
-  flex-shrink: 0 !important;
-}
-.challenge-actions__right {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.375rem !important;
-  flex-shrink: 0 !important;
-}
-
-
 
 /* ACTION BTN */
 .action-btn {
@@ -388,6 +565,85 @@
 }
 .pagination-btn:hover:not(:disabled) { border-color: var(--blue) !important; color: var(--blue) !important; }
 .pagination-btn:disabled { opacity: 0.4 !important; cursor: not-allowed !important; }
+
+/* FP PAGINATION */
+.fp-pagination-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.875rem 0 !important;
+  flex-wrap: wrap !important;
+  gap: 0.75rem !important;
+}
+.fp-page-btn {
+  padding: 0.375rem 0.75rem !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 0.4rem !important;
+  background: var(--white) !important;
+  color: var(--dark) !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+}
+.fp-page-btn:hover:not(:disabled) { border-color: var(--blue) !important; color: var(--blue) !important; }
+.fp-page-btn:disabled { opacity: 0.4 !important; cursor: not-allowed !important; }
+.fp-page-info { color: var(--muted) !important; font-size: 0.8rem !important; }
+
+/* FP HEADER / TABS */
+.fp-header-section { margin-bottom: 1.5rem !important; }
+.fp-main-title {
+  font-size: 2.25rem !important;
+  font-weight: 800 !important;
+  margin: 0 0 0.75rem 0 !important;
+  background: var(--grad) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.fp-tab-nav {
+  display: inline-flex !important;
+  gap: 0.25rem !important;
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.3rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  flex-wrap: wrap !important;
+}
+.fp-nav-tab {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  padding: 0.65rem 1.25rem !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+.fp-nav-tab:hover { background: var(--bg) !important; color: var(--dark) !important; }
+.fp-tab-active {
+  background: var(--grad) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  box-shadow: var(--shadow-accent) !important;
+}
+
+/* FP EMPTY */
+.fp-empty-view {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3rem !important;
+  gap: 0.75rem !important;
+}
+.fp-empty-emoji { font-size: 2.5rem !important; }
+.fp-empty-msg { color: #9ca3af !important; font-size: 0.875rem !important; }
 
 /* PENDING SUBMISSIONS TAB */
 .submissions-container { background: var(--white) !important; border: 1.5px solid var(--border) !important; border-radius: 0.875rem !important; overflow: hidden !important; box-shadow: var(--shadow-sm) !important; }
@@ -733,49 +989,7 @@
 .metric-item          { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 0.525rem 0.75rem !important; background: #f9fafb !important; border: 1.5px solid var(--border) !important; border-radius: 0.4rem !important; }
 .metric-label         { font-size: 0.775rem !important; color: var(--muted) !important; }
 .metric-value         { font-size: 0.825rem !important; font-weight: 700 !important; color: var(--dark) !important; }
-/* ─── Meta Tags (dance style + level chips on card) ─────────────────────── */
-.fp-meta-tags {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 4px !important;
-  margin-bottom: 0.375rem !important;
-  /* NO border, background, or border-radius here */
-}
 
-.fp-style-tag {
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 2px 10px !important;
-  border-radius: 999px !important;
-  border: 1.5px solid #ec4899 !important;
-  background: rgba(236,72,153,0.07) !important;
-  color: #ec4899 !important;
-  font-size: 0.65rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.3px !important;
-  white-space: nowrap !important;
-}
-
-.fp-level-tag {
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 2px 10px !important;
-  border-radius: 999px !important;
-  border: 1.5px solid #6b7280 !important;
-  background: rgba(107,114,128,0.07) !important;
-  color: #6b7280 !important;
-  font-size: 0.65rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.3px !important;
-  white-space: nowrap !important;
-}
-
-/* Optional: level-specific colors */
-.fp-level-beginner     { border-color: #10b981 !important; color: #10b981 !important; background: rgba(16,185,129,0.07) !important; }
-.fp-level-intermediate { border-color: #f59e0b !important; color: #d97706 !important; background: rgba(245,158,11,0.07) !important; }
-.fp-level-advanced     { border-color: #6c3de8 !important; color: #6c3de8 !important; background: rgba(108,61,232,0.07) !important; }
 /* SUBMISSION DETAIL MODAL */
 .submission-detail         { display: flex !important; flex-direction: column !important; gap: 1rem !important; }
 .submission-detail-header  { display: flex !important; align-items: flex-start !important; gap: 0.875rem !important; padding: 0.875rem !important; background: #f9fafb !important; border: 1.5px solid var(--border) !important; border-radius: 0.625rem !important; }
@@ -817,25 +1031,6 @@
 .alert-banner__msg     { flex: 1 !important; font-size: 0.825rem !important; }
 .alert-banner__close   { background: rgba(255,255,255,0.2) !important; border: none !important; color: #fff !important; border-radius: 50% !important; width: 22px !important; height: 22px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; }
 .alert-banner__close > svg { width: 11px !important; height: 11px !important; display: block !important; }
-
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-  .challenge-details  { grid-template-columns: 1fr !important; }
-  .analytics-overview { grid-template-columns: 1fr !important; }
-}
-@media (max-width: 768px) {
-  .challenge-content  { padding: 1rem !important; }
-  .challenges-grid    { grid-template-columns: 1fr !important; }
-  .filters-container  { flex-direction: column !important; align-items: stretch !important; }
-  .search-container   { max-width: 100% !important; }
-  .form-row           { grid-template-columns: 1fr !important; }
-  .submissions-grid   { grid-template-columns: 1fr !important; }
-}
-@media (max-width: 576px) {
-  .tab-nav              { flex-direction: column !important; width: 100% !important; }
-  .challenge-actions    { flex-wrap: wrap !important; }
-  .analytics-stats-grid { grid-template-columns: repeat(2,1fr) !important; }
-}
 
 /* ─── DanceStylesSelect ──────────────────────────────────────────────────── */
 .ds-wrap { position: relative; }
@@ -935,33 +1130,49 @@
   font-size: 0.8rem !important; color: #374151 !important;
 }
 .fd-reason-icon { color: #ef4444 !important; flex-shrink: 0 !important; margin-top: 2px !important; }
-/* ─── Card Body Fix — pins action buttons to bottom ─────────────────────── */
-.fp-content-card {
-  background: var(--white) !important;
-  border: 1.5px solid var(--border) !important;
-  border-radius: 0.875rem !important;
-  overflow: hidden !important;
-  box-shadow: var(--shadow-sm) !important;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s !important;
-  display: flex !important;
-  flex-direction: column !important;
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .challenge-details  { grid-template-columns: 1fr !important; }
+  .analytics-overview { grid-template-columns: 1fr !important; }
 }
 
-.fp-card-body {
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 !important;
-  padding: 0.875rem 1rem 1rem !important;
+@media (max-width: 768px) {
+  .challenge-content    { padding: 1rem !important; }
+  .fp-content-grid      { grid-template-columns: 1fr !important; }
+  .challenges-grid      { grid-template-columns: 1fr !important; }
+  .filters-container    { flex-direction: column !important; align-items: stretch !important; }
+  .search-container     { max-width: 100% !important; }
+  .form-row             { grid-template-columns: 1fr !important; }
+  .submissions-grid     { grid-template-columns: 1fr !important; }
+  .fp-tab-nav           { width: 100% !important; }
+  .fp-nav-tab           { flex: 1 !important; justify-content: center !important; padding: 0.6rem 0.5rem !important; font-size: 0.8rem !important; }
 }
 
-.fp-post-caption {
-  flex: 1 !important;
-  color: var(--muted) !important;
-  font-size: 0.75rem !important;
-  line-height: 1.5 !important;
-  margin-bottom: 0.625rem !important;
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-  overflow: hidden !important;
+@media (max-width: 576px) {
+  .fp-content-grid      { grid-template-columns: 1fr !important; }
+  .challenge-actions    { flex-wrap: wrap !important; }
+  .analytics-stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+  .fp-engagement-stats  {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.25rem !important;
+  }
+  .fp-stat-group {
+    justify-content: center !important;
+    width: 100% !important;
+    font-size: 0.6rem !important;
+    padding: 2px 4px !important;
+  }
+  .fp-stat-group svg { width: 10px !important; height: 10px !important; }
+}
+
+@media (max-width: 400px) {
+  .fp-engagement-stats {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .challenge-actions { gap: 0.25rem !important; }
+  .status-select { width: 75px !important; font-size: 0.72rem !important; }
 }

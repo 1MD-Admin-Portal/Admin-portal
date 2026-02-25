@@ -984,7 +984,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo1.png";
 import {
   Home,
   Users,
@@ -1309,7 +1309,7 @@ const Sidebar = () => {
         }
 
         .vs-activity-logo img {
-          width: 30px; height: 30px;
+          width: 40px; height: 50px;
           object-fit: contain;
           border-radius: 8px;
           filter: drop-shadow(0 0 8px rgba(244, 208, 63, 0.5))

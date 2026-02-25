@@ -129,6 +129,7 @@ const SeverityBadge = ({ count }) => {
   );
 };
 
+// ─── Confirm Dialog ───────────────────────────────────────────────────────────
 const ConfirmDialog = ({ message, onConfirm, onClose }) => (
   <div className="modal-overlay-custom" style={{ zIndex: 2000 }}>
     <div className="modal-shell" style={{ maxWidth: "420px" }}>
@@ -206,39 +207,33 @@ const ChallengePage = () => {
   const [error,         setError]         = useState("");
   const [success,       setSuccess]       = useState("");
   const [confirmDialog, setConfirmDialog] = useState({ open: false, message: "", onConfirm: null });
-  const showConfirm = (message, onConfirm) => {
-  setConfirmDialog({ open: true, message, onConfirm });
-};
-const closeConfirm = () => setConfirmDialog({ open: false, message: "", onConfirm: null });
+
+  const showConfirm  = (message, onConfirm) => setConfirmDialog({ open: true, message, onConfirm });
+  const closeConfirm = () => setConfirmDialog({ open: false, message: "", onConfirm: null });
+
+  // Load dance styles
   useEffect(() => {
     getDanceStyles()
       .then(res => setDanceStyleOptions(Array.isArray(res) ? res : []))
       .catch(err => console.error("Failed to load dance styles", err));
   }, []);
 
-
-  
-
-  // Auto-dismiss alerts after 3 seconds
-useEffect(() => {
-  if (error) {
-    const t = setTimeout(() => setError(""), 3000);
-    return () => clearTimeout(t);
-  }
-}, [error]);
-
-useEffect(() => {
-  if (success) {
-    const t = setTimeout(() => setSuccess(""), 3000);
-    return () => clearTimeout(t);
-  }
-}, [success]);
+  // Auto-dismiss alerts
   useEffect(() => {
-    if (activeTab === "challenges")           fetchChallenges();
-    if (activeTab === "pending-submissions")  fetchPendingSubmissions();
-    if (activeTab === "flagged-comments")     fetchFlaggedComments();
+    if (error)   { const t = setTimeout(() => setError(""),   3000); return () => clearTimeout(t); }
+  }, [error]);
+  useEffect(() => {
+    if (success) { const t = setTimeout(() => setSuccess(""), 3000); return () => clearTimeout(t); }
+  }, [success]);
+
+  // Tab data fetch
+  useEffect(() => {
+    if (activeTab === "challenges")          fetchChallenges();
+    if (activeTab === "pending-submissions") fetchPendingSubmissions();
+    if (activeTab === "flagged-comments")    fetchFlaggedComments();
   }, [page, activeTab, flaggedPage]);
 
+  // ── Fetch functions ──────────────────────────────────────────────────────────
   const fetchChallenges = async () => {
     try { setLoading(true); const r = await getAllChallengesService(page, 20); setChallenges(r.challenges || []); setPagination(r.pagination || {}); }
     catch { setError("Failed to fetch challenges"); } finally { setLoading(false); }
@@ -258,6 +253,7 @@ useEffect(() => {
     } catch { setError("Failed to fetch flagged comments"); } finally { setFlaggedLoading(false); }
   };
 
+  // ── Open modals ──────────────────────────────────────────────────────────────
   const openChallengeDetails = async (challenge) => {
     try { const r = await getChallengeDetailsService(challenge.id); setSelectedChallenge(r || challenge); setChallengeDetailsModal(true); }
     catch { setError("Failed to fetch challenge details"); }
@@ -285,6 +281,7 @@ useEffect(() => {
 
   const openFlaggedDetail = (comment) => { setSelectedFlaggedComment(comment); setFlaggedDetailModal(true); };
 
+  // ── Actions ──────────────────────────────────────────────────────────────────
   const handleApproveSubmission = async (id) => {
     try { await approveSubmissionService(id, feedbackText); setSuccess("Submission approved"); setFeedbackText(""); setSubmissionDetailModal(false); fetchPendingSubmissions(); }
     catch { setError("Failed to approve submission"); }
@@ -296,31 +293,32 @@ useEffect(() => {
   };
 
   const handleDeleteSubmission = (id) => {
-  showConfirm("Delete this submission? This action cannot be undone.", async () => {
-    try { await deleteSubmissionService(id); setSuccess("Submission deleted"); setSubmissionDetailModal(false); fetchPendingSubmissions(); }
-    catch { setError("Failed to delete submission"); }
-  });
-};
+    showConfirm("Delete this submission? This action cannot be undone.", async () => {
+      try { await deleteSubmissionService(id); setSuccess("Submission deleted"); setSubmissionDetailModal(false); fetchPendingSubmissions(); }
+      catch { setError("Failed to delete submission"); }
+    });
+  };
 
   const handleRemoveParticipant = (challengeId, userId) => {
-  showConfirm("Remove this participant from the challenge?", async () => {
-    try { await removeParticipantService(challengeId, userId); setSuccess("Participant removed"); openParticipants(selectedChallenge); }
-    catch { setError("Failed to remove participant"); }
-  });
-};
+    showConfirm("Remove this participant from the challenge?", async () => {
+      try { await removeParticipantService(challengeId, userId); setSuccess("Participant removed"); openParticipants(selectedChallenge); }
+      catch { setError("Failed to remove participant"); }
+    });
+  };
+
   const handleDeleteComment = (id) => {
-  showConfirm("Delete this comment? This action cannot be undone.", async () => {
-    try { await deleteCommentService(id); setSuccess("Comment deleted"); if (selectedSubmission) openSubmissionDetail(selectedSubmission); }
-    catch { setError("Failed to delete comment"); }
-  });
-};
+    showConfirm("Delete this comment? This action cannot be undone.", async () => {
+      try { await deleteCommentService(id); setSuccess("Comment deleted"); if (selectedSubmission) openSubmissionDetail(selectedSubmission); }
+      catch { setError("Failed to delete comment"); }
+    });
+  };
 
   const handleDeleteFlaggedComment = (id) => {
-  showConfirm("Permanently delete this flagged comment?", async () => {
-    try { await deleteCommentService(id); setSuccess("Flagged comment deleted"); setFlaggedDetailModal(false); setSelectedFlaggedComment(null); fetchFlaggedComments(); }
-    catch { setError("Failed to delete flagged comment"); }
-  });
-};
+    showConfirm("Permanently delete this flagged comment?", async () => {
+      try { await deleteCommentService(id); setSuccess("Flagged comment deleted"); setFlaggedDetailModal(false); setSelectedFlaggedComment(null); fetchFlaggedComments(); }
+      catch { setError("Failed to delete flagged comment"); }
+    });
+  };
 
   const addTask    = () => setTasks([...tasks, { task_type: "watch_video", task_title: "", video_url: "" }]);
   const removeTask = (i) => { if (tasks.length > 1) { const t = [...tasks]; t.splice(i, 1); setTasks(t); } };
@@ -353,49 +351,36 @@ useEffect(() => {
     } catch { setError("Failed to create challenge"); }
   };
 
-  // const handleUpdateChallenge = async () => {
-  //   try {
-  //     await updateChallengeService(editChallenge.id, {
-  //       ...editChallenge,
-  //       dance_style: Array.isArray(editChallenge.dance_style) ? editChallenge.dance_style.join(", ") : editChallenge.dance_style,
-  //     });
-  //     setSuccess("Challenge updated"); setEditChallengeModal(false); fetchChallenges();
-  //   } catch { setError("Failed to update challenge"); }
-  // };
   const handleUpdateChallenge = async () => {
-  try {
-    const payload = {
-      title: editChallenge.title,
-      description: editChallenge.description,
-      dance_style: Array.isArray(editChallenge.dance_style)
-        ? editChallenge.dance_style.join(", ")
-        : editChallenge.dance_style,
-      dance_level: editChallenge.dance_level,
-      prize_details: editChallenge.prize_details,
-      max_participants: editChallenge.max_participants,
-      image_url: editChallenge.image_url,
-      is_trending: editChallenge.is_trending,
-    };
+    try {
+      const payload = {
+        title:           editChallenge.title,
+        description:     editChallenge.description,
+        dance_style:     Array.isArray(editChallenge.dance_style) ? editChallenge.dance_style.join(", ") : editChallenge.dance_style,
+        dance_level:     editChallenge.dance_level,
+        prize_details:   editChallenge.prize_details,
+        max_participants: editChallenge.max_participants,
+        image_url:       editChallenge.image_url,
+        is_trending:     editChallenge.is_trending,
+      };
+      await updateChallengeService(editChallenge.id, payload);
+      setSuccess("Challenge updated");
+      setEditChallengeModal(false);
+      fetchChallenges();
+    } catch { setError("Failed to update challenge"); }
+  };
 
-    await updateChallengeService(editChallenge.id, payload);
-    setSuccess("Challenge updated");
-    setEditChallengeModal(false);
-    fetchChallenges();
-  } catch {
-    setError("Failed to update challenge");
-  }
-};
   const handleStatusChange = async (challengeId, newStatus) => {
     try { await updateChallengeStatusService(challengeId, newStatus); setSuccess("Status updated"); fetchChallenges(); }
     catch { setError("Failed to update status"); }
   };
 
   const handleDeleteChallenge = (id) => {
-  showConfirm("Delete this challenge? This action cannot be undone.", async () => {
-    try { await deleteChallengeService(id); setSuccess("Challenge deleted"); fetchChallenges(); }
-    catch { setError("Failed to delete challenge"); }
-  });
-};
+    showConfirm("Delete this challenge? This action cannot be undone.", async () => {
+      try { await deleteChallengeService(id); setSuccess("Challenge deleted"); fetchChallenges(); }
+      catch { setError("Failed to delete challenge"); }
+    });
+  };
 
   const openEditModal = (challenge) => {
     setEditChallenge({
@@ -407,6 +392,7 @@ useEffect(() => {
     setEditChallengeModal(true);
   };
 
+  // ── Filters ──────────────────────────────────────────────────────────────────
   const filteredChallenges = challenges.filter(c => {
     const matchSearch = c.title.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter ? c.status === statusFilter : true;
@@ -421,6 +407,7 @@ useEffect(() => {
       (c.challenge_title || "").toLowerCase().includes(q);
   });
 
+  // ════════════════════════════════════════════════════════════════════════════
   return (
     <div className="fp-main-container">
 
@@ -447,6 +434,7 @@ useEffect(() => {
       {/* ══ Challenges Tab ══ */}
       {activeTab === "challenges" && (
         <>
+          {/* Filters */}
           <div className="filters-section">
             <div className="filters-container">
               <div className="filters-left">
@@ -473,9 +461,12 @@ useEffect(() => {
             <div className="loading-container"><div className="loading-spinner" /></div>
           ) : (
             <>
+              {/* ── Cards Grid ── */}
               <div className="fp-content-grid">
                 {filteredChallenges.map(challenge => (
                   <div key={challenge.id} className="fp-content-card" onClick={() => openChallengeDetails(challenge)}>
+
+                    {/* Thumbnail */}
                     <div className="fp-thumbnail-wrap">
                       {challenge.image_url ? (
                         <img src={challenge.image_url} alt={challenge.title} className="fp-media-thumb"
@@ -487,39 +478,47 @@ useEffect(() => {
                         <span className={`status-badge ${challenge.status}`}>{challenge.status}</span>
                       </div>
                     </div>
+
+                    {/* Card Body */}
                     <div className="fp-card-body">
-                      <div className="fp-user-details">
-                        <h3 className="fp-username">{challenge.title}</h3>
-                        <div className="fp-meta-tags">
-  {challenge.dance_style &&
-    challenge.dance_style.split(",").map((style, i) => {
-      const trimmed = style.trim();
-      return (
-        <span
-          key={i}
-          className={`fp-style-tag fp-style-${trimmed.toLowerCase().replace(/\s+/g, "-")}`}
-        >
-          {trimmed}
-        </span>
-      );
-    })
-  }
-  {challenge.dance_level && (
-    <span className={`fp-level-tag fp-level-${challenge.dance_level?.toLowerCase()}`}>
-      {challenge.dance_level}
-    </span>
-  )}
-</div>
-                      </div>
-                      <p className="fp-post-caption">{challenge.description}</p>
-                      <div className="fp-engagement-stats">
-                        <div className="fp-stat-group"><Users size={14} /><span>{challenge.participants_count || 0} participants</span></div>
-                        <div className="fp-stat-group"><Upload size={14} /><span>{challenge.submissions_count || 0} submissions</span></div>
-                        <div className="fp-stat-group"><Clock size={14} /><span>{challenge.pending_submissions || 0} pending</span></div>
-                      </div>
+
+                      {/* ── TOP: title, tags, description, stats — does NOT grow ── */}
+                      
+                        <div className="fp-user-details">
+                          <h3 className="fp-username">{challenge.title}</h3>
+                          <div className="fp-meta-tags">
+                            {challenge.dance_style &&
+                              challenge.dance_style.split(",").map((style, i) => {
+                                const trimmed = style.trim();
+                                return (
+                                  <span key={i} className={`fp-style-tag fp-style-${trimmed.toLowerCase().replace(/\s+/g, "-")}`}>
+                                    {trimmed}
+                                  </span>
+                                );
+                              })
+                            }
+                            {challenge.dance_level && (
+                              <span className={`fp-level-tag fp-level-${challenge.dance_level?.toLowerCase()}`}>
+                                {challenge.dance_level}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="fp-post-caption">{challenge.description}</p>
+                        <div className="fp-card-top">
+                        <div className="fp-engagement-stats">
+                          <div className="fp-stat-group"><Users size={14} /><span>{challenge.participants_count || 0} Participants</span></div>
+                          <div className="fp-stat-group"><Upload size={14} /><span>{challenge.submissions_count || 0} Submissions</span></div>
+                          <div className="fp-stat-group"><Clock size={14} /><span>{challenge.pending_submissions || 0} Pending</span></div>
+                        </div>
+                        
+                      
+                      {/* ── END TOP ── */}
+
+                    
                       <div className="challenge-actions" onClick={e => e.stopPropagation()}>
                         <div className="challenge-actions__left">
-                          {/* <button className="action-btn" title="View Details" onClick={() => openChallengeDetails(challenge)}><Eye size={13} /></button> */}
                           <button className="action-btn" title="Edit"         onClick={() => openEditModal(challenge)}><Edit3 size={13} /></button>
                           <button className="action-btn" title="Submissions"  onClick={() => openSubmissions(challenge)}><Upload size={13} /></button>
                           <button className="action-btn" title="Participants" onClick={() => openParticipants(challenge)}><Users size={13} /></button>
@@ -538,6 +537,10 @@ useEffect(() => {
                           </button>
                         </div>
                       </div>
+                      {/* ── END BOTTOM ── */}
+                      </div>
+
+          
                     </div>
                   </div>
                 ))}
@@ -691,33 +694,82 @@ useEffect(() => {
       {/* ══ CREATE CHALLENGE MODAL ══ */}
       {createChallengeModal && (
         <ModalShell title="Create New Challenge" onClose={() => setCreateChallengeModal(false)} maxWidth="640px"
-          footer={<><button className="btn-cancel" onClick={() => setCreateChallengeModal(false)}>Cancel</button><button className="btn-primary" onClick={handleCreateChallenge}>Create Challenge</button></>}>
-          <Field label="Title"><input type="text" className="form-input" value={newChallenge.title} onChange={e => setNewChallenge({ ...newChallenge, title: e.target.value })} /></Field>
-          <Field label="Description"><textarea className="form-textarea" rows={3} value={newChallenge.description} onChange={e => setNewChallenge({ ...newChallenge, description: e.target.value })} /></Field>
+          footer={
+            <>
+              <button className="btn-cancel" onClick={() => setCreateChallengeModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleCreateChallenge}>Create Challenge</button>
+            </>
+          }>
+          <Field label="Title">
+            <input type="text" className="form-input" value={newChallenge.title}
+              onChange={e => setNewChallenge({ ...newChallenge, title: e.target.value })} />
+          </Field>
+          <Field label="Description">
+            <textarea className="form-textarea" rows={3} value={newChallenge.description}
+              onChange={e => setNewChallenge({ ...newChallenge, description: e.target.value })} />
+          </Field>
           <div className="form-row">
-            <Field label="Dance Style"><DanceStylesSelect selected={newChallenge.dance_style} onChange={val => setNewChallenge({ ...newChallenge, dance_style: val })} options={danceStyleOptions} /></Field>
+            <Field label="Dance Style">
+              <DanceStylesSelect selected={newChallenge.dance_style}
+                onChange={val => setNewChallenge({ ...newChallenge, dance_style: val })}
+                options={danceStyleOptions} />
+            </Field>
             <Field label="Dance Level">
-              <select className="form-select" value={newChallenge.dance_level} onChange={e => setNewChallenge({ ...newChallenge, dance_level: e.target.value })}>
-                <option value="">Select Level</option><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option>
+              <select className="form-select" value={newChallenge.dance_level}
+                onChange={e => setNewChallenge({ ...newChallenge, dance_level: e.target.value })}>
+                <option value="">Select Level</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
               </select>
             </Field>
           </div>
           <div className="form-row">
-            <Field label="Start Date"><input type="date" className="form-input" value={newChallenge.start_date} onChange={e => setNewChallenge({ ...newChallenge, start_date: e.target.value })} /></Field>
-            <Field label="End Date"><input type="date" className="form-input" value={newChallenge.end_date} onChange={e => setNewChallenge({ ...newChallenge, end_date: e.target.value })} /></Field>
+            <Field label="Start Date">
+              <input type="date" className="form-input" value={newChallenge.start_date}
+                onChange={e => setNewChallenge({ ...newChallenge, start_date: e.target.value })} />
+            </Field>
+            <Field label="End Date">
+              <input type="date" className="form-input" value={newChallenge.end_date}
+                onChange={e => setNewChallenge({ ...newChallenge, end_date: e.target.value })} />
+            </Field>
           </div>
-          <Field label="Prize Details"><input type="text" className="form-input" value={newChallenge.prize_details} onChange={e => setNewChallenge({ ...newChallenge, prize_details: e.target.value })} /></Field>
-          <Field label="Max Participants"><input type="number" className="form-input" value={newChallenge.max_participants} onChange={e => setNewChallenge({ ...newChallenge, max_participants: e.target.value })} /></Field>
+          <Field label="Prize Details">
+            <input type="text" className="form-input" value={newChallenge.prize_details}
+              onChange={e => setNewChallenge({ ...newChallenge, prize_details: e.target.value })} />
+          </Field>
+          <Field label="Max Participants">
+            <input type="number" className="form-input" value={newChallenge.max_participants}
+              onChange={e => setNewChallenge({ ...newChallenge, max_participants: e.target.value })} />
+          </Field>
           <Field label="Challenge Image">
-            <input type="file" className="form-input" accept="image/*" onChange={e => handleFileUpload(e, "image_url")} disabled={uploading} />
-            {newChallenge.image_url && (<div className="cp-img-preview"><img src={newChallenge.image_url} alt="Preview" className="cp-img-preview__img" /><button className="cp-img-preview__remove" onClick={() => setNewChallenge({ ...newChallenge, image_url: "" })}><X size={12} /></button></div>)}
+            <input type="file" className="form-input" accept="image/*"
+              onChange={e => handleFileUpload(e, "image_url")} disabled={uploading} />
+            {newChallenge.image_url && (
+              <div className="cp-img-preview">
+                <img src={newChallenge.image_url} alt="Preview" className="cp-img-preview__img" />
+                <button className="cp-img-preview__remove" onClick={() => setNewChallenge({ ...newChallenge, image_url: "" })}>
+                  <X size={12} />
+                </button>
+              </div>
+            )}
           </Field>
           <Field label="Challenge Type">
-            <select className="form-select" value={newChallenge.challenger_type} onChange={e => setNewChallenge({ ...newChallenge, challenger_type: e.target.value })}>
-              <option value="public">Public</option><option value="private">Private</option>
+            <select className="form-select" value={newChallenge.challenger_type}
+              onChange={e => setNewChallenge({ ...newChallenge, challenger_type: e.target.value })}>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
             </select>
           </Field>
-          <div className="cp-form-group"><label className="form-checkbox"><input type="checkbox" checked={newChallenge.is_trending} onChange={e => setNewChallenge({ ...newChallenge, is_trending: e.target.checked })} />Mark as Trending</label></div>
+          <div className="cp-form-group">
+            <label className="form-checkbox">
+              <input type="checkbox" checked={newChallenge.is_trending}
+                onChange={e => setNewChallenge({ ...newChallenge, is_trending: e.target.checked })} />
+              Mark as Trending
+            </label>
+          </div>
+
+          {/* Tasks */}
           <div className="cp-form-group">
             <div className="cp-tasks-header">
               <label className="cp-form-label">Challenge Tasks</label>
@@ -727,38 +779,31 @@ useEffect(() => {
               <div key={index} className="cp-task-card">
                 <div className="form-row">
                   <Field label="Task Type">
-                    <select className="form-select" value={task.task_type} onChange={e => updateTask(index, "task_type", e.target.value)}>
-                      <option value="watch_video">Watch Video</option><option value="upload_video">Upload Video</option>
+                    <select className="form-select" value={task.task_type}
+                      onChange={e => updateTask(index, "task_type", e.target.value)}>
+                      <option value="watch_video">Watch Video</option>
+                      <option value="upload_video">Upload Video</option>
                     </select>
                   </Field>
-                  <div className="cp-task-remove-wrap"><button className="delete-btn" onClick={() => removeTask(index)} disabled={tasks.length === 1}><X size={14} /></button></div>
+                  <div className="cp-task-remove-wrap">
+                    <button className="delete-btn" onClick={() => removeTask(index)} disabled={tasks.length === 1}>
+                      <X size={14} />
+                    </button>
+                  </div>
                 </div>
                 {task.task_type === "upload_video" && (
-  <Field label="Upload Submission Template (Optional)">
-    <input
-      type="file"
-      className="form-input"
-      accept="video/*"
-      onChange={e => handleFileUpload(e, "video_url", index)}
-      disabled={uploading}
-    />
-
-    {task.video_url && (
-      <div className="cp-img-preview">
-        <video
-          src={task.video_url}
-          className="cp-img-preview__img"
-          controls
-        />
-        <button
-          className="cp-img-preview__remove"
-          onClick={() => updateTask(index, "video_url", "")}
-        >
-          <X size={12} />
-        </button>
-      </div>
-    )}
-  </Field>
+                  <Field label="Upload Submission Template (Optional)">
+                    <input type="file" className="form-input" accept="video/*"
+                      onChange={e => handleFileUpload(e, "video_url", index)} disabled={uploading} />
+                    {task.video_url && (
+                      <div className="cp-img-preview">
+                        <video src={task.video_url} className="cp-img-preview__img" controls />
+                        <button className="cp-img-preview__remove" onClick={() => updateTask(index, "video_url", "")}>
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </Field>
                 )}
               </div>
             ))}
@@ -769,46 +814,87 @@ useEffect(() => {
       {/* ══ EDIT CHALLENGE MODAL ══ */}
       {editChallengeModal && (
         <ModalShell title="Edit Challenge" onClose={() => setEditChallengeModal(false)} maxWidth="580px"
-          footer={<><button className="btn-cancel" onClick={() => setEditChallengeModal(false)}>Cancel</button><button className="btn-primary" onClick={handleUpdateChallenge}>Update Challenge</button></>}>
-          <Field label="Title"><input type="text" className="form-input" value={editChallenge.title || ""} onChange={e => setEditChallenge({ ...editChallenge, title: e.target.value })} /></Field>
-          <Field label="Description"><textarea className="form-textarea" rows={3} value={editChallenge.description || ""} onChange={e => setEditChallenge({ ...editChallenge, description: e.target.value })} /></Field>
+          footer={
+            <>
+              <button className="btn-cancel" onClick={() => setEditChallengeModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleUpdateChallenge}>Update Challenge</button>
+            </>
+          }>
+          <Field label="Title">
+            <input type="text" className="form-input" value={editChallenge.title || ""}
+              onChange={e => setEditChallenge({ ...editChallenge, title: e.target.value })} />
+          </Field>
+          <Field label="Description">
+            <textarea className="form-textarea" rows={3} value={editChallenge.description || ""}
+              onChange={e => setEditChallenge({ ...editChallenge, description: e.target.value })} />
+          </Field>
           <div className="form-row">
-            <Field label="Dance Style"><DanceStylesSelect selected={editChallenge.dance_style || []} onChange={val => setEditChallenge({ ...editChallenge, dance_style: val })} options={danceStyleOptions} /></Field>
+            <Field label="Dance Style">
+              <DanceStylesSelect selected={editChallenge.dance_style || []}
+                onChange={val => setEditChallenge({ ...editChallenge, dance_style: val })}
+                options={danceStyleOptions} />
+            </Field>
             <Field label="Dance Level">
-              <select className="form-select" value={editChallenge.dance_level || ""} onChange={e => setEditChallenge({ ...editChallenge, dance_level: e.target.value })}>
-                <option value="">Select Level</option><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option>
+              <select className="form-select" value={editChallenge.dance_level || ""}
+                onChange={e => setEditChallenge({ ...editChallenge, dance_level: e.target.value })}>
+                <option value="">Select Level</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
               </select>
             </Field>
           </div>
-          <Field label="Prize Details"><input type="text" className="form-input" value={editChallenge.prize_details || ""} onChange={e => setEditChallenge({ ...editChallenge, prize_details: e.target.value })} /></Field>
-          <Field label="Max Participants"><input type="number" className="form-input" value={editChallenge.max_participants || ""} onChange={e => setEditChallenge({ ...editChallenge, max_participants: e.target.value })} /></Field>
-          <Field label="Image URL"><input type="url" className="form-input" value={editChallenge.image_url || ""} onChange={e => setEditChallenge({ ...editChallenge, image_url: e.target.value })} /></Field>
-          <div className="cp-form-group"><label className="form-checkbox"><input type="checkbox" checked={editChallenge.is_trending || false} onChange={e => setEditChallenge({ ...editChallenge, is_trending: e.target.checked })} />Mark as Trending</label></div>
+          <Field label="Prize Details">
+            <input type="text" className="form-input" value={editChallenge.prize_details || ""}
+              onChange={e => setEditChallenge({ ...editChallenge, prize_details: e.target.value })} />
+          </Field>
+          <Field label="Max Participants">
+            <input type="number" className="form-input" value={editChallenge.max_participants || ""}
+              onChange={e => setEditChallenge({ ...editChallenge, max_participants: e.target.value })} />
+          </Field>
+          <Field label="Image URL">
+            <input type="url" className="form-input" value={editChallenge.image_url || ""}
+              onChange={e => setEditChallenge({ ...editChallenge, image_url: e.target.value })} />
+          </Field>
+          <div className="cp-form-group">
+            <label className="form-checkbox">
+              <input type="checkbox" checked={editChallenge.is_trending || false}
+                onChange={e => setEditChallenge({ ...editChallenge, is_trending: e.target.checked })} />
+              Mark as Trending
+            </label>
+          </div>
         </ModalShell>
       )}
 
       {/* ══ CHALLENGE DETAILS MODAL ══ */}
       {challengeDetailsModal && selectedChallenge && (
-        <ModalShell title="Challenge Details" onClose={() => setChallengeDetailsModal(false)} maxWidth="860px"
-          >
+        <ModalShell title="Challenge Details" onClose={() => setChallengeDetailsModal(false)} maxWidth="860px">
           <div className="challenge-details">
             <div>
-              {selectedChallenge.challenge?.image_url && (<img src={selectedChallenge.challenge.image_url} alt={selectedChallenge.challenge.title} className="details-image" />)}
+              {selectedChallenge.challenge?.image_url && (
+                <img src={selectedChallenge.challenge.image_url} alt={selectedChallenge.challenge.title} className="details-image" />
+              )}
               <h4 className="details-title">{selectedChallenge.challenge?.title}</h4>
               <p className="details-description">{selectedChallenge.challenge?.description}</p>
               <div className="details-info">
-                <div className="info-item"><Calendar size={16} className="info-icon" />{new Date(selectedChallenge.challenge?.start_date).toLocaleDateString()} – {new Date(selectedChallenge.challenge?.end_date).toLocaleDateString()}</div>
+                <div className="info-item">
+                  <Calendar size={16} className="info-icon" />
+                  {new Date(selectedChallenge.challenge?.start_date).toLocaleDateString()} – {new Date(selectedChallenge.challenge?.end_date).toLocaleDateString()}
+                </div>
                 <div className="info-item"><Award size={16} className="info-icon" />{selectedChallenge.challenge?.dance_style}</div>
                 <div className="info-item"><TrendingUp size={16} className="info-icon" />{selectedChallenge.challenge?.dance_level}</div>
-                {selectedChallenge.challenge?.prize_details && (<div className="info-item"><Award size={16} className="info-icon" />{selectedChallenge.challenge.prize_details}</div>)}
+                {selectedChallenge.challenge?.prize_details && (
+                  <div className="info-item"><Award size={16} className="info-icon" />{selectedChallenge.challenge.prize_details}</div>
+                )}
                 <div className="info-item"><Users size={16} className="info-icon" />Max: {selectedChallenge.challenge?.max_participants || "Unlimited"} participants</div>
               </div>
             </div>
             <div>
               <div className="detail-stats-row">
-                {[{ icon: Users, val: selectedChallenge.challenge?.total_participants || 0, label: "Participants" },
-                  { icon: Upload, val: selectedChallenge.challenge?.total_submissions || 0, label: "Submissions" },
-                  { icon: Clock, val: selectedChallenge.challenge?.pending_submissions || 0, label: "Pending" }
+                {[
+                  { icon: Users,  val: selectedChallenge.challenge?.total_participants  || 0, label: "Participants" },
+                  { icon: Upload, val: selectedChallenge.challenge?.total_submissions   || 0, label: "Submissions"  },
+                  { icon: Clock,  val: selectedChallenge.challenge?.pending_submissions || 0, label: "Pending"      },
                 ].map(({ icon: Icon, val, label }) => (
                   <div key={label} className="detail-stat-card"><Icon size={18} /><h4>{val}</h4><p>{label}</p></div>
                 ))}
@@ -819,8 +905,15 @@ useEffect(() => {
                   <div className="tasks-list">
                     {selectedChallenge.challenge.tasks.map((task, i) => (
                       <div key={i} className="task-item">
-                        <div className="task-header"><span className="task-type">{task.task_type}</span><span className="task-title">{task.task_title}</span></div>
-                        {task.video_url && (<a href={task.video_url} target="_blank" rel="noopener noreferrer" className="task-video-link"><Play size={13} /> Watch Video</a>)}
+                        <div className="task-header">
+                          <span className="task-type">{task.task_type}</span>
+                          <span className="task-title">{task.task_title}</span>
+                        </div>
+                        {task.video_url && (
+                          <a href={task.video_url} target="_blank" rel="noopener noreferrer" className="task-video-link">
+                            <Play size={13} /> Watch Video
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -833,8 +926,7 @@ useEffect(() => {
 
       {/* ══ SUBMISSIONS MODAL ══ */}
       {submissionsModal && selectedChallenge && (
-        <ModalShell title={`Submissions — ${selectedChallenge.title}`} onClose={() => setSubmissionsModal(false)} maxWidth="1000px"
-          >
+        <ModalShell title={`Submissions — ${selectedChallenge.title}`} onClose={() => setSubmissionsModal(false)} maxWidth="1000px">
           {submissions.length === 0 ? (
             <div className="empty-state"><Upload size={48} className="empty-icon" /><p className="empty-text">No submissions found</p></div>
           ) : (
@@ -842,17 +934,32 @@ useEffect(() => {
               {submissions.map(sub => (
                 <div key={sub.id} className="submission-card">
                   <div className="submission-header">
-                    <img src={sub.profile_image_url || "/default-avatar.png"} alt={sub.username} className="submission-user-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
-                    <div className="submission-user-info"><h4>{sub.username}</h4><p>{new Date(sub.submitted_at).toLocaleDateString()}</p></div>
+                    <img src={sub.profile_image_url || "/default-avatar.png"} alt={sub.username}
+                      className="submission-user-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
+                    <div className="submission-user-info">
+                      <h4>{sub.username}</h4>
+                      <p>{new Date(sub.submitted_at).toLocaleDateString()}</p>
+                    </div>
                     <span className={`submission-status ${sub.status}`}>{sub.status}</span>
                   </div>
                   <div className="submission-content">
                     <h5>{sub.title}</h5>
                     {sub.description && <p className="submission-desc">{sub.description}</p>}
-                    {sub.video_url && (<div className="submission-video"><a href={sub.video_url} target="_blank" rel="noopener noreferrer" className="video-link"><Play size={13} /> Watch Submission</a></div>)}
+                    {sub.video_url && (
+                      <div className="submission-video">
+                        <a href={sub.video_url} target="_blank" rel="noopener noreferrer" className="video-link">
+                          <Play size={13} /> Watch Submission
+                        </a>
+                      </div>
+                    )}
                     <div className="submission-actions">
                       <button className="view-detail-btn" onClick={() => openSubmissionDetail(sub)}><Eye size={13} /> View</button>
-                      {sub.status === "pending" && (<><button className="approve-btn-sm" onClick={() => handleApproveSubmission(sub.id)}><CheckCircle size={13} /> Approve</button><button className="reject-btn" onClick={() => handleRejectSubmission(sub.id)}><XCircle size={13} /> Reject</button></>)}
+                      {sub.status === "pending" && (
+                        <>
+                          <button className="approve-btn-sm" onClick={() => handleApproveSubmission(sub.id)}><CheckCircle size={13} /> Approve</button>
+                          <button className="reject-btn"     onClick={() => handleRejectSubmission(sub.id)}><XCircle size={13} /> Reject</button>
+                        </>
+                      )}
                       <button className="reject-btn" onClick={() => handleDeleteSubmission(sub.id)}><Trash2 size={13} /> Delete</button>
                     </div>
                   </div>
@@ -865,16 +972,15 @@ useEffect(() => {
 
       {/* ══ PARTICIPANTS MODAL ══ */}
       {participantsModal && selectedChallenge && (
-        <ModalShell title={`Participants — ${selectedChallenge.title}`} onClose={() => setParticipantsModal(false)} maxWidth="720px"
-          >
+        <ModalShell title={`Participants — ${selectedChallenge.title}`} onClose={() => setParticipantsModal(false)} maxWidth="720px">
           {participants.length === 0 ? (
             <div className="empty-state"><Users size={48} className="empty-icon" /><p className="empty-text">No participants found</p></div>
           ) : (
             <div className="participants-list">
               {participants.map(p => (
                 <div key={p.user_id} className="participant-item">
-                  <img src={p.profile_image_url || "/default-avatar.png"} alt={p.username} className="participant-avatar"
-                    onError={e => { e.target.src = "/default-avatar.png"; }} />
+                  <img src={p.profile_image_url || "/default-avatar.png"} alt={p.username}
+                    className="participant-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
                   <div className="participant-info">
                     <div className="participant-name">{p.username}</div>
                     <div className="participant-email">{p.email}</div>
@@ -896,20 +1002,24 @@ useEffect(() => {
 
       {/* ══ ANALYTICS MODAL ══ */}
       {analyticsModal && selectedChallenge && analytics && (
-        <ModalShell title={`Analytics — ${selectedChallenge.title}`} onClose={() => setAnalyticsModal(false)} maxWidth="1000px"
-          >
+        <ModalShell title={`Analytics — ${selectedChallenge.title}`} onClose={() => setAnalyticsModal(false)} maxWidth="1000px">
           <div className="analytics-container">
             <div className="analytics-card">
               <div className="analytics-card-header"><h3>Overview</h3><BarChart3 size={20} className="analytics-icon" /></div>
               <div className="analytics-stats-grid">
                 {[
-                  { val: analytics.analytics?.total_participants || 0,   label: "Total Participants" },
-                  { val: analytics.analytics?.total_submissions || 0,    label: "Total Submissions"  },
+                  { val: analytics.analytics?.total_participants   || 0, label: "Total Participants" },
+                  { val: analytics.analytics?.total_submissions    || 0, label: "Total Submissions"  },
                   { val: analytics.analytics?.approved_submissions || 0, label: "Approved"           },
-                  { val: analytics.analytics?.pending_submissions || 0,  label: "Pending"            },
-                  { val: analytics.analytics?.total_likes || 0,          label: "Total Likes"        },
-                  { val: analytics.analytics?.total_comments || 0,       label: "Total Comments"     },
-                ].map(({ val, label }) => (<div key={label} className="analytics-stat"><span className="stat-value">{val}</span><span className="stat-label">{label}</span></div>))}
+                  { val: analytics.analytics?.pending_submissions  || 0, label: "Pending"            },
+                  { val: analytics.analytics?.total_likes         || 0, label: "Total Likes"        },
+                  { val: analytics.analytics?.total_comments      || 0, label: "Total Comments"     },
+                ].map(({ val, label }) => (
+                  <div key={label} className="analytics-stat">
+                    <span className="stat-value">{val}</span>
+                    <span className="stat-label">{label}</span>
+                  </div>
+                ))}
               </div>
             </div>
             {analytics.analytics?.top_performers?.length > 0 && (
@@ -920,8 +1030,12 @@ useEffect(() => {
                     {analytics.analytics.top_performers.map((p, i) => (
                       <div key={p.user_id} className="top-performer-item">
                         <div className="performer-rank">{i + 1}</div>
-                        <img src={p.profile_image_url || "/default-avatar.png"} alt={p.username} className="performer-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
-                        <div className="performer-info"><span className="performer-name">{p.username}</span><span className="performer-stats">{p.likes_count} likes · {p.submissions_count} submissions</span></div>
+                        <img src={p.profile_image_url || "/default-avatar.png"} alt={p.username}
+                          className="performer-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
+                        <div className="performer-info">
+                          <span className="performer-name">{p.username}</span>
+                          <span className="performer-stats">{p.likes_count} likes · {p.submissions_count} submissions</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -930,11 +1044,16 @@ useEffect(() => {
                   <div className="analytics-card-header"><h3>Engagement Metrics</h3><TrendingUp size={18} className="analytics-icon" /></div>
                   <div className="engagement-metrics">
                     {[
-                      { label: "Avg Likes / Submission",    val: analytics.analytics?.engagement_metrics?.avg_likes_per_submission || 0 },
+                      { label: "Avg Likes / Submission",    val: analytics.analytics?.engagement_metrics?.avg_likes_per_submission    || 0 },
                       { label: "Avg Comments / Submission", val: analytics.analytics?.engagement_metrics?.avg_comments_per_submission || 0 },
                       { label: "Participation Rate",        val: `${analytics.engagement_metrics?.participation_rate || 0}%` },
-                      { label: "Completion Rate",           val: `${analytics.engagement_metrics?.completion_rate || 0}%` },
-                    ].map(({ label, val }) => (<div key={label} className="metric-item"><span className="metric-label">{label}</span><span className="metric-value">{val}</span></div>))}
+                      { label: "Completion Rate",           val: `${analytics.engagement_metrics?.completion_rate    || 0}%` },
+                    ].map(({ label, val }) => (
+                      <div key={label} className="metric-item">
+                        <span className="metric-label">{label}</span>
+                        <span className="metric-value">{val}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -945,8 +1064,7 @@ useEffect(() => {
 
       {/* ══ SUBMISSION DETAIL MODAL ══ */}
       {submissionDetailModal && selectedSubmission && (
-        <ModalShell title="Submission Review" onClose={() => setSubmissionDetailModal(false)} maxWidth="720px"
-          >
+        <ModalShell title="Submission Review" onClose={() => setSubmissionDetailModal(false)} maxWidth="720px">
           <div className="submission-detail">
             <div className="submission-detail-header">
               <img src={selectedSubmission.profile_image_url || "/default-avatar.png"} alt={selectedSubmission.username}
@@ -956,23 +1074,38 @@ useEffect(() => {
                 <p>by {selectedSubmission.username}</p>
                 <span className="submission-date">{new Date(selectedSubmission.submitted_at).toLocaleDateString()}</span>
               </div>
-              <span className={`submission-detail-status submission-status ${selectedSubmission.status}`}>{selectedSubmission.status}</span>
+              <span className={`submission-detail-status submission-status ${selectedSubmission.status}`}>
+                {selectedSubmission.status}
+              </span>
             </div>
             <div className="submission-detail-content">
-              {selectedSubmission.description && (<div className="detail-section"><h4>Description</h4><p>{selectedSubmission.description}</p></div>)}
+              {selectedSubmission.description && (
+                <div className="detail-section"><h4>Description</h4><p>{selectedSubmission.description}</p></div>
+              )}
               {selectedSubmission.video_url && (
-                <div className="detail-section"><h4>Submission Video</h4>
-                  <div className="video-container"><a href={selectedSubmission.video_url} target="_blank" rel="noopener noreferrer" className="video-link-large"><Play size={20} /> Watch Video</a></div>
+                <div className="detail-section">
+                  <h4>Submission Video</h4>
+                  <div className="video-container">
+                    <a href={selectedSubmission.video_url} target="_blank" rel="noopener noreferrer" className="video-link-large">
+                      <Play size={20} /> Watch Video
+                    </a>
+                  </div>
                 </div>
               )}
-              {selectedSubmission.admin_feedback && (<div className="detail-section"><h4>Admin Feedback</h4><div className="admin-feedback">{selectedSubmission.admin_feedback}</div></div>)}
+              {selectedSubmission.admin_feedback && (
+                <div className="detail-section">
+                  <h4>Admin Feedback</h4>
+                  <div className="admin-feedback">{selectedSubmission.admin_feedback}</div>
+                </div>
+              )}
               {selectedSubmission.comments?.length > 0 && (
                 <div className="detail-section">
                   <h4>Comments</h4>
                   <div className="comments-list">
                     {selectedSubmission.comments.map(comment => (
                       <div key={comment.id} className="comment-item">
-                        <img src={comment.profile_image_url || "/default-avatar.png"} alt={comment.username} className="comment-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
+                        <img src={comment.profile_image_url || "/default-avatar.png"} alt={comment.username}
+                          className="comment-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
                         <div className="comment-content">
                           <div className="comment-header">
                             <span className="comment-username">{comment.username}</span>
@@ -980,7 +1113,9 @@ useEffect(() => {
                           </div>
                           <p className="comment-text">{comment.content}</p>
                         </div>
-                        <button className="comment-delete-btn" onClick={() => handleDeleteComment(comment.id)}><Trash2 size={12} /></button>
+                        <button className="comment-delete-btn" onClick={() => handleDeleteComment(comment.id)}>
+                          <Trash2 size={12} />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -990,11 +1125,16 @@ useEffect(() => {
                 <div className="admin-actions">
                   <div className="feedback-input">
                     <label className="cp-form-label">Feedback (optional)</label>
-                    <textarea className="form-textarea" rows={3} placeholder="Add feedback for the creator..." value={feedbackText} onChange={e => setFeedbackText(e.target.value)} />
+                    <textarea className="form-textarea" rows={3} placeholder="Add feedback for the creator..."
+                      value={feedbackText} onChange={e => setFeedbackText(e.target.value)} />
                   </div>
                   <div className="action-buttons-group">
-                    <button className="approve-btn-large" onClick={() => handleApproveSubmission(selectedSubmission.id)}><CheckCircle size={16} /> Approve Submission</button>
-                    <button className="reject-btn-large"  onClick={() => handleRejectSubmission(selectedSubmission.id)}><XCircle size={16} /> Reject Submission</button>
+                    <button className="approve-btn-large" onClick={() => handleApproveSubmission(selectedSubmission.id)}>
+                      <CheckCircle size={16} /> Approve Submission
+                    </button>
+                    <button className="reject-btn-large" onClick={() => handleRejectSubmission(selectedSubmission.id)}>
+                      <XCircle size={16} /> Reject Submission
+                    </button>
                   </div>
                 </div>
               )}
@@ -1018,20 +1158,24 @@ useEffect(() => {
         const reasons         = c.flag_reasons || c.report_reasons || [];
 
         return (
-          <ModalShell title="Flagged Comment Review"
+          <ModalShell
+            title="Flagged Comment Review"
             onClose={() => { setFlaggedDetailModal(false); setSelectedFlaggedComment(null); }}
             maxWidth="600px"
             footer={
               <div className="flagged-detail-footer">
-                
-                <button className="reject-btn-large reject-btn-large--no-flex" onClick={() => handleDeleteFlaggedComment(commentId)}><Trash2 size={14} /> Delete Comment</button>
+                <button className="reject-btn-large reject-btn-large--no-flex"
+                  onClick={() => handleDeleteFlaggedComment(commentId)}>
+                  <Trash2 size={14} /> Delete Comment
+                </button>
               </div>
             }>
             <div className="fd-user-card">
-              <img src={avatar} alt={username} className="fd-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
+              <img src={avatar} alt={username} className="fd-avatar"
+                onError={e => { e.target.src = "/default-avatar.png"; }} />
               <div className="fd-user-info">
                 <div className="fd-username">{username}</div>
-                {email && <div className="fd-email">{email}</div>}
+                {email     && <div className="fd-email">{email}</div>}
                 {createdAt && <div className="fd-date">Commented: {new Date(createdAt).toLocaleString()}</div>}
               </div>
               <SeverityBadge count={flagCount} />
@@ -1062,10 +1206,15 @@ useEffect(() => {
 
             {reasons.length > 0 && (
               <div className="fd-section">
-                <div className="fd-section-label"><Flag size={13} className="fd-label-icon fd-label-icon--red" /> Report Reasons ({reasons.length})</div>
+                <div className="fd-section-label">
+                  <Flag size={13} className="fd-label-icon fd-label-icon--red" /> Report Reasons ({reasons.length})
+                </div>
                 <div className="fd-reasons-list">
                   {reasons.map((r, i) => (
-                    <div key={i} className="fd-reason-item"><Flag size={12} className="fd-reason-icon" /><span>{r.reason || r}</span></div>
+                    <div key={i} className="fd-reason-item">
+                      <Flag size={12} className="fd-reason-icon" />
+                      <span>{r.reason || r}</span>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -1073,13 +1222,15 @@ useEffect(() => {
           </ModalShell>
         );
       })()}
+
+      {/* ══ CONFIRM DIALOG ══ */}
       {confirmDialog.open && (
-  <ConfirmDialog
-    message={confirmDialog.message}
-    onConfirm={confirmDialog.onConfirm}
-    onClose={closeConfirm}
-  />
-)}
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onClose={closeConfirm}
+        />
+      )}
 
     </div>
   );

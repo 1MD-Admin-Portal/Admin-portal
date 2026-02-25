@@ -1,5 +1,14 @@
 /* Enhanced UI/UX CSS for DancersList - Challenge-Style Responsive */
 
+/* ── BADGE EMOJI IMAGE ── */
+.badge-emoji-img {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
 .dancers-main-container {
   padding: clamp(1.5rem, 3vw, 2rem);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,

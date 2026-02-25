@@ -29,6 +29,9 @@ const formatValueForDisplay = (value) => {
         value.level !== undefined && value.level !== null
           ? ` (Level ${value.level})`
           : "";
+      if (emoji && emoji.startsWith("http")) {
+        return <><img src={emoji} alt={value.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} /> {value.badge_name}{level}</>;
+      }
       return `${emoji} ${value.badge_name}${level}`;
     }
   }
@@ -652,7 +655,11 @@ const ProfessorsListPage = () => {
                                 >
                                   <div className="dancer-next-badge-header">
                                     <span className="dancer-next-badge-name">
-                                      {badge.badge_emoji} {badge.badge_name}
+                                      {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
+                                        <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                                      ) : (
+                                        badge.badge_emoji
+                                      )}{" "}{badge.badge_name}
                                     </span>
                                     <span className="dancer-next-badge-persona">
                                       Persona: {persona}

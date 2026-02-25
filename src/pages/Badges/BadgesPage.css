@@ -262,6 +262,15 @@
   font-size: 0.8rem;
 }
 
+/* ── BADGE EMOJI IMAGE ── */
+.badge-emoji-img {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1200px) {
   .badge-management-container { padding: 1.5rem; }
