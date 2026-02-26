@@ -501,14 +501,14 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         <div style={S.footer}>
-          <button onClick={onClose} disabled={loading}
+          {/* <button onClick={onClose} disabled={loading}
             style={{
               padding: "0.55rem 1.25rem", borderRadius: "8px", fontSize: "0.875rem",
               fontWeight: 600, cursor: "pointer", border: "1.5px solid #d1d5db",
               background: "white", color: "#374151", fontFamily: "inherit",
             }}>
             Cancel
-          </button>
+          </button> */}
           <button onClick={handleCreate} disabled={loading}
             style={{
               padding: "0.55rem 1.25rem", borderRadius: "8px", fontSize: "0.875rem",

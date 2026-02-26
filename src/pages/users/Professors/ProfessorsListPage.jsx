@@ -7,6 +7,7 @@ import {
   assignUserBadge,
 } from "../../../services/badge.service";
 import { maskEmail } from "../../../components/maskEmail";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 // 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
   if (value === null || value === undefined) return "N/A";
@@ -61,6 +62,7 @@ const renderProfessorInfoGrid = (items) => {
 
 const ProfessorsListPage = () => {
   const [professors, setProfessors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({});
   const [selectedProfessor, setSelectedProfessor] = useState(null);
@@ -87,9 +89,14 @@ const ProfessorsListPage = () => {
   }, [page]);
 
   const loadProfessors = async (pg) => {
-    const data = await fetchProfessors(pg);
-    setProfessors(data.users || []);
-    setPagination(data.pagination || {});
+    setLoading(true);
+    try {
+      const data = await fetchProfessors(pg);
+      setProfessors(data.users || []);
+      setPagination(data.pagination || {});
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadProfessorBadges = async (prof) => {
@@ -195,6 +202,8 @@ const ProfessorsListPage = () => {
     setBadgeDetails(null);
     setBadgeError(null);
   };
+
+  if (loading) return <GlobalLoader text="Loading professors..." />;
 
   return (
     <div className="dancers-main-container">

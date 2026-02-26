@@ -6,6 +6,7 @@ import {
   assignUserBadge,
 } from "../../../services/badge.service";
 import { maskEmail } from "../../../components/maskEmail";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 
 // 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
@@ -61,6 +62,7 @@ const renderDJInfoGrid = (items) => {
 
 const DJListPage = () => {
   const [djs, setDJs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);
@@ -83,9 +85,14 @@ const DJListPage = () => {
   }, [page]);
 
   const loadDJs = async (pageNum) => {
-    const data = await fetchDJs(pageNum);
-    setDJs(Array.isArray(data?.users) ? data.users : []);
-    setPagination(data?.pagination || {});
+    setLoading(true);
+    try {
+      const data = await fetchDJs(pageNum);
+      setDJs(Array.isArray(data?.users) ? data.users : []);
+      setPagination(data?.pagination || {});
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadDJBadges = async (user) => {
@@ -185,6 +192,8 @@ const DJListPage = () => {
     setBadgeDetails(null);
     setBadgeError(null);
   };
+
+  if (loading) return <GlobalLoader text="Loading DJs..." />;
 
   return (
     <div className="dancers-main-container">

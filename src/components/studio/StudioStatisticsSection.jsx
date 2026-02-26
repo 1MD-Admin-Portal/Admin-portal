@@ -98,7 +98,7 @@ const loadStatistics = async () => {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon">
-            <Building size={24} />
+            <Building size={40} />
           </div>
           <div className="stat-content">
             <p className="stat-label">Total Studios</p>
@@ -108,7 +108,7 @@ const loadStatistics = async () => {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: "rgba(46, 204, 113, 0.1)", color: "#27ae60" }}>
-            <TrendingUp size={24} />
+            <TrendingUp size={40} />
           </div>
           <div className="stat-content">
             <p className="stat-label">Active Studios</p>
@@ -120,7 +120,7 @@ const loadStatistics = async () => {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: "rgba(52, 152, 219, 0.1)", color: "#2980b9" }}>
-            <Users size={24} />
+            <Users size={40} />
           </div>
           <div className="stat-content">
             <p className="stat-label">Total Instructors</p>

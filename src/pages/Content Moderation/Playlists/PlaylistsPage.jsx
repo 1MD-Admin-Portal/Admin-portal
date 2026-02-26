@@ -181,7 +181,7 @@ const PlaylistsPage = () => {
       <div className="plmgmt-filter-wrapper">
         <div className="plmgmt-filter-controls">
           <div className="plmgmt-filter-item">
-            <Search size={18} />
+            {/* <Search size={18} /> */}
             <input
               type="text"
               placeholder="Search by title or DJ..."

@@ -146,7 +146,7 @@ const ConfirmDialog = ({ message, onConfirm, onClose }) => (
         </div>
       </div>
       <div className="modal-footer-custom">
-        <button className="btn-cancel" onClick={onClose}>Cancel</button>
+        {/* <button className="btn-cancel" onClick={onClose}>Cancel</button> */}
         <button
           className="reject-btn-large"
           style={{ flex: "none", minWidth: "auto" }}
@@ -696,7 +696,7 @@ const ChallengePage = () => {
         <ModalShell title="Create New Challenge" onClose={() => setCreateChallengeModal(false)} maxWidth="640px"
           footer={
             <>
-              <button className="btn-cancel" onClick={() => setCreateChallengeModal(false)}>Cancel</button>
+              {/* <button className="btn-cancel" onClick={() => setCreateChallengeModal(false)}>Cancel</button> */}
               <button className="btn-primary" onClick={handleCreateChallenge}>Create Challenge</button>
             </>
           }>
@@ -816,7 +816,7 @@ const ChallengePage = () => {
         <ModalShell title="Edit Challenge" onClose={() => setEditChallengeModal(false)} maxWidth="580px"
           footer={
             <>
-              <button className="btn-cancel" onClick={() => setEditChallengeModal(false)}>Cancel</button>
+              {/* <button className="btn-cancel" onClick={() => setEditChallengeModal(false)}>Cancel</button> */}
               <button className="btn-primary" onClick={handleUpdateChallenge}>Update Challenge</button>
             </>
           }>

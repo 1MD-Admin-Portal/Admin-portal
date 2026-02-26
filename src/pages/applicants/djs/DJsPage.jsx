@@ -14,7 +14,7 @@ const DJsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
-  const [showConfirm, setShowConfirm] = useState(null); // approve, reject, approve-selected, reject-selected
+  const [showConfirm, setShowConfirm] = useState(null);
   const [bulkRejectComment, setBulkRejectComment] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);

@@ -8,6 +8,7 @@ import {
 } from "../../../services/user.service";
 import "../Dancers/DancersList.css";
 import { maskEmail } from "../../../components/maskEmail";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 
 const DancersList = () => {
   const [dancers, setDancers] = useState([]);
@@ -19,6 +20,7 @@ const DancersList = () => {
   const [subscriptionFilter, setSubscriptionFilter] = useState("");
   const [skillLevelFilter, setSkillLevelFilter] = useState("");
 
+  const [loading, setLoading] = useState(true);
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
 
@@ -37,6 +39,7 @@ const DancersList = () => {
 
   useEffect(() => {
     const loadDancers = async () => {
+      setLoading(true);
       try {
         const data = await fetchUsers(page, 10);
         if (data && data.users) {
@@ -49,6 +52,8 @@ const DancersList = () => {
       } catch (error) {
         console.error("Error loading dancers:", error);
         setDancers([]);
+      } finally {
+        setLoading(false);
       }
     };
     loadDancers();
@@ -203,6 +208,8 @@ const DancersList = () => {
       setSavingBadge(false);
     }
   };
+
+  if (loading) return <GlobalLoader text="Loading dancers..." />;
 
   return (
     <div className="dancers-main-container">

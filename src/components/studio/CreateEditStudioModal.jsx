@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, Clock, Globe, Instagram, Facebook, Twitter, Youtube, Music2 } from "lucide-react";
+import { X, Clock, Globe, Instagram, Facebook, Twitter, Youtube, Music2, Upload } from "lucide-react";
 import "./CreateEditStudioModal.css";
 import {
   getCountries,
   getCitiesByCountry,
   getDanceStyles,
-  getStatesByCountryName,
 } from "../../services/masterData.service";
+import { uploadMediaFile } from "../../services/upload.service";
 
 
 const DAYS_OF_WEEK = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -105,8 +105,7 @@ const serializeSocial = (links) => {
 };
 
 // ─── Operating Hours Component ────────────────────────────────────────────────
-// Purely presentational: receives hours object, calls onChange with updated object.
-// No internal state, no useEffect, no JSON serialization — zero sync issues.
+
 
 const OperatingHoursField = ({ hours, onChange }) => {
   const update = (day, field, val) =>
@@ -238,22 +237,39 @@ const danceStylesRef = useRef(null);
 
 const [countryOpen, setCountryOpen] = useState(false);
 const [cityOpen, setCityOpen] = useState(false);
-const [stateOpen, setStateOpen] = useState(false);
 
 const [countryQuery, setCountryQuery] = useState("");
 const [cityQuery, setCityQuery] = useState("");
-const [stateQuery, setStateQuery] = useState("");
 
 const countryRef = useRef(null);
 const cityRef = useRef(null);
-const stateRef = useRef(null);
-
-const [stateOptions, setStateOptions] = useState([]);
 
   // Structured state — no JSON string intermediary
   const [hours, setHours] = useState(buildDefaultHours);
   const [socialLinks, setSocialLinks] = useState(buildDefaultSocial);
   const [errors, setErrors] = useState({});
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoFileRef = useRef(null);
+
+  const handleLogoFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoUploading(true);
+    try {
+      const url = await uploadMediaFile(file);
+      if (url) {
+        setFormData(prev => ({ ...prev, logo_url: url }));
+      } else {
+        alert("Upload succeeded but no URL was returned.");
+      }
+    } catch (err) {
+      console.error("Logo upload failed", err);
+      alert("Failed to upload logo. Please try again or paste a URL.");
+    } finally {
+      setLogoUploading(false);
+      if (logoFileRef.current) logoFileRef.current.value = "";
+    }
+  };
 
   useEffect(() => {
   if (!isOpen) return;
@@ -291,31 +307,6 @@ useEffect(() => {
 }, [formData.country_id]);
 
 useEffect(() => {
-  if (!formData.country_id || countries.length === 0) {
-    setStateOptions([]);
-    return;
-  }
-
-  const selectedCountry = countries.find(c => c.id == formData.country_id);
-  if (!selectedCountry?.name) {
-    setStateOptions([]);
-    return;
-  }
-
-  const loadStates = async () => {
-    try {
-      const res = await getStatesByCountryName(selectedCountry.name);
-      setStateOptions(res);
-    } catch (e) {
-      console.error("State load failed", e);
-      setStateOptions([]);
-    }
-  };
-
-  loadStates();
-}, [formData.country_id, countries]);
-
-useEffect(() => {
   if (!danceStylesOpen) return;
 
   const onDocMouseDown = (e) => {
@@ -332,7 +323,6 @@ useEffect(() => {
   const handler = (e) => {
     if (!countryRef.current?.contains(e.target)) setCountryOpen(false);
     if (!cityRef.current?.contains(e.target)) setCityOpen(false);
-    if (!stateRef.current?.contains(e.target)) setStateOpen(false);
   };
   document.addEventListener("mousedown", handler);
   return () => document.removeEventListener("mousedown", handler);
@@ -428,8 +418,8 @@ useEffect(() => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Studio name is required";
     if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.city_id) newErrors.city = "City is required";
-if (!formData.country_id) newErrors.country = "Country is required";
+    if (!studio && !formData.city_id) newErrors.city = "City is required";
+    if (!studio && !formData.country_id) newErrors.country = "Country is required";
 
     if (!formData.latitude || isNaN(formData.latitude)) newErrors.latitude = "Valid latitude is required";
     if (!formData.longitude || isNaN(formData.longitude)) newErrors.longitude = "Valid longitude is required";
@@ -516,7 +506,7 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="city">City <span className="required">*</span></label>
+                  <label htmlFor="city">City {!studio && <span className="required">*</span>}</label>
                   <div className="search-select" ref={cityRef}>
   <button
     type="button"
@@ -570,59 +560,19 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
                 </div>
                 <div className="form-group">
                   <label htmlFor="state">State</label>
-                  <div className="search-select" ref={stateRef}>
-  <button
-    type="button"
-    className="search-select-trigger"
-    disabled={!formData.country_id}
-    onClick={() => setStateOpen(v => !v)}
-  >
-    {formData.state || "Select State"}
-    <span>▾</span>
-  </button>
-
-  {stateOpen && (
-    <div className="search-select-dropdown">
-      <input
-        type="text"
-        placeholder="Search state..."
-        value={stateQuery}
-        onChange={(e) => setStateQuery(e.target.value)}
-        className="search-select-input"
-        autoFocus
-      />
-
-      <div className="search-select-list">
-        {stateOptions
-          .filter(s =>
-            s.name.toLowerCase().includes(stateQuery.toLowerCase())
-          )
-          .map(s => (
-            <div
-              key={s.state_code || s.name}
-              className="search-select-item"
-              onClick={() => {
-                setFormData(prev => ({
-                  ...prev,
-                  state: s.name
-                }));
-                setStateOpen(false);
-                setStateQuery("");
-              }}
-            >
-              {s.name}
-            </div>
-          ))}
-      </div>
-    </div>
-  )}
-</div>
-
+                  <input
+                    type="text"
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    placeholder="Enter state"
+                  />
                 </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="country">Country <span className="required">*</span></label>
+                  <label htmlFor="country">Country {!studio && <span className="required">*</span>}</label>
                   <div className="search-select" ref={countryRef}>
   <button
     type="button"
@@ -719,10 +669,33 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
                 <input type="url" id="website" name="website" value={formData.website}
                   onChange={handleChange} placeholder="https://example.com" />
               </div>
-              <div className="form-group">
-                <label htmlFor="logo_url">Logo URL</label>
-                <input type="url" id="logo_url" name="logo_url" value={formData.logo_url}
-                  onChange={handleChange} placeholder="https://example.com/logo.png" />
+              <div className="form-group logo-upload-group">
+                <label htmlFor="logo_url">Studio Logo</label>
+                <div className="logo-input-row">
+                  <input type="url" id="logo_url" name="logo_url" value={formData.logo_url}
+                    onChange={handleChange} placeholder="Paste URL or upload a file" className="logo-url-input" />
+                  <input
+                    type="file"
+                    ref={logoFileRef}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleLogoFileUpload}
+                  />
+                  <button
+                    type="button"
+                    className="logo-upload-btn"
+                    disabled={logoUploading}
+                    onClick={() => logoFileRef.current?.click()}
+                  >
+                    <Upload size={16} />
+                    {logoUploading ? "Uploading…" : "Upload"}
+                  </button>
+                </div>
+                {formData.logo_url && (
+                  <div className="logo-preview">
+                    <img src={formData.logo_url} alt="Logo preview" onError={(e) => e.target.style.display = 'none'} />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -893,7 +866,7 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
           </div>
 
           <div className="studio-modal-footer">
-            <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>Cancel</button>
+            {/* <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>Cancel</button> */}
             <button type="submit" className={`btn-submit ${loading ? "loading" : ""}`} disabled={loading}>
               {loading ? "" : studio ? "Update Studio" : "Create Studio"}
             </button>

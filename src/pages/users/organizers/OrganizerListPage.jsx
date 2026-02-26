@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { fetchOrganizers } from "../../../services/organizer.service";
 import "../Dancers/DancersList.css"; // Import the dancer CSS for organizer styling
 import { maskEmail } from "../../../components/maskEmail";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 const OrganizerListPage = () => {
   const [organizers, setOrganizers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);
@@ -13,6 +15,7 @@ const OrganizerListPage = () => {
   }, [page]);
 
   const loadOrganizers = async (pageNum) => {
+    setLoading(true);
     try {
       const data = await fetchOrganizers(pageNum);
       console.log("Fetched data:", data);
@@ -24,6 +27,8 @@ const OrganizerListPage = () => {
       console.error("Failed to load organizers:", error);
       setOrganizers([]); // fallback to empty list
       setPagination({});
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,6 +45,8 @@ const OrganizerListPage = () => {
       </div>
     );
   };
+
+  if (loading) return <GlobalLoader text="Loading organizers..." />;
 
   return (
     <div className="dancers-main-container">

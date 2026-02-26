@@ -233,6 +233,58 @@
 .form-group textarea.error:focus,
 .form-group select.error:focus { box-shadow: none; }
 
+/* ── Logo upload group ──────────────────────────── */
+.logo-upload-group {
+  margin-bottom: 20px;
+}
+
+.logo-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.logo-input-row .logo-url-input {
+  flex: 1;
+}
+
+.logo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #8E5CF6, #6C3FD1);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.logo-upload-btn:hover {
+  opacity: 0.88;
+}
+
+.logo-upload-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.logo-preview {
+  margin-top: 10px;
+}
+
+.logo-preview img {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  object-fit: cover;
+}
+
 .error-message {
   font-size: 12px;
   color: #ff4d4f;

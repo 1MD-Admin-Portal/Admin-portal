@@ -45,7 +45,7 @@ const StudioManagementPage = () => {
       const response = await getStudios(pageNum, searchQuery);
       setStudios(Array.isArray(response?.studios) ? response.studios : []);
       const paginationData = response?.pagination || { total_pages: 1, current_page: 1 };
-      console.log("Pagination data:", paginationData);
+      
       setPagination(paginationData);
     } catch (err) {
       console.error("Error loading studios:", err);

@@ -205,6 +205,22 @@
   padding: 14px 16px;
 }
 
+/* ── Studio name cell with logo ──────────── */
+.studio-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.studio-thumbnail {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
 .studios-table tbody tr:hover {
   background: rgba(142, 92, 246, 0.05);
 }
