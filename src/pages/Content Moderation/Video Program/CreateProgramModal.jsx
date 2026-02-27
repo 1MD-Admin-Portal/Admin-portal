@@ -263,8 +263,6 @@ const Field = ({ label, style, children }) => (
 
 // ─── Main Modal ───────────────────────────────────────────────────────────────
 const CreateProgramModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-
   const [title,        setTitle]        = useState("");
   const [description,  setDescription]  = useState("");
   const [danceStyles,  setDanceStyles]  = useState([]);
@@ -280,6 +278,7 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
   const [instructors,       setInstructors]       = useState([]);
 
   useEffect(() => {
+    if (!isOpen) return;
     (async () => {
       try {
         const [stylesRes, profRes] = await Promise.all([getDanceStyles(), fetchProfessors()]);
@@ -287,7 +286,7 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
         setInstructors(Array.isArray(profRes?.users) ? profRes.users : []);
       } catch (err) { console.error("Failed to load modal data:", err); }
     })();
-  }, []);
+  }, [isOpen]);
 
   const handleVideoChange = (i, field, val) => {
     const u = [...videos]; u[i][field] = val; setVideos(u);
@@ -296,6 +295,10 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
   const removeVideo = (i) => setVideos(videos.filter((_, idx) => idx !== i));
 
   const handleCreate = async () => {
+    if (!danceStyles.length) {
+      alert("Please select at least one dance style.");
+      return;
+    }
     try {
       setLoading(true);
       let imageUrl = "";
@@ -309,7 +312,7 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
         uploadedVideos.push({ title: v.title, duration: v.duration, description: v.description, video_url: url });
       }
       await createProgramService({
-        title, description, overview, dance_styles: danceStyles, dance_level: danceLevel,
+        title, description, overview, dance_style: danceStyles[0], dance_level: danceLevel,
         pricing_type: pricingType, price: pricingType === "paid" ? price : 0,
         instructor_id: instructorId ? parseInt(instructorId, 10) : null,
         videos: uploadedVideos, image_url: imageUrl,
@@ -317,13 +320,15 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
       alert("Program created successfully!");
       onClose();
     } catch (err) {
-      console.error(err?.response?.data || err);
-      alert("Failed to create program.");
+      const msg = err?.response?.data?.error || err?.response?.data?.message || "Failed to create program.";
+      alert(msg);
     } finally { setLoading(false); }
   };
 
   const inputFocus = (e) => { e.target.style.borderColor = "#ec4899"; e.target.style.background = "white"; e.target.style.boxShadow = "0 0 0 3px rgba(236,72,153,0.1)"; };
   const inputBlur  = (e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; };
+
+  if (!isOpen) return null;
 
   return (
     <div style={S.overlay} onClick={onClose}>

@@ -42,7 +42,7 @@ const VideoPrograms = () => {
     try {
       setLoading(true);
       const res = await getProgramsService();
-      console.log("Loaded programs response:", res);
+      
       if (Array.isArray(res)) {
         setPrograms(res);
       } else if (res && Array.isArray(res.programs)) {
@@ -64,7 +64,7 @@ const VideoPrograms = () => {
         pagination.page,
         pagination.limit
       );
-      console.log("Loaded pending programs response:", res);
+      
       setPendingPrograms(res.programs || []);
       setPagination((prev) => ({
         ...prev,
@@ -82,7 +82,7 @@ const VideoPrograms = () => {
     try {
       setLoading(true);
       const result = await approveProgramService(programId, adminNotes);
-      console.log("Program approved:", result);
+      
 
       // Refresh the pending programs list
       await loadPendingPrograms();
@@ -106,7 +106,7 @@ const VideoPrograms = () => {
     try {
       setLoading(true);
       const result = await rejectProgramService(programId, rejectionReason);
-      console.log("Program rejected:", result);
+      
 
       // Refresh the pending programs list
       await loadPendingPrograms();
@@ -235,9 +235,7 @@ const VideoPrograms = () => {
       await handleRejectProgram(selectedProgram.program_id, reason);
     } else {
       // Handle other actions (Delete, Retire, Pause) as before
-      console.log(
-        `${action} program ${selectedProgram.title} for reason: ${reason}`
-      );
+      
       setSelectedProgram(null);
       setAction(null);
       setReason("");

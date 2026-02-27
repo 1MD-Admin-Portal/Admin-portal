@@ -324,10 +324,19 @@ const ProfessorsPage = () => {
             <p><strong>Availability:</strong> {formatField(selectedApp.availability)}</p>
             <p><strong>Experience:</strong> {selectedApp.experience}</p>
             <p><strong>Document Type:</strong> {selectedApp.document_type}</p>
-            <p><strong>Document:</strong>{" "}
-              {selectedApp.document_url
-                ? <a href={selectedApp.document_url} target="_blank" rel="noopener noreferrer">View</a>
-                : "No document"}
+            <p>
+              <strong>Document:</strong>{" "}
+              {selectedApp.document_url ? (
+                <a
+                  href={selectedApp.document_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View
+                </a>
+              ) : (
+                "No document"
+              )}
             </p>
             <p><strong>Status:</strong> {selectedApp.status}</p>
             <p><strong>Comment:</strong> {selectedApp.comment || "-"}</p>

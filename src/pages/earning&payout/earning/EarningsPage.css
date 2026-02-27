@@ -423,26 +423,23 @@
 }
 
 .earnings-mgmt-view-btn {
-  background: linear-gradient(135deg, #4F7CF7 0%, #8E5CF6 50%, #E84D9B 100%);
+  
   border: none;
   border-radius: 10px;
   padding: 8px 12px;
-  color: white;
+  
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   font-weight: 600;
   font-size: 12px;
-  box-shadow: 0 4px 12px rgba(142, 92, 246, 0.25);
+  
 }
 
-.earnings-mgmt-view-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(142, 92, 246, 0.35);
-}
+
 
 .earnings-mgmt-view-btn:active {
   transform: translateY(0);

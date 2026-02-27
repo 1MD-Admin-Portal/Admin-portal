@@ -226,16 +226,16 @@ const StudioManagementPage = () => {
             </thead>
             <tbody>
               {filteredStudios.map((studio) => (
-                <tr key={studio.id} className="studio-row">
-                  <td className="studio-name">
+                <tr key={studio.id} className="studio-row" style={{ cursor: "pointer" }} >
+                  <td className="studio-name" onClick={() => handleViewDetails(studio)}>
                     {studio.logo_url && (
                       <img src={studio.logo_url} alt={studio.name} className="studio-thumbnail" />
                     )}
                     <span>{studio.name}</span>
                   </td>
-                  <td>{studio.city || "N/A"}</td>
-                  <td>{studio.country || "N/A"}</td>
-                  <td>{studio.capacity || "N/A"}</td>
+                  <td onClick={() => handleViewDetails(studio)}>{studio.city || "N/A"}</td>
+                  <td onClick={() => handleViewDetails(studio)}>{studio.country || "N/A"}</td>
+                  <td onClick={() => handleViewDetails(studio)}>{studio.capacity || "N/A"}</td>
                   <td>{studio.established_year || "N/A"}</td>
                   <td>
                     <span className={`status-badge status-${studio.status}`}>
@@ -247,7 +247,7 @@ const StudioManagementPage = () => {
 
     <button
       className="action-icon-btn"
-      onClick={() => handleViewDetails(studio)}
+      onClick={(e) => { e.stopPropagation(); handleViewDetails(studio); }}
       title="View"
     >
       <Eye size={16} />
@@ -255,7 +255,7 @@ const StudioManagementPage = () => {
 
     <button
       className="action-icon-btn"
-      onClick={() => handleEditClick(studio)}
+      onClick={(e) => { e.stopPropagation(); handleEditClick(studio); }}
       title="Edit"
     >
       <Edit2 size={16} />
@@ -263,7 +263,7 @@ const StudioManagementPage = () => {
 
     <button
       className="action-icon-btn delete"
-      onClick={() => handleDeleteClick(studio)}
+      onClick={(e) => { e.stopPropagation(); handleDeleteClick(studio); }}
       title="Delete"
     >
       <Trash2 size={16} />

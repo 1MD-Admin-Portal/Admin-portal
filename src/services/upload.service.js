@@ -15,8 +15,6 @@ export const uploadMediaFile = async (file) => {
       },
     });
 
-    console.log("✅ Upload response:", response.data);
-
     // ✅ use fileURL returned by backend
     return response.data?.uploadResponse?.fileURL || null;
   } catch (error) {

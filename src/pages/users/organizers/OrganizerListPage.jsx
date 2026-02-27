@@ -419,12 +419,12 @@ const OrganizerListPage = () => {
 
             {/* Modal Footer */}
             <div className="dancer-modal-footer">
-              <button
+              {/* <button
                 className="dancer-modal-close-btn"
                 onClick={() => setSelectedUser(null)}
               >
                 Close
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

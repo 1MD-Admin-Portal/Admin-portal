@@ -270,8 +270,7 @@
 .icon-actions {
   display: flex;
   gap: 10px;
-  align-items: center;
-  justify-content: center;
+  
 }
 
 .action-icon {
@@ -953,6 +952,24 @@
   background: #f8fafc;
   border-color: rgba(142, 92, 246, 0.3);
   color: #4f7cf7;
+}
+.btn-approve {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  color: white;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+  min-height: 40px;
+}
+
+.btn-approve:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(192, 57, 43, 0.4);
 }
 
 .btn-reject {

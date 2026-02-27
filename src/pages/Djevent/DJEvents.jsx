@@ -29,6 +29,7 @@ const DjEvents = () => {
   const [pagination, setPagination] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showApproveModal,setShowApproveModal]= useState(false);
   const [rejectNotes, setRejectNotes] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
@@ -40,7 +41,7 @@ const DjEvents = () => {
     } else if (activeTab === "statistics") {
       fetchStatistics();
     }
-  }, [filters, activeTab]);
+  }, [filters.status, filters.playlist_type, filters.page, filters.limit, activeTab]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -49,7 +50,7 @@ const DjEvents = () => {
       const data = await getAllDjEvents(
         filters.status,
         filters.playlist_type,
-        filters.search,
+        "",
         filters.page,
         filters.limit
       );
@@ -57,6 +58,7 @@ const DjEvents = () => {
       setPagination(data.pagination || {});
     } catch (err) {
       setError("Failed to fetch DJ events");
+      setEvents([]);
       console.error(err);
     } finally {
       setLoading(false);
@@ -72,6 +74,7 @@ const DjEvents = () => {
       setPagination(data.pagination || {});
     } catch (err) {
       setError("Failed to fetch pending DJ events");
+      setEvents([]);
       console.error(err);
     } finally {
       setLoading(false);
@@ -121,6 +124,13 @@ const DjEvents = () => {
         setLoading(false);
       }
     }
+  };
+
+  //mera
+  const handleApproveClick = (event, e) => {
+    e.stopPropagation();
+    setSelectedEvent({ event });
+    setShowApproveModal(true);
   };
 
   const handleApprove = async (eventId, e) => {
@@ -215,6 +225,17 @@ const DjEvents = () => {
     setShowModal(false);
     setSelectedEvent(null);
   };
+
+  const filteredEvents = events.filter((event) => {
+    if (!filters.search) return true;
+    const q = filters.search.toLowerCase();
+    return (
+      (event.event_title || "").toLowerCase().includes(q) ||
+      (event.dj_name || "").toLowerCase().includes(q) ||
+      (event.music_genre || "").toLowerCase().includes(q) ||
+      (event.event_type || "").toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="dj-events-container">
@@ -388,7 +409,7 @@ const DjEvents = () => {
                 </tr>
               </thead>
               <tbody>
-                {events.map((event) => (
+                {filteredEvents.map((event) => (
                   <tr
                     key={event.id}
                     onClick={() => handleViewDetails(event)}
@@ -431,7 +452,7 @@ const DjEvents = () => {
                       <div className="icon-actions">
                         <CheckCircle
                           className={`action-icon ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => event.status === "pending_approval" && handleApprove(event.id, e)}
+                          onClick={(e) => event.status === "pending_approval" && handleApproveClick(event.id, e)}
                           title={event.status === "pending_approval" ? "Approve" : "Already processed"}
                         />
                         <XCircle
@@ -581,6 +602,44 @@ const DjEvents = () => {
                     </table>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/*Approve Modal*/}
+      {showApproveModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowApproveModal(false)}
+        >
+          <div
+            className="modal-content small"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>Approve Event</h2>
+              <button
+                onClick={() => setShowApproveModal(false)}
+                className="close-btn"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to approve this event?</p>
+              <div className="modal-actions">
+                <button
+                  onClick={() => setShowApproveModal(false)}
+                  className="btn-cancel"
+                >
+                  Cancel
+                </button>
+                <button onClick={handleApprove} className="btn-approve">
+                  Approve Event
+                </button>
               </div>
             </div>
           </div>
