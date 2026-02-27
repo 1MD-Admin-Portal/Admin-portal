@@ -1000,7 +1000,7 @@
 .submission-date           { font-size: 0.7rem !important; color: #9ca3af !important; }
 .submission-detail-status  { padding: 0.15rem 0.55rem !important; border-radius: 2rem !important; font-size: 0.6rem !important; font-weight: 700 !important; text-transform: uppercase !important; flex-shrink: 0 !important; }
 .submission-detail-content { display: flex !important; flex-direction: column !important; gap: 0.875rem !important; }
-.detail-section h4         { font-size: 0.875rem !important; font-weight: 700 !important; color: var(--dark) !important; margin: 0 0 0.5rem 0 !important; }
+.detail-section h4         { font-size: 0.875rem !important; font-weight: 700 !important; color: var(--dark) !important; margin:0 0.5rem 0 !important; }
 .detail-section p          { font-size: 0.825rem !important; color: var(--muted) !important; line-height: 1.6 !important; margin: 0 !important; }
 .video-container           { display: flex !important; }
 .video-link-large          { display: inline-flex !important; align-items: center !important; gap: 0.4rem !important; padding: 0.575rem 1.125rem !important; background: var(--grad) !important; color: #fff !important; text-decoration: none !important; border-radius: 0.5rem !important; font-size: 0.85rem !important; font-weight: 600 !important; box-shadow: var(--shadow-accent) !important; }

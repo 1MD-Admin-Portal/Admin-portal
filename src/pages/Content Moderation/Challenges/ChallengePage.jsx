@@ -275,7 +275,7 @@ const ChallengePage = () => {
   };
 
   const openSubmissionDetail = async (submission) => {
-    try { const r = await getSubmissionDetailsService(submission.id); setSelectedSubmission(r || submission); setSubmissionDetailModal(true); }
+    try { const r = await getSubmissionDetailsService(submission.id); setSelectedSubmission(r?.submission || r?.data || r || submission); setSubmissionDetailModal(true); }
     catch { setError("Failed to fetch submission details"); }
   };
 
@@ -910,9 +910,9 @@ const ChallengePage = () => {
                           <span className="task-title">{task.task_title}</span>
                         </div>
                         {task.video_url && (
-                          <a href={task.video_url} target="_blank" rel="noopener noreferrer" className="task-video-link">
-                            <Play size={13} /> Watch Video
-                          </a>
+                          <div className="video-container" style={{ marginTop: "0.5rem" }}>
+                            <video key={task.video_url} src={task.video_url} controls preload="metadata" controlsList="nodownload" onEnded={e => e.target.pause()} style={{ width: "100%", borderRadius: "8px" }} />
+                          </div>
                         )}
                       </div>
                     ))}
@@ -1067,12 +1067,12 @@ const ChallengePage = () => {
         <ModalShell title="Submission Review" onClose={() => setSubmissionDetailModal(false)} maxWidth="720px">
           <div className="submission-detail">
             <div className="submission-detail-header">
-              <img src={selectedSubmission.profile_image_url || "/default-avatar.png"} alt={selectedSubmission.username}
+              <img src={selectedSubmission.profile_image_url || selectedSubmission.avatar || selectedSubmission.user?.profile_image_url || "/default-avatar.png"} alt={selectedSubmission.username || selectedSubmission.user_name || selectedSubmission.user?.username || "User"}
                 className="submission-detail-avatar" onError={e => { e.target.src = "/default-avatar.png"; }} />
               <div className="submission-detail-info">
-                <h3>{selectedSubmission.title}</h3>
-                <p>by {selectedSubmission.username}</p>
-                <span className="submission-date">{new Date(selectedSubmission.submitted_at).toLocaleDateString()}</span>
+                <h3>{selectedSubmission.title || selectedSubmission.challenge_title || "Untitled Submission"}</h3>
+                <p>by {selectedSubmission.username || selectedSubmission.user_name || selectedSubmission.user?.username || selectedSubmission.user?.name || "Unknown User"}</p>
+                <span className="submission-date">{selectedSubmission.submitted_at || selectedSubmission.created_at || selectedSubmission.createdAt ? new Date(selectedSubmission.submitted_at || selectedSubmission.created_at || selectedSubmission.createdAt).toLocaleDateString() : ""}</span>
               </div>
               <span className={`submission-detail-status submission-status ${selectedSubmission.status}`}>
                 {selectedSubmission.status}
@@ -1086,9 +1086,7 @@ const ChallengePage = () => {
                 <div className="detail-section">
                   <h4>Submission Video</h4>
                   <div className="video-container">
-                    <a href={selectedSubmission.video_url} target="_blank" rel="noopener noreferrer" className="video-link-large">
-                      <Play size={20} /> Watch Video
-                    </a>
+                    <video key={selectedSubmission.video_url} src={selectedSubmission.video_url} controls preload="metadata" controlsList="nodownload" onEnded={e => e.target.pause()} style={{ width: "100%", borderRadius: "8px" }} />
                   </div>
                 </div>
               )}
@@ -1123,11 +1121,11 @@ const ChallengePage = () => {
               )}
               {selectedSubmission.status === "pending" && (
                 <div className="admin-actions">
-                  <div className="feedback-input">
+                  {/* <div className="feedback-input">
                     <label className="cp-form-label">Feedback (optional)</label>
                     <textarea className="form-textarea" rows={3} placeholder="Add feedback for the creator..."
                       value={feedbackText} onChange={e => setFeedbackText(e.target.value)} />
-                  </div>
+                  </div> */}
                   <div className="action-buttons-group">
                     <button className="approve-btn-large" onClick={() => handleApproveSubmission(selectedSubmission.id)}>
                       <CheckCircle size={16} /> Approve Submission
