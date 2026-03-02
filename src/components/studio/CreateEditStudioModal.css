@@ -168,7 +168,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  min-height: 72px;
+  
 }
 
 .form-row {
@@ -239,6 +239,8 @@
   margin-top: 6px;
   font-weight: 500;
   display: block;
+   background: none;   
+  padding: 0;
 }
 
 .studio-modal-footer {

@@ -18,7 +18,7 @@ const ProfessorsPage = () => {
   const [selectedApp, setSelectedApp] = useState(null);
   const modalRef = useRef(null);
   const selectAllRef = useRef(null);
-  const [showConfirm, setShowConfirm] = useState(null); // "approve-all", "reject-all", "approve-selected", "reject-selected"
+  const [showConfirm, setShowConfirm] = useState(null);
 
   const pendingApps = applications.filter((a) => a.status === "pending");
 
@@ -199,8 +199,8 @@ const ProfessorsPage = () => {
       <h1 className="professors-title">Instructor Applications</h1>
 
       {/* Action bar */}
-      {/* <div className="bulk-actions-bar">
-        {selectedIds.length === 0 ? (
+      <div className="bulk-actions-bar">
+        
           <>
             <button
               className="bulk-approve-btn"
@@ -215,23 +215,8 @@ const ProfessorsPage = () => {
               ❌ Reject All ({pendingApps.length})
             </button>
           </>
-        ) : (
-          <>
-            <button
-              className="bulk-approve-btn"
-              onClick={() => setShowConfirm("approve-selected")}
-            >
-              ✅ Approve Selected ({selectedIds.length})
-            </button>
-            <button
-              className="bulk-reject-btn"
-              onClick={() => setShowConfirm("reject-selected")}
-            >
-              ❌ Reject Selected ({selectedIds.length})
-            </button>
-          </>
-        )}
-      </div> */}
+        
+      </div>
 
       <table className="professors-table">
         <thead>

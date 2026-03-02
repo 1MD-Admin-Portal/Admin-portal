@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   Play,
   Eye,
@@ -71,6 +70,39 @@ const ChallengePage = () => {
   const [participantsModal, setParticipantsModal] = useState(false);
   const [analyticsModal, setAnalyticsModal] = useState(false);
   const [submissionDetailModal, setSubmissionDetailModal] = useState(false);
+
+  // Disable background scroll when any modal is open
+  useEffect(() => {
+    const modalOpen =
+      challengeDetailsModal ||
+      createChallengeModal ||
+      editChallengeModal ||
+      submissionsModal ||
+      participantsModal ||
+      analyticsModal ||
+      submissionDetailModal;
+
+    if (modalOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [
+    challengeDetailsModal,
+    createChallengeModal,
+    editChallengeModal,
+    submissionsModal,
+    participantsModal,
+    analyticsModal,
+    submissionDetailModal,
+  ]);
 
   // Data states
   const [submissions, setSubmissions] = useState([]);
@@ -411,7 +443,7 @@ const ChallengePage = () => {
         <style>{`
           @media (min-width: 992px) {
             .challenge-wrapper {
-              margin-left: 280px !important;
+              margin-left: 255px !important;
               padding-left: 15px !important;
             }
           }
@@ -500,18 +532,18 @@ const ChallengePage = () => {
 
 
         <div className="challenge-content">
-          <div className="text-center mb-4 mb-md-5">
-            <h1 className="text-dark fw-bold display-6 display-md-4 mb-2">
+          <div className=" mb-4">
+            <h1 className="challenge">
               Challenge Management
             </h1>
-            <p className="text-secondary fs-6 fs-md-5">
+            {/* <p className="text-secondary fs-6 fs-md-5">
               Manage challenges, submissions, and participants
-            </p>
+            </p> */}
           </div>
           {/* Tab Navigation */}
-          <div className="card mb-4 bg-transparent border-light">
-            <div className="card-body p-2">
-              <ul className="nav nav-pills justify-content-center flex-column flex-sm-row">
+          <div className=" mb-4  ">
+            <div className="card-body p-2 plmgmt-tab-controls">
+              <ul className="nav nav-pills flex-column flex-sm-row">
                 {[
                   { id: "challenges", label: "Challenges", icon: Award },
                   {
@@ -555,7 +587,7 @@ const ChallengePage = () => {
                         />
                         <input
                           type="text"
-                          className="form-control ps-5"
+                          className="form-controls ps-5"
                           placeholder="Search challenges..."
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
@@ -589,15 +621,19 @@ const ChallengePage = () => {
               </div>
 
               {loading ? (
-                <GlobalLoader text="Loading challenges..." />
+                <div className="d-flex justify-content-center py-5">
+                  <div className="spinner-border text-light" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
               ) : (
                 <>
                   {/* Challenges Grid */}
                   {filteredChallenges.length > 0 ? (
                     <>
-                      <div className="alert alert-info">
+                      {/* <div className="alert alert-info">
                         Total Challenges: {challenges.length} | Filtered: {filteredChallenges.length}
-                      </div>
+                      </div> */}
                       <div className="row g-3 g-md-4 mb-4">
                         {filteredChallenges.map((challenge) => (
                           <div
@@ -890,8 +926,10 @@ const ChallengePage = () => {
           {/* Create Challenge Modal */}
           {createChallengeModal && (
             <div
-              className="modal fade show d-block modal-center"
+              className="custom-modal-overlay show d-block"
               tabIndex="-1"
+              role="dialog"
+              aria-modal="true"
             >
               <div className="modal-dialog modal-lg">
                 <div className="modal-content">
@@ -1239,9 +1277,10 @@ const ChallengePage = () => {
           {/* Edit Challenge Modal */}
           {editChallengeModal && (
             <div
-              className="modal fade show d-block"
+              className="custom-modal-overlay show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              role="dialog"
+              aria-modal="true"
             >
               <div className="modal-dialog">
                 <div className="modal-content">
@@ -1404,9 +1443,10 @@ const ChallengePage = () => {
           {/* Challenge Details Modal */}
           {challengeDetailsModal && selectedChallenge && (
             <div
-              className="modal fade show d-block"
+              className="custom-modal-overlay show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              role="dialog"
+              aria-modal="true"
             >
               <div className="modal-dialog modal-lg">
                 <div className="modal-content">
@@ -1571,14 +1611,14 @@ const ChallengePage = () => {
                     </div>
                   </div>
 
-                  <div className="modal-footer">
+                  {/* <div className="modal-footer">
                     <button
                       onClick={() => setChallengeDetailsModal(false)}
                       className="btn btn-secondary"
                     >
                       Close
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -1589,9 +1629,10 @@ const ChallengePage = () => {
           {" "}
           {submissionsModal && selectedChallenge && (
             <div
-              className="modal fade show d-block"
+              className="custom-modal-overlay show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              role="dialog"
+              aria-modal="true"
             >
               <div className="modal-dialog modal-xl">
                 <div className="modal-content">
@@ -1729,14 +1770,14 @@ const ChallengePage = () => {
                     )}
                   </div>
 
-                  <div className="modal-footer">
+                  {/* <div className="modal-footer">
                     <button
                       onClick={() => setSubmissionsModal(false)}
                       className="btn btn-secondary"
                     >
                       Close
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -1744,9 +1785,10 @@ const ChallengePage = () => {
           {/* Participants Modal */}
           {participantsModal && selectedChallenge && (
             <div
-              className="modal fade show d-block"
+              className="custom-modal-overlay show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              role="dialog"
+              aria-modal="true"
             >
               <div className="modal-dialog modal-lg">
                 <div className="modal-content">
@@ -1772,10 +1814,10 @@ const ChallengePage = () => {
                         {participants.map((participant) => (
                           <div
                             key={participant.user_id}
-                            className="list-group-item"
+                            className="list-group-item participant-item"
                           >
-                            <div className="d-flex justify-content-between align-items-center">
-                              <div className="d-flex align-items-center">
+                            <div className="d-flex justify-content-between align-items-center participant-row">
+                              <div className="d-flex align-items-center participant-info">
                                 <img
                                   src={
                                     participant.profile_image_url ||
@@ -1805,26 +1847,17 @@ const ChallengePage = () => {
                                 </div>
                               </div>
 
-                              <div className="d-flex align-items-center">
-                                <div className="me-3 text-end">
+                              <div className="participant-meta d-flex align-items-center">
+                                <div className="participant-stats me-3 text-end">
                                   <div className="d-flex align-items-center">
-                                    <Upload
-                                      size={14}
-                                      className="me-1 text-muted"
-                                    />
+                                    <Upload size={14} className="me-1 text-muted" />
                                     <small>
-                                      {participant.submissions_count || 0}{" "}
-                                      submissions
+                                      {participant.submissions_count || 0} submissions
                                     </small>
                                   </div>
                                   <div className="d-flex align-items-center">
-                                    <ThumbsUp
-                                      size={14}
-                                      className="me-1 text-muted"
-                                    />
-                                    <small>
-                                      {participant.likes_received || 0} likes
-                                    </small>
+                                    <ThumbsUp size={14} className="me-1 text-muted" />
+                                    <small>{participant.likes_received || 0} likes</small>
                                   </div>
                                 </div>
                                 <button
@@ -1834,7 +1867,7 @@ const ChallengePage = () => {
                                       participant.user_id
                                     )
                                   }
-                                  className="btn btn-sm btn-outline-danger"
+                                  className="btn btn-sm btn-outline-danger remove-btn"
                                 >
                                   <UserMinus size={14} className="me-1" />
                                   Remove
@@ -1847,14 +1880,14 @@ const ChallengePage = () => {
                     )}
                   </div>
 
-                  <div className="modal-footer">
+                  {/* <div className="modal-footer">
                     <button
                       onClick={() => setParticipantsModal(false)}
                       className="btn btn-secondary"
                     >
                       Close
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -1862,9 +1895,10 @@ const ChallengePage = () => {
           {/* Analytics Modal */}
           {analyticsModal && selectedChallenge && analytics && (
             <div
-              className="modal fade show d-block"
+              className="custom-modal-overlay show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              role="dialog"
+              aria-modal="true"
             >
               <div className="modal-dialog modal-xl">
                 <div className="modal-content">
