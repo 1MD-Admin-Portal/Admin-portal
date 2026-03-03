@@ -96,7 +96,7 @@ export const rejectDjEvent = async (eventId, admin_notes = "") => {
 
     return res.data;
   } catch (error) {
-    console.error("Error rejecting DJ event:", error);
+    console.error("Error rejecting DJ event:", error?.response?.data || error);
     throw error;
   }
 };

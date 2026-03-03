@@ -32,6 +32,12 @@ const DjEvents = () => {
   const [showApproveModal,setShowApproveModal]= useState(false);
   const [rejectNotes, setRejectNotes] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
+  };
 
   useEffect(() => {
     if (activeTab === "all") {
@@ -133,22 +139,18 @@ const DjEvents = () => {
     setShowApproveModal(true);
   };
 
-  const handleApprove = async (eventId, e) => {
-    e.stopPropagation();
-    if (!window.confirm("Are you sure you want to approve this event?")) {
-      return;
-    }
-
+  const handleApprove = async () => {
     try {
-      await approveDjEvent(eventId);
-      alert("Event approved successfully!");
+      await approveDjEvent(selectedEvent.event);
+      setShowApproveModal(false);
+      showToast("Event approved successfully!", "success");
       if (activeTab === "all") {
         fetchEvents();
       } else {
         fetchPendingEvents();
       }
     } catch (err) {
-      alert("Failed to approve event");
+      showToast("Failed to approve event", "error");
       console.error(err);
     }
   };
@@ -161,11 +163,15 @@ const DjEvents = () => {
 
   const handleReject = async () => {
     if (!selectedEvent) return;
+    if (!rejectNotes.trim()) {
+      showToast("Please enter a reason for rejection.", "error");
+      return;
+    }
 
     try {
       await rejectDjEvent(selectedEvent.event.id, rejectNotes);
-      alert("Event rejected successfully!");
       setShowRejectModal(false);
+      showToast("Event rejected successfully!", "success");
       setShowModal(false);
       setRejectNotes("");
       if (activeTab === "all") {
@@ -174,7 +180,7 @@ const DjEvents = () => {
         fetchPendingEvents();
       }
     } catch (err) {
-      alert("Failed to reject event");
+      showToast("Failed to reject event", "error");
       console.error(err);
     }
   };
@@ -452,12 +458,12 @@ const DjEvents = () => {
                       <div className="icon-actions">
                         <CheckCircle
                           className={`action-icon ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => event.status === "pending_approval" && handleApproveClick(event.id, e)}
+                          onClick={(e) => { e.stopPropagation(); if (event.status === "pending_approval") handleApproveClick(event.id, e); }}
                           title={event.status === "pending_approval" ? "Approve" : "Already processed"}
                         />
                         <XCircle
                           className={`action-icon reject ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => event.status === "pending_approval" && handleRejectClick(event, e)}
+                          onClick={(e) => { e.stopPropagation(); if (event.status === "pending_approval") handleRejectClick(event, e); }}
                           title={event.status === "pending_approval" ? "Reject" : "Already processed"}
                         />
                       </div>
@@ -687,6 +693,21 @@ const DjEvents = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`toast-notification ${toast.type}`}>
+          <span className="toast-icon">
+            {toast.type === "success" ? "✓" : "✕"}
+          </span>
+          <span className="toast-message">{toast.message}</span>
+          <button
+            className="toast-close"
+            onClick={() => setToast({ show: false, message: "", type: "success" })}
+          >
+            ×
+          </button>
         </div>
       )}
     </div>
