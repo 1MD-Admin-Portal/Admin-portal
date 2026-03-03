@@ -6,7 +6,7 @@ const ResetProfessorPasswordModal = ({ professor, onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSendLink = () => {
-    console.log(`Reset link sent to ${professor.email}`);
+    
     onClose();
   };
 
@@ -15,7 +15,7 @@ const ResetProfessorPasswordModal = ({ professor, onClose }) => {
       alert("Passwords don't match");
       return;
     }
-    console.log('New Password:', password);
+    
     onClose();
   };
 

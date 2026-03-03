@@ -87,7 +87,7 @@ export const uploadNotificationImageService = async (file) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log("Upload response:", response.data);
+    
     return response.data.url; // adjust if your backend returns differently
   } catch (error) {
     console.error("Image upload error:", error?.response?.data || error);

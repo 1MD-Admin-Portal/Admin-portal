@@ -101,11 +101,7 @@ export const approveClassService = async (id, adminNotes = "") => {
 // rejectClassService.js
 export const rejectClassService = async (id) => {
   const body = { rejection_reason: "Rejected by admin" }; // ✅ confirmed correct
-  console.log(
-    "📤 Sending reject request:",
-    CONSTANTS.URL.CLASS_REJECT(id),
-    body
-  );
+  
 
   try {
     const response = await api.put(CONSTANTS.URL.CLASS_REJECT(id), body, {

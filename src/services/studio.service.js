@@ -62,7 +62,6 @@ export const getStudioById = async (studioId) => {
  */
 export const createStudio = async (studioData) => {
   try {
-    console.log("Creating studio with data:", JSON.stringify(studioData, null, 2));
     const res = await axios.post(
       `${BASE_URL}${CONSTANTS.URL.STUDIOS.CREATE}`,
       studioData,
@@ -86,7 +85,7 @@ export const createStudio = async (studioData) => {
  */
 export const updateStudio = async (studioId, studioData) => {
   try {
-    console.log("Updating studio with data:", JSON.stringify(studioData, null, 2));
+    
     const res = await axios.put(
       `${BASE_URL}${CONSTANTS.URL.STUDIOS.UPDATE(studioId)}`,
       studioData,

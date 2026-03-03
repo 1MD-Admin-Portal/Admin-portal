@@ -13,7 +13,7 @@ const BadgesPage = () => {
       setLoading(true);
       try {
         const data = await getAllBadgesService();
-        console.log("🔹 All badges raw response:", data);
+        
 
         let list = [];
 

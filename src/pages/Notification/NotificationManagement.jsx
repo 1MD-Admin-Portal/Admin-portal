@@ -193,7 +193,7 @@ const NotificationManagement = () => {
         : [];
     }
 
-    console.log("📤 Final Payload sending:", submitData);
+    
 
     try {
       await createNotificationService(submitData);

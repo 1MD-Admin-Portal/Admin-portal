@@ -18,7 +18,7 @@ const OrganizerListPage = () => {
     setLoading(true);
     try {
       const data = await fetchOrganizers(pageNum);
-      console.log("Fetched data:", data);
+      
 
       // ✅ Safe defaults in case API response is malformed or fails
       setOrganizers(Array.isArray(data?.users) ? data.users : []);

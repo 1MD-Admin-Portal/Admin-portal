@@ -72,7 +72,7 @@ export const assignUserBadge = async ({
     payload.custom_commission_rate = Number(custom_commission_rate);
   }
 
-  console.log("🔹 Assign badge payload:", payload);
+  
 
   try {
     const res = await axios.post(url, payload, {

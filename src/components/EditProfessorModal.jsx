@@ -5,7 +5,7 @@ const EditProfessorModal = ({ professor, onClose }) => {
   const [email, setEmail] = useState(professor.email);
 
   const handleSubmit = () => {
-    console.log('Updated Professor:', { name, email });
+    
     onClose();
   };
 

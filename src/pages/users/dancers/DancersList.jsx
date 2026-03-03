@@ -43,8 +43,7 @@ const DancersList = () => {
       try {
         const data = await fetchUsers(page, 10);
         if (data && data.users) {
-          console.log("Fetched users:", data.users);
-          console.log("Pagination info:", data.pagination);
+          
           setDancers(data.users);
           setPagination(data.pagination || { page, totalPages: 1 });
           window.scrollTo(0, 0);

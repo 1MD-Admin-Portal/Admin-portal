@@ -25,7 +25,7 @@ const AddPlanModal = ({ onClose }) => {
       yearly: yearlyPrice ? parseFloat(yearlyPrice) : undefined,
       features: features.filter((f) => f.trim() !== ""),
     };
-    console.log("New Plan Submitted:", newPlan);
+    
     onClose(); // Close modal after submit
   };
 

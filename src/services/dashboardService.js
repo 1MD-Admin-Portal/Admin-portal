@@ -26,7 +26,7 @@ export const getDashboardMetrics = async (filters = {}) => {
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
 
-    console.log("API Endpoint:", endpoint); // Debug log to see the actual URL being called
+    
 
     const res = await axios.get(endpoint, {
       headers: {
@@ -35,7 +35,7 @@ export const getDashboardMetrics = async (filters = {}) => {
       },
     });
 
-    console.log("API Response:", res.data); // Debug log to see the response
+    
 
     // Return the response data directly since your API returns the expected format
     return {
