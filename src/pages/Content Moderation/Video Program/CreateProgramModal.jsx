@@ -299,6 +299,10 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
       alert("Please select at least one dance style.");
       return;
     }
+    if (!videos.some(v => v.title && v.file)) {
+      alert("Please add at least one video with a title and file.");
+      return;
+    }
     try {
       setLoading(true);
       let imageUrl = "";
@@ -309,14 +313,27 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
       for (const [i, v] of videos.entries()) {
         let url = v.video_url || "";
         if (v.file) { try { url = (await uploadMediaFile(v.file)) || ""; } catch (e) { console.error(e); } }
-        uploadedVideos.push({ title: v.title, duration: v.duration, description: v.description, video_url: url });
+        uploadedVideos.push({ title: v.title, duration: v.duration, video_url: url });
       }
-      await createProgramService({
-        title, description, overview, dance_style: danceStyles[0], dance_level: danceLevel,
-        pricing_type: pricingType, price: pricingType === "paid" ? price : 0,
+      
+      const payload = {
+        title, 
+        description, 
+        overview, 
+        dance_style: danceStyles[0],
+        dance_level: danceLevel,
+        pricing_type: pricingType,
         instructor_id: instructorId ? parseInt(instructorId, 10) : null,
-        videos: uploadedVideos, image_url: imageUrl,
-      });
+        videos: uploadedVideos, 
+        image_url: imageUrl,
+      };
+      
+      // Only include price if it's a paid program
+      if (pricingType === "paid") {
+        payload.price = price;
+      }
+      
+      await createProgramService(payload);
       alert("Program created successfully!");
       onClose();
     } catch (err) {

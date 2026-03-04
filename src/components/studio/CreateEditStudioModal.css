@@ -608,6 +608,16 @@
   box-shadow: 0 0 0 3px rgba(142, 92, 246, 0.15);
 }
 
+.social-url-input.social-url-invalid {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.social-url-input.social-url-invalid:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
 .social-clear-btn {
   width: 28px;
   height: 28px;

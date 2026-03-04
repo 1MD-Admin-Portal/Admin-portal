@@ -100,8 +100,19 @@ const parseSocialFromRaw = (raw) => {
 
 const serializeSocial = (links) => {
   const out = {};
-  Object.entries(links).forEach(([k, v]) => { if (v && v.trim()) out[k] = v.trim(); });
+  Object.entries(links).forEach(([k, v]) => { 
+    if (v && v.trim() && isValidUrl(v.trim())) out[k] = v.trim(); 
+  });
   return Object.keys(out).length > 0 ? out : null;
+};
+
+const isValidUrl = (string) => {
+  try {
+    const url = new URL(string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    return false;
+  }
 };
 
 // ─── Operating Hours Component ────────────────────────────────────────────────
@@ -180,6 +191,9 @@ const SocialMediaField = ({ links, onChange }) => {
     <div className="social-builder">
       {SOCIAL_PLATFORMS.map(platform => {
         const Icon = platform.icon;
+        const value = links[platform.key] || "";
+        const isValid = !value || isValidUrl(value);
+        
         return (
           <div key={platform.key} className="social-row">
             <div className="social-icon-wrap" style={{ "--platform-color": platform.color }}>
@@ -188,12 +202,13 @@ const SocialMediaField = ({ links, onChange }) => {
             <span className="social-platform-label">{platform.label}</span>
             <input
               type="url"
-              className="social-url-input"
-              value={links[platform.key] || ""}
+              className={`social-url-input ${value && !isValid ? "social-url-invalid" : ""}`}
+              value={value}
               onChange={e => update(platform.key, e.target.value)}
               placeholder={platform.placeholder}
+              title={value && !isValid ? "Invalid URL format" : ""}
             />
-            {links[platform.key] && (
+            {value && (
               <button
                 type="button"
                 className="social-clear-btn"
@@ -436,6 +451,19 @@ useEffect(() => {
   
   const newErrors = validateForm();
   if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+
+  // Check for invalid social media URLs
+  const invalidSocialLinks = Object.entries(socialLinks).filter(
+    ([_, url]) => url && url.trim() && !isValidUrl(url.trim())
+  );
+  
+  if (invalidSocialLinks.length > 0) {
+    const invalidPlatforms = invalidSocialLinks.map(([key, _]) => 
+      SOCIAL_PLATFORMS.find(p => p.key === key)?.label || key
+    ).join(", ");
+    alert(`Invalid URLs for: ${invalidPlatforms}. Please fix these or remove them.`);
+    return;
+  }
 
  const selectedCountry = countries.find(c => c.id == formData.country_id);
 const selectedCity = cities.find(c => c.id == formData.city_id);
