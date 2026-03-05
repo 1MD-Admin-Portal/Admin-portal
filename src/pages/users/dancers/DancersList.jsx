@@ -193,7 +193,16 @@ const DancersList = () => {
           "Exceptional performance and contribution to platform",
       });
 
+      // Reload badge details
       await loadUserBadges(selectedDancer);
+
+      // Update dancers list to refresh current_badges and badge_summary
+      const updatedDancersData = await fetchUsers(page, 10);
+      const updatedDancers = Array.isArray(updatedDancersData?.users) ? updatedDancersData.users : [];
+      const updatedDancer = updatedDancers.find(d => d.id === selectedDancer.id);
+      if (updatedDancer) {
+        setSelectedDancer(updatedDancer);
+      }
     } catch (err) {
       console.error("Error assigning badge:", err);
       const backendMsg =

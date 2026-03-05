@@ -173,7 +173,16 @@ const DJListPage = () => {
         reason: badgeForm.reason || "Badge updated for DJ via admin dashboard",
       });
 
+      // Reload badge details
       await loadDJBadges(selectedUser);
+
+      // Update DJs list to refresh current_badges and badge_summary
+      const updatedDJData = await fetchDJs(page);
+      const updatedDJs = Array.isArray(updatedDJData?.users) ? updatedDJData.users : [];
+      const updatedUser = updatedDJs.find(dj => dj.id === selectedUser.id);
+      if (updatedUser) {
+        setSelectedUser(updatedUser);
+      }
     } catch (err) {
       console.error("Error assigning badge:", err);
       const backendMsg =

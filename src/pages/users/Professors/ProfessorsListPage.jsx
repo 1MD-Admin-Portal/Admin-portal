@@ -181,7 +181,16 @@ const ProfessorsListPage = () => {
           "Badge updated for instructor via admin dashboard",
       });
 
+      // Reload badge details
       await loadProfessorBadges(selectedProfessor);
+
+      // Update professors list to refresh current_badges and badge_summary
+      const updatedProfessorsData = await fetchProfessors(page);
+      const updatedProfessors = Array.isArray(updatedProfessorsData?.users) ? updatedProfessorsData.users : [];
+      const updatedProfessor = updatedProfessors.find(prof => prof.id === selectedProfessor.id);
+      if (updatedProfessor) {
+        setSelectedProfessor(updatedProfessor);
+      }
     } catch (err) {
       console.error("Error assigning badge:", err);
       const backendMsg =
