@@ -236,28 +236,28 @@ const PendingPayouts = () => {
           <div className="stat-card">
             <div className="stat-content">
               <div className="stat-icon total-pending">€</div>
-              <div className="stat-info">
+              {/* <div className="stat-info"> */}
                 <p className="stat-label">Total Pending</p>
                 <p className="stat-value">{formatCurrency(payouts.reduce((s, p) => s + p.amount, 0))}</p>
-              </div>
+              {/* </div> */}
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-content">
               <div className="stat-icon pending-requests">⏰</div>
-              <div className="stat-info">
+              {/* <div className="stat-info"> */}
                 <p className="stat-label">Pending Requests</p>
                 <p className="stat-value">{pagination.total}</p>
-              </div>
+              {/* </div> */}
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-content">
               <div className="stat-icon unique-users">👤</div>
-              <div className="stat-info">
+              {/* <div className="stat-info"> */}
                 <p className="stat-label">Unique Users</p>
                 <p className="stat-value">{new Set(payouts.map((p) => p.user.id)).size}</p>
-              </div>
+              {/* </div> */}
             </div>
           </div>
         </div>

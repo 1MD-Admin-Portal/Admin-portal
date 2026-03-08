@@ -1087,6 +1087,60 @@
   background: linear-gradient(135deg, #4a6cf5, #7c3aed, #db2777);
 }
 
+/* ── PAGINATION ── */
+.mktplace-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--mktplace-border);
+}
+
+.mktplace-pagination-info {
+  font-size: 0.875rem;
+  color: var(--mktplace-text);
+  font-weight: 500;
+}
+
+.mktplace-pagination-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mktplace-pagination-btn {
+  background: var(--mktplace-white);
+  color: var(--mktplace-blue);
+  border: 2px solid var(--mktplace-blue);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mktplace-pagination-btn:hover:not(:disabled) {
+  background: var(--mktplace-blue);
+  color: var(--mktplace-white);
+  box-shadow: 0 4px 12px rgba(91,124,250,0.3);
+  transform: translateY(-2px);
+}
+
+.mktplace-pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.mktplace-pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--mktplace-border);
+  color: var(--mktplace-muted);
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .mktplace-main-wrapper {

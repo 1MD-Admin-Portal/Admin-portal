@@ -26,6 +26,24 @@ const MarketplacePage = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Pagination state for main data
+  const [programPagination, setProgramPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+  const [eventPagination, setEventPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
@@ -36,6 +54,14 @@ const MarketplacePage = () => {
   const [purchases, setPurchases] = useState([]);
   const [stats, setStats] = useState({});
   const [loadingPurchases, setLoadingPurchases] = useState(false);
+  const [purchasePagination, setPurchasePagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
   // Event details modal
   const [showEventModal, setShowEventModal] = useState(false);
@@ -47,11 +73,23 @@ const MarketplacePage = () => {
       setLoading(true);
       try {
         if (filter === "Program") {
-          const res = await getMarketplacePrograms(1, 20);
+          const res = await getMarketplacePrograms(
+            programPagination.page,
+            programPagination.limit
+          );
           setPrograms(res.programs || []);
+          if (res.pagination) {
+            setProgramPagination(res.pagination);
+          }
         } else if (filter === "Event") {
-          const res = await getPublishedEvents(1, 20);
+          const res = await getPublishedEvents(
+            eventPagination.page,
+            eventPagination.limit
+          );
           setEvents(res.events || []);
+          if (res.pagination) {
+            setEventPagination(res.pagination);
+          }
         }
       } catch (err) {
         console.error("❌ Error loading marketplace:", err);
@@ -60,7 +98,7 @@ const MarketplacePage = () => {
       }
     };
     fetchData();
-  }, [filter]);
+  }, [filter, programPagination.page, eventPagination.page]);
 
   // Filter + search
   const filteredData =
@@ -77,14 +115,48 @@ const MarketplacePage = () => {
     setSelectedProgram(program);
     setShowDetails(true);
     setLoadingPurchases(true);
+    setPurchasePagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
     try {
       const res = await getProgramPurchases(program.program_id, 1, 20);
       setPurchases(res.purchases || []);
       setStats(res.statistics || {});
+      if (res.pagination) {
+        setPurchasePagination(res.pagination);
+      }
     } catch (err) {
       console.error("❌ Error fetching purchases:", err);
     } finally {
       setLoadingPurchases(false);
+    }
+  };
+
+  // Fetch purchases on page change
+  const handlePurchasePageChange = async (newPage) => {
+    if (!selectedProgram) return;
+    setLoadingPurchases(true);
+    try {
+      const res = await getProgramPurchases(
+        selectedProgram.program_id,
+        newPage,
+        purchasePagination.limit
+      );
+      setPurchases(res.purchases || []);
+      if (res.pagination) {
+        setPurchasePagination(res.pagination);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching purchases:", err);
+    } finally {
+      setLoadingPurchases(false);
+    }
+  };
+
+  // Handle main data pagination
+  const handleMainPaginationChange = (newPage) => {
+    if (filter === "Program") {
+      setProgramPagination((prev) => ({ ...prev, page: newPage }));
+    } else {
+      setEventPagination((prev) => ({ ...prev, page: newPage }));
     }
   };
 
@@ -117,7 +189,15 @@ const MarketplacePage = () => {
               className={`mktplace-filter-option ${
                 filter === item ? "selected" : ""
               }`}
-              onClick={() => setFilter(item)}
+              onClick={() => {
+                setFilter(item);
+                // Reset pagination when switching filter
+                if (item === "Program") {
+                  setProgramPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
+                } else {
+                  setEventPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
+                }
+              }}
             >
               {item === "Program" ? (
                 <ShoppingBag size={16} />
@@ -151,89 +231,148 @@ const MarketplacePage = () => {
           </span>
         </div>
       ) : (
-        <div className="mktplace-data-table-wrapper">
-          <table className="mktplace-data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name / Title</th>
-                <th>Instructor / Organizer</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Type</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((item, index) => (
-                <tr key={index} className="mktplace-data-row">
-                  <td className="mktplace-id-column">
-                    #{filter === "Program" ? item.program_id : item.event_id}
-                  </td>
-                  <td
-                    className="mktplace-title-column clickable-title"
-                    onClick={() =>
-                      filter === "Program"
-                        ? openProgramDetails(item)
-                        : (setSelectedEvent(item), setShowEventModal(true))
-                    }
-                  >
-                    <div className="mktplace-title-wrapper">
-                      <span className="mktplace-title-text">
-                        {filter === "Program" ? item.title : item.event_title}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="mktplace-instructor-column">
-                    <div className="mktplace-instructor-data">
-                      <User size={14} />
-                      {filter === "Program"
-                        ? item.instructor_name
-                        : item.organizer?.name}
-                    </div>
-                  </td>
-                  <td className="mktplace-price-column">
-                    <div className="mktplace-price-display">
-                      <Euro size={14} />
-                      {filter === "Program" ? item.price : item.price || "Free"}
-                    </div>
-                  </td>
-                  <td className="mktplace-status-column">
-                    <span
-                      className={`mktplace-status-indicator ${
-                        filter === "Program"
-                          ? "approved"
-                          : item.status?.toLowerCase()
-                      }`}
-                    >
-                      {filter === "Program" ? "Approved" : item.status}
-                    </span>
-                  </td>
-                  <td className="mktplace-type-column">
-                    <span
-                      className={`mktplace-type-indicator type-${filter.toLowerCase()}`}
-                    >
-                      {filter}
-                    </span>
-                  </td>
-                  <td className="mktplace-actions-column">
-                    <button
-                      className="action-button"
+        <>
+          <div className="mktplace-data-table-wrapper">
+            <table className="mktplace-data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name / Title</th>
+                  <th>Instructor / Organizer</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Type</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredData.map((item, index) => (
+                  <tr key={index} className="mktplace-data-row">
+                    <td className="mktplace-id-column">
+                      #{filter === "Program" ? item.program_id : item.event_id}
+                    </td>
+                    <td
+                      className="mktplace-title-column clickable-title"
                       onClick={() =>
                         filter === "Program"
                           ? openProgramDetails(item)
                           : (setSelectedEvent(item), setShowEventModal(true))
                       }
                     >
-                        <Eye size={16} />
-                      {/* <TrendingUp size={14} /> */}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <div className="mktplace-title-wrapper">
+                        <span className="mktplace-title-text">
+                          {filter === "Program" ? item.title : item.event_title}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="mktplace-instructor-column">
+                      <div className="mktplace-instructor-data">
+                        <User size={14} />
+                        {filter === "Program"
+                          ? item.instructor_name
+                          : item.organizer?.name}
+                      </div>
+                    </td>
+                    <td className="mktplace-price-column">
+                      <div className="mktplace-price-display">
+                        <Euro size={14} />
+                        {filter === "Program" ? item.price : item.price || "Free"}
+                      </div>
+                    </td>
+                    <td className="mktplace-status-column">
+                      <span
+                        className={`mktplace-status-indicator ${
+                          filter === "Program"
+                            ? "approved"
+                            : item.status?.toLowerCase()
+                        }`}
+                      >
+                        {filter === "Program" ? "Approved" : item.status}
+                      </span>
+                    </td>
+                    <td className="mktplace-type-column">
+                      <span
+                        className={`mktplace-type-indicator type-${filter.toLowerCase()}`}
+                      >
+                        {filter}
+                      </span>
+                    </td>
+                    <td className="mktplace-actions-column">
+                      <button
+                        className="action-button"
+                        onClick={() =>
+                          filter === "Program"
+                            ? openProgramDetails(item)
+                            : (setSelectedEvent(item), setShowEventModal(true))
+                        }
+                      >
+                          <Eye size={16} />
+                        {/* <TrendingUp size={14} /> */}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="mktplace-pagination-container">
+            <div className="mktplace-pagination-info">
+              <span>
+                Page{" "}
+                {filter === "Program"
+                  ? programPagination.page
+                  : eventPagination.page}{" "}
+                of{" "}
+                {filter === "Program"
+                  ? programPagination.totalPages
+                  : eventPagination.totalPages}{" "}
+                | Total:{" "}
+                {filter === "Program"
+                  ? programPagination.total
+                  : eventPagination.total}{" "}
+                {filter.toLowerCase()}s
+              </span>
+            </div>
+            <div className="mktplace-pagination-controls">
+              <button
+                className="mktplace-pagination-btn"
+                onClick={() =>
+                  handleMainPaginationChange(
+                    (filter === "Program"
+                      ? programPagination.page
+                      : eventPagination.page) - 1
+                  )
+                }
+                disabled={
+                  filter === "Program"
+                    ? !programPagination.hasPreviousPage
+                    : !eventPagination.hasPreviousPage
+                }
+              >
+                ← Previous
+              </button>
+              <button
+                className="mktplace-pagination-btn"
+                onClick={() =>
+                  handleMainPaginationChange(
+                    (filter === "Program"
+                      ? programPagination.page
+                      : eventPagination.page) + 1
+                  )
+                }
+                disabled={
+                  filter === "Program"
+                    ? !programPagination.hasNextPage
+                    : !eventPagination.hasNextPage
+                }
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Create Listing Modal */}
@@ -584,6 +723,41 @@ const MarketplacePage = () => {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+
+                    {/* Purchase Pagination Controls */}
+                    <div className="mktplace-pagination-container">
+                      <div className="mktplace-pagination-info">
+                        <span>
+                          Page {purchasePagination.page} of{" "}
+                          {purchasePagination.totalPages} | Total:{" "}
+                          {purchasePagination.total} purchases
+                        </span>
+                      </div>
+                      <div className="mktplace-pagination-controls">
+                        <button
+                          className="mktplace-pagination-btn"
+                          onClick={() =>
+                            handlePurchasePageChange(
+                              purchasePagination.page - 1
+                            )
+                          }
+                          disabled={!purchasePagination.hasPreviousPage}
+                        >
+                          ← Previous
+                        </button>
+                        <button
+                          className="mktplace-pagination-btn"
+                          onClick={() =>
+                            handlePurchasePageChange(
+                              purchasePagination.page + 1
+                            )
+                          }
+                          disabled={!purchasePagination.hasNextPage}
+                        >
+                          Next →
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </>
