@@ -182,7 +182,7 @@ const VideoPrograms = () => {
       return (
         <div className="program-actions">
           <button
-            className="action-btn success-btn"
+            className="success-btn"
             onClick={() => setAction("Approve")}
             disabled={loading}
           >
@@ -190,7 +190,7 @@ const VideoPrograms = () => {
             Approve
           </button>
           <button
-            className="action-btn danger-btn"
+            className="danger-btn"
             onClick={() => setAction("Reject")}
             disabled={loading}
           >
@@ -205,19 +205,19 @@ const VideoPrograms = () => {
     return (
       <div className="program-actions">
         <button
-          className="action-btn danger-btn"
+          className="danger-btn"
           onClick={() => setAction("Delete")}
         >
           Delete
         </button>
         <button
-          className="action-btn warning-btn"
+          className="warning-btn"
           onClick={() => setAction("Retire")}
         >
           Retire
         </button>
         <button
-          className="action-btn pause-btn"
+          className="pause-btn"
           onClick={() => setAction("Pause")}
         >
           Pause
