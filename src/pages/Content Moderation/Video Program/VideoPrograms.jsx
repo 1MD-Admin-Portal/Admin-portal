@@ -23,6 +23,8 @@ const VideoPrograms = () => {
   const [action, setAction] = useState(null);
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoLoading, setVideoLoading] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -458,6 +460,7 @@ const VideoPrograms = () => {
             setSelectedProgram(null);
             setAction(null);
             setReason("");
+            setSelectedVideo(null);
           }}
         >
           <div
@@ -472,6 +475,7 @@ const VideoPrograms = () => {
                   setSelectedProgram(null);
                   setAction(null);
                   setReason("");
+                  setSelectedVideo(null);
                 }}
               >
                 <X />
@@ -555,24 +559,58 @@ const VideoPrograms = () => {
 
               <div className="popup-section">
                 <h3 className="section-title">Videos</h3>
-                <div className="videos-list">
-                  {selectedProgram.videos?.map((video) => (
-                    <div key={video.id} className="video-item">
-                      <div className="video-info">
-                        <div className="video-title">{video.title}</div>
-                        <div className="video-duration">{video.duration}s</div>
-                      </div>
-                      <a
-                        href={video.video_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="watch-link"
+                {selectedVideo ? (
+                  <div className="video-player-section">
+                    <div className="video-player-container">
+                      {videoLoading && (
+                        <div className="video-loading-overlay">
+                          <div className="video-loading-spinner"></div>
+                          <p className="video-loading-text">Loading video...</p>
+                        </div>
+                      )}
+                      <video
+                        width="100%"
+                        height="400"
+                        controls
+                        controlsList="nodownload"
+                        preload="metadata"
+                        poster={selectedProgram.image_url || "https://via.placeholder.com/800x450?text=Loading"}
+                        src={selectedVideo.video_url}
+                        onLoadStart={() => setVideoLoading(true)}
+                        onCanPlay={() => setVideoLoading(false)}
                       >
-                        Watch Video
-                      </a>
+                        Your browser does not support the video tag.
+                      </video>
                     </div>
-                  ))}
-                </div>
+                    <div className="video-player-info">
+                      <h4 className="video-player-title">{selectedVideo.title}</h4>
+                      <p className="video-player-duration">Duration: {selectedVideo.duration}s</p>
+                      <button
+                        className="close-video-btn"
+                        onClick={() => setSelectedVideo(null)}
+                      >
+                        Close Video
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="videos-list">
+                    {selectedProgram.videos?.map((video) => (
+                      <div key={video.id} className="video-item">
+                        <div className="video-info">
+                          <div className="video-title">{video.title}</div>
+                          <div className="video-duration">{video.duration}s</div>
+                        </div>
+                        <button
+                          className="watch-link"
+                          onClick={() => setSelectedVideo(video)}
+                        >
+                          Watch Video
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {renderActionButtons()}

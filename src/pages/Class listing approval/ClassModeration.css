@@ -383,26 +383,20 @@
 }
 
 .class-mod-action-icon {
+  color: #3b82f6;
   cursor: pointer;
-  font-size: 1.5rem;
-  color: #6b7280;
-  margin: 0 0.25rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  display: inline-block;
-  z-index: 1;
-  position: relative;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: 0.2s ease;
+  width: 20px;
+  height: 20px;
 }
 
 .class-mod-action-icon:hover {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
+.class-mod-action-icon.class-mod-reject {
+  color: #ec4899;
+}
 .class-mod-action-icon.class-mod-reject:hover {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Edit2, Trash2, Eye, AlertCircle, Check } from "lucide-react";
+// import { Plus, Edit2, Trash2, Eye, AlertCircle, Check } from "lucide-react";
 import GlobalLoader from "../../components/common/GlobalLoader";
 import {
   getStudios,
@@ -11,6 +11,8 @@ import CreateEditStudioModal from "../../components/studio/CreateEditStudioModal
 import DeleteModal from "../../components/DeleteModal";
 import StudioDetailDrawer from "../../components/studio/StudioDetailDrawer";
 import StudioStatisticsSection from "../../components/studio/StudioStatisticsSection";
+import InstructorLinkModal from "../../components/studio/InstructorLinkModal";
+import { Plus, Edit2, Trash2, Eye, AlertCircle, Check, UserPlus } from "lucide-react";
 import "./StudioManagementPage.css";
 
 const StudioManagementPage = () => {
@@ -28,6 +30,8 @@ const StudioManagementPage = () => {
   const [drawerLoading, setDrawerLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [studioToDelete, setStudioToDelete] = useState(null);
+  const [instructorModalOpen, setInstructorModalOpen] = useState(false);
+  const [instructorModalStudio, setInstructorModalStudio] = useState(null);
 
   // Search and Filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -140,6 +144,11 @@ const StudioManagementPage = () => {
     setStudioToDelete(null);
   };
 
+  const handleManageInstructors = (studio) => {
+  setInstructorModalStudio(studio);
+  setInstructorModalOpen(true);
+};
+
   // Filter studios by status
   const filteredStudios =
     statusFilter === "all" ? studios : studios.filter((s) => s.status === statusFilter);
@@ -220,6 +229,7 @@ const StudioManagementPage = () => {
                 <th>Country</th>
                 <th>Capacity</th>
                 <th>Est. Year</th>
+                <th>Instructors</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -237,6 +247,16 @@ const StudioManagementPage = () => {
                   <td onClick={() => handleViewDetails(studio)}>{studio.country || "N/A"}</td>
                   <td onClick={() => handleViewDetails(studio)}>{studio.capacity || "N/A"}</td>
                   <td>{studio.established_year || "N/A"}</td>
+                  <td>
+  <button
+    className="action-icon-btn"
+    onClick={(e) => { e.stopPropagation(); handleManageInstructors(studio); }}
+    title="Manage Instructors"
+    style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", width: "auto", fontSize: 12, fontWeight: 600, color: "#4F7CF7", borderColor: "rgba(79,124,247,0.3)" }}
+  >
+    <UserPlus size={14} /> Manage
+  </button>
+</td>
                   <td>
                     <span className={`status-badge status-${studio.status}`}>
                       {studio.status}
@@ -340,6 +360,11 @@ const StudioManagementPage = () => {
         studio={selectedStudio}
         loading={drawerLoading}
       />
+      <InstructorLinkModal
+  isOpen={instructorModalOpen}
+  onClose={() => { setInstructorModalOpen(false); setInstructorModalStudio(null); }}
+  studio={instructorModalStudio}
+/>
     </div>
   );
 };

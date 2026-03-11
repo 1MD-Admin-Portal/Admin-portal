@@ -216,7 +216,7 @@ const ClassModeration = () => {
         <table className="class-mod-table">
           <thead>
             <tr>
-              {tab === "pending" && (
+              {/* {tab === "pending" && (
                 <th>
                   <input
                     type="checkbox"
@@ -233,7 +233,7 @@ const ClassModeration = () => {
                     }
                   />
                 </th>
-              )}
+              )} */}
               <th>Instructor</th>
               <th>Title</th>
               <th>Type</th>
@@ -247,7 +247,7 @@ const ClassModeration = () => {
           <tbody>
             {filteredClasses.map((classItem) => (
               <tr key={classItem.id} className="class-mod-clickable-row">
-                {tab === "pending" && (
+                {/* {tab === "pending" && (
                   <td>
                     <input
                       type="checkbox"
@@ -264,7 +264,7 @@ const ClassModeration = () => {
                       }}
                     />
                   </td>
-                )}
+                )} */}
                 <td onClick={() => openClassDetail(classItem.id)}>
                   {classItem.instructor_name}
                 </td>

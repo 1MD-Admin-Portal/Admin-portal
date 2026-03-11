@@ -461,28 +461,38 @@
 
 .event-action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   align-items: center;
 }
 
-.event-approve-btn,
-.event-reject-btn,
+.event-action-buttons button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+
 .event-view-interested-btn {
   border: none;
   border-radius: 8px;
-  padding: 0.5rem;
+  
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  
   position: relative;
   overflow: hidden;
 }
 
-.event-approve-btn::before,
-.event-reject-btn::before,
+
 .event-view-interested-btn::before {
   content: "";
   position: absolute;
@@ -490,39 +500,37 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent);
+
   transition: left 0.5s;
 }
 
-.event-approve-btn:hover::before,
-.event-reject-btn:hover::before,
+
 .event-view-interested-btn:hover::before {
   left: 100%;
 }
 
 .event-approve-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  color: #3b82f6;
+  cursor: pointer;
+  transition: 0.2s ease;
+  width: 20px;
+  height: 20px;
 }
 
 .event-approve-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+  transform: scale(1.2);
 }
 
 .event-reject-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  color: #ec4899;
+  cursor: pointer;
+  transition: 0.2s ease;
+  width: 20px;
+  height: 20px;
 }
 
 .event-reject-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+  transform: scale(1.2);
 }
 
 .event-view-interested-btn {

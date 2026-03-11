@@ -760,10 +760,114 @@
   font-size: 0.78rem;
   transition: all 0.2s ease;
   white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 .watch-link:hover {
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(236, 72, 153, 0.4);
+}
+
+/* ── Video Player Section ── */
+.video-player-section {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.video-player-container {
+  width: 100%;
+  background: #000;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-player-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── Video Loading Overlay ── */
+.video-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.video-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #ec4899;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.video-loading-text {
+  color: white;
+  font-size: 0.875rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.video-player-info {
+  padding: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.video-player-title {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.video-player-duration {
+  margin: 0 0 1rem 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.close-video-btn {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.25);
+}
+
+.close-video-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(100, 116, 139, 0.4);
 }
 
 /* ── Program Actions (popup footer) ── */

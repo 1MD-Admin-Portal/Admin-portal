@@ -11,34 +11,34 @@ import {
 import "../styles/SettingsPage.css";
 
 const settingsOptions = [
-  // {
-  //   title: 'App Branding',
-  //   description: 'Customize logo, theme colors, and visual identity',
-  //   icon: <FaPalette />,
-  //   path: '/settings/app-branding',
-  //   color: 'blue',
-  // },
-  // {
-  //   title: 'Subscription Plans',
-  //   description: 'Manage Danceur, Ginga, and Fiver subscription tiers',
-  //   icon: <FaClipboardList />,
-  //   path: '/settings/subscription-plans',
-  //   color: 'purple',
-  // },
-  // {
-  //   title: 'Legal Content',
-  //   description: 'Update terms of service, privacy policy, and legal documents',
-  //   icon: <FaFileContract />,
-  //   path: '/settings/legal-content',
-  //   color: 'pink',
-  // },
-  // {
-  //   title: 'Admin & Roles',
-  //   description: 'Configure user roles, permissions, and access controls',
-  //   icon: <FaUserShield />,
-  //   path: '/settings/admin-roles',
-  //   color: 'blue',
-  // },
+  {
+    title: 'App Branding',
+    description: 'Customize logo, theme colors, and visual identity',
+    icon: <FaPalette />,
+    path: '/settings/app-branding',
+    color: 'blue',
+  },
+  {
+    title: 'Subscription Plans',
+    description: 'Manage Danceur, Ginga, and Fiver subscription tiers',
+    icon: <FaClipboardList />,
+    path: '/settings/subscription-plans',
+    color: 'purple',
+  },
+  {
+    title: 'Legal Content',
+    description: 'Update terms of service, privacy policy, and legal documents',
+    icon: <FaFileContract />,
+    path: '/settings/legal-content',
+    color: 'pink',
+  },
+  {
+    title: 'Admin & Roles',
+    description: 'Configure user roles, permissions, and access controls',
+    icon: <FaUserShield />,
+    path: '/settings/admin-roles',
+    color: 'blue',
+  },
   {
     title: "App Version Info",
     description: "View current version details and release information",

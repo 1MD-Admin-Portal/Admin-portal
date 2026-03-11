@@ -509,12 +509,12 @@ const ReportsPage = () => {
             </div>
 
             <div className="reports-modal-footer">
-              <button
+              {/* <button
                 onClick={() => setReportModalOpen(false)}
                 className="reports-modal-action-btn reports-modal-secondary"
               >
                 Close
-              </button>
+              </button> */}
               {selectedReport.status === "pending" && (
                 <button
                   className="reports-modal-action-btn reports-modal-primary"

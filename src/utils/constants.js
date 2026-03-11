@@ -1,7 +1,7 @@
 export const CONSTANTS = {
   URL: {
     BASE_URL:
-      // "https://uat-dancewithme-dye9ftbrbdeybfg2.francecentral-01.azurewebsites.net"
+      //"https://uat-dancewithme-dye9ftbrbdeybfg2.francecentral-01.azurewebsites.net",
       "https://trilliondancers-uat-dbc8h5h7f2bpf6by.francecentral-01.azurewebsites.net",
     // BASE_URL: "",
 
