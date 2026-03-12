@@ -205,28 +205,28 @@ const VideoPrograms = () => {
     }
 
     // Original action buttons for regular programs
-    return (
-      <div className="program-actions">
-        <button
-          className="danger-btn"
-          onClick={() => setAction("Delete")}
-        >
-          Delete
-        </button>
-        <button
-          className="warning-btn"
-          onClick={() => setAction("Retire")}
-        >
-          Retire
-        </button>
-        <button
-          className="pause-btn"
-          onClick={() => setAction("Pause")}
-        >
-          Pause
-        </button>
-      </div>
-    );
+    // return (
+    //   <div className="program-actions">
+    //     <button
+    //       className="danger-btn"
+    //       onClick={() => setAction("Delete")}
+    //     >
+    //       Delete
+    //     </button>
+    //     <button
+    //       className="warning-btn"
+    //       onClick={() => setAction("Retire")}
+    //     >
+    //       Retire
+    //     </button>
+    //     <button
+    //       className="pause-btn"
+    //       onClick={() => setAction("Pause")}
+    //     >
+    //       Pause
+    //     </button>
+    //   </div>
+    // );
   };
 
   const handleSubmitAction = async () => {

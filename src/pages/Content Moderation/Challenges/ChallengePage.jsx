@@ -447,7 +447,7 @@ const ChallengePage = () => {
                   <option value="">All Status</option>
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
-                  <option value="completed">Completed</option>
+                  {/* <option value="completed">Completed</option> */}
                   <option value="ended">Ended</option>
                 </select>
               </div>
@@ -529,7 +529,7 @@ const ChallengePage = () => {
                             onChange={e => handleStatusChange(challenge.id, e.target.value)}>
                             <option value="draft">Draft</option>
                             <option value="active">Active</option>
-                            <option value="completed">Completed</option>
+                            {/* <option value="completed">Completed</option> */}
                             <option value="ended">Ended</option>
                           </select>
                           <button className="delete-btn" title="Delete" onClick={() => handleDeleteChallenge(challenge.id)}>

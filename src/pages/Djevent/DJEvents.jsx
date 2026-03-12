@@ -216,8 +216,8 @@ const DjEvents = () => {
       pending_approval: "status-badge pending",
       approved: "status-badge approved",
       in_progress: "status-badge in-progress",
-      completed: "status-badge completed",
-      cancelled: "status-badge cancelled",
+      // completed: "status-badge completed",
+      // cancelled: "status-badge cancelled",
       rejected: "status-badge rejected",
     };
 
@@ -287,8 +287,8 @@ const DjEvents = () => {
             <option value="pending_approval">Pending Approval</option>
             <option value="approved">Approved</option>
             <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            {/* <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option> */}
             <option value="rejected">Rejected</option>
           </select>
 
