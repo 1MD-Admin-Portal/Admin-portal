@@ -26,6 +26,14 @@ const FeedPage = () => {
   const [likesData, setLikesData] = useState(null);
   const [page, setPage] = useState(1);
 
+  // Filter & Sort States
+  const [sortByInput, setSortByInput] = useState("created_at");
+  const [orderInput, setOrderInput] = useState("desc");
+  const [filters, setFilters] = useState({
+    sort_by: "created_at",
+    order: "desc",
+  });
+
   // Content Moderation States
   const [activeTab, setActiveTab] = useState("feeds"); // 'feeds', 'reports', 'stats'
   const [selectedReport, setSelectedReport] = useState(null);
@@ -50,16 +58,16 @@ const FeedPage = () => {
 
   useEffect(() => {
     if (activeTab === "feeds") {
-      fetchFeeds(page);
+      fetchFeeds(page, filters);
     } else if (activeTab === "reports") {
       refreshReportedPosts({ page: reportsPage });
     } else if (activeTab === "stats") {
       refreshModerationStats();
     }
-  }, [page, reportsPage, activeTab, refreshModerationStats, refreshReportedPosts]);
+  }, [page, reportsPage, activeTab, filters, refreshModerationStats, refreshReportedPosts]);
 
-  const fetchFeeds = async (page) => {
-    const res = await getFeedsService(page, 12);
+  const fetchFeeds = async (pageNum, appliedFilters) => {
+    const res = await getFeedsService(pageNum, 12, appliedFilters);
     setFeeds(res.posts || []);
     setPagination(res.pagination || {});
   };
@@ -67,6 +75,24 @@ const FeedPage = () => {
   const handleViewLikes = async (postId) => {
     const res = await getFeedLikesService(postId);
     setLikesData(res);
+  };
+
+  const handleApplyFilters = () => {
+    setFilters({
+      sort_by: sortByInput,
+      order: orderInput,
+    });
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSortByInput("created_at");
+    setOrderInput("desc");
+    setFilters({
+      sort_by: "created_at",
+      order: "desc",
+    });
+    setPage(1);
   };
 
   const handleOpenModerationModal = (reportedPost) => {
@@ -199,6 +225,76 @@ const FeedPage = () => {
       {/* Feeds Tab */}
       {activeTab === "feeds" && (
         <>
+          {/* Filters Section */}
+          <div style={{
+            background: "#f8f9ff", padding: "16px", borderRadius: "10px",
+            marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
+            display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
+          }}>
+            {/* Sort By */}
+            <div style={{ flex: "1 1 150px" }}>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
+                Sort By
+              </label>
+              <select
+                value={sortByInput}
+                onChange={(e) => setSortByInput(e.target.value)}
+                style={{
+                  width: "100%", padding: "8px 12px", borderRadius: "6px",
+                  border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                  boxSizing: "border-box", cursor: "pointer",
+                }}
+              >
+                <option value="created_at">Creation Date</option>
+                <option value="updated_at">Updated Date</option>
+              </select>
+            </div>
+
+            {/* Order */}
+            <div style={{ flex: "1 1 150px" }}>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
+                Order
+              </label>
+              <select
+                value={orderInput}
+                onChange={(e) => setOrderInput(e.target.value)}
+                style={{
+                  width: "100%", padding: "8px 12px", borderRadius: "6px",
+                  border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                  boxSizing: "border-box", cursor: "pointer",
+                }}
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+
+            {/* Apply & Clear Buttons */}
+            <div style={{ display: "flex", gap: "8px", marginTop: "24px" }}>
+              <button
+                onClick={handleApplyFilters}
+                style={{
+                  padding: "8px 16px", borderRadius: "6px",
+                  background: "linear-gradient(135deg, #6c3de8, #ec4899)",
+                  color: "white", border: "none", cursor: "pointer",
+                  fontWeight: "600", fontSize: "13px",
+                }}
+              >
+                Apply Filters
+              </button>
+              <button
+                onClick={handleClearFilters}
+                style={{
+                  padding: "8px 16px", borderRadius: "6px",
+                  background: "#f0f0f0", color: "#333", border: "1px solid #ddd",
+                  cursor: "pointer", fontWeight: "600", fontSize: "13px",
+                }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
           <div className="fp-content-grid">
             {feeds.map((feed) => (
               <div
