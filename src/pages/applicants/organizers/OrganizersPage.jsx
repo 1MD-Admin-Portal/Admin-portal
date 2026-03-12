@@ -292,6 +292,40 @@ const OrganizersPage = () => {
       {loading && <GlobalLoader text="Loading organizer applications..." />}
       <h1 className="professors-title">Organizer Applications</h1>
 
+      <div className="bulk-actions-bar">
+        {selectedIds.length === 0 ? (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve-all")}
+            >
+              ✅ Approve All ({pendingApps.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject-all")}
+            >
+              ❌ Reject All ({pendingApps.length})
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve-selected")}
+            >
+              ✅ Approve Selected ({selectedIds.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject-selected")}
+            >
+              ❌ Reject Selected ({selectedIds.length})
+            </button>
+          </>
+        )}
+      </div>
+
       {/* Filters Section */}
       <div style={{
         background: "#f8f9ff", padding: "16px", borderRadius: "10px",
@@ -332,6 +366,7 @@ const OrganizersPage = () => {
         </div>
 
         {/* Date From */}
+        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
         <div style={{ flex: "1 1 150px" }}>
           <input
             type="date"
@@ -346,6 +381,7 @@ const OrganizersPage = () => {
         </div>
 
         {/* Date To */}
+        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
         <div style={{ flex: "1 1 150px" }}>
           <input
             type="date"
@@ -397,39 +433,7 @@ const OrganizersPage = () => {
           - If nothing selected -> show Approve All / Reject All
           - If something selected -> show Approve Selected / Reject Selected (only)
       */}
-      <div className="bulk-actions-bar">
-        {selectedIds.length === 0 ? (
-          <>
-            <button
-              className="bulk-approve-btn"
-              onClick={() => setShowConfirm("approve-all")}
-            >
-              ✅ Approve All ({pendingApps.length})
-            </button>
-            <button
-              className="bulk-reject-btn"
-              onClick={() => setShowConfirm("reject-all")}
-            >
-              ❌ Reject All ({pendingApps.length})
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              className="bulk-approve-btn"
-              onClick={() => setShowConfirm("approve-selected")}
-            >
-              ✅ Approve Selected ({selectedIds.length})
-            </button>
-            <button
-              className="bulk-reject-btn"
-              onClick={() => setShowConfirm("reject-selected")}
-            >
-              ❌ Reject Selected ({selectedIds.length})
-            </button>
-          </>
-        )}
-      </div>
+      
 
       <table className="professors-table">
         <thead>

@@ -75,7 +75,8 @@ const MarketplacePage = () => {
         if (filter === "Program") {
           const res = await getMarketplacePrograms(
             programPagination.page,
-            programPagination.limit
+            programPagination.limit,
+            search
           );
           setPrograms(res.programs || []);
           if (res.pagination) {
@@ -98,7 +99,7 @@ const MarketplacePage = () => {
       }
     };
     fetchData();
-  }, [filter, programPagination.page, eventPagination.page]);
+  }, [filter, programPagination.page, eventPagination.page, search]);
 
   // Filter + search
   const filteredData =

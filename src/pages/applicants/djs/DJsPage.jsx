@@ -164,6 +164,40 @@ const DJsPage = () => {
       {loading && <GlobalLoader text="Loading DJ applications..." />}
       <h2 className="professors-title">DJ Applications</h2>
 
+
+      <div className="pagination-controls">
+          {selectedIds.length === 0 ? (
+            <>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("approve")}
+              >
+                ✅ Approve All({pendingApps.length})
+              </button>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("reject")}
+              >
+                ❌ Reject All({pendingApps.length})
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("approve-selected")}
+              >
+                ✅ Approve Selected
+              </button>
+              <button
+                className="pagination-btn"
+                onClick={() => setShowConfirm("reject-selected")}
+              >
+                ❌ Reject Selected
+              </button>
+            </>
+          )}
+        </div>
       {/* Filters Section */}
       <div style={{
         background: "#f8f9ff", padding: "16px", borderRadius: "10px",
@@ -204,6 +238,7 @@ const DJsPage = () => {
         </div>
 
         {/* Date From */}
+        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
         <div style={{ flex: "1 1 150px" }}>
           <input
             type="date"
@@ -216,7 +251,7 @@ const DJsPage = () => {
             }}
           />
         </div>
-
+        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
         {/* Date To */}
         <div style={{ flex: "1 1 150px" }}>
           <input
@@ -266,39 +301,7 @@ const DJsPage = () => {
         }}>Loading...</div>
       )}
 
-        <div className="pagination-controls">
-          {selectedIds.length === 0 ? (
-            <>
-              <button
-                className="pagination-btn"
-                onClick={() => setShowConfirm("approve")}
-              >
-                ✅ Approve All({pendingApps.length})
-              </button>
-              <button
-                className="pagination-btn"
-                onClick={() => setShowConfirm("reject")}
-              >
-                ❌ Reject All({pendingApps.length})
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                className="pagination-btn"
-                onClick={() => setShowConfirm("approve-selected")}
-              >
-                ✅ Approve Selected
-              </button>
-              <button
-                className="pagination-btn"
-                onClick={() => setShowConfirm("reject-selected")}
-              >
-                ❌ Reject Selected
-              </button>
-            </>
-          )}
-        </div>
+        
 
       <table className="professors-table">
         <thead>
@@ -390,11 +393,30 @@ const DJsPage = () => {
               </td>
               {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
-              <td>
+              
+              {/* <td>
                 <CheckCircle className={`action-icon ${app.status !== "pending" ? "disabled" : ""}`} onClick={() => app.status === "pending" && handleApprove(app.id) } />
 
                 <XCircle className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""}`} onClick={() => app.status === "pending" && setSelectedRejectId(app.id) } />
 
+              </td> */}
+              <td>
+              <div className="icon-actions">
+                                <CheckCircle
+                                  className={`action-icon ${app.status !== "pending" ? "disabled" : ""
+                                    }`}
+                                  onClick={() =>
+                                    app.status === "pending" && handleApprove(app.id)
+                                  }
+                                />
+                                <XCircle
+                                  className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
+                                    }`}
+                                  onClick={() =>
+                                    app.status === "pending" && setSelectedRejectId(app.id)
+                                  }
+                                />
+                              </div>
               </td>
             </tr>
           ))}

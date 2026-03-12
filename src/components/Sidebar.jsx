@@ -1027,6 +1027,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = () => {
   const sidebarScrollRef = useRef(null);
+  // const sidebarPanelRef = useRef(null);
   const location = useLocation();
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -1104,6 +1105,31 @@ const Sidebar = () => {
     document.body.style.marginLeft = isPanelOpen ? "280px" : "55px";
     document.body.style.transition = "margin-left 0.2s ease";
   }, [isPanelOpen]);
+
+  // Close sidebar when clicking outside
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     // Get the activity bar (left icon bar)
+  //     const activityBar = document.querySelector(".vs-activity-bar");
+  //     // Get the sidebar panel
+  //     const sidebarPanel = sidebarPanelRef.current;
+
+  //     // If panel is open and click is outside both activity bar and sidebar panel, close it
+  //     if (
+  //       isPanelOpen &&
+  //       sidebarPanel &&
+  //       !sidebarPanel.contains(event.target) &&
+  //       !activityBar?.contains(event.target)
+  //     ) {
+  //       setIsPanelOpen(false);
+  //     }
+  //   };
+
+  //   if (isPanelOpen) {
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //     return () => document.removeEventListener("mousedown", handleClickOutside);
+  //   }
+  // }, [isPanelOpen]);
 
   // Save sidebar scroll position
   useEffect(() => {
@@ -1842,16 +1868,16 @@ const Sidebar = () => {
         <div className="vs-activity-nav">
           {activityItems.map((item) => (
             <button
-              key={item.id}
-              className={`vs-activity-btn ${activePanel === item.id && isPanelOpen ? "active" : ""}`}
-              onClick={() => handleActivityClick(item.id)}
-              aria-label={item.label}
-            >
-              <span className="vs-icon-wrap">
-                <item.icon size={20} />
-              </span>
-              <span className="vs-activity-tooltip">{item.label}</span>
-            </button>
+                key={item.id}
+                className={`vs-activity-btn ${activePanel === item.id ? "active" : ""}`}
+                onClick={() => handleActivityClick(item.id)}
+                aria-label={item.label}
+              >
+                <span className="vs-icon-wrap">
+                  <item.icon size={20} />
+                </span>
+                <span className="vs-activity-tooltip">{item.label}</span>
+              </button>
           ))}
         </div>
 

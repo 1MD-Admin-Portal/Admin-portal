@@ -26,12 +26,14 @@ const FeedPage = () => {
   const [likesData, setLikesData] = useState(null);
   const [page, setPage] = useState(1);
 
-  // Filter & Sort States
+  // Filter, Sort, and Search States
   const [sortByInput, setSortByInput] = useState("created_at");
   const [orderInput, setOrderInput] = useState("desc");
+  const [searchInput, setSearchInput] = useState("");
   const [filters, setFilters] = useState({
     sort_by: "created_at",
     order: "desc",
+    search: "",
   });
 
   // Content Moderation States
@@ -56,6 +58,18 @@ const FeedPage = () => {
     moderateReport,
   } = useModeration();
 
+  // Debounced search effect
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      setFilters((prev) => ({
+        ...prev,
+        search: searchInput,
+      }));
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(debounce);
+  }, [searchInput]);
+
   useEffect(() => {
     if (activeTab === "feeds") {
       fetchFeeds(page, filters);
@@ -77,10 +91,12 @@ const FeedPage = () => {
     setLikesData(res);
   };
 
+
   const handleApplyFilters = () => {
     setFilters({
       sort_by: sortByInput,
       order: orderInput,
+      search: searchInput,
     });
     setPage(1);
   };
@@ -88,9 +104,11 @@ const FeedPage = () => {
   const handleClearFilters = () => {
     setSortByInput("created_at");
     setOrderInput("desc");
+    setSearchInput("");
     setFilters({
       sort_by: "created_at",
       order: "desc",
+      search: "",
     });
     setPage(1);
   };
@@ -231,6 +249,24 @@ const FeedPage = () => {
             marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
             display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
           }}>
+            {/* Search */}
+            <div style={{ flex: "2 1 220px" }}>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
+                Search
+              </label>
+              <input
+                type="text"
+                placeholder="Search by user, caption, etc..."
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                style={{
+                  width: "100%", padding: "8px 12px", borderRadius: "6px",
+                  border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
             {/* Sort By */}
             <div style={{ flex: "1 1 150px" }}>
               <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>

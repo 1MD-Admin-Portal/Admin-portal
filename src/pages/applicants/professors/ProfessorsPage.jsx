@@ -258,6 +258,16 @@ const ProfessorsPage = () => {
       {loading && <GlobalLoader text="Loading instructor applications..." />}
       <h1 className="professors-title">Instructor Applications</h1>
 
+      <div className="bulk-actions-bar">
+        <button className="bulk-approve-btn" onClick={() => setShowConfirm("approve-all")}>
+          ✅ Approve All ({pendingApps.length})
+        </button>
+        <button className="bulk-reject-btn" onClick={() => setShowConfirm("reject-all")}>
+          ❌ Reject All ({pendingApps.length})
+        </button>
+      </div>
+
+
       {/* Filters Section */}
       <div style={{
         background: "#f8f9ff", padding: "16px", borderRadius: "10px",
@@ -298,6 +308,7 @@ const ProfessorsPage = () => {
         </div>
 
         {/* Date From */}
+        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
         <div style={{ flex: "1 1 150px" }}>
           <input
             type="date"
@@ -312,6 +323,7 @@ const ProfessorsPage = () => {
         </div>
 
         {/* Date To */}
+        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
         <div style={{ flex: "1 1 150px" }}>
           <input
             type="date"
@@ -360,15 +372,7 @@ const ProfessorsPage = () => {
       )}
 
       {/* Action bar */}
-      <div className="bulk-actions-bar">
-        <button className="bulk-approve-btn" onClick={() => setShowConfirm("approve-all")}>
-          ✅ Approve All ({pendingApps.length})
-        </button>
-        <button className="bulk-reject-btn" onClick={() => setShowConfirm("reject-all")}>
-          ❌ Reject All ({pendingApps.length})
-        </button>
-      </div>
-
+      
       <table className="professors-table">
         <thead>
           <tr>

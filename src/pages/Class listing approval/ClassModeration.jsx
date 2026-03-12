@@ -53,12 +53,10 @@ const ClassModeration = () => {
     fetchClasses();
   }, [tab, page]);
 
-  // Real-time search for ongoing classes
+  // Real-time search for both tabs
   useEffect(() => {
-    if (tab === "ongoing") {
-      setPage(1);
-      fetchClasses();
-    }
+    setPage(1);
+    fetchClasses();
   }, [search]);
 
   const handleTabChange = (newTab) => {
@@ -72,7 +70,13 @@ const ClassModeration = () => {
     setLoading(true);
     try {
       if (tab === "pending") {
-        const data = await getPendingClassesService(page, limit);
+        const data = await getPendingClassesService({
+          page,
+          limit,
+          search,
+          date_from: dateFrom,
+          date_to: dateTo,
+        });
         setPendingClasses(data.classes || []);
         setPagination(data.pagination || { page: 1, total: 0, limit });
       } else {
@@ -142,11 +146,14 @@ const ClassModeration = () => {
     }
   };
 
-  const classesToShow = tab === "pending" ? pendingClasses : ongoingClasses;
-
-  const filteredClasses = classesToShow.filter((classItem) =>
-    classItem.class_title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  let filteredClasses = [];
+  if (tab === "pending") {
+    filteredClasses = pendingClasses;
+  } else {
+    filteredClasses = ongoingClasses.filter((classItem) =>
+      classItem.class_title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
   const toggleSelectAll = () => {
     if (selectAll) {
@@ -201,22 +208,8 @@ const ClassModeration = () => {
         </button>
       </div>
 
-      {tab === "pending" && (
-        <div className="class-mod-bulk-actions">
-          <button onClick={() => handleBulkAction("approve")}>
-            {selectedIds.length
-              ? `Approve Selected (${selectedIds.length})`
-              : "Approve All"}
-          </button>
-          <button onClick={() => handleBulkAction("reject")}>
-            {selectedIds.length
-              ? `Reject Selected (${selectedIds.length})`
-              : "Reject All"}
-          </button>
-        </div>
-      )}
-
-      {tab === "ongoing" && (
+      {/* Filter UI for both tabs */}
+      {(tab === "pending" || tab === "ongoing") && (
         <div style={{
           background: "#f8f9ff", padding: "16px", borderRadius: "10px",
           marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
@@ -228,7 +221,9 @@ const ClassModeration = () => {
               type="text"
               placeholder="Search by class title or instructor..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
               style={{
                 width: "100%", padding: "8px 12px", borderRadius: "6px",
                 border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
@@ -238,6 +233,7 @@ const ClassModeration = () => {
           </div>
 
           {/* Date From */}
+          <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
           <div style={{ flex: "1 1 150px" }}>
             <input
               type="date"
@@ -250,7 +246,7 @@ const ClassModeration = () => {
               }}
             />
           </div>
-
+          <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
           {/* Date To */}
           <div style={{ flex: "1 1 150px" }}>
             <input
@@ -283,19 +279,7 @@ const ClassModeration = () => {
         </div>
       )}
 
-      <div className="class-mod-actions" style={{ display: tab === "ongoing" ? "none" : "flex" }}>
-        <div className="class-mod-search">
-          <span role="img" aria-label="search">
-            🔍
-          </span>
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
+      {/* Remove old search UI for pending tab, now handled in filter UI above */}
 
       {loading ? (
         <GlobalLoader text="Loading classes..." />
@@ -484,6 +468,5 @@ const ClassModeration = () => {
       )}
     </div>
   );
-};
-
+}
 export default ClassModeration;

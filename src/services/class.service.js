@@ -3,17 +3,21 @@ import { CONSTANTS } from "../utils/constants";
 
 /**
  * Get pending classes for approval.
- * Only returns classes that are pending status.
- * @param {number} page - Page number
- * @param {number} limit - Items per page
+ * Supports search and date filters.
+ * @param {object} params - { page, limit, search, date_from, date_to }
  */
-// Pending Classes (pagination support)
-export const getPendingClassesService = async (page = 1, limit = 20) => {
+export const getPendingClassesService = async (params = {}) => {
+  const { page = 1, limit = 20, search = "", date_from = "", date_to = "" } = params;
+  const token = localStorage.getItem("token");
+  const queryParams = new URLSearchParams({ page, limit });
+  if (search) queryParams.append("search", search);
+  if (date_from) queryParams.append("date_from", date_from);
+  if (date_to) queryParams.append("date_to", date_to);
   try {
     const response = await api.get(
-      `${CONSTANTS.URL.CLASS_PENDING}?page=${page}&limit=${limit}`,
+      `${CONSTANTS.URL.CLASS_PENDING}?${queryParams.toString()}`,
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
     return response.data; // { classes: [...], pagination: {...} }
