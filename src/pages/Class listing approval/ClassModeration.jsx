@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
 import "./ClassModeration.css";
 import { X, CheckCircle, XCircle } from "lucide-react";
 import {
@@ -28,6 +29,11 @@ const ClassModeration = () => {
     limit: 10,
   });
 
+  // Filter states
+  const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -47,6 +53,14 @@ const ClassModeration = () => {
     fetchClasses();
   }, [tab, page]);
 
+  // Real-time search for ongoing classes
+  useEffect(() => {
+    if (tab === "ongoing") {
+      setPage(1);
+      fetchClasses();
+    }
+  }, [search]);
+
   const handleTabChange = (newTab) => {
     setTab(newTab);
     setPage(1);
@@ -62,7 +76,13 @@ const ClassModeration = () => {
         setPendingClasses(data.classes || []);
         setPagination(data.pagination || { page: 1, total: 0, limit });
       } else {
-        const data = await getAllClassesService(page, limit);
+        const data = await getAllClassesService({
+          page,
+          limit,
+          search,
+          date_from: dateFrom,
+          date_to: dateTo,
+        });
         const approvedOnly = (data.classes || []).filter(
           (cls) => cls.status?.toLowerCase() === "approved"
         );
@@ -196,7 +216,74 @@ const ClassModeration = () => {
         </div>
       )}
 
-      <div className="class-mod-actions">
+      {tab === "ongoing" && (
+        <div style={{
+          background: "#f8f9ff", padding: "16px", borderRadius: "10px",
+          marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
+          display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
+        }}>
+          {/* Search */}
+          <div style={{ flex: "1 1 200px" }}>
+            <input
+              type="text"
+              placeholder="Search by class title or instructor..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: "100%", padding: "8px 12px", borderRadius: "6px",
+                border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* Date From */}
+          <div style={{ flex: "1 1 150px" }}>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              style={{
+                width: "100%", padding: "8px 12px", borderRadius: "6px",
+                border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* Date To */}
+          <div style={{ flex: "1 1 150px" }}>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              style={{
+                width: "100%", padding: "8px 12px", borderRadius: "6px",
+                border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* Apply Button */}
+          <button
+            onClick={() => {
+              setPage(1);
+              fetchClasses();
+            }}
+            style={{
+              padding: "8px 16px", borderRadius: "6px", border: "none",
+              background: "linear-gradient(135deg, #6c3de8, #ec4899)",
+              color: "white", fontWeight: "600", fontSize: "13px",
+              cursor: "pointer",
+            }}
+          >
+            Apply Filters
+          </button>
+        </div>
+      )}
+
+      <div className="class-mod-actions" style={{ display: tab === "ongoing" ? "none" : "flex" }}>
         <div className="class-mod-search">
           <span role="img" aria-label="search">
             🔍
@@ -313,38 +400,12 @@ const ClassModeration = () => {
       )}
 
       {/* Pagination */}
-      <div className="class-mod-pagination">
-        <button
-          disabled={pagination.page <= 1}
-          onClick={() => setPage((prev) => prev - 1)}
-        >
-          Prev
-        </button>
-
-        {Array.from(
-          { length: Math.ceil(pagination.total / pagination.limit) },
-          (_, i) => (
-            <button
-              key={i + 1}
-              className={
-                pagination.page === i + 1 ? "class-mod-pagination-active" : ""
-              }
-              onClick={() => setPage(i + 1)}
-            >
-              {i + 1}
-            </button>
-          )
-        )}
-
-        <button
-          disabled={
-            pagination.page >= Math.ceil(pagination.total / pagination.limit)
-          }
-          onClick={() => setPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page || 1}
+        totalPages={Math.ceil(pagination.total / pagination.limit) || 1}
+        onPageChange={setPage}
+        isLoading={loading}
+      />
 
       {/* Enhanced Detail Modal with exact DancersList structure */}
       {selectedClass && (

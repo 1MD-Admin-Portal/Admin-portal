@@ -40,12 +40,25 @@ export const rejectInstructorApplication = async (
   return res.data;
 };
 
-// ✅ Get list of instructor applications
-export const getInstructorApplications = async () => {
+// ✅ Get list of instructor applications with filters
+export const getInstructorApplications = async (params = {}) => {
   const token = localStorage.getItem("token");
+  const { search = "", page = 1, limit = 10, status = "", date_from = "", date_to = "" } = params;
+
+  const queryParams = new URLSearchParams({
+    page,
+    limit,
+  });
+
+  if (search) queryParams.append("search", search);
+  if (status) queryParams.append("status", status);
+  if (date_from) queryParams.append("date_from", date_from);
+  if (date_to) queryParams.append("date_to", date_to);
+
+
 
   const res = await axios.get(
-    `${BASE_URL}${CONSTANTS.URL.INSTRUCTOR_APPLICATION_LIST}`,
+    `${BASE_URL}${CONSTANTS.URL.INSTRUCTOR_APPLICATION_LIST}?${queryParams.toString()}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -53,7 +66,10 @@ export const getInstructorApplications = async () => {
     }
   );
 
-  return res.data.application; // Only return the array
+
+
+  // Return the full response object so we can access both application and pagination
+  return res.data;
 };
 
 // ✅ NEW: Fetch professors with pagination (used for list view)

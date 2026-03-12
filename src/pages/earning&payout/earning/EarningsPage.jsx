@@ -10,6 +10,7 @@ import {
 
 import { X, Eye, Euro, TrendingUp, Users, AlertCircle, ShieldAlert } from "lucide-react";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 
 const EarningsPage = () => {
   // ── Original state (unchanged) ──────────────────────────────────────────
@@ -397,18 +398,12 @@ const EarningsPage = () => {
           </div>
 
           {/* Pagination */}
-          <div className="earnings-mgmt-pagination">
-            <button disabled={page === 1} onClick={() => setPage((prev) => prev - 1)} className="earnings-mgmt-pagination-btn">
-              Previous
-            </button>
-            <span className="earnings-mgmt-pagination-info">
-              Page {page} of {pagination?.total_pages || 1}
-              {pagination?.total && ` (${pagination.total} total)`}
-            </span>
-            <button disabled={page === pagination?.total_pages} onClick={() => setPage((prev) => prev + 1)} className="earnings-mgmt-pagination-btn">
-              Next
-            </button>
-          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={pagination?.total_pages || 1}
+            onPageChange={setPage}
+            isLoading={loading}
+          />
         </>
       )}
 

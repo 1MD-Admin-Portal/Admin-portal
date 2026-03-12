@@ -7,6 +7,7 @@ import {
 } from "../../../services/badge.service";
 import { maskEmail } from "../../../components/maskEmail";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 
 // 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
@@ -265,25 +266,12 @@ const OrganizerListPage = () => {
         </tbody>
       </table>
 
-      <div className="dancers-pagination-controls">
-        <button
-          className="dancers-pagination-btn"
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-        >
-          Previous
-        </button>
-        <span className="dancers-page-indicator">
-          Page {pagination.page || page} of {pagination.totalPages || 1}
-        </span>
-        <button
-          className="dancers-pagination-btn"
-          onClick={() => setPage((prev) => prev + 1)}
-          disabled={page === pagination.totalPages}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page || page}
+        totalPages={pagination.totalPages || 1}
+        onPageChange={setPage}
+        isLoading={loading}
+      />
 
       {selectedUser && (
         <div

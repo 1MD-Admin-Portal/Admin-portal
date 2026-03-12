@@ -553,7 +553,7 @@ const ChallengePage = () => {
                 </div>
               )}
 
-              {pagination.pages > 1 && (
+              {(
                 <div className="fp-pagination-wrapper">
                   <button className="fp-page-btn" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</button>
                   <span className="fp-page-info">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</span>
@@ -778,6 +778,12 @@ const ChallengePage = () => {
             {tasks.map((task, index) => (
               <div key={index} className="cp-task-card">
                 <div className="form-row">
+                  <Field label="Task Title">
+                    <input type="text" className="form-input"
+                      value={task.task_title}
+                      onChange={e => updateTask(index, "task_title", e.target.value)}
+                      placeholder="Enter task title" />
+                  </Field>
                   <Field label="Task Type">
                     <select className="form-select" value={task.task_type}
                       onChange={e => updateTask(index, "task_type", e.target.value)}>

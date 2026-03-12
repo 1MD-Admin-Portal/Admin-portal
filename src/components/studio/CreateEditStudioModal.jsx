@@ -762,8 +762,7 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
                         formData.dance_styles.map((name) => (
                           <span key={name} className="dance-style-chip">
                             <span className="dance-style-chip__label">{name}</span>
-                            <button
-                              type="button"
+                            <span
                               className="dance-style-chip__remove"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -772,10 +771,12 @@ const selectedCity = cities.find(c => c.id == formData.city_id);
                                   dance_styles: (prev.dance_styles || []).filter((s) => s !== name),
                                 }));
                               }}
+                              role="button"
+                              tabIndex={0}
                               aria-label={`Remove ${name}`}
                             >
                               <X size={12} />
-                            </button>
+                            </span>
                           </span>
                         ))
                       ) : (

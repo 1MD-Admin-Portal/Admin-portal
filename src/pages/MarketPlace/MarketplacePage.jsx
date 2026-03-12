@@ -164,9 +164,9 @@ const MarketplacePage = () => {
     <div className="mktplace-main-wrapper">
       <div className="mktplace-top-header">
         <div className="mktplace-header-content">
-          {/* <div className="mktplace-icon-wrapper">
+          <div className="mktplace-icon-wrapper">
             <ShoppingBag size={32} />
-          </div> */}
+          </div>
           <div>
             <h1 className="mktplace-main-title">Marketplace</h1>
             <p className="mktplace-header-subtitle">Manage programs and events marketplace</p>

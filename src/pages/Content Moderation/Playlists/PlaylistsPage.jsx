@@ -11,6 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 import {
   getPlaylistsService,
   approvePlaylistService,
@@ -389,29 +390,14 @@ const PlaylistsPage = () => {
       </div>
 
       {/* Enhanced Pagination */}
-      <div className="plmgmt-pagination-wrapper">
-        <button
-          className="plmgmt-pagination-btn"
-          onClick={() =>
-            setFilters((prev) => ({ ...prev, page: prev.page - 1 }))
-          }
-          disabled={pagination.page <= 1}
-        >
-          Previous
-        </button>
-        <span className="plmgmt-page-info">
-          Page {pagination.page || 1} of {pagination.total_pages || 1}
-        </span>
-        <button
-          className="plmgmt-pagination-btn"
-          onClick={() =>
-            setFilters((prev) => ({ ...prev, page: prev.page + 1 }))
-          }
-          disabled={pagination.page >= pagination.total_pages}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page || 1}
+        totalPages={pagination.total_pages || 1}
+        onPageChange={(newPage) =>
+          setFilters((prev) => ({ ...prev, page: newPage }))
+        }
+        isLoading={loading}
+      />
 
       {/* Enhanced Modal */}
       {selectedPlaylist && (

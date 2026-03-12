@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./VideoPrograms.css";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 import CreateProgramModal from "./CreateProgramModal";
 import { X, Check, XCircle, Clock } from "lucide-react";
 import {
@@ -420,28 +421,15 @@ const VideoPrograms = () => {
       </div>
 
       {/* Pagination for pending programs */}
-      {currentView === "pending" && pagination.totalPages > 1 && (
-        <div className="pagination">
-          <button
-            disabled={pagination.page === 1}
-            onClick={() =>
-              setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
-            }
-          >
-            Previous
-          </button>
-          <span>
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <button
-            disabled={pagination.page === pagination.totalPages}
-            onClick={() =>
-              setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-            }
-          >
-            Next
-          </button>
-        </div>
+      {(
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={(newPage) =>
+            setPagination((prev) => ({ ...prev, page: newPage }))
+          }
+          isLoading={loading}
+        />
       )}
 
       {/* create modal */}

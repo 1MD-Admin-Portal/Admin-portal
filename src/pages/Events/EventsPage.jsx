@@ -10,13 +10,12 @@ import {
   Users,
   Image as ImageIcon,
   X,
-  ChevronLeft,
-  ChevronRight,
   Filter,
   User,
   Mail,
 } from "lucide-react";
 import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
 import {
   getAllDraftEventsService,
   getAllApprovedEventsService,
@@ -297,30 +296,13 @@ const EventsPage = () => {
       )}
 
       {/* Enhanced Pagination */}
-      {totalPages > 1 && (
-        <div className="event-pagination-controls">
-          <div className="event-pagination-info">
-            Showing page {page} of {totalPages}
-          </div>
-          <div className="event-pagination-buttons">
-            <button
-              className="event-pagination-btn"
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-            >
-              <ChevronLeft size={16} />
-              Previous
-            </button>
-            <button
-              className="event-pagination-btn"
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
+      { (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          isLoading={loading}
+        />
       )}
 
       {/* Enhanced Modal */}

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { X, UserMinus, UserPlus, Loader, Search } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { X, UserMinus, UserPlus, Loader, Search, ChevronDown } from "lucide-react";
 import { linkInstructorToStudio, unlinkInstructor } from "../../services/studio.service";
 import axios from "axios";
 import { CONSTANTS } from "../../utils/constants";
@@ -20,6 +20,8 @@ const InstructorLinkModal = ({ isOpen, onClose, studio }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [search, setSearch] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && studio?.id) {
@@ -27,6 +29,18 @@ const InstructorLinkModal = ({ isOpen, onClose, studio }) => {
       fetchAllInstructors();
     }
   }, [isOpen, studio]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
 
   const fetchAllInstructors = async () => {
     setInstructorsLoading(true);
@@ -75,6 +89,7 @@ const InstructorLinkModal = ({ isOpen, onClose, studio }) => {
       setSelectedInstructorId("");
       setIsPrimary(false);
       setSearch("");
+      setIsDropdownOpen(false);
       fetchLinkedInstructors();
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
@@ -165,42 +180,101 @@ const filteredInstructors = allInstructors.filter(
               Link Instructor
             </p>
 
-            {/* Search */}
-            <div style={{ position: "relative", marginBottom: 10 }}>
-              <Search size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#adb5bd" }} />
-              <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+            {/* Merged Searchable Dropdown */}
+            <div ref={dropdownRef} style={{ position: "relative", marginBottom: 12 }}>
+              <div
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 style={{
-                  width: "100%", padding: "10px 14px 10px 34px",
+                  position: "relative", width: "100%", padding: "10px 14px",
                   borderRadius: 8, border: "2px solid rgba(142,92,246,0.2)",
-                  fontSize: 13, outline: "none", boxSizing: "border-box",
+                  fontSize: 13, outline: "none",
+                  cursor: "pointer", boxSizing: "border-box",
+                  display: "flex", alignItems: "center", gap: 8,
+                  transition: "all 0.2s ease",
+                  borderColor: isDropdownOpen ? "rgba(79,124,247,0.4)" : "rgba(142,92,246,0.2)",
+                  background: isDropdownOpen ? "rgba(79,124,247,0.02)" : "white",
                 }}
-              />
-            </div>
+              >
+                <Search size={14} style={{ color: "#adb5bd", flexShrink: 0 }} />
+                <input
+                  type="text"
+                  placeholder={instructorsLoading ? "Loading instructors..." : "Search and select instructor..."}
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setIsDropdownOpen(true);
+                  }}
+                  onFocus={() => {
+                    setIsDropdownOpen(true);
+                  }}
+                  style={{
+                    flex: 1, border: "none", outline: "none", fontSize: 13,
+                    background: "transparent", color: "#212529", fontFamily: "inherit",
+                  }}
+                />
+                <ChevronDown
+                  size={14}
+                  style={{
+                    color: "#adb5bd", flexShrink: 0,
+                    transform: isDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+              </div>
 
-            {/* Dropdown */}
-            <select
-              value={selectedInstructorId}
-              onChange={(e) => setSelectedInstructorId(e.target.value)}
-              style={{
-                width: "100%", padding: "10px 14px",
-                borderRadius: 8, border: "2px solid rgba(142,92,246,0.2)",
-                fontSize: 13, outline: "none", background: "white",
-                marginBottom: 12, cursor: "pointer", boxSizing: "border-box",
-              }}
-            >
-              <option value="">
-                {instructorsLoading ? "Loading instructors..." : "— Select an instructor —"}
-              </option>
-              {filteredInstructors.map((inst) => (
-                <option key={inst.id} value={inst.id}>
-                  {inst.name} — {inst.email}
-                </option>
-              ))}
-            </select>
+              {/* Dropdown List */}
+              {isDropdownOpen && (
+                <div
+                  style={{
+                    position: "absolute", top: "100%", left: 0, right: 0,
+                    marginTop: 4, background: "white", borderRadius: 8,
+                    border: "2px solid rgba(79,124,247,0.2)",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    zIndex: 1000, maxHeight: 240, overflowY: "auto",
+                  }}
+                >
+                  {instructorsLoading ? (
+                    <div style={{ padding: 12, textAlign: "center", color: "#adb5bd", fontSize: 13 }}>
+                      <Loader size={16} style={{ animation: "spin 0.8s linear infinite", margin: "0 auto" }} />
+                    </div>
+                  ) : filteredInstructors.length === 0 ? (
+                    <div style={{ padding: 12, textAlign: "center", color: "#adb5bd", fontSize: 13 }}>
+                      {search ? "No instructors found" : "No available instructors"}
+                    </div>
+                  ) : (
+                    filteredInstructors.map((inst) => (
+                      <div
+                        key={inst.id}
+                        onClick={() => {
+                          setSelectedInstructorId(inst.id);
+                          setSearch(inst.name);
+                          setIsDropdownOpen(false);
+                        }}
+                        style={{
+                          padding: "10px 14px", cursor: "pointer",
+                          borderBottom: "1px solid rgba(0,0,0,0.05)",
+                          transition: "background 0.2s ease",
+                          background: selectedInstructorId === inst.id ? "rgba(79,124,247,0.1)" : "transparent",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = selectedInstructorId === inst.id ? "rgba(79,124,247,0.15)" : "rgba(142,92,246,0.08)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = selectedInstructorId === inst.id ? "rgba(79,124,247,0.1)" : "transparent";
+                        }}
+                      >
+                        <p style={{ margin: 0, fontWeight: 500, fontSize: 13, color: "#212529" }}>
+                          {inst.name}
+                        </p>
+                        <p style={{ margin: "3px 0 0", fontSize: 12, color: "#adb5bd" }}>
+                          {inst.email}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", color: "#495057" }}>

@@ -8,6 +8,7 @@ import {
   getDjEventsStatistics,
 } from "../../services/djEvents.service";
 import "./DJEvents.css";
+import Pagination from "../../components/common/Pagination";
 import { AlignCenter, CheckCircle, XCircle } from "lucide-react";
 
 const DjEvents = () => {
@@ -475,26 +476,13 @@ const DjEvents = () => {
           </div>
 
           {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="pagination">
-              <button
-                onClick={() => handlePageChange(filters.page - 1)}
-                disabled={!pagination.hasPreviousPage}
-                className="pagination-btn"
-              >
-                Previous
-              </button>
-              <span className="pagination-info">
-                Page {pagination.page} of {pagination.totalPages}
-              </span>
-              <button
-                onClick={() => handlePageChange(filters.page + 1)}
-                disabled={!pagination.hasNextPage}
-                className="pagination-btn"
-              >
-                Next
-              </button>
-            </div>
+          {(
+            <Pagination
+              currentPage={pagination.page || 1}
+              totalPages={pagination.totalPages || 1}
+              onPageChange={handlePageChange}
+              isLoading={loading}
+            />
           )}
         </>
       )}

@@ -8,6 +8,7 @@ import {
 } from "../../../services/user.service";
 import "../Dancers/DancersList.css";
 import { maskEmail } from "../../../components/maskEmail";
+import Pagination from "../../../components/common/Pagination";
 import GlobalLoader from "../../../components/common/GlobalLoader";
 
 const DancersList = () => {
@@ -305,27 +306,12 @@ const DancersList = () => {
         </tbody>
       </table>
 
-      <div className="dancers-pagination-controls">
-        <button
-          className="dancers-pagination-btn"
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page <= 1}
-        >
-          Previous
-        </button>
-        <span className="dancers-page-indicator">
-          Page {pagination.page} of {pagination.totalPages}
-        </span>
-        <button
-          className="dancers-pagination-btn"
-          onClick={() =>
-            setPage((prev) => Math.min(prev + 1, pagination.totalPages))
-          }
-          disabled={page >= pagination.totalPages}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
+        onPageChange={setPage}
+        isLoading={loading}
+      />
 
       {selectedDancer && (
         <div

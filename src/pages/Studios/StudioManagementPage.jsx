@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 // import { Plus, Edit2, Trash2, Eye, AlertCircle, Check } from "lucide-react";
 import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
 import {
   getStudios,
   createStudio,
@@ -216,7 +217,7 @@ const StudioManagementPage = () => {
         ) : filteredStudios.length === 0 ? (
           <div className="empty-state">
             <p>No studios found</p>
-            <button onClick={handleCreateClick} className="btn-create-small">
+            <button onClick={handleCreateClick} className="btn-create">
               Create your first studio
             </button>
           </div>
@@ -300,39 +301,12 @@ const StudioManagementPage = () => {
       </div>
 
       {/* Pagination */}
-      <div className="pagination">
-        <button
-          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
-          className="pagination-btn"
-        >
-          Previous
-        </button>
-
-        <div className="page-numbers">
-          {pagination.total_pages && pagination.total_pages > 0 ? (
-            Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`page-number ${currentPage === page ? "active" : ""}`}
-              >
-                {page}
-              </button>
-            ))
-          ) : (
-            <button className="page-number active">1</button>
-          )}
-        </div>
-
-        <button
-          onClick={() => setCurrentPage(Math.min(pagination.total_pages, currentPage + 1))}
-          disabled={currentPage === pagination.total_pages}
-          className="pagination-btn"
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={pagination.total_pages || 1}
+        onPageChange={setCurrentPage}
+        isLoading={loading}
+      />
 
       {/* Modal */}
       <CreateEditStudioModal

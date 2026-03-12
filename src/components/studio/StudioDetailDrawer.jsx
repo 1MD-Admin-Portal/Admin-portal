@@ -316,7 +316,7 @@ const StudioDetailDrawer = ({ isOpen, onClose, studio, loading = false }) => {
         `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.STUDIOS.GET_BY_ID(studio.id)}`,
         { headers: getHeaders() }
       );
-      console.log("Studio BY ID response:", res.data);
+      
       const data = res.data?.studio || res.data;
       setLinkedInstructors(res.data?.studio?.instructors || []);
     } catch (err) {

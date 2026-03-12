@@ -24,11 +24,16 @@ export const getPendingClassesService = async (page = 1, limit = 20) => {
 };
 
 // All Classes (pagination support)
-export const getAllClassesService = async (page = 1, limit = 20) => {
+export const getAllClassesService = async (params = {}) => {
+  const { page = 1, limit = 20, search = "", date_from = "", date_to = "" } = params;
   const token = localStorage.getItem("token");
+  const queryParams = new URLSearchParams({ page, limit });
+  if (search) queryParams.append("search", search);
+  if (date_from) queryParams.append("date_from", date_from);
+  if (date_to) queryParams.append("date_to", date_to);
   try {
     const res = await api.get(
-      `${CONSTANTS.URL.GET_ALL_CLASSES}?page=${page}&limit=${limit}`,
+      `${CONSTANTS.URL.GET_ALL_CLASSES}?${queryParams.toString()}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }

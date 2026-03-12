@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
 import "./ReferralsPage.css";
 import {
   getReferralLeaderboardService,
@@ -10,26 +11,55 @@ import {
 const ReferralsPage = () => {
   const [activeTab, setActiveTab] = useState("leaderboard"); // leaderboard | stats | user
   const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardPagination, setLeaderboardPagination] = useState({});
   const [stats, setStats] = useState(null);
   const [userId, setUserId] = useState(""); // Input user ID for user referrals
   const [userReferrals, setUserReferrals] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [page, setPage] = useState(1);
+  const [dateFrom, setDateFrom] = useState("2026-01-01");
+  const limit = 20;
 
   useEffect(() => {
-    if (activeTab === "leaderboard") fetchLeaderboard();
+    if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
     if (activeTab === "stats") fetchStats();
     if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
-  }, [activeTab, page]);
+  }, [activeTab, leaderboardPage, page]);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = async (pageNum = 1) => {
     setLoading(true);
     try {
-      const data = await getReferralLeaderboardService();
-      setLeaderboard(data || []);
+      const data = await getReferralLeaderboardService({
+        date_from: dateFrom,
+        page: pageNum,
+        limit: limit,
+      });
+     
+      
+      // Handle different response structures
+      let leaderboardData = [];
+      let paginationData = {};
+      
+      if (Array.isArray(data)) {
+        // If response is directly an array
+        leaderboardData = data;
+      } else if (data?.data && Array.isArray(data.data)) {
+        // If response has data property
+        leaderboardData = data.data;
+        paginationData = data.pagination || {};
+      } else if (Array.isArray(data?.leaderboard)) {
+        // If response has leaderboard array
+        leaderboardData = data.leaderboard;
+        paginationData = data.pagination || {};
+      }
+      
+      setLeaderboard(leaderboardData);
+      setLeaderboardPagination(paginationData);
     } catch (err) {
       console.error("❌ Error fetching leaderboard:", err);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
@@ -92,6 +122,28 @@ const ReferralsPage = () => {
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (
         <div className="referral-content-section">
+          <div className="referral-date-filter" style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center" }}>
+            <label htmlFor="leaderboard-date" style={{ fontWeight: "600" }}>From Date:</label>
+            <input
+              id="leaderboard-date"
+              type="date"
+              value={dateFrom}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+                setLeaderboardPage(1);
+              }}
+              className="referral-search-input"
+              style={{ maxWidth: "200px" }}
+            />
+            <button
+              onClick={() => fetchLeaderboard(1)}
+              className="referral-search-button"
+              style={{ padding: "8px 16px" }}
+            >
+              Apply Filter
+            </button>
+          </div>
+
           <table className="referral-data-table">
             <thead>
               <tr>
@@ -114,6 +166,13 @@ const ReferralsPage = () => {
               ))}
             </tbody>
           </table>
+
+          <Pagination
+            currentPage={leaderboardPagination.current_page || leaderboardPage}
+            totalPages={leaderboardPagination.last_page || 1}
+            onPageChange={setLeaderboardPage}
+            isLoading={loading}
+          />
         </div>
       )}
 
@@ -232,27 +291,13 @@ const ReferralsPage = () => {
             </table>
           )}
 
-          {pagination.total > 0 && (
-            <div className="referral-pagination-controls">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="referral-pagination-button"
-              >
-                Prev
-              </button>
-              <span className="referral-pagination-info">
-                Page {pagination.current_page || page} of{" "}
-                {pagination.last_page || 1}
-              </span>
-              <button
-                disabled={page >= (pagination.last_page || 1)}
-                onClick={() => setPage((p) => p + 1)}
-                className="referral-pagination-button"
-              >
-                Next
-              </button>
-            </div>
+          {(
+            <Pagination
+              currentPage={pagination.current_page || page}
+              totalPages={pagination.last_page || 1}
+              onPageChange={setPage}
+              isLoading={loading}
+            />
           )}
         </div>
       )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 import {
   getPendingPayoutsService,
   uploadTransferProofService,
@@ -153,20 +154,9 @@ const PendingPayouts = () => {
     setUploadingProof((prev) => ({ ...prev, [payoutId]: true }));
     try {
       const result = await uploadTransferProofService(payoutId, files, "", "");
-      setPayouts((prev) =>
-        prev.map((p) =>
-          p.id === payoutId
-            ? {
-                ...p,
-                has_transfer_proof: true,
-                transfer_proof_urls:
-                  result?.payout?.transfer_proof_urls ||
-                  result?.transfer_proof_urls ||
-                  p.transfer_proof_urls,
-              }
-            : p
-        )
-      );
+      // Refresh the payouts list to sync with backend state
+      // This ensures if backend auto-completes the payout, UI reflects it
+      await fetchPayouts(pagination.page, pagination.limit);
       await showAlert("Upload Successful", result.message || "Transfer proof uploaded successfully!", "✅");
     } catch (error) {
       const msg =
@@ -395,39 +385,13 @@ const PendingPayouts = () => {
                 </table>
               </div>
 
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <div className="pagination-info">
-                    <p>
-                      Showing <span className="page-number">{(pagination.page - 1) * pagination.limit + 1}</span> to{" "}
-                      <span className="page-number">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{" "}
-                      <span className="page-number">{pagination.total}</span> results
-                    </p>
-                  </div>
-                  <div className="pagination-controls">
-                    <button onClick={() => handlePageChange(pagination.page - 1)} disabled={pagination.page <= 1} className="pagination-btn">
-                      ❮ Previous
-                    </button>
-                    <div className="page-numbers">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNumber;
-                        if (totalPages <= 5) pageNumber = i + 1;
-                        else if (pagination.page <= 3) pageNumber = i + 1;
-                        else if (pagination.page >= totalPages - 2) pageNumber = totalPages - 4 + i;
-                        else pageNumber = pagination.page - 2 + i;
-                        return (
-                          <button key={pageNumber} onClick={() => handlePageChange(pageNumber)}
-                            className={`page-btn ${pageNumber === pagination.page ? "active" : ""}`}>
-                            {pageNumber}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <button onClick={() => handlePageChange(pagination.page + 1)} disabled={pagination.page >= totalPages} className="pagination-btn">
-                      Next ❯
-                    </button>
-                  </div>
-                </div>
+              {(
+                <Pagination
+                  currentPage={pagination.page || 1}
+                  totalPages={totalPages || 1}
+                  onPageChange={handlePageChange}
+                  isLoading={loading}
+                />
               )}
             </>
           )}

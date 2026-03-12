@@ -10,6 +10,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { maskEmail } from "../../../components/maskEmail";
 const OrganizersPage = () => {
   const [applications, setApplications] = useState([]);
+  const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
 
   // single-reject modal state
@@ -22,22 +23,65 @@ const OrganizersPage = () => {
   const [showConfirm, setShowConfirm] = useState(null); // "approve-all", "reject-all", "approve-selected", "reject-selected"
   const [selectedApp, setSelectedApp] = useState(null);
 
+  // Filter states
+  const [searchInput,     setSearchInput]     = useState("");
+  const [statusInput,     setStatusInput]     = useState("");
+  const [dateFromInput,   setDateFromInput]   = useState("");
+  const [dateToInput,     setDateToInput]     = useState("");
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "",
+    date_from: "",
+    date_to: "",
+    page: 1,
+  });
+  const limit = 10;
+
   const modalRef = useRef(null);
   const selectAllRef = useRef(null);
 
+  // Debounce filter changes - input updates immediately, fetch waits 300ms
   useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const data = await getOrganizerApplications();
-        setApplications(data);
-      } catch (error) {
-        console.error("Error fetching organizer applications:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchApplications();
-  }, []);
+  }, [filters]);
+
+  const fetchApplications = async () => {
+    setLoading(true);
+    try {
+      const data = await getOrganizerApplications({
+        search: filters.search,
+        page: filters.page,
+        limit,
+        status: filters.status,
+        date_from: filters.date_from,
+        date_to: filters.date_to,
+      });
+
+    
+
+      // Handle the API response structure
+      let applicationsData = [];
+      let paginationData = {};
+
+      if (data?.applications && Array.isArray(data.applications)) {
+        applicationsData = data.applications;
+        paginationData = data.pagination || {};
+      } else if (Array.isArray(data)) {
+        applicationsData = data;
+      } else if (data?.data && Array.isArray(data.data)) {
+        applicationsData = data.data;
+        paginationData = data.pagination || {};
+      }
+
+      setApplications(applicationsData);
+      setPagination(paginationData);
+    } catch (error) {
+      console.error("Error fetching organizer applications:", error);
+      setApplications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // click outside detail modal to close
   useEffect(() => {
@@ -64,12 +108,36 @@ const OrganizersPage = () => {
     return field;
   };
 
+  const handleApplyFilters = () => {
+    setFilters({
+      search: searchInput,
+      status: statusInput,
+      date_from: dateFromInput,
+      date_to: dateToInput,
+      page: 1,
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setStatusInput("");
+    setDateFromInput("");
+    setDateToInput("");
+    setFilters({
+      search: "",
+      status: "",
+      date_from: "",
+      date_to: "",
+      page: 1,
+    });
+  };
+
   const handleApprove = async (id) => {
     try {
       await approveOrganizerApplication(id);
       setApplications((prev) =>
         prev.map((app) =>
-          app.id === id ? { ...app, status: "approved" } : app
+          app.id === id ? { ...app, status: "accepted" } : app
         )
       );
     } catch (error) {
@@ -134,7 +202,7 @@ const OrganizersPage = () => {
       );
       setApplications((prev) =>
         prev.map((a) =>
-          a.status === "pending" ? { ...a, status: "approved" } : a
+          a.status === "pending" ? { ...a, status: "accepted" } : a
         )
       );
     } catch (err) {
@@ -171,7 +239,7 @@ const OrganizersPage = () => {
       );
       setApplications((prev) =>
         prev.map((a) =>
-          selectedIds.includes(a.id) ? { ...a, status: "approved" } : a
+          selectedIds.includes(a.id) ? { ...a, status: "accepted" } : a
         )
       );
     } catch (err) {
@@ -206,6 +274,99 @@ const OrganizersPage = () => {
   return (
     <div className="professors-container">
       <h1 className="professors-title">Organizer Applications</h1>
+
+      {/* Filters Section */}
+      <div style={{
+        background: "#f8f9ff", padding: "16px", borderRadius: "10px",
+        marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
+        display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
+      }}>
+        {/* Search */}
+        <div style={{ flex: "1 1 200px" }}>
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{
+              width: "100%", padding: "8px 12px", borderRadius: "6px",
+              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Status Filter */}
+        <div style={{ flex: "1 1 150px" }}>
+          <select
+            value={statusInput}
+            onChange={(e) => setStatusInput(e.target.value)}
+            style={{
+              width: "100%", padding: "8px 12px", borderRadius: "6px",
+              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+              boxSizing: "border-box", cursor: "pointer",
+            }}
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
+        {/* Date From */}
+        <div style={{ flex: "1 1 150px" }}>
+          <input
+            type="date"
+            value={dateFromInput}
+            onChange={(e) => setDateFromInput(e.target.value)}
+            style={{
+              width: "100%", padding: "8px 12px", borderRadius: "6px",
+              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Date To */}
+        <div style={{ flex: "1 1 150px" }}>
+          <input
+            type="date"
+            value={dateToInput}
+            onChange={(e) => setDateToInput(e.target.value)}
+            style={{
+              width: "100%", padding: "8px 12px", borderRadius: "6px",
+              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Apply & Clear Buttons */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            onClick={handleApplyFilters}
+            style={{
+              padding: "8px 16px", borderRadius: "6px",
+              background: "linear-gradient(135deg, #6c3de8, #ec4899)",
+              color: "white", border: "none", cursor: "pointer",
+              fontWeight: "600", fontSize: "13px",
+            }}
+          >
+            Apply Filters
+          </button>
+          <button
+            onClick={handleClearFilters}
+            style={{
+              padding: "8px 16px", borderRadius: "6px",
+              background: "#f0f0f0", color: "#333", border: "1px solid #ddd",
+              cursor: "pointer", fontWeight: "600", fontSize: "13px",
+            }}
+          >
+            Clear
+          </button>
+        </div>
+      </div>
 
       {/* Bulk actions bar:
           - If nothing selected -> show Approve All / Reject All
@@ -350,6 +511,44 @@ const OrganizersPage = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {applications.length > 0 && (
+        <div style={{
+          display: "flex", justifyContent: "center", alignItems: "center",
+          gap: "10px", marginTop: "20px", padding: "16px",
+        }}>
+          <button
+            onClick={() => setFilters(prev => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
+            disabled={filters.page === 1}
+            style={{
+              padding: "8px 12px", borderRadius: "6px", border: "1px solid #e0e0e0",
+              background: filters.page === 1 ? "#f0f0f0" : "white",
+              cursor: filters.page === 1 ? "not-allowed" : "pointer",
+              opacity: filters.page === 1 ? 0.6 : 1,
+            }}
+          >
+            ← Previous
+          </button>
+
+          <span style={{ fontSize: "14px", fontWeight: "600" }}>
+            Page {pagination.page || filters.page} of {pagination.total_pages || 1}
+          </span>
+
+          <button
+            onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
+            disabled={(pagination.page || filters.page) >= (pagination.total_pages || 1)}
+            style={{
+              padding: "8px 12px", borderRadius: "6px", border: "1px solid #e0e0e0",
+              background: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? "#f0f0f0" : "white",
+              cursor: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? "not-allowed" : "pointer",
+              opacity: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? 0.6 : 1,
+            }}
+          >
+            Next →
+          </button>
+        </div>
+      )}
 
       {/* Confirm modals */}
       {showConfirm === "approve-all" && (

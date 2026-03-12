@@ -8,6 +8,7 @@ import {
 } from "../../../services/badge.service";
 import { maskEmail } from "../../../components/maskEmail";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 // 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
   if (value === null || value === undefined) return "N/A";
@@ -272,27 +273,12 @@ const ProfessorsListPage = () => {
         </tbody>
       </table>
 
-      <div className="dancers-pagination-controls">
-        <button
-          className="dancers-pagination-btn"
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          Previous
-        </button>
-
-        <span className="dancers-page-indicator">
-          Page {pagination.page} of {pagination.totalPages}
-        </span>
-
-        <button
-          className="dancers-pagination-btn"
-          disabled={page === pagination.totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page || page}
+        totalPages={pagination.totalPages || 1}
+        onPageChange={setPage}
+        isLoading={loading}
+      />
 
       {isModalOpen && selectedProfessor && (
         <div className="dancer-modal-overlay" onClick={closeModal}>
