@@ -20,6 +20,7 @@ const ReferralsPage = () => {
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [page, setPage] = useState(1);
   const [dateFrom, setDateFrom] = useState("2026-01-01");
+  const [searchTerm, setSearchTerm] = useState("");
   const limit = 20;
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const ReferralsPage = () => {
     try {
       const data = await getReferralLeaderboardService({
         date_from: dateFrom,
+        search: searchTerm,
         page: pageNum,
         limit: limit,
       });
@@ -122,19 +124,36 @@ const ReferralsPage = () => {
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (
         <div className="referral-content-section">
-          <div className="referral-date-filter" style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center" }}>
-            <label htmlFor="leaderboard-date" style={{ fontWeight: "600" }}>From Date:</label>
-            <input
-              id="leaderboard-date"
-              type="date"
-              value={dateFrom}
-              onChange={(e) => {
-                setDateFrom(e.target.value);
-                setLeaderboardPage(1);
-              }}
-              className="referral-search-input"
-              style={{ maxWidth: "200px" }}
-            />
+          <div className="referral-date-filter" style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <label htmlFor="leaderboard-search" style={{ fontWeight: "600" }}>Search:</label>
+              <input
+                id="leaderboard-search"
+                type="text"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setLeaderboardPage(1);
+                }}
+                className="referral-search-input"
+                style={{ maxWidth: "250px" }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <label htmlFor="leaderboard-date" style={{ fontWeight: "600" }}>From Date:</label>
+              <input
+                id="leaderboard-date"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => {
+                  setDateFrom(e.target.value);
+                  setLeaderboardPage(1);
+                }}
+                className="referral-search-input"
+                style={{ maxWidth: "200px" }}
+              />
+            </div>
             <button
               onClick={() => fetchLeaderboard(1)}
               className="referral-search-button"

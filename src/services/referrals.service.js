@@ -3,13 +3,16 @@ import { CONSTANTS } from "../utils/constants";
 
 // Get leaderboard
 export const getReferralLeaderboardService = async (params = {}) => {
-  const { date_from = null, page = 1, limit = 20 } = params;
+  const { date_from = null, search = null, page = 1, limit = 20 } = params;
   const queryParams = new URLSearchParams({
     page,
     limit,
   });
   if (date_from) {
     queryParams.append("date_from", date_from);
+  }
+  if (search) {
+    queryParams.append("search", search);
   }
   const response = await api.get(
     `${CONSTANTS.URL.REFERRALS.LEADERBOARD}?${queryParams.toString()}`

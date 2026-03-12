@@ -42,10 +42,11 @@ const DanceStylesSelect = ({ selected, onChange, options }) => {
           {selected.length ? selected.map(name => (
             <span key={name} className="ds-chip">
               {name}
-              <button type="button" className="ds-chip__remove"
-                onClick={e => { e.stopPropagation(); onChange(selected.filter(s => s !== name)); }}>
+              <span className="ds-chip__remove" role="button" tabIndex={0}
+                onClick={e => { e.stopPropagation(); onChange(selected.filter(s => s !== name)); }}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onChange(selected.filter(s => s !== name)); } }}>
                 <X size={11} />
-              </button>
+              </span>
             </span>
           )) : (
             <span className="ds-placeholder">Select dance styles</span>
@@ -90,8 +91,8 @@ const DanceStylesSelect = ({ selected, onChange, options }) => {
 
 // ─── Modal Shell ──────────────────────────────────────────────────────────────
 const ModalShell = ({ title, onClose, maxWidth = "600px", children, footer }) => (
-  <div className="modal-overlay-custom">
-    <div className="modal-shell" style={{ maxWidth }}>
+  <div className="modal-overlay-custom" onClick={onClose}>
+    <div className="modal-shell" style={{ maxWidth }} onClick={(e) => e.stopPropagation()}>
       <div className="modal-header-custom">
         <h5 className="modal-title-custom">{title}</h5>
         <button className="modal-close-custom" onClick={onClose}><X size={16} /></button>
@@ -131,8 +132,8 @@ const SeverityBadge = ({ count }) => {
 
 // ─── Confirm Dialog ───────────────────────────────────────────────────────────
 const ConfirmDialog = ({ message, onConfirm, onClose }) => (
-  <div className="modal-overlay-custom" style={{ zIndex: 2000 }}>
-    <div className="modal-shell" style={{ maxWidth: "420px" }}>
+  <div className="modal-overlay-custom" style={{ zIndex: 2000 }} onClick={onClose}>
+    <div className="modal-shell" style={{ maxWidth: "420px" }} onClick={(e) => e.stopPropagation()}>
       <div className="modal-header-custom" style={{ background: "linear-gradient(135deg,#ef4444,#dc2626)" }}>
         <h5 className="modal-title-custom">Confirm Action</h5>
         <button className="modal-close-custom" onClick={onClose}><X size={16} /></button>
