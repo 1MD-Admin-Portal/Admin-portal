@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import GlobalLoader from "../../components/common/GlobalLoader";
 import Pagination from "../../components/common/Pagination";
 import "./ReferralsPage.css";
@@ -22,50 +22,98 @@ const ReferralsPage = () => {
   const [dateFrom, setDateFrom] = useState("2026-01-01");
   const [searchTerm, setSearchTerm] = useState("");
   const limit = 20;
-
+  const [tableLoading, setTableLoading] = useState(false); // separate loader for search/filter
+  // useEffect(() => {
+  //   if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
+  //   if (activeTab === "stats") fetchStats();
+  //   if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
+  // }, [activeTab, leaderboardPage, page]);
   useEffect(() => {
-    if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
-    if (activeTab === "stats") fetchStats();
-    if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
-  }, [activeTab, leaderboardPage, page]);
+  if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
+  if (activeTab === "stats") fetchStats();
+  if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
+}, [activeTab, leaderboardPage, page]);
 
-  const fetchLeaderboard = async (pageNum = 1) => {
-    setLoading(true);
-    try {
-      const data = await getReferralLeaderboardService({
-        date_from: dateFrom,
-        search: searchTerm,
-        page: pageNum,
-        limit: limit,
-      });
+
+  // Add this useEffect after your existing ones
+useEffect(() => {
+  if (activeTab !== "leaderboard") return;
+  const debounceTimer = setTimeout(() => {
+    fetchLeaderboard(1);
+  }, 400);
+  return () => clearTimeout(debounceTimer);
+}, [searchTerm, dateFrom, activeTab]);
+
+  // const fetchLeaderboard = async (pageNum = 1) => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await getReferralLeaderboardService({
+  //       date_from: dateFrom,
+  //       search: searchTerm,
+  //       page: pageNum,
+  //       limit: limit,
+  //     });
      
       
-      // Handle different response structures
-      let leaderboardData = [];
-      let paginationData = {};
+  //     // Handle different response structures
+  //     let leaderboardData = [];
+  //     let paginationData = {};
       
-      if (Array.isArray(data)) {
-        // If response is directly an array
-        leaderboardData = data;
-      } else if (data?.data && Array.isArray(data.data)) {
-        // If response has data property
-        leaderboardData = data.data;
-        paginationData = data.pagination || {};
-      } else if (Array.isArray(data?.leaderboard)) {
-        // If response has leaderboard array
-        leaderboardData = data.leaderboard;
-        paginationData = data.pagination || {};
-      }
+  //     if (Array.isArray(data)) {
+  //       // If response is directly an array
+  //       leaderboardData = data;
+  //     } else if (data?.data && Array.isArray(data.data)) {
+  //       // If response has data property
+  //       leaderboardData = data.data;
+  //       paginationData = data.pagination || {};
+  //     } else if (Array.isArray(data?.leaderboard)) {
+  //       // If response has leaderboard array
+  //       leaderboardData = data.leaderboard;
+  //       paginationData = data.pagination || {};
+  //     }
       
-      setLeaderboard(leaderboardData);
-      setLeaderboardPagination(paginationData);
-    } catch (err) {
-      console.error("❌ Error fetching leaderboard:", err);
-      setLeaderboard([]);
-    } finally {
-      setLoading(false);
+  //     setLeaderboard(leaderboardData);
+  //     setLeaderboardPagination(paginationData);
+  //   } catch (err) {
+  //     console.error("❌ Error fetching leaderboard:", err);
+  //     setLeaderboard([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const fetchLeaderboard = useCallback(async (pageNum = 1) => {
+  setTableLoading(true); 
+  try {
+    const data = await getReferralLeaderboardService({
+      date_from: dateFrom,
+      search: searchTerm,
+      page: pageNum,
+      limit: limit,
+    });
+
+    let leaderboardData = [];
+    let paginationData = {};
+
+    if (Array.isArray(data)) {
+      leaderboardData = data;
+    } else if (data?.data && Array.isArray(data.data)) {
+      leaderboardData = data.data;
+      paginationData = data.pagination || {};
+    } else if (Array.isArray(data?.leaderboard)) {
+      leaderboardData = data.leaderboard;
+      paginationData = data.pagination || {};
     }
-  };
+
+    setLeaderboard(leaderboardData);
+    setLeaderboardPagination(paginationData);
+  } catch (err) {
+    console.error("❌ Error fetching leaderboard:", err);
+    setLeaderboard([]);
+  } finally {
+    setTableLoading(false);
+  }
+}, [dateFrom, searchTerm]); // <-- dependencies here
 
   const fetchStats = async () => {
     setLoading(true);
@@ -119,7 +167,13 @@ const ReferralsPage = () => {
         </button> */}
       </div>
 
-      {loading && <GlobalLoader text="Loading referral data..." />}
+      {/* {loading && <GlobalLoader text="Loading referral data..." />} */}
+      {/* Add this inside the leaderboard table section */}
+{tableLoading && (
+  <div style={{ textAlign: "center", padding: "10px", color: "#888" }}>
+    Loading...
+  </div>
+)}
 
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (

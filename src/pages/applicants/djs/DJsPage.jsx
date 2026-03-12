@@ -13,6 +13,7 @@ const DJsPage = () => {
   const [applications, setApplications] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
   const [showConfirm, setShowConfirm] = useState(null);
@@ -34,11 +35,25 @@ const DJsPage = () => {
 
   // Debounce filter changes - input updates immediately, fetch waits 300ms
   useEffect(() => {
-    fetchApplications();
+    const isInitial = !searchInput && !statusInput && !dateFromInput && !dateToInput && filters.page === 1;
+    fetchApplications(isInitial);
   }, [filters]);
 
-  const fetchApplications = async () => {
-    setLoading(true);
+  // Debounced search effect
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setFilters(prev => ({
+        ...prev,
+        search: searchInput,
+        page: 1,
+      }));
+    }, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchInput]);
+
+  const fetchApplications = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
+    else setTableLoading(true);
     try {
       const data = await getDJApplications({
         search: filters.search,
@@ -72,6 +87,7 @@ const DJsPage = () => {
       setApplications([]);
     } finally {
       setLoading(false);
+      setTableLoading(false);
     }
   };
 
@@ -143,10 +159,9 @@ const DJsPage = () => {
 
   const pendingApps = applications.filter((a) => a.status === "pending");
 
-  if (loading) return <GlobalLoader text="Loading DJ applications..." />;
-
   return (
     <div className="professors-container">
+      {loading && <GlobalLoader text="Loading DJ applications..." />}
       <h2 className="professors-title">DJ Applications</h2>
 
       {/* Filters Section */}
@@ -242,6 +257,14 @@ const DJsPage = () => {
         </div>
       </div>
 
+
+      {tableLoading && (
+        <div style={{
+          padding: "12px 16px", background: "rgba(108, 61, 232, 0.05)",
+          borderRadius: "8px", marginBottom: "16px", fontSize: "13px",
+          color: "#666", textAlign: "center",
+        }}>Loading...</div>
+      )}
 
         <div className="pagination-controls">
           {selectedIds.length === 0 ? (

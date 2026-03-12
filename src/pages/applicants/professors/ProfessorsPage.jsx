@@ -58,6 +58,7 @@ const ProfessorsPage = () => {
   const [applications,    setApplications]    = useState([]);
   const [pagination,      setPagination]      = useState({});
   const [loading,         setLoading]         = useState(true);
+  const [tableLoading,    setTableLoading]    = useState(false);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment,   setRejectComment]   = useState("");
   const [bulkComment,     setBulkComment]     = useState("");
@@ -78,15 +79,31 @@ const ProfessorsPage = () => {
   const limit = 10;
   const modalRef    = useRef(null);
   const selectAllRef = useRef(null);
+  const isInitialLoadRef = useRef(true);
 
   const pendingApps = applications.filter(a => a.status === "pending");
 
   useEffect(() => {
-    fetchApplications();
+    const isInitial = isInitialLoadRef.current && !filters.search && !filters.status && filters.page === 1;
+    if (isInitial) isInitialLoadRef.current = false;
+    fetchApplications(isInitial);
   }, [filters]);
 
-  const fetchApplications = async () => {
-    setLoading(true);
+  // Debounced search effect
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setFilters(prev => ({
+        ...prev,
+        search: searchInput,
+        page: 1,
+      }));
+    }, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchInput]);
+
+  const fetchApplications = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
+    else setTableLoading(true);
     try {
       const data = await getInstructorApplications({
         search: filters.search,
@@ -120,6 +137,7 @@ const ProfessorsPage = () => {
       setApplications([]);
     } finally {
       setLoading(false);
+      setTableLoading(false);
     }
   };
 
@@ -235,10 +253,9 @@ const ProfessorsPage = () => {
     });
   };
 
-  if (loading) return <GlobalLoader text="Loading instructor applications..." />;
-
   return (
     <div className="professors-container">
+      {loading && <GlobalLoader text="Loading instructor applications..." />}
       <h1 className="professors-title">Instructor Applications</h1>
 
       {/* Filters Section */}
@@ -333,6 +350,14 @@ const ProfessorsPage = () => {
           </button>
         </div>
       </div>
+
+      {tableLoading && (
+        <div style={{
+          padding: "12px 16px", background: "rgba(108, 61, 232, 0.05)",
+          borderRadius: "8px", marginBottom: "16px", fontSize: "13px",
+          color: "#666", textAlign: "center",
+        }}>Loading...</div>
+      )}
 
       {/* Action bar */}
       <div className="bulk-actions-bar">
