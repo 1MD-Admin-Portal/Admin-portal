@@ -19,7 +19,7 @@ const ReferralsPage = () => {
   const [loading, setLoading] = useState(false);
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [page, setPage] = useState(1);
-  const [dateFrom, setDateFrom] = useState("2026-01-01");
+  const [dateFrom, setDateFrom] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const limit = 20;
   const [tableLoading, setTableLoading] = useState(false); // separate loader for search/filter
@@ -209,11 +209,15 @@ useEffect(() => {
               />
             </div>
             <button
-              onClick={() => fetchLeaderboard(1)}
+              onClick={() => {
+                setSearchTerm("");
+                setDateFrom("");
+                setLeaderboardPage(1);
+              }}
               className="referral-search-button"
               style={{ padding: "8px 16px" }}
             >
-              Apply Filter
+              Clear
             </button>
           </div>
 

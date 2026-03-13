@@ -281,8 +281,8 @@ const FeedPage = () => {
                   boxSizing: "border-box", cursor: "pointer",
                 }}
               >
-                <option value="created_at">Creation Date</option>
-                <option value="updated_at">Updated Date</option>
+                <option value="created_at">Date Created</option>
+                <option value="updated_at">Date Updated</option>
               </select>
             </div>
 
@@ -300,8 +300,8 @@ const FeedPage = () => {
                   boxSizing: "border-box", cursor: "pointer",
                 }}
               >
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
+                <option value="asc">Oldest</option>
+                <option value="desc">Newest</option>
               </select>
             </div>
 
