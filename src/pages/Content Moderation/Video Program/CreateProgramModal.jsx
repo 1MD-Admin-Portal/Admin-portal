@@ -276,6 +276,7 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
   const [videos,       setVideos]       = useState([{ title: "", duration: "", description: "", file: null }]);
   const [danceStyleOptions, setDanceStyleOptions] = useState([]);
   const [instructors,       setInstructors]       = useState([]);
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -334,8 +335,11 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
       }
       
       await createProgramService(payload);
-      alert("Program created successfully!");
-      onClose();
+      setSuccessMsg("Program created successfully!");
+      setTimeout(() => {
+        setSuccessMsg("");
+        onClose();
+      }, 2000);
     } catch (err) {
       const msg = err?.response?.data?.error || err?.response?.data?.message || "Failed to create program.";
       alert(msg);
@@ -346,9 +350,32 @@ const CreateProgramModal = ({ isOpen, onClose }) => {
   const inputBlur  = (e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f8fafc"; e.target.style.boxShadow = "none"; };
 
   if (!isOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <div style={S.overlay} onClick={onClose}>
+      {/* Success Notification */}
+      {successMsg && (
+        <div style={{
+          position: "fixed",
+          top: "18%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "linear-gradient(135deg,#6c3de8,#ec4899)",
+          color: "white",
+          fontWeight: 700,
+          fontSize: "1rem",
+          padding: "16px 32px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 24px rgba(108,61,232,0.18)",
+          zIndex: 2000,
+          letterSpacing: "0.02em",
+          textAlign: "center",
+          opacity: 0.97,
+        }}>
+          {successMsg}
+        </div>
+      )}
       <div style={S.modal} onClick={e => e.stopPropagation()}>
 
         {/* Header */}
