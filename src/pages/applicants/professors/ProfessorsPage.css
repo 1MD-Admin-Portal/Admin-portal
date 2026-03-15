@@ -1,3 +1,111 @@
+/* Modern SaaS-style filter toolbar for professors */
+.professors-filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background: #f8f9ff;
+  border-radius: 12px;
+  border: 1px solid #c4b5fd;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.professors-filter-search,
+.professors-filter-status,
+.professors-filter-date {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #c4b5fd;
+  padding: 0.5rem 1rem;
+  min-width: 150px;
+  flex: 1 1 150px;
+}
+
+.professors-filter-icon {
+  color: #a78bfa;
+  margin-right: 0.5rem;
+  width: 20px;
+  height: 20px;
+}
+
+.professors-filter-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: #4b5563;
+  width: 100%;
+}
+
+.professors-filter-input::placeholder {
+  color: #a78bfa;
+  opacity: 0.7;
+}
+
+.professors-filter-select {
+  background: transparent;
+  appearance: none;
+  padding-right: 1.5rem;
+  cursor: pointer;
+}
+
+.professors-filter-apply {
+  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.7rem 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(167, 139, 250, 0.15);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.professors-filter-apply:hover {
+  background: linear-gradient(135deg, #6c3de8 0%, #ec4899 100%);
+  transform: translateY(-2px);
+}
+
+.professors-filter-clear {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.7rem 2rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.professors-filter-clear:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .professors-filter-toolbar {
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 0.7rem 0.5rem;
+  }
+  .professors-filter-search,
+  .professors-filter-status,
+  .professors-filter-date {
+    min-width: 100px;
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+  }
+  .professors-filter-apply,
+  .professors-filter-clear {
+    width: 100%;
+    padding: 0.7rem 1rem;
+  }
+}
 /* ================= CONTAINER ================= */
 
 .professors-container {
@@ -14,7 +122,7 @@
   margin-bottom: 24px;
   background: linear-gradient(135deg, #3b82f6, #ec4899);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+ 
 }
 
 /* ================= TABLE ================= */

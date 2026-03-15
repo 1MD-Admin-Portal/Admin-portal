@@ -140,23 +140,23 @@ const DancersList = () => {
         user_personas: finalPersonas,
       });
 
-      const defaultPersona = finalPersonas[0]; // always valid now
+      const defaultPersona = "dancer";
 
       const nextForPersona =
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-        user_type: defaultPersona,
-        badge_level:
-          nextForPersona && nextForPersona.level
-            ? String(nextForPersona.level)
-            : "",
-        custom_commission_rate:
-          nextForPersona && nextForPersona.commission_rate
-            ? String(nextForPersona.commission_rate)
-            : "",
-        reason: "",
-      });
+  user_type: "dancer",
+  badge_level:
+    nextForPersona && nextForPersona.level
+      ? String(nextForPersona.level)
+      : "",
+  custom_commission_rate:
+    nextForPersona && nextForPersona.commission_rate
+      ? String(nextForPersona.commission_rate)
+      : "",
+  reason: "",
+});
     } catch (err) {
       console.error("Error loading user badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -222,16 +222,11 @@ const DancersList = () => {
 
   return (
     <div className="dancers-main-container">
-      <h2 className="dancers-page-title">Dancers List</h2>
-      <div className="dancers-filters-container">
-        {/* filters currently commented-out */}
-      </div>
-
+      <h2 className="dancers-page-title">💃 Dancers List</h2>
       <table className="dancers-data-table">
         <thead>
           <tr>
             <th>ID</th>
-            
             <th>Name</th>
             <th>Email</th>
             <th>Created Date</th>
@@ -544,21 +539,7 @@ const DancersList = () => {
                         {
                           label: "Dancer Badge",
                           value: selectedDancer.current_badges.dancer || "None",
-                        },
-                        {
-                          label: "Instructor Badge",
-                          value:
-                            selectedDancer.current_badges.instructor || "None",
-                        },
-                        {
-                          label: "DJ Badge",
-                          value: selectedDancer.current_badges.dj || "None",
-                        },
-                        {
-                          label: "Organizer Badge",
-                          value:
-                            selectedDancer.current_badges.organizer || "None",
-                        },
+                        }
                       ])}
                     </div>
                   ) : (
@@ -712,22 +693,11 @@ const DancersList = () => {
                           <label>
                             Persona / User Type
                             <select
-                              value={badgeForm.user_type}
-                              onChange={(e) =>
-                                setBadgeForm((prev) => ({
-                                  ...prev,
-                                  user_type: e.target.value,
-                                }))
-                              }
-                            >
-                              <option value="">Select persona</option>
-                              {badgeDetails.user_personas &&
-                                badgeDetails.user_personas.map((p) => (
-                                  <option key={p} value={p}>
-                                    {p}
-                                  </option>
-                                ))}
-                            </select>
+  value="dancer"
+  disabled
+>
+  <option value="dancer">dancer</option>
+</select>
                           </label>
                         </div>
 

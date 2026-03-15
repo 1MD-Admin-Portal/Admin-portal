@@ -123,25 +123,19 @@ const DJListPage = () => {
       });
 
       // For DJs, default to "dj" if available
-      const defaultPersona = finalPersonas.includes("dj")
-        ? "dj"
-        : finalPersonas[0];
+      const defaultPersona = "dj";
 
       const nextForPersona =
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-        user_type: defaultPersona,
-        badge_level:
-          nextForPersona && nextForPersona.level
-            ? String(nextForPersona.level)
-            : "",
-        custom_commission_rate:
-          nextForPersona && nextForPersona.commission_rate
-            ? String(nextForPersona.commission_rate)
-            : "",
-        reason: "",
-      });
+  user_type: "dj",
+  badge_level: nextForPersona?.level ? String(nextForPersona.level) : "",
+  custom_commission_rate: nextForPersona?.commission_rate
+    ? String(nextForPersona.commission_rate)
+    : "",
+  reason: "",
+});
     } catch (err) {
       console.error("Error loading DJ badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -464,23 +458,10 @@ const DJListPage = () => {
                   ) ? (
                     <div className="dancer-badges-grid">
                       {renderDJInfoGrid([
-                        {
-                          label: "Dancer Badge",
-                          value: selectedUser.current_badges.dancer || "None",
-                        },
-                        {
-                          label: "Instructor Badge",
-                          value:
-                            selectedUser.current_badges.instructor || "None",
-                        },
+                        
                         {
                           label: "DJ Badge",
                           value: selectedUser.current_badges.dj || "None",
-                        },
-                        {
-                          label: "Organizer Badge",
-                          value:
-                            selectedUser.current_badges.organizer || "None",
                         },
                       ])}
                     </div>
@@ -585,17 +566,13 @@ const DJListPage = () => {
                     <>
                       <div className="dancer-badge-personas">
                         <strong>User Personas:</strong>{" "}
-                        {badgeDetails.user_personas &&
-                        badgeDetails.user_personas.length > 0
-                          ? badgeDetails.user_personas.join(", ")
-                          : "N/A"}
                       </div>
 
                       {badgeDetails.next_badges && (
                         <div className="dancer-next-badges">
-                          {Object.entries(badgeDetails.next_badges).map(
-                            ([persona, badge]) =>
-                              badge && (
+                          {Object.entries(badgeDetails.next_badges)
+  .filter(([persona]) => persona === "dj")
+  .map(([persona, badge]) => (
                                 <div
                                   key={persona}
                                   className="dancer-next-badge-card"
@@ -631,25 +608,11 @@ const DJListPage = () => {
                       >
                         <div className="dancer-badge-form-row">
                           <label>
-                            Persona / User Type
-                            <select
-                              value={badgeForm.user_type}
-                              onChange={(e) =>
-                                setBadgeForm((prev) => ({
-                                  ...prev,
-                                  user_type: e.target.value,
-                                }))
-                              }
-                            >
-                              <option value="">Select persona</option>
-                              {badgeDetails.user_personas &&
-                                badgeDetails.user_personas.map((p) => (
-                                  <option key={p} value={p}>
-                                    {p}
-                                  </option>
-                                ))}
-                            </select>
-                          </label>
+  Persona / User Type
+  <select value="dj" disabled>
+    <option value="dj">dj</option>
+  </select>
+</label>
                         </div>
 
                         <div className="dancer-badge-form-row">

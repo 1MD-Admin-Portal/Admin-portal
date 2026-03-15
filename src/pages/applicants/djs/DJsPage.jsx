@@ -5,8 +5,11 @@ import {
   rejectDJApplication,
 } from "../../../services/dj.service";
 import GlobalLoader from "../../../components/common/GlobalLoader";
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+import Pagination from "../../../components/common/Pagination";
 import "./DJsPage.css";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Search, Calendar, Filter } from "lucide-react";
 import { maskEmail } from "../../../components/maskEmail";
 
 const DJsPage = () => {
@@ -81,7 +84,10 @@ const DJsPage = () => {
       }
 
       setApplications(applicationsData);
-      setPagination(paginationData);
+      setPagination({
+  ...paginationData,
+  totalPages: paginationData.total_pages ?? paginationData.totalPages,
+});
     } catch (error) {
       console.error("Error fetching DJ applications:", error);
       setApplications([]);
@@ -137,12 +143,15 @@ const DJsPage = () => {
     setFilters({
       search: searchInput,
       status: statusInput,
-      date_from: dateFromInput,
-      date_to: dateToInput,
+      date_from: dateFromInput ? dateFromInput.toLocaleDateString("en-CA") : undefined,
+  date_to: dateToInput ? dateToInput.toLocaleDateString("en-CA") : undefined,
       page: 1,
     });
   };
 
+  const handleMainPaginationChange = (newPage) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  }
   const handleClearFilters = () => {
     setSearchInput("");
     setStatusInput("");
@@ -162,7 +171,7 @@ const DJsPage = () => {
   return (
     <div className="professors-container">
       {loading && <GlobalLoader text="Loading DJ applications..." />}
-      <h2 className="professors-title">DJ Applications</h2>
+      <h2 className="professors-title">🎧 DJ Applications</h2>
 
 
       <div className="pagination-controls">
@@ -198,37 +207,24 @@ const DJsPage = () => {
             </>
           )}
         </div>
-      {/* Filters Section */}
-      <div style={{
-        background: "#f8f9ff", padding: "16px", borderRadius: "10px",
-        marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
-        display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
-      }}>
-        {/* Search */}
-        <div style={{ flex: "1 1 200px" }}>
+      {/* Modern SaaS-style filter toolbar */}
+      <div className="professors-filter-toolbar">
+        <div className="professors-filter-search">
+          <Search className="professors-filter-icon" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box",
-            }}
+            className="professors-filter-input"
           />
         </div>
-
-        {/* Status Filter */}
-        <div style={{ flex: "1 1 150px" }}>
+        <div className="professors-filter-status">
+          <Filter className="professors-filter-icon" />
           <select
             value={statusInput}
             onChange={(e) => setStatusInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box", cursor: "pointer",
-            }}
+            className="professors-filter-input professors-filter-select"
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -236,60 +232,48 @@ const DJsPage = () => {
             <option value="rejected">Rejected</option>
           </select>
         </div>
+        <div className="professors-filter-date">
+          <Calendar className="professors-filter-icon" />
+          <DatePicker
+  selected={dateFromInput}
+  onChange={(date) => setDateFromInput(date)}
+  onChangeRaw={(e) => e.preventDefault()}
+  placeholderText="From"
+  className="class-mod-filter-input"
+  dateFormat="dd-MM-yyyy"
+  showMonthDropdown
+  showYearDropdown
+  dropdownMode="select"
+/>
+        </div>
+        <div className="professors-filter-date">
+           <Calendar className="class-mod-filter-icon" />
+    <DatePicker
+  selected={dateToInput}
+  onChange={(date) => setDateToInput(date)}
+  minDate={dateFromInput}
 
-        {/* Date From */}
-        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
-        <div style={{ flex: "1 1 150px" }}>
-          <input
-            type="date"
-            value={dateFromInput}
-            onChange={(e) => setDateFromInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box",
-            }}
-          />
+  onChangeRaw={(e) => e.preventDefault()}
+  placeholderText="To"
+  className="class-mod-filter-input"
+  dateFormat="dd-MM-yyyy"
+  showMonthDropdown
+  showYearDropdown
+  dropdownMode="select"
+/>
         </div>
-        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
-        {/* Date To */}
-        <div style={{ flex: "1 1 150px" }}>
-          <input
-            type="date"
-            value={dateToInput}
-            onChange={(e) => setDateToInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box",
-            }}
-          />
-        </div>
-
-        {/* Apply & Clear Buttons */}
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            onClick={handleApplyFilters}
-            style={{
-              padding: "8px 16px", borderRadius: "6px",
-              background: "linear-gradient(135deg, #6c3de8, #ec4899)",
-              color: "white", border: "none", cursor: "pointer",
-              fontWeight: "600", fontSize: "13px",
-            }}
-          >
-            Apply Filters
-          </button>
-          <button
-            onClick={handleClearFilters}
-            style={{
-              padding: "8px 16px", borderRadius: "6px",
-              background: "#f0f0f0", color: "#333", border: "1px solid #ddd",
-              cursor: "pointer", fontWeight: "600", fontSize: "13px",
-            }}
-          >
-            Clear
-          </button>
-        </div>
+        <button
+          onClick={handleApplyFilters}
+          className="professors-filter-apply"
+        >
+          Apply Filters
+        </button>
+        <button
+          onClick={handleClearFilters}
+          className="professors-filter-clear"
+        >
+          Clear
+        </button>
       </div>
 
 
@@ -330,6 +314,7 @@ const DJsPage = () => {
             <th>Frequency</th>
             <th>Document</th>
             {/* <th>Status</th> */}
+            <th>Created at </th>
             <th>Comment</th>
             <th>Actions</th>
           </tr>
@@ -391,6 +376,7 @@ const DJsPage = () => {
                   "No document"
                 )}
               </td>
+              <td>{new Date(app.created_at).toLocaleDateString("en-GB")}</td>
               {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
               
@@ -424,42 +410,14 @@ const DJsPage = () => {
       </table>
 
       {/* Pagination */}
-      {applications.length > 0 && (
-        <div style={{
-          display: "flex", justifyContent: "center", alignItems: "center",
-          gap: "10px", marginTop: "20px", padding: "16px",
-        }}>
-          <button
-            onClick={() => setFilters(prev => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
-            disabled={filters.page === 1}
-            style={{
-              padding: "8px 12px", borderRadius: "6px", border: "1px solid #e0e0e0",
-              background: filters.page === 1 ? "#f0f0f0" : "white",
-              cursor: filters.page === 1 ? "not-allowed" : "pointer",
-              opacity: filters.page === 1 ? 0.6 : 1,
-            }}
-          >
-            ← Previous
-          </button>
-
-          <span style={{ fontSize: "14px", fontWeight: "600" }}>
-            Page {pagination.page || filters.page} of {pagination.total_pages || 1}
-          </span>
-
-          <button
-            onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
-            disabled={(pagination.page || filters.page) >= (pagination.total_pages || 1)}
-            style={{
-              padding: "8px 12px", borderRadius: "6px", border: "1px solid #e0e0e0",
-              background: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? "#f0f0f0" : "white",
-              cursor: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? "not-allowed" : "pointer",
-              opacity: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? 0.6 : 1,
-            }}
-          >
-            Next →
-          </button>
-        </div>
-      )}
+      {pagination.totalPages > 1 && (
+  <Pagination
+    currentPage={pagination.page}
+    totalPages={pagination.totalPages}
+    onPageChange={handleMainPaginationChange}
+    isLoading={loading || tableLoading}
+  />
+)}
 
       {/* Approve All */}
       {showConfirm === "approve" && (

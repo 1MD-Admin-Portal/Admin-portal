@@ -41,21 +41,23 @@ const EventsPage = () => {
   }, [page, activeTab]);
 
   const fetchEvents = async () => {
-    setLoading(true);
-    try {
-      let res;
-      if (activeTab === "requireApproval") {
-        res = await getAllDraftEventsService({ page, limit: 10 });
-      } else if (activeTab === "approved") {
-        res = await getAllApprovedEventsService({ page, limit: 10 });
-      }
-      setEvents(res?.events || []);
-      setTotalPages(res?.pagination?.totalPages || 1);
-    } catch (err) {
-      console.error("❌ Error fetching events:", err);
+  setLoading(true);
+  try {
+    let res;
+    if (activeTab === "requireApproval") {
+      res = await getAllDraftEventsService({ page, limit: 10 });
+    } else {
+      res = await getAllApprovedEventsService({ page, limit: 10 });
     }
-    setLoading(false);
-  };
+    setEvents(res?.events || []);
+    setTotalPages(res?.pagination?.totalPages ?? 1); // ✅ fix here
+  } catch (err) {
+    console.error("❌ Error fetching events:", err);
+    setEvents([]);        // ✅ clear on error too
+    setTotalPages(1);
+  }
+  setLoading(false);
+};
 
   useEffect(() => {
     if (modalOpen) {
@@ -106,6 +108,14 @@ const EventsPage = () => {
     if (!price || price === 0) return "Free";
     return `${price}`;
   };
+
+  // Helper function — add this inside your component
+const formatDate = (dateStr) => {
+  if (!dateStr) return "—";
+  const date = new Date(dateStr);
+  if (isNaN(date)) return "—";
+  return date.toLocaleDateString("en-GB"); // gives dd/mm/yyyy
+};
 
   return (
     <div className="event-moderation-wrapper">
@@ -188,6 +198,7 @@ const EventsPage = () => {
                   <Euro size={16} />
                   Price
                 </th>
+                <th>Created at </th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -228,7 +239,7 @@ const EventsPage = () => {
                     <div className="event-datetime-info">
                       <div className="event-date-info">
                         <Calendar size={14} />
-                        {new Date(event.event_date).toLocaleDateString()}
+                        {formatDate(event.event_date)}
                       </div>
                       {event.event_time && (
                         <div className="event-time-info">
@@ -240,7 +251,7 @@ const EventsPage = () => {
                   </td>
                   <td className="event-location-column">
                     <div className="event-location-info">
-                      <MapPin size={14} />
+                      <MapPin size={14}/>
                       {event.location}
                     </div>
                   </td>
@@ -250,6 +261,8 @@ const EventsPage = () => {
                       {formatPrice(event.price)}
                     </div>
                   </td>
+                  
+                  <td>{new Date(event.created_at).toLocaleDateString("en-GB")}</td>
                   <td className="event-actions-column">
                     {activeTab === "requireApproval" && (
                       <div className="event-action-buttons">
@@ -296,7 +309,7 @@ const EventsPage = () => {
       )}
 
       {/* Enhanced Pagination */}
-      { (
+      {totalPages > 1 && (
         <Pagination
           currentPage={page}
           totalPages={totalPages}
@@ -372,7 +385,7 @@ const EventsPage = () => {
                           <Calendar size={16} />
                           {new Date(
                             selectedEvent.event_date
-                          ).toLocaleDateString()}
+                          ).toLocaleDateString("en-GB")}
                           {selectedEvent.event_time && (
                             <div className="event-time-info">
                               <Clock size={14} />

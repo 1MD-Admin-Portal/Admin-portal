@@ -1,3 +1,84 @@
+/* Modern SaaS-style filter toolbar for leaderboard */
+.referral-filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background: #f8f9ff;
+  border-radius: 12px;
+  border: 1px solid #c4b5fd;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.referral-filter-search,
+.referral-filter-date {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #c4b5fd;
+  padding: 0.5rem 1rem;
+  min-width: 180px;
+  flex: 1 1 180px;
+}
+
+.referral-filter-icon {
+  color: #a78bfa;
+  margin-right: 0.5rem;
+  width: 20px;
+  height: 20px;
+}
+
+.referral-filter-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: #4b5563;
+  width: 100%;
+}
+
+.referral-filter-input::placeholder {
+  color: #a78bfa;
+  opacity: 0.7;
+}
+
+.referral-filter-clear {
+  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.7rem 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(167, 139, 250, 0.15);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.referral-filter-clear:hover {
+  background: linear-gradient(135deg, #6c3de8 0%, #ec4899 100%);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .referral-filter-toolbar {
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 0.7rem 0.5rem;
+  }
+  .referral-filter-search,
+  .referral-filter-date {
+    min-width: 100px;
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+  }
+  .referral-filter-clear {
+    width: 100%;
+    padding: 0.7rem 1rem;
+  }
+}
 /* =============================================
    REFERRALS PAGE — THEME MATCHED TO PROJECT
    White bg + Blue→Purple→Pink gradient

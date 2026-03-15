@@ -11,6 +11,7 @@ import {
   Eye,
 } from "lucide-react";
 import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
 import "./MarketplacePage.css";
 import {
   getMarketplacePrograms,
@@ -160,7 +161,9 @@ const MarketplacePage = () => {
       setEventPagination((prev) => ({ ...prev, page: newPage }));
     }
   };
-
+   
+  const currentPagination =
+  filter === "Program" ? programPagination : eventPagination;
   return (
     <div className="mktplace-main-wrapper">
       <div className="mktplace-top-header">
@@ -240,6 +243,7 @@ const MarketplacePage = () => {
                   <th>ID</th>
                   <th>Name / Title</th>
                   <th>Instructor / Organizer</th>
+                  <th>Created at </th>
                   <th>Price</th>
                   <th>Status</th>
                   <th>Type</th>
@@ -274,6 +278,7 @@ const MarketplacePage = () => {
                           : item.organizer?.name}
                       </div>
                     </td>
+                    <td>{new Date(filter === "Program" ? item.created_at : item.created_at).toLocaleDateString("en-GB")}</td>
                     <td className="mktplace-price-column">
                       <div className="mktplace-price-display">
                         <Euro size={14} />
@@ -318,61 +323,14 @@ const MarketplacePage = () => {
           </div>
 
           {/* Pagination Controls */}
-          <div className="mktplace-pagination-container">
-            <div className="mktplace-pagination-info">
-              <span>
-                Page{" "}
-                {filter === "Program"
-                  ? programPagination.page
-                  : eventPagination.page}{" "}
-                of{" "}
-                {filter === "Program"
-                  ? programPagination.totalPages
-                  : eventPagination.totalPages}{" "}
-                | Total:{" "}
-                {filter === "Program"
-                  ? programPagination.total
-                  : eventPagination.total}{" "}
-                {filter.toLowerCase()}s
-              </span>
-            </div>
-            <div className="mktplace-pagination-controls">
-              <button
-                className="mktplace-pagination-btn"
-                onClick={() =>
-                  handleMainPaginationChange(
-                    (filter === "Program"
-                      ? programPagination.page
-                      : eventPagination.page) - 1
-                  )
-                }
-                disabled={
-                  filter === "Program"
-                    ? !programPagination.hasPreviousPage
-                    : !eventPagination.hasPreviousPage
-                }
-              >
-                ← Previous
-              </button>
-              <button
-                className="mktplace-pagination-btn"
-                onClick={() =>
-                  handleMainPaginationChange(
-                    (filter === "Program"
-                      ? programPagination.page
-                      : eventPagination.page) + 1
-                  )
-                }
-                disabled={
-                  filter === "Program"
-                    ? !programPagination.hasNextPage
-                    : !eventPagination.hasNextPage
-                }
-              >
-                Next →
-              </button>
-            </div>
-          </div>
+          {currentPagination.totalPages > 1 && (
+  <Pagination
+    currentPage={currentPagination.page}
+    totalPages={currentPagination.totalPages}
+    onPageChange={handleMainPaginationChange}
+    isLoading={loading}
+  />
+)}
         </>
       )}
 
@@ -727,40 +685,16 @@ const MarketplacePage = () => {
                     </div>
 
                     {/* Purchase Pagination Controls */}
-                    <div className="mktplace-pagination-container">
-                      <div className="mktplace-pagination-info">
-                        <span>
-                          Page {purchasePagination.page} of{" "}
-                          {purchasePagination.totalPages} | Total:{" "}
-                          {purchasePagination.total} purchases
-                        </span>
-                      </div>
-                      <div className="mktplace-pagination-controls">
-                        <button
-                          className="mktplace-pagination-btn"
-                          onClick={() =>
-                            handlePurchasePageChange(
-                              purchasePagination.page - 1
-                            )
-                          }
-                          disabled={!purchasePagination.hasPreviousPage}
-                        >
-                          ← Previous
-                        </button>
-                        <button
-                          className="mktplace-pagination-btn"
-                          onClick={() =>
-                            handlePurchasePageChange(
-                              purchasePagination.page + 1
-                            )
-                          }
-                          disabled={!purchasePagination.hasNextPage}
-                        >
-                          Next →
-                        </button>
-                      </div>
+                    {purchasePagination.totalPages > 1 && (
+  <Pagination
+    currentPage={purchasePagination.page}
+    totalPages={purchasePagination.totalPages}
+    onPageChange={handlePurchasePageChange}
+    isLoading={loadingPurchases}
+  />
+)}
                     </div>
-                  </div>
+                  
                 </>
               )}
             </div>

@@ -231,6 +231,7 @@ const StudioManagementPage = () => {
                 <th>Capacity</th>
                 <th>Est. Year</th>
                 <th>Instructors</th>
+                <th>Created at</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -258,6 +259,7 @@ const StudioManagementPage = () => {
     <UserPlus size={14} /> Manage
   </button>
 </td>
+                  <td>{new Date(studio.created_at).toLocaleDateString("en-GB")}</td>
                   <td>
                     <span className={`status-badge status-${studio.status}`}>
                       {studio.status}

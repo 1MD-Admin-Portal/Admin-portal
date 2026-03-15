@@ -25,7 +25,9 @@ import {
   uploadNotificationImageService,
 } from "../../services/notification.service";
 import "./NotificationManagement.css";
+import Pagination from "../../components/common/Pagination";
 import { uploadMediaFile } from "../../services/upload.service";
+import DatePicker from "react-datepicker";
 
 const NotificationManagement = () => {
   const [notifications, setNotifications] = useState([]);
@@ -641,6 +643,7 @@ const NotificationManagement = () => {
                     onChange={handleInputChange}
                     className="notification-mgmt-form-input"
                   />
+                  
                 </div>
               )}
             </div>
@@ -718,7 +721,7 @@ const NotificationManagement = () => {
                       </td>
                       <td className="notification-mgmt-table-cell">
                         {notification.sent_at
-                          ? new Date(notification.sent_at).toLocaleString()
+                          ? new Date(notification.sent_at).toLocaleString("en-GB")
                           : "-"}
                       </td>
                       <td>
@@ -741,7 +744,7 @@ const NotificationManagement = () => {
             </div>
 
             {/* Pagination */}
-            <div className="notification-mgmt-pagination-container">
+            {/* <div className="notification-mgmt-pagination-container">
               <div className="notification-mgmt-pagination-info">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
                 {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
@@ -770,7 +773,12 @@ const NotificationManagement = () => {
                   Next
                 </button>
               </div>
-            </div>
+            </div> */}
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+            />
           </>
         )}
       </div>
@@ -896,7 +904,7 @@ const NotificationManagement = () => {
                         <span className="notification-mgmt-info-value">
                           {new Date(
                             selectedNotification.notification.created_at
-                          ).toLocaleString()}
+                          ).toLocaleString("en-GB")}
                         </span>
                       </div>
                       {selectedNotification.notification.sent_at && (
@@ -907,7 +915,7 @@ const NotificationManagement = () => {
                           <span className="notification-mgmt-info-value">
                             {new Date(
                               selectedNotification.notification.sent_at
-                            ).toLocaleString()}
+                            ).toLocaleString("en-GB")}
                           </span>
                         </div>
                       )}
@@ -1037,10 +1045,10 @@ const NotificationManagement = () => {
                                   {delivery.delivered_at
                                     ? new Date(
                                         delivery.delivered_at
-                                      ).toLocaleString()
+                                      ).toLocaleString("en-GB")
                                     : new Date(
                                         delivery.created_at
-                                      ).toLocaleString()}
+                                      ).toLocaleString("en-GB")}
                                 </td>
                               </tr>
                             )
@@ -1087,14 +1095,7 @@ const NotificationManagement = () => {
                   </button>
                 )}
               </div>
-              <div className="notification-mgmt-modal-actions-right">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="notification-mgmt-btn notification-mgmt-btn-secondary"
-                >
-                  Close
-                </button>
-              </div>
+              
             </div>
           </div>
         </div>

@@ -17,10 +17,8 @@ import "../../styles/global-loader.css";
 const GlobalLoader = ({ text = "Loading..." }) => {
   return (
     <div className="global-loader-container">
-      <div className="global-loader-card">
-        <div className="global-loader-spinner"></div>
-        <p className="global-loader-text">{text}</p>
-      </div>
+      <div className="global-loader-spinner" />
+      <p className="global-loader-text">{text}</p>
     </div>
   );
 };

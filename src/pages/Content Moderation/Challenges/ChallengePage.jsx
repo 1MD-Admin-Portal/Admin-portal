@@ -14,7 +14,9 @@ import {
   getChallengeAnalyticsService, deleteCommentService,
   getFlaggedCommentsService,
 } from "../../../services/challenge.service";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Pagination from "../../../components/common/Pagination";
 import { uploadMediaFile } from "../../../services/upload.service";
 import { getDanceStyles } from "../../../services/masterData.service";
 import "./ChallengePage.css";
@@ -186,12 +188,12 @@ const ChallengePage = () => {
   const [analytics,          setAnalytics]          = useState(null);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
 
-  const [flaggedComments,        setFlaggedComments]        = useState([]);
+  // const [flaggedComments,        setFlaggedComments]        = useState([]);
   const [flaggedPage,            setFlaggedPage]            = useState(1);
   const [flaggedPagination,      setFlaggedPagination]      = useState({});
   const [flaggedSearch,          setFlaggedSearch]          = useState("");
   const [flaggedLoading,         setFlaggedLoading]         = useState(false);
-  const [selectedFlaggedComment, setSelectedFlaggedComment] = useState(null);
+  // const [selectedFlaggedComment, setSelectedFlaggedComment] = useState(null);
   const [flaggedDetailModal,     setFlaggedDetailModal]     = useState(false);
 
   const [danceStyleOptions, setDanceStyleOptions] = useState([]);
@@ -231,8 +233,8 @@ const ChallengePage = () => {
   useEffect(() => {
     if (activeTab === "challenges")          fetchChallenges();
     if (activeTab === "pending-submissions") fetchPendingSubmissions();
-    if (activeTab === "flagged-comments")    fetchFlaggedComments();
-  }, [page, activeTab, flaggedPage]);
+    // if (activeTab === "flagged-comments")    fetchFlaggedComments();
+  }, [page, activeTab]);
 
   // ── Fetch functions ──────────────────────────────────────────────────────────
   const fetchChallenges = async () => {
@@ -245,14 +247,14 @@ const ChallengePage = () => {
     catch { setError("Failed to fetch pending submissions"); } finally { setLoading(false); }
   };
 
-  const fetchFlaggedComments = async () => {
-    try {
-      setFlaggedLoading(true);
-      const r = await getFlaggedCommentsService(flaggedPage, 20);
-      setFlaggedComments(r.comments || r.data || []);
-      setFlaggedPagination(r.pagination || {});
-    } catch { setError("Failed to fetch flagged comments"); } finally { setFlaggedLoading(false); }
-  };
+  // const fetchFlaggedComments = async () => {
+  //   try {
+  //     setFlaggedLoading(true);
+  //     const r = await getFlaggedCommentsService(flaggedPage, 20);
+  //     setFlaggedComments(r.comments || r.data || []);
+  //     setFlaggedPagination(r.pagination || {});
+  //   } catch { setError("Failed to fetch flagged comments"); } finally { setFlaggedLoading(false); }
+  // };
 
   // ── Open modals ──────────────────────────────────────────────────────────────
   const openChallengeDetails = async (challenge) => {
@@ -280,7 +282,7 @@ const ChallengePage = () => {
     catch { setError("Failed to fetch submission details"); }
   };
 
-  const openFlaggedDetail = (comment) => { setSelectedFlaggedComment(comment); setFlaggedDetailModal(true); };
+  // const openFlaggedDetail = (comment) => { setSelectedFlaggedComment(comment); setFlaggedDetailModal(true); };
 
   // ── Actions ──────────────────────────────────────────────────────────────────
   const handleApproveSubmission = async (id) => {
@@ -295,7 +297,7 @@ const ChallengePage = () => {
 
   const handleDeleteSubmission = (id) => {
     showConfirm("Delete this submission? This action cannot be undone.", async () => {
-      try { await deleteSubmissionService(id); setSuccess("Submission deleted"); setSubmissionDetailModal(false); fetchPendingSubmissions(); }
+      try { await deleteSubmissionService(id);setSubmissions(prev => prev.filter(s => s.id !== id)); setSuccess("Submission deleted"); setSubmissionDetailModal(false); fetchPendingSubmissions(); }
       catch { setError("Failed to delete submission"); }
     });
   };
@@ -314,12 +316,12 @@ const ChallengePage = () => {
     });
   };
 
-  const handleDeleteFlaggedComment = (id) => {
-    showConfirm("Permanently delete this flagged comment?", async () => {
-      try { await deleteCommentService(id); setSuccess("Flagged comment deleted"); setFlaggedDetailModal(false); setSelectedFlaggedComment(null); fetchFlaggedComments(); }
-      catch { setError("Failed to delete flagged comment"); }
-    });
-  };
+  // const handleDeleteFlaggedComment = (id) => {
+  //   showConfirm("Permanently delete this flagged comment?", async () => {
+  //     try { await deleteCommentService(id); setSuccess("Flagged comment deleted"); setFlaggedDetailModal(false); setSelectedFlaggedComment(null); fetchFlaggedComments(); }
+  //     catch { setError("Failed to delete flagged comment"); }
+  //   });
+  // };
 
   const addTask    = () => setTasks([...tasks, { task_type: "watch_video", task_title: "", video_url: "" }]);
   const removeTask = (i) => { if (tasks.length > 1) { const t = [...tasks]; t.splice(i, 1); setTasks(t); } };
@@ -400,13 +402,13 @@ const ChallengePage = () => {
     return matchSearch && matchStatus;
   });
 
-  const filteredFlaggedComments = flaggedComments.filter(c => {
-    const q = flaggedSearch.toLowerCase();
-    return !q ||
-      (c.content || c.comment || "").toLowerCase().includes(q) ||
-      (c.username || c.user?.username || "").toLowerCase().includes(q) ||
-      (c.challenge_title || "").toLowerCase().includes(q);
-  });
+  // const filteredFlaggedComments = flaggedComments.filter(c => {
+  //   const q = flaggedSearch.toLowerCase();
+  //   return !q ||
+  //     (c.content || c.comment || "").toLowerCase().includes(q) ||
+  //     (c.username || c.user?.username || "").toLowerCase().includes(q) ||
+  //     (c.challenge_title || "").toLowerCase().includes(q);
+  // });
 
   // ════════════════════════════════════════════════════════════════════════════
   return (
@@ -419,7 +421,7 @@ const ChallengePage = () => {
           {[
             { id: "challenges",          label: "Challenges",          icon: Award },
             { id: "pending-submissions", label: "Pending Submissions", icon: Clock },
-            { id: "flagged-comments",    label: "Flagged Comments",    icon: Flag  },
+            // { id: "flagged-comments",    label: "Flagged Comments",    icon: Flag  },
           ].map(tab => (
             <button key={tab.id} className={`fp-nav-tab ${activeTab === tab.id ? "fp-tab-active" : ""}`}
               onClick={() => setActiveTab(tab.id)}>
@@ -555,11 +557,13 @@ const ChallengePage = () => {
               )}
 
               {(
-                <div className="fp-pagination-wrapper">
-                  <button className="fp-page-btn" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</button>
-                  <span className="fp-page-info">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</span>
-                  <button className="fp-page-btn" onClick={() => setPage(p => Math.min(pagination.pages, p + 1))} disabled={page === pagination.pages}>Next</button>
-                </div>
+             
+                  <Pagination
+                    currentPage={pagination.current_page || 1}
+                    totalPages={pagination.total_pages || 1}
+                    onPageChange={p => setPage(p)}
+                  />
+                
               )}
             </>
           )}
@@ -604,7 +608,7 @@ const ChallengePage = () => {
       )}
 
       {/* ══ Flagged Comments Tab ══ */}
-      {activeTab === "flagged-comments" && (
+      {/* {activeTab === "flagged-comments" && (
         <div className="submissions-container">
           <div className="submissions-header">
             <div className="flagged-header-title">
@@ -690,7 +694,7 @@ const ChallengePage = () => {
             </div>
           )}
         </div>
-      )}
+      )} */}
 
       {/* ══ CREATE CHALLENGE MODAL ══ */}
       {createChallengeModal && (
@@ -725,16 +729,34 @@ const ChallengePage = () => {
               </select>
             </Field>
           </div>
-          <div className="form-row">
-            <Field label="Start Date">
-              <input type="date" className="form-input" value={newChallenge.start_date}
-                onChange={e => setNewChallenge({ ...newChallenge, start_date: e.target.value })} />
-            </Field>
-            <Field label="End Date">
-              <input type="date" className="form-input" value={newChallenge.end_date}
-                onChange={e => setNewChallenge({ ...newChallenge, end_date: e.target.value })} />
-            </Field>
-          </div>
+<div className="form-row">
+  <Field label="Start Date">
+    <Calendar className="class-mod-filter-icon" />
+    <DatePicker
+      selected={newChallenge.start_date ? new Date(newChallenge.start_date) : null}
+      onChange={date => setNewChallenge({ ...newChallenge, start_date: date ? date.toISOString().split('T')[0] : "" })}
+      placeholderText="Select start date"
+      className="class-mod-filter-input"
+      dateFormat="MM-dd-yyyy"
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+    />
+  </Field>
+  <Field label="End Date">
+    <DatePicker
+      selected={newChallenge.end_date ? new Date(newChallenge.end_date) : null}
+      onChange={date => setNewChallenge({ ...newChallenge, end_date: date ? date.toISOString().split('T')[0] : "" })}
+      placeholderText="Select end date"
+      className="class-mod-filter-input"
+      dateFormat="MM-dd-yyyy"
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+      minDate={newChallenge.start_date ? new Date(newChallenge.start_date) : null}
+    />
+  </Field>
+</div>
           <Field label="Prize Details">
             <input type="text" className="form-input" value={newChallenge.prize_details}
               onChange={e => setNewChallenge({ ...newChallenge, prize_details: e.target.value })} />
@@ -1149,7 +1171,7 @@ const ChallengePage = () => {
       )}
 
       {/* ══ FLAGGED COMMENT DETAIL MODAL ══ */}
-      {flaggedDetailModal && selectedFlaggedComment && (() => {
+      {/* {flaggedDetailModal && selectedFlaggedComment && (() => {
         const c               = selectedFlaggedComment;
         const commentId       = c.id || c.comment_id;
         const content         = c.content || c.comment || "";
@@ -1226,7 +1248,7 @@ const ChallengePage = () => {
             )}
           </ModalShell>
         );
-      })()}
+      })()} */}
 
       {/* ══ CONFIRM DIALOG ══ */}
       {confirmDialog.open && (

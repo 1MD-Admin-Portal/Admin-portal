@@ -411,6 +411,7 @@ const DjEvents = () => {
                   {/* <th>Type/Genre</th> */}
                   <th>Date & Time</th>
                   <th>Price</th>
+                  <th>Created at </th>
                   <th>Status</th>
                   <th className="actions-header">Actions</th>
                 </tr>
@@ -454,6 +455,7 @@ const DjEvents = () => {
                       </div>
                     </td>
                     <td>€{event.price}</td>
+                    <td>{new Date(event.created_at).toLocaleDateString("en-GB")}</td>
                     <td>{getStatusBadge(event.status)}</td>
                     <td>
                       <div className="icon-actions">

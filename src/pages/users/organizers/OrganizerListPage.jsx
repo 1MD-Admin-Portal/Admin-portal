@@ -130,25 +130,21 @@ const OrganizerListPage = () => {
       });
 
       // For organizers, default to "organizer" if available
-      const defaultPersona = finalPersonas.includes("organizer")
-        ? "organizer"
-        : finalPersonas[0];
+      const defaultPersona = "organizer";
 
       const nextForPersona =
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-        user_type: defaultPersona,
-        badge_level:
-          nextForPersona && nextForPersona.level
-            ? String(nextForPersona.level)
-            : "",
-        custom_commission_rate:
-          nextForPersona && nextForPersona.commission_rate
-            ? String(nextForPersona.commission_rate)
-            : "",
-        reason: "",
-      });
+  user_type: "organizer",
+  badge_level: nextForPersona?.level
+    ? String(nextForPersona.level)
+    : "",
+  custom_commission_rate: nextForPersona?.commission_rate
+    ? String(nextForPersona.commission_rate)
+    : "",
+  reason: "",
+});
     } catch (err) {
       console.error("Error loading organizer badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -483,19 +479,6 @@ const OrganizerListPage = () => {
                     <div className="dancer-badges-grid">
                       {renderOrganizerInfoGridWithFormatter([
                         {
-                          label: "Dancer Badge",
-                          value: selectedUser.current_badges.dancer || "None",
-                        },
-                        {
-                          label: "Instructor Badge",
-                          value:
-                            selectedUser.current_badges.instructor || "None",
-                        },
-                        {
-                          label: "DJ Badge",
-                          value: selectedUser.current_badges.dj || "None",
-                        },
-                        {
                           label: "Organizer Badge",
                           value:
                             selectedUser.current_badges.organizer || "None",
@@ -611,9 +594,9 @@ const OrganizerListPage = () => {
 
                       {badgeDetails.next_badges && (
                         <div className="dancer-next-badges">
-                          {Object.entries(badgeDetails.next_badges).map(
-                            ([persona, badge]) =>
-                              badge && (
+                          {Object.entries(badgeDetails.next_badges)
+  .filter(([persona]) => persona === "organizer")
+  .map(([persona, badge]) => (
                                 <div
                                   key={persona}
                                   className="dancer-next-badge-card"
@@ -650,23 +633,9 @@ const OrganizerListPage = () => {
                         <div className="dancer-badge-form-row">
                           <label>
                             Persona / User Type
-                            <select
-                              value={badgeForm.user_type}
-                              onChange={(e) =>
-                                setBadgeForm((prev) => ({
-                                  ...prev,
-                                  user_type: e.target.value,
-                                }))
-                              }
-                            >
-                              <option value="">Select persona</option>
-                              {badgeDetails.user_personas &&
-                                badgeDetails.user_personas.map((p) => (
-                                  <option key={p} value={p}>
-                                    {p}
-                                  </option>
-                                ))}
-                            </select>
+                            <select value="organizer" disabled>
+  <option value="organizer">organizer</option>
+</select>
                           </label>
                         </div>
 

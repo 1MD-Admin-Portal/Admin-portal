@@ -2,55 +2,55 @@ import React from 'react';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
-  const metrics = [
-    {
-      title: 'Total Users',
-      value: '1250',
-      change: '+5%',
-      icon: '👤',
-      color: 'blue'
-    },
-    {
-      title: 'Active Subscriptions',
-      value: '320',
-      change: '+7%',
-      icon: '📹',
-      color: 'green'
-    },
-    {
-      title: 'Total Revenue',
-      value: '8500',
-      change: '+7%',
-      icon: '💰',
-      color: 'purple'
-    },
-    {
-      title: 'Active Challenges',
-      value: '12',
-      change: '',
-      icon: '⏰',
-      color: 'orange'
-    }
-  ];
+  // const metrics = [
+  //   {
+  //     title: 'Total Users',
+  //     value: '1250',
+  //     change: '+5%',
+  //     icon: '👤',
+  //     color: 'blue'
+  //   },
+  //   {
+  //     title: 'Active Subscriptions',
+  //     value: '320',
+  //     change: '+7%',
+  //     icon: '📹',
+  //     color: 'green'
+  //   },
+  //   {
+  //     title: 'Total Revenue',
+  //     value: '8500',
+  //     change: '+7%',
+  //     icon: '💰',
+  //     color: 'purple'
+  //   },
+  //   {
+  //     title: 'Active Challenges',
+  //     value: '12',
+  //     change: '',
+  //     icon: '⏰',
+  //     color: 'orange'
+  //   }
+  // ];
 
-  const chartData = {
-    userGrowth: [
-      { month: 'Jan', value: 600 },
-      { month: 'Feb', value: 750 },
-      { month: 'Mar', value: 800 },
-      { month: 'Apr', value: 900 },
-      { month: 'May', value: 850 },
-      { month: 'Jun', value: 1100 }
-    ],
-    subscriptionGrowth: [
-      { month: 'Jan', value: 620 },
-      { month: 'Feb', value: 700 },
-      { month: 'Mar', value: 750 },
-      { month: 'Apr', value: 900 },
-      { month: 'May', value: 880 },
-      { month: 'Jun', value: 1150 }
-    ]
-  };
+  // const chartData = {
+  //   userGrowth: [
+  //     { month: 'Jan', value: 600 },
+  //     { month: 'Feb', value: 750 },
+  //     { month: 'Mar', value: 800 },
+  //     { month: 'Apr', value: 900 },
+  //     { month: 'May', value: 850 },
+  //     { month: 'Jun', value: 1100 }
+  //   ],
+  //   subscriptionGrowth: [
+  //     { month: 'Jan', value: 620 },
+  //     { month: 'Feb', value: 700 },
+  //     { month: 'Mar', value: 750 },
+  //     { month: 'Apr', value: 900 },
+  //     { month: 'May', value: 880 },
+  //     { month: 'Jun', value: 1150 }
+  //   ]
+  // };
 
   const quickActions = [
     { title: 'Add New Program', icon: '➕' },

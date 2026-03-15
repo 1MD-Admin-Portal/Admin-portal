@@ -6,7 +6,10 @@ import {
 } from "../../../services/professor.service";
 import GlobalLoader from "../../../components/common/GlobalLoader";
 import "./ProfessorsPage.css";
-import { CheckCircle, XCircle } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Pagination from "../../../components/common/Pagination";
+import { CheckCircle, XCircle, Search, Calendar, Filter } from "lucide-react";
 import { maskEmail } from "../../../components/maskEmail";
 // ─── Confirmation Popup ───────────────────────────────────────────────────────
 const ConfirmPopup = ({ title, confirmLabel = "Confirm", onConfirm, onCancel, children }) => (
@@ -131,7 +134,10 @@ const ProfessorsPage = () => {
       }
 
       setApplications(applicationsData);
-      setPagination(paginationData);
+      setPagination({
+  ...paginationData,
+  totalPages: paginationData.total_pages ?? paginationData.totalPages,
+});
     } catch (err) {
       console.error("Error fetching instructor applications:", err);
       setApplications([]);
@@ -192,6 +198,9 @@ const ProfessorsPage = () => {
     finally { setShowConfirm(null); setBulkComment(""); setSelectedIds([]); }
   };
 
+  const handleMainPaginationChange = (newPage) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  };
   const performApproveSelected = async () => {
     try {
       await Promise.all(selectedIds.map(id => approveInstructorApplication(id)));
@@ -233,8 +242,8 @@ const ProfessorsPage = () => {
     setFilters({
       search: searchInput,
       status: statusInput,
-      date_from: dateFromInput,
-      date_to: dateToInput,
+      date_from: dateFromInput ? dateFromInput.toLocaleDateString("en-CA") : undefined,
+      date_to: dateToInput ? dateToInput.toLocaleDateString("en-CA") : undefined,
       page: 1,
     });
   };
@@ -253,10 +262,20 @@ const ProfessorsPage = () => {
     });
   };
 
+  const isValidUrl = (url) => {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
   return (
     <div className="professors-container">
       {loading && <GlobalLoader text="Loading instructor applications..." />}
-      <h1 className="professors-title">Instructor Applications</h1>
+      <h1 className="professors-title">👨‍🏫 Instructor Applications</h1>
 
       <div className="bulk-actions-bar">
         <button className="bulk-approve-btn" onClick={() => setShowConfirm("approve-all")}>
@@ -269,36 +288,24 @@ const ProfessorsPage = () => {
 
 
       {/* Filters Section */}
-      <div style={{
-        background: "#f8f9ff", padding: "16px", borderRadius: "10px",
-        marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
-        display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
-      }}>
-        {/* Search */}
-        <div style={{ flex: "1 1 200px" }}>
+      {/* Modern SaaS-style filter toolbar */}
+      <div className="professors-filter-toolbar">
+        <div className="professors-filter-search">
+          <Search className="professors-filter-icon" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box",
-            }}
+            className="professors-filter-input"
           />
         </div>
-
-        {/* Status Filter */}
-        <div style={{ flex: "1 1 150px" }}>
+        <div className="professors-filter-status">
+          <Filter className="professors-filter-icon" />
           <select
             value={statusInput}
             onChange={(e) => setStatusInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box", cursor: "pointer",
-            }}
+            className="professors-filter-input professors-filter-select"
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -306,61 +313,48 @@ const ProfessorsPage = () => {
             <option value="rejected">Rejected</option>
           </select>
         </div>
-
-        {/* Date From */}
-        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
-        <div style={{ flex: "1 1 150px" }}>
-          <input
-            type="date"
-            value={dateFromInput}
-            onChange={(e) => setDateFromInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box",
-            }}
-          />
-        </div>
-
-        {/* Date To */}
-        <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
-        <div style={{ flex: "1 1 150px" }}>
-          <input
-            type="date"
-            value={dateToInput}
-            onChange={(e) => setDateToInput(e.target.value)}
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-              boxSizing: "border-box",
-            }}
-          />
-        </div>
-
-        {/* Apply & Clear Buttons */}
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            onClick={handleApplyFilters}
-            style={{
-              padding: "8px 16px", borderRadius: "6px",
-              background: "linear-gradient(135deg, #6c3de8, #ec4899)",
-              color: "white", border: "none", cursor: "pointer",
-              fontWeight: "600", fontSize: "13px",
-            }}
-          >
-            Apply Filters
-          </button>
-          <button
-            onClick={handleClearFilters}
-            style={{
-              padding: "8px 16px", borderRadius: "6px",
-              background: "#f0f0f0", color: "#333", border: "1px solid #ddd",
-              cursor: "pointer", fontWeight: "600", fontSize: "13px",
-            }}
-          >
-            Clear
-          </button>
-        </div>
+        <div className="professors-filter-date">
+                  <Calendar className="professors-filter-icon" />
+                  <DatePicker
+          selected={dateFromInput}
+          onChange={(date) => setDateFromInput(date)}
+          onChangeRaw={(e) => e.preventDefault()}
+          placeholderText="From"
+          className="class-mod-filter-input"
+          dateFormat="dd-MM-yyyy"
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+        />
+                </div>
+                <div className="professors-filter-date">
+                   <Calendar className="class-mod-filter-icon" />
+            <DatePicker
+          selected={dateToInput}
+          onChange={(date) => setDateToInput(date)}
+          minDate={dateFromInput}
+        
+          onChangeRaw={(e) => e.preventDefault()}
+          placeholderText="To"
+          className="class-mod-filter-input"
+          dateFormat="dd-MM-yyyy"
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+        />
+                </div>
+        <button
+          onClick={handleApplyFilters}
+          className="professors-filter-apply"
+        >
+          Apply Filters
+        </button>
+        <button
+          onClick={handleClearFilters}
+          className="professors-filter-clear"
+        >
+          Clear
+        </button>
       </div>
 
       {tableLoading && (
@@ -381,6 +375,7 @@ const ProfessorsPage = () => {
             <th>Availability</th>
             <th>Experience</th>
             <th>Document</th>
+            <th>Created at </th>
             <th>Comment</th>
             <th>Actions</th>
           </tr>
@@ -389,14 +384,15 @@ const ProfessorsPage = () => {
           {applications.map(app => (
             <tr key={app.id}>
               <td>{app.id}</td>
-              <td className="clickable-email" onClick={() => setSelectedApp(app)}>{maskEmail(app.email)}</td>
+              <td className="clickable-email" onClick={() => setSelectedApp(app)} style={{ cursor: "pointer" }}>{maskEmail(app.email)} </td>
               <td>{formatField(app.availability)}</td>
               <td>{app.experience}</td>
               <td>
-                {app.document_url
-                  ? <a href={app.document_url} target="_blank" rel="noopener noreferrer">View</a>
-                  : "No document"}
+                {isValidUrl(app.document_url)
+  ? <a href={app.document_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>View</a>
+  : "No document"}
               </td>
+              <td>{new Date(app.created_at).toLocaleDateString("en-GB")}</td>
               <td>{app.comment || "-"}</td>
               <td>
                 <div className="icon-actions">
@@ -416,42 +412,14 @@ const ProfessorsPage = () => {
       </table>
 
       {/* Pagination */}
-      {applications.length > 0 && (
-        <div style={{
-          display: "flex", justifyContent: "center", alignItems: "center",
-          gap: "10px", marginTop: "20px", padding: "16px",
-        }}>
-          <button
-            onClick={() => setFilters(prev => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
-            disabled={filters.page === 1}
-            style={{
-              padding: "8px 12px", borderRadius: "6px", border: "1px solid #e0e0e0",
-              background: filters.page === 1 ? "#f0f0f0" : "white",
-              cursor: filters.page === 1 ? "not-allowed" : "pointer",
-              opacity: filters.page === 1 ? 0.6 : 1,
-            }}
-          >
-            ← Previous
-          </button>
-
-          <span style={{ fontSize: "14px", fontWeight: "600" }}>
-            Page {pagination.page || filters.page} of {pagination.total_pages || 1}
-          </span>
-
-          <button
-            onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
-            disabled={(pagination.page || filters.page) >= (pagination.total_pages || 1)}
-            style={{
-              padding: "8px 12px", borderRadius: "6px", border: "1px solid #e0e0e0",
-              background: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? "#f0f0f0" : "white",
-              cursor: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? "not-allowed" : "pointer",
-              opacity: (pagination.page || filters.page) >= (pagination.total_pages || 1) ? 0.6 : 1,
-            }}
-          >
-            Next →
-          </button>
-        </div>
-      )}
+      {pagination.totalPages > 1 && (
+  <Pagination
+    currentPage={pagination.page}
+    totalPages={pagination.totalPages}
+    onPageChange={handleMainPaginationChange}
+    isLoading={loading || tableLoading}
+  />
+)}
 
       {/* ── Approve All Confirm ── */}
       {showConfirm === "approve-all" && (
@@ -541,7 +509,7 @@ const ProfessorsPage = () => {
       {/* ── Detail Modal ── */}
       {selectedApp && (
         <div className="modal-overlay">
-          <div className="detail-modal" ref={modalRef}>
+          <div className="detail-modal" ref={modalRef} onClick={(e) => e.stopPropagation()} >
             <button className="modal-close-icon" onClick={() => setSelectedApp(null)}>×</button>
             <h3>Application Details</h3>
             <p><strong>ID:</strong> {selectedApp.id}</p>
@@ -552,17 +520,9 @@ const ProfessorsPage = () => {
             <p><strong>Document Type:</strong> {selectedApp.document_type}</p>
             <p>
               <strong>Document:</strong>{" "}
-              {selectedApp.document_url ? (
-                <a
-                  href={selectedApp.document_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View
-                </a>
-              ) : (
-                "No document"
-              )}
+              {isValidUrl(selectedApp.document_url)
+  ? <a href={selectedApp.document_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>View</a>
+  : "No document"}
             </p>
             <p><strong>Status:</strong> {selectedApp.status}</p>
             <p><strong>Comment:</strong> {selectedApp.comment || "-"}</p>

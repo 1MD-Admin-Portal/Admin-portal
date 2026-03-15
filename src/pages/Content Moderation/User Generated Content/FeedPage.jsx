@@ -18,6 +18,7 @@ import {
 } from "../../../services/feed.service";
 import { useModeration } from "../../../contexts/ModerationContext";
 import "./FeedPage.css";
+import Pagination from "../../../components/common/Pagination";
 
 const FeedPage = () => {
   const [feeds, setFeeds] = useState([]);
@@ -404,26 +405,11 @@ const FeedPage = () => {
               <span className="fp-empty-msg">No feeds found.</span>
             </div>
           )}
-
-          <div className="fp-pagination-wrapper">
-            <button
-              className="fp-page-btn"
-              onClick={() => setPage(page - 1)}
-              disabled={!pagination.hasPreviousPage}
-            >
-              Previous
-            </button>
-            <span className="fp-page-info">
-              Page {pagination.page || 1} of {pagination.totalPages || 1}
-            </span>
-            <button
-              className="fp-page-btn"
-              onClick={() => setPage(page + 1)}
-              disabled={!pagination.hasNextPage}
-            >
-              Next
-            </button>
-          </div>
+            <Pagination
+              currentPage={pagination.current_page || 1}
+              totalPages={pagination.total_pages || 1}
+              onPageChange={p => setPage(p)}
+            />
         </>
       )}
 
@@ -533,26 +519,11 @@ const FeedPage = () => {
                 </div>
               )}
 
-              <div className="fp-pagination-wrapper">
-                <button
-                  className="fp-page-btn"
-                  onClick={() => setReportsPage(reportsPage - 1)}
-                  disabled={!reportsPagination.hasPreviousPage}
-                >
-                  Previous
-                </button>
-                <span className="fp-page-info">
-                  Page {reportsPagination.page || 1} of{" "}
-                  {reportsPagination.totalPages || 1}
-                </span>
-                <button
-                  className="fp-page-btn"
-                  onClick={() => setReportsPage(reportsPage + 1)}
-                  disabled={!reportsPagination.hasNextPage}
-                >
-                  Next
-                </button>
-              </div>
+              <Pagination
+                currentPage={reportsPagination.current_page || 1}
+                totalPages={reportsPagination.total_pages || 1}
+                onPageChange={p => setReportsPage(p)}
+              />
             </>
           )}
         </div>

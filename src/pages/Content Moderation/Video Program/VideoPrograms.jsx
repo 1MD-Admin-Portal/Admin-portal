@@ -33,6 +33,12 @@ const VideoPrograms = () => {
     totalPages: 1,
   });
 
+
+const isDirectVideo = (url) => {
+  if (!url) return false;
+  return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+};
+
   useEffect(() => {
     if (currentView === "all") {
       loadPrograms();
@@ -350,6 +356,7 @@ const VideoPrograms = () => {
                 <th>Host</th>
                 <th>Level</th>
                 <th>Videos</th>
+                <th>Created at </th>
                 <th>Status</th>
                 {currentView === "pending" && <th>Submitted</th>}
               </tr>
@@ -389,6 +396,9 @@ const VideoPrograms = () => {
                     <span className="video-count">
                       {prog.videos?.length || 0}
                     </span>
+                  </td>
+                  <td className="program-created-at">
+                    {new Date(prog.created_at).toLocaleDateString("en-GB")}
                   </td>
                   <td className="program-status">{getStatusDisplay(prog)}</td>
                   {currentView === "pending" && (
@@ -589,12 +599,19 @@ const VideoPrograms = () => {
                           <div className="video-title">{video.title}</div>
                           <div className="video-duration">{video.duration}s</div>
                         </div>
-                        <button
-                          className="watch-link"
-                          onClick={() => setSelectedVideo(video)}
-                        >
-                          Watch Video
-                        </button>
+<button
+  className="watch-link"
+  onClick={(e) => {
+    e.stopPropagation();
+    if (isDirectVideo(video.video_url)) {
+      setSelectedVideo(video);
+    } else {
+      window.open(video.video_url, "_blank", "noopener,noreferrer");
+    }
+  }}
+>
+  Watch Video
+</button>
                       </div>
                     ))}
                   </div>

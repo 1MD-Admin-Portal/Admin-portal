@@ -118,8 +118,7 @@ const ProfessorsListPage = () => {
         ? data.user_personas.filter((p) => ALLOWED_PERSONAS.includes(p))
         : [];
 
-      const finalPersonas =
-        personasFromApi.length > 0 ? personasFromApi : ALLOWED_PERSONAS;
+      const finalPersonas = ["instructor"];
 
       setBadgeDetails({
         ...data,
@@ -127,25 +126,19 @@ const ProfessorsListPage = () => {
       });
 
       // For professors, default to instructor if present, else first persona
-      const defaultPersona = finalPersonas.includes("instructor")
-        ? "instructor"
-        : finalPersonas[0];
+      const defaultPersona = "instructor";
 
       const nextForPersona =
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-        user_type: defaultPersona,
-        badge_level:
-          nextForPersona && nextForPersona.level
-            ? String(nextForPersona.level)
-            : "",
-        custom_commission_rate:
-          nextForPersona && nextForPersona.commission_rate
-            ? String(nextForPersona.commission_rate)
-            : "",
-        reason: "",
-      });
+  user_type: "instructor",
+  badge_level: nextForPersona?.level ? String(nextForPersona.level) : "",
+  custom_commission_rate: nextForPersona?.commission_rate
+    ? String(nextForPersona.commission_rate)
+    : "",
+  reason: "",
+});
     } catch (err) {
       console.error("Error loading professor badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -544,26 +537,11 @@ const ProfessorsListPage = () => {
                     <div className="dancer-badges-grid">
                       {renderProfessorInfoGrid([
                         {
-                          label: "Dancer Badge",
-                          value:
-                            selectedProfessor.current_badges.dancer || "None",
-                        },
-                        {
                           label: "Instructor Badge",
                           value:
                             selectedProfessor.current_badges.instructor ||
                             "None",
-                        },
-                        {
-                          label: "DJ Badge",
-                          value: selectedProfessor.current_badges.dj || "None",
-                        },
-                        {
-                          label: "Organizer Badge",
-                          value:
-                            selectedProfessor.current_badges.organizer ||
-                            "None",
-                        },
+                        }
                       ])}
                     </div>
                   ) : (
@@ -650,9 +628,9 @@ const ProfessorsListPage = () => {
 
                       {badgeDetails.next_badges && (
                         <div className="dancer-next-badges">
-                          {Object.entries(badgeDetails.next_badges).map(
-                            ([persona, badge]) =>
-                              badge && (
+                          {Object.entries(badgeDetails.next_badges)
+  .filter(([persona]) => persona === "instructor")
+  .map(([persona, badge]) => (
                                 <div
                                   key={persona}
                                   className="dancer-next-badge-card"
@@ -689,24 +667,11 @@ const ProfessorsListPage = () => {
                         <div className="dancer-badge-form-row">
                           <label>
                             Persona / User Type
-                            <select
-                              value={badgeForm.user_type}
-                              onChange={(e) =>
-                                setBadgeForm((prev) => ({
-                                  ...prev,
-                                  user_type: e.target.value,
-                                }))
-                              }
-                            >
-                              <option value="">Select persona</option>
-                              {badgeDetails.user_personas &&
-                                badgeDetails.user_personas.map((p) => (
-                                  <option key={p} value={p}>
-                                    {p}
-                                  </option>
-                                ))}
-                            </select>
-                          </label>
+  <select value="instructor" disabled>
+    <option value="instructor">instructor</option>
+  </select>
+</label>
+                          
                         </div>
 
                         <div className="dancer-badge-form-row">

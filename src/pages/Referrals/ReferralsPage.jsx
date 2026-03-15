@@ -1,6 +1,9 @@
-import React, { useState, useEffect,useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Search, Calendar } from "lucide-react";
 import GlobalLoader from "../../components/common/GlobalLoader";
 import Pagination from "../../components/common/Pagination";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./ReferralsPage.css";
 import {
   getReferralLeaderboardService,
@@ -86,7 +89,7 @@ useEffect(() => {
   setTableLoading(true); 
   try {
     const data = await getReferralLeaderboardService({
-      date_from: dateFrom,
+      date_from: dateFrom ? dateFrom.toLocaleDateString("en-GB") : undefined,
       search: searchTerm,
       page: pageNum,
       limit: limit,
@@ -169,18 +172,16 @@ useEffect(() => {
 
       {/* {loading && <GlobalLoader text="Loading referral data..." />} */}
       {/* Add this inside the leaderboard table section */}
-{tableLoading && (
-  <div style={{ textAlign: "center", padding: "10px", color: "#888" }}>
-    Loading...
-  </div>
-)}
+
 
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (
         <div className="referral-content-section">
-          <div className="referral-date-filter" style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-              <label htmlFor="leaderboard-search" style={{ fontWeight: "600" }}>Search:</label>
+
+          {/* Modern SaaS-style filter toolbar */}
+          <div className="referral-filter-toolbar">
+            <div className="referral-filter-search">
+              <Search className="referral-filter-icon" />
               <input
                 id="leaderboard-search"
                 type="text"
@@ -190,36 +191,36 @@ useEffect(() => {
                   setSearchTerm(e.target.value);
                   setLeaderboardPage(1);
                 }}
-                className="referral-search-input"
-                style={{ maxWidth: "250px" }}
+                className="referral-filter-input"
               />
             </div>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-              <label htmlFor="leaderboard-date" style={{ fontWeight: "600" }}>From Date:</label>
-              <input
-                id="leaderboard-date"
-                type="date"
-                value={dateFrom}
-                onChange={(e) => {
-                  setDateFrom(e.target.value);
-                  setLeaderboardPage(1);
-                }}
-                className="referral-search-input"
-                style={{ maxWidth: "200px" }}
-              />
-            </div>
+            <div className="class-mod-filter-date">
+    <Calendar className="class-mod-filter-icon" />
+    <DatePicker
+  selected={dateFrom}
+  onChange={(date) => setDateFrom(date)}
+  onChangeRaw={(e) => e.preventDefault()}
+  placeholderText="From"
+  className="class-mod-filter-input"
+  dateFormat="dd-MM-yyyy"
+  showMonthDropdown
+  showYearDropdown
+  dropdownMode="select"
+/>
+  </div>
             <button
               onClick={() => {
                 setSearchTerm("");
                 setDateFrom("");
                 setLeaderboardPage(1);
               }}
-              className="referral-search-button"
-              style={{ padding: "8px 16px" }}
+              className="referral-filter-clear"
             >
               Clear
             </button>
           </div>
+
+          
 
           <table className="referral-data-table">
             <thead>
@@ -243,7 +244,7 @@ useEffect(() => {
               ))}
             </tbody>
           </table>
-
+          
           <Pagination
             currentPage={leaderboardPagination.current_page || leaderboardPage}
             totalPages={leaderboardPagination.last_page || 1}

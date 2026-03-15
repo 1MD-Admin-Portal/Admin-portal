@@ -2,7 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import GlobalLoader from "../../components/common/GlobalLoader";
 import Pagination from "../../components/common/Pagination";
 import "./ClassModeration.css";
-import { X, CheckCircle, XCircle } from "lucide-react";
+import { X, CheckCircle, XCircle ,Euro} from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import { Search, Calendar } from "lucide-react";
 import {
   getPendingClassesService,
   getAllClassesService,
@@ -31,8 +36,8 @@ const ClassModeration = () => {
 
   // Filter states
   const [search, setSearch] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
 
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -51,13 +56,9 @@ const ClassModeration = () => {
 
   useEffect(() => {
     fetchClasses();
-  }, [tab, page]);
+  }, [tab, page, search]);
 
-  // Real-time search for both tabs
-  useEffect(() => {
-    setPage(1);
-    fetchClasses();
-  }, [search]);
+
 
   const handleTabChange = (newTab) => {
     setTab(newTab);
@@ -74,8 +75,8 @@ const ClassModeration = () => {
           page,
           limit,
           search,
-          date_from: dateFrom,
-          date_to: dateTo,
+          date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
+  date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
         });
         setPendingClasses(data.classes || []);
         setPagination(data.pagination || { page: 1, total: 0, limit });
@@ -84,8 +85,8 @@ const ClassModeration = () => {
           page,
           limit,
           search,
-          date_from: dateFrom,
-          date_to: dateTo,
+          date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
+  date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
         });
         const approvedOnly = (data.classes || []).filter(
           (cls) => cls.status?.toLowerCase() === "approved"
@@ -210,73 +211,70 @@ const ClassModeration = () => {
 
       {/* Filter UI for both tabs */}
       {(tab === "pending" || tab === "ongoing") && (
-        <div style={{
-          background: "#f8f9ff", padding: "16px", borderRadius: "10px",
-          marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
-          display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
-        }}>
-          {/* Search */}
-          <div style={{ flex: "1 1 200px" }}>
-            <input
-              type="text"
-              placeholder="Search by class title or instructor..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-              style={{
-                width: "100%", padding: "8px 12px", borderRadius: "6px",
-                border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
 
-          {/* Date From */}
-          <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>From:</label>
-          <div style={{ flex: "1 1 150px" }}>
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              style={{
-                width: "100%", padding: "8px 12px", borderRadius: "6px",
-                border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-          <label style={{ fontSize: "18px", color: "black",fontWeight: "600" }}>To:</label>
-          {/* Date To */}
-          <div style={{ flex: "1 1 150px" }}>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              style={{
-                width: "100%", padding: "8px 12px", borderRadius: "6px",
-                border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
+<div className="class-mod-filter-toolbar">
+  <div className="class-mod-filter-search">
+    <Search className="class-mod-filter-icon" />
+    <input
+      type="text"
+      placeholder="Search by class title or instructor..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="class-mod-filter-input"
+    />
+  </div>
+  <div className="class-mod-filter-date">
+    <Calendar className="class-mod-filter-icon" />
+    <DatePicker
+  selected={dateFrom}
+  onChange={(date) => setDateFrom(date)}
+  onChangeRaw={(e) => e.preventDefault()}
+  placeholderText="From"
+  className="class-mod-filter-input"
+  dateFormat="dd-MM-yyyy"
+  showMonthDropdown
+  showYearDropdown
+  dropdownMode="select"
+/>
+  </div>
+  <div className="class-mod-filter-date">
+    <Calendar className="class-mod-filter-icon" />
+    <DatePicker
+  selected={dateTo}
+  onChange={(date) => setDateTo(date)}
+  minDate={dateFrom}
 
-          {/* Apply Button */}
-          <button
-            onClick={() => {
-              setPage(1);
-              fetchClasses();
-            }}
-            style={{
-              padding: "8px 16px", borderRadius: "6px", border: "none",
-              background: "linear-gradient(135deg, #6c3de8, #ec4899)",
-              color: "white", fontWeight: "600", fontSize: "13px",
-              cursor: "pointer",
-            }}
-          >
-            Apply Filters
-          </button>
-        </div>
+  onChangeRaw={(e) => e.preventDefault()}
+  placeholderText="To"
+  className="class-mod-filter-input"
+  dateFormat="dd-MM-yyyy"
+  showMonthDropdown
+  showYearDropdown
+  dropdownMode="select"
+/>
+  </div>
+  <button
+    className="class-mod-filter-apply"
+    onClick={() => {
+      setPage(1);
+      fetchClasses();
+    }}
+  >
+    Apply Filters
+  </button>
+  <button
+    className="class-mod-filter-apply"
+    style={{ marginLeft: 8, background: '#f3f4f6', color: '#a78bfa' }}
+    onClick={() => {
+      setSearch("");
+      setDateFrom(null);
+      setDateTo(null);
+      setPage(1);
+    }}
+  >
+    Clear
+  </button>
+</div>
       )}
 
       {/* Remove old search UI for pending tab, now handled in filter UI above */}
@@ -309,7 +307,8 @@ const ClassModeration = () => {
               <th>Title</th>
               <th>Type</th>
               <th>Capacity</th>
-              <th>Price</th>
+              <th>Created at</th>
+              <th><Euro size={16} />Price</th>
               <th>Slots</th>
               <th>Status</th>
               {tab === "pending" && <th>Actions</th>}
@@ -336,15 +335,16 @@ const ClassModeration = () => {
                     />
                   </td>
                 )} */}
-                <td onClick={() => openClassDetail(classItem.id)}>
+                <td onClick={() => openClassDetail(classItem.id)} style={{ cursor: "pointer" }}>
                   {classItem.instructor_name}
                 </td>
-                <td onClick={() => openClassDetail(classItem.id)}>
+                <td onClick={() => openClassDetail(classItem.id)} style={{ cursor: "pointer" }}>
                   {classItem.class_title}
                 </td>
                 <td>{classItem.class_type}</td>
                 <td>{classItem.max_students}</td>
-                <td>{classItem.price}</td>
+                <td>{new Date(classItem.created_at).toLocaleDateString("en-GB")}</td>
+                <td><Euro size={14} />{classItem.price}</td>
                 <td>{classItem.current_students}</td>
                 <td>
                   <span className={`class-mod-status ${classItem.status}`}>
