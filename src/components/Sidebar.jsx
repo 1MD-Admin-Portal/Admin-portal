@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
+import {useTheme} from "../contexts/ThemeContext";
+
 const Sidebar = () => {
   const sidebarScrollRef = useRef(null);
   const location = useLocation();
@@ -86,7 +88,14 @@ const Sidebar = () => {
     if (!container) return;
     container.innerHTML = "";
     const count = 32;
-    const colors = ["rgba(244,208,63,VAR)", "rgba(255,220,80,VAR)", "rgba(255,200,40,VAR)", "rgba(230,170,30,VAR)", "rgba(255,240,140,VAR)"];
+    const colors = [
+  "rgba(244,208,63,VAR)",   // gold
+  "rgba(255,220,80,VAR)",   // light gold
+  "rgba(180,80,255,VAR)",   // purple ← add this
+  "rgba(160,60,240,VAR)",   // deep purple ← add this
+  "rgba(255,240,140,VAR)",  // pale gold
+];
+
     for (let i = 0; i < count; i++) {
       const el = document.createElement("div");
       el.className = "vs-sprinkle";
@@ -107,6 +116,8 @@ const Sidebar = () => {
     }
   }, []);
 
+
+  const { isDark, toggleTheme } = useTheme();
   const activityItems = [
     { id: "main", icon: Home, label: "Main" },
     { id: "users", icon: Users, label: "Users" },
@@ -180,7 +191,7 @@ const Sidebar = () => {
         .vs-activity-bar {
           position: fixed; top: 0; left: 0;
           width: 56px; height: 100vh;
-          background: #07050f;
+          background: #0a0518;
           display: flex; flex-direction: column; align-items: center;
           z-index: 1000;
           border-right: 1px solid rgba(255,255,255,0.05);
@@ -280,11 +291,14 @@ const Sidebar = () => {
           background: rgba(255,255,255,0.08); margin: 0 auto 8px;
         }
 
+        
+
+
         /* ══ SIDEBAR PANEL ══ */
         .vs-sidebar-panel {
           position: fixed; top: 0; left: 56px;
           width: 224px; height: 100vh;
-          background: linear-gradient(170deg, #0e0a22 0%, #130d30 45%, #0b0820 100%);
+          background: linear-gradient(170deg, #12082e 0%, #1a0d3d 45%, #0e0820 100%);
           display: flex; flex-direction: column;
           z-index: 999;
           border-right: 1px solid rgba(255,255,255,0.06);
@@ -308,7 +322,7 @@ const Sidebar = () => {
           display: flex; align-items: center; padding: 0 16px;
           border-bottom: 1px solid rgba(255,255,255,0.055);
           flex-shrink: 0;
-          background: rgba(5,3,14,0.5);
+          background: rgba(8,3,20,0.6); 
           position: relative; z-index: 1;
         }
         .vs-panel-header::after {
@@ -503,6 +517,7 @@ const Sidebar = () => {
             </button>
           ))}
         </div>
+        
         <div className="vs-activity-bottom">
           <button className="vs-activity-btn" onClick={handleLogout} aria-label="Logout">
             <span className="vs-icon-wrap"><LogOut size={17} /></span>
@@ -511,11 +526,35 @@ const Sidebar = () => {
         </div>
       </div>
 
+
+
       {/* ── Sidebar Panel ── */}
       <div className={`vs-sidebar-panel ${!isPanelOpen ? "collapsed" : ""}`}>
         <div className="vs-panel-header">
           <p className="vs-panel-title">One Trillion Dancers</p>
         </div>
+
+        <div style={{
+  display: 'flex', alignItems: 'center', gap: '77px',
+  marginTop: '12px',padding: '22px',paddingBottom: '0px',
+  borderTop: '1px solid rgba(255,255,255,0.08)'
+}}>
+  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+    {isDark ? 'Dark Mode' : 'Light Mode'}
+  </span>
+  <div onClick={toggleTheme} style={{
+    width: '40px', height: '22px', borderRadius: '11px', cursor: 'pointer',
+    background: isDark ? '#6d28d9' : 'rgba(255,255,255,0.2)',
+    position: 'relative', transition: 'background 0.3s'
+  }}>
+    <div style={{
+      position: 'absolute', top: '3px',
+      left: isDark ? '21px' : '3px',
+      width: '16px', height: '16px', borderRadius: '50%',
+      background: 'white', transition: 'left 0.3s'
+    }} />
+  </div>
+</div>
 
         {/* MAIN */}
         <div className={`vs-panel-body ${activePanel === "main" ? "visible" : ""}`}>

@@ -76,28 +76,30 @@ const ClassModeration = () => {
     setSelectAll(false);
   };
 
-  // ✅ Update fetchClasses signature:
-const fetchClasses = async (currentPage = page, currentSearch = debouncedSearch) => {
+  const fetchClasses = async (
+  currentPage = page,
+  currentSearch = debouncedSearch,
+  fromDate = dateFrom,
+  toDate = dateTo
+) => {
   setLoading(true);
   try {
+    const payload = {
+      page: currentPage,
+      limit,
+      search: currentSearch,
+      date_from: fromDate ? fromDate.toLocaleDateString("en-CA") : undefined,
+      date_to: toDate ? toDate.toLocaleDateString("en-CA") : undefined,
+    };
+
     if (tab === "pending") {
-      const data = await getPendingClassesService({
-        page: currentPage,        // ✅ use param
-        limit,
-        search: currentSearch,    // ✅ use param
-        date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
-        date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
-      });
+      const data = await getPendingClassesService(payload);
       setPendingClasses(data.classes || []);
       setPagination(data.pagination || { page: 1, total: 0, limit });
     } else {
       const data = await getAllClassesService({
-        page: currentPage,        // ✅ use param
-        limit,
-        search: currentSearch,    // ✅ use param
+        ...payload,
         status: "approved",
-        date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
-        date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
       });
       setOngoingClasses(data.classes || []);
       setPagination(data.pagination || { page: 1, total: 0, limit });
@@ -259,7 +261,7 @@ const fetchClasses = async (currentPage = page, currentSearch = debouncedSearch)
   onClick={() => {
     setPage(1);
     setDebouncedSearch(search);
-    fetchClasses(1, search); // ✅ pass directly, no stale closure
+    fetchClasses(1, search, dateFrom, dateTo);
   }}
 >
   Apply Filters
@@ -274,7 +276,8 @@ const fetchClasses = async (currentPage = page, currentSearch = debouncedSearch)
     setDateFrom(null);
     setDateTo(null);
     setPage(1);
-    fetchClasses(1, ""); // ✅ pass directly
+
+    fetchClasses(1, "", null, null); // ✅ pass cleared values
   }}
 >
   Clear
@@ -287,6 +290,14 @@ const fetchClasses = async (currentPage = page, currentSearch = debouncedSearch)
       {loading ? (
         <GlobalLoader text="Loading classes..." />
       ) : (
+        <div className="class-mod-table-container" style={{
+          background: "var(--ev-white)",
+          borderRadius: "var(--ev-radius-lg)",
+          overflow: "hidden",
+          boxShadow: "var(--ev-shadow-md)",
+          border: "1px solid var(--ev-border)",
+          marginBottom: "1.5rem"
+        }}>
         <table className="class-mod-table">
           <thead>
             <tr>
@@ -386,6 +397,7 @@ const fetchClasses = async (currentPage = page, currentSearch = debouncedSearch)
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* Pagination */}

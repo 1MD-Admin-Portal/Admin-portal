@@ -232,6 +232,7 @@
   overflow: hidden;
   box-shadow: var(--mk-shadow-md);
   border: 1px solid var(--mk-border);
+  margin-bottom: 1.75rem;
 }
 
 .mktplace-data-table {

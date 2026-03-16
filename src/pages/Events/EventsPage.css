@@ -310,7 +310,13 @@
   font-size: 0.775rem;
 }
 
-.event-location-info,
+.event-location-info{
+  
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .event-price-display {
   display: flex;
   align-items: center;
@@ -361,16 +367,17 @@
 .event-reject-btn:hover { transform: scale(1.18); color: #db2777; }
 
 .event-view-interested-btn {
-  width: 34px; height: 34px;
-  border-radius: var(--ev-radius-sm);
-  border: 1.5px solid var(--ev-border);
-  background: var(--ev-white);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--mk-radius-sm);
+  border: 1.5px solid var(--mk-border);
+  background: var(--mk-white);
   cursor: pointer;
-  transition: all var(--ev-transition);
+  transition: all var(--mk-transition);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  color: var(--mk-blue);
 }
 
 .event-view-interested-btn::before { display: none; }

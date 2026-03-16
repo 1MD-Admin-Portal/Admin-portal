@@ -242,6 +242,7 @@
   backdrop-filter: none;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.75rem;
 }
 
 .events-table table {

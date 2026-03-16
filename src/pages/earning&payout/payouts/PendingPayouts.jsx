@@ -384,8 +384,10 @@ const PendingPayouts = () => {
                   </tbody>
                 </table>
               </div>
-
-              {(
+            </>
+          )}
+        </div>
+                      {(
                 <Pagination
                   currentPage={pagination.page || 1}
                   totalPages={totalPages || 1}
@@ -393,9 +395,6 @@ const PendingPayouts = () => {
                   isLoading={loading}
                 />
               )}
-            </>
-          )}
-        </div>
       </div>
     </div>
   );

@@ -217,6 +217,7 @@
   overflow-x: auto;
   box-shadow: var(--sm-shadow-md);
   border: 1px solid var(--sm-border);
+  margin-bottom: 1.75rem;
 }
 
 /* ── Table ── */
@@ -224,6 +225,7 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 750px;
+  
 }
 
 

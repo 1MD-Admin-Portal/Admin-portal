@@ -245,17 +245,14 @@ const FeedPage = () => {
       {activeTab === "feeds" && (
         <>
           {/* Filters Section */}
-          <div style={{
-            background: "#f8f9ff", padding: "16px", borderRadius: "10px",
-            marginBottom: "20px", border: "1px solid rgba(142,92,246,0.15)",
-            display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center",
-          }}>
+          <div className="filter-section-feed">
             {/* Search */}
             <div style={{ flex: "2 1 220px" }}>
               <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
                 Search
               </label>
-              <input
+              <input 
+                className="fp-search-input"
                 type="text"
                 placeholder="Search by user, caption, etc..."
                 value={searchInput}

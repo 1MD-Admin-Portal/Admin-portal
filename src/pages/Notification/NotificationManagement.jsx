@@ -42,6 +42,9 @@ const NotificationManagement = () => {
     totalPages: 1,
   });
 
+const [showCancelModal, setShowCancelModal] = useState(false);
+const [selectedNotificationId, setSelectedNotificationId] = useState(null);
+
   // Form state
   const [formData, setFormData] = useState({
     title: "",
@@ -102,6 +105,11 @@ const NotificationManagement = () => {
     fetchNotifications();
   }, [pagination.page]);
 
+
+  const openCancelModal = (id) => {
+  setSelectedNotificationId(id);
+  setShowCancelModal(true);
+};
   const fetchNotifications = async () => {
     try {
       setLoading(true);
@@ -235,20 +243,16 @@ const NotificationManagement = () => {
     }
   };
 
-  const handleCancelNotification = async (notificationId) => {
-    if (!window.confirm("Are you sure you want to cancel this notification?"))
-      return;
-
-    try {
-      await cancelNotificationService(notificationId);
-      fetchNotifications();
-      setShowModal(false);
-      alert("Notification cancelled successfully!");
-    } catch (error) {
-      console.error("Failed to cancel notification:", error);
-      alert("Failed to cancel notification.");
-    }
-  };
+  const handleCancelNotification = async () => {
+  try {
+    await cancelNotificationService(selectedNotificationId);
+    fetchNotifications();
+    setShowCancelModal(false);
+    setShowModal(false);
+  } catch (error) {
+    console.error("Failed to cancel notification:", error);
+  }
+};
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -734,9 +738,6 @@ const NotificationManagement = () => {
                           </div>
                         </div>
                       </td>
-                      <td>
-                        {/* Action column removed - click on title to view details */}
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -774,14 +775,14 @@ const NotificationManagement = () => {
                 </button>
               </div>
             </div> */}
-            <Pagination
+          </>
+        )}
+      </div>
+      <Pagination
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
               onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
             />
-          </>
-        )}
-      </div>
 
       {/* Notification Details Modal */}
       {showModal && selectedNotification && (
@@ -1077,6 +1078,7 @@ const NotificationManagement = () => {
               )}
             </div>
 
+
             {/* Modal Actions */}
             <div className="notification-mgmt-modal-footer">
               <div className="notification-mgmt-modal-actions-left">
@@ -1084,9 +1086,7 @@ const NotificationManagement = () => {
                   selectedNotification.notification.status === "scheduled") && (
                   <button
                     onClick={() =>
-                      handleCancelNotification(
-                        selectedNotification.notification.id
-                      )
+                      openCancelModal(selectedNotification.notification.id)
                     }
                     className="notification-mgmt-btn notification-mgmt-btn-danger"
                   >
@@ -1095,11 +1095,40 @@ const NotificationManagement = () => {
                   </button>
                 )}
               </div>
-              
             </div>
           </div>
         </div>
       )}
+      {showCancelModal && (
+  <div
+    className="notification-mgmt-modal-overlay"
+    onClick={() => setShowCancelModal(false)}
+  >
+    <div
+      className="notification-mgmt-confirm-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h3>Cancel Notification</h3>
+      <p>Are you sure you want to cancel this notification?</p>
+
+      <div className="notification-mgmt-confirm-actions">
+        <button
+          className="notification-mgmt-btn notification-mgmt-btn-secondary"
+          onClick={() => setShowCancelModal(false)}
+        >
+          Keep Notification 
+        </button>
+
+        <button
+          className="notification-mgmt-btn notification-mgmt-btn-danger"
+          onClick={handleCancelNotification}
+        >
+          Cancel Notification
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

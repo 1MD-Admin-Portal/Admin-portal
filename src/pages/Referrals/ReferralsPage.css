@@ -305,14 +305,14 @@
 
 .referral-data-table th {
   padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem);
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  color: #475569;
-  font-weight: 600;
-  font-size: clamp(0.75rem, 1vw, 0.875rem);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid #e2e8f0;
-  position: relative;
+    background: linear-gradient(135deg, #5a7ddc 0%, #6576bc 100%);
+    
+    color: #ffffff;
+    font-weight: 600;
+    font-size: clamp(0.75rem, 1vw, 0.875rem);
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e2e8f0;
+    position: relative;
 }
 
 .referral-data-table th::after {

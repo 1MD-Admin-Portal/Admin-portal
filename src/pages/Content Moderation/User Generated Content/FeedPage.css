@@ -1264,6 +1264,17 @@
   background: linear-gradient(180deg, var(--blue), var(--purple));
 }
 
+.filter-section-feed {
+  background: #f8f9ff;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(142, 92, 246, 0.15);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
 /* ── Focus ── */
 .fp-content-card:focus,
 .fp-page-btn:focus,
@@ -1272,6 +1283,17 @@
 .fp-nav-tab:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(79,124,255,0.22);
+}
+
+.fp-search-input{
+  padding: 0.6rem 0.875rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    background: white;
+    color: #374151;
+    font-family: inherit;
 }
 
 /* ── Responsive ── */

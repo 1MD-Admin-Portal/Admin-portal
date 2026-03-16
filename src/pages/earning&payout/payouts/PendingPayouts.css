@@ -220,6 +220,7 @@
   border-collapse: collapse;
   font-size: 0.875rem;
   min-width: 900px;
+  margin-bottom:1.75rem;
 }
 
 /* Fixed column widths — proportional to content */

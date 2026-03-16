@@ -143,6 +143,7 @@
   box-shadow: var(--dn-shadow-md);
   margin-top: 1.5rem;
   border: 1px solid var(--dn-border);
+  margin-bottom:1.75rem;
 }
 
 .dancers-data-table tbody tr {

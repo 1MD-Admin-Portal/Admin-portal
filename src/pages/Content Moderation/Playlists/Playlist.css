@@ -260,6 +260,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
   gap: 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
 /* ── Playlist Card ── */

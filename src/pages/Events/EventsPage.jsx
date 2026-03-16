@@ -253,6 +253,9 @@ const formatDate = (dateStr) => {
                     <div className="event-location-info">
                       <MapPin size={14}/>
                       {event.location}
+                      {/* <a href={event.location} target="_blank" rel="noopener noreferrer">
+                        view location
+                      </a> */}
                     </div>
                   </td>
                   <td className="event-price-column">
@@ -307,7 +310,7 @@ const formatDate = (dateStr) => {
           </table>
         </div>
       )}
-
+      
       {/* Enhanced Pagination */}
       {totalPages > 1 && (
         <Pagination
