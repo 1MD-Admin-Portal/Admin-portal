@@ -510,12 +510,12 @@
   border-color: var(--blue) !important;
   color: var(--blue) !important;
 }
-.action-btn > svg, .action-btn .action-icon {
+.challenge-actions .action-btn > svg, .challenge-actions .action-btn .action-icon {
   width: 13px !important; height: 13px !important;
   min-width: 13px !important; display: block !important;
   flex-shrink: 0 !important; pointer-events: none !important;
 }
-.action-icon { width: 13px !important; height: 13px !important; display: block !important; }
+.challenge-actions .action-icon { width: 13px !important; height: 13px !important; display: block !important; }
 
 .challenge-controls {
   display: flex !important; align-items: center !important; gap: 4px !important; flex-shrink: 0 !important;

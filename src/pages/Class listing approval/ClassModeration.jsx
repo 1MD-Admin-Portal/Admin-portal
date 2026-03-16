@@ -34,6 +34,8 @@ const ClassModeration = () => {
     limit: 10,
   });
 
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   // Filter states
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState(null);
@@ -56,9 +58,16 @@ const ClassModeration = () => {
 
   useEffect(() => {
     fetchClasses();
-  }, [tab, page, search]);
+  }, [tab, page, debouncedSearch]);
 
 
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedSearch(search);
+    setPage(1); // Reset to page 1 on new search
+  }, 400);
+  return () => clearTimeout(timer);
+}, [search]);
 
   const handleTabChange = (newTab) => {
     setTab(newTab);
@@ -67,39 +76,38 @@ const ClassModeration = () => {
     setSelectAll(false);
   };
 
-  const fetchClasses = async () => {
-    setLoading(true);
-    try {
-      if (tab === "pending") {
-        const data = await getPendingClassesService({
-          page,
-          limit,
-          search,
-          date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
-  date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
-        });
-        setPendingClasses(data.classes || []);
-        setPagination(data.pagination || { page: 1, total: 0, limit });
-      } else {
-        const data = await getAllClassesService({
-          page,
-          limit,
-          search,
-          date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
-  date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
-        });
-        const approvedOnly = (data.classes || []).filter(
-          (cls) => cls.status?.toLowerCase() === "approved"
-        );
-        setOngoingClasses(approvedOnly);
-        setPagination(data.pagination || { page: 1, total: 0, limit });
-      }
-    } catch (err) {
-      console.error("Error fetching classes:", err);
-    } finally {
-      setLoading(false);
+  // ✅ Update fetchClasses signature:
+const fetchClasses = async (currentPage = page, currentSearch = debouncedSearch) => {
+  setLoading(true);
+  try {
+    if (tab === "pending") {
+      const data = await getPendingClassesService({
+        page: currentPage,        // ✅ use param
+        limit,
+        search: currentSearch,    // ✅ use param
+        date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
+        date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
+      });
+      setPendingClasses(data.classes || []);
+      setPagination(data.pagination || { page: 1, total: 0, limit });
+    } else {
+      const data = await getAllClassesService({
+        page: currentPage,        // ✅ use param
+        limit,
+        search: currentSearch,    // ✅ use param
+        status: "approved",
+        date_from: dateFrom ? dateFrom.toLocaleDateString("en-CA") : undefined,
+        date_to: dateTo ? dateTo.toLocaleDateString("en-CA") : undefined,
+      });
+      setOngoingClasses(data.classes || []);
+      setPagination(data.pagination || { page: 1, total: 0, limit });
     }
-  };
+  } catch (err) {
+    console.error("Error fetching classes:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleApprove = async (id) => {
     try {
@@ -147,14 +155,7 @@ const ClassModeration = () => {
     }
   };
 
-  let filteredClasses = [];
-  if (tab === "pending") {
-    filteredClasses = pendingClasses;
-  } else {
-    filteredClasses = ongoingClasses.filter((classItem) =>
-      classItem.class_title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
+  const filteredClasses = tab === "pending" ? pendingClasses : ongoingClasses;
 
   const toggleSelectAll = () => {
     if (selectAll) {
@@ -254,26 +255,30 @@ const ClassModeration = () => {
 />
   </div>
   <button
-    className="class-mod-filter-apply"
-    onClick={() => {
-      setPage(1);
-      fetchClasses();
-    }}
-  >
-    Apply Filters
-  </button>
-  <button
-    className="class-mod-filter-apply"
-    style={{ marginLeft: 8, background: '#f3f4f6', color: '#a78bfa' }}
-    onClick={() => {
-      setSearch("");
-      setDateFrom(null);
-      setDateTo(null);
-      setPage(1);
-    }}
-  >
-    Clear
-  </button>
+  className="class-mod-filter-apply"
+  onClick={() => {
+    setPage(1);
+    setDebouncedSearch(search);
+    fetchClasses(1, search); // ✅ pass directly, no stale closure
+  }}
+>
+  Apply Filters
+</button>
+
+<button
+  className="class-mod-filter-apply"
+  style={{ marginLeft: 8, background: '#f3f4f6', color: '#a78bfa' }}
+  onClick={() => {
+    setSearch("");
+    setDebouncedSearch("");
+    setDateFrom(null);
+    setDateTo(null);
+    setPage(1);
+    fetchClasses(1, ""); // ✅ pass directly
+  }}
+>
+  Clear
+</button>
 </div>
       )}
 

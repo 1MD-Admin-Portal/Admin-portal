@@ -64,53 +64,61 @@ const MarketplacePage = () => {
     hasPreviousPage: false,
   });
 
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   // Event details modal
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   // Fetch programs or events
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (filter === "Program") {
-          const res = await getMarketplacePrograms(
-            programPagination.page,
-            programPagination.limit,
-            search
-          );
-          setPrograms(res.programs || []);
-          if (res.pagination) {
-            setProgramPagination(res.pagination);
-          }
-        } else if (filter === "Event") {
-          const res = await getPublishedEvents(
-            eventPagination.page,
-            eventPagination.limit
-          );
-          setEvents(res.events || []);
-          if (res.pagination) {
-            setEventPagination(res.pagination);
-          }
-        }
-      } catch (err) {
-        console.error("❌ Error loading marketplace:", err);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      if (filter === "Program") {
+        const res = await getMarketplacePrograms(
+          programPagination.page,
+          programPagination.limit,
+          debouncedSearch  // ✅ already wired
+        );
+        setPrograms(res.programs || []);
+        if (res.pagination) setProgramPagination(res.pagination);
+      } else {
+        const res = await getPublishedEvents(
+          eventPagination.page,
+          eventPagination.limit,
+          debouncedSearch  // ✅ ADD THIS — was missing
+        );
+        setEvents(res.events || []);
+        if (res.pagination) setEventPagination(res.pagination);
       }
-    };
-    fetchData();
-  }, [filter, programPagination.page, eventPagination.page, search]);
+    } catch (err) {
+      console.error("Error loading marketplace:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, [filter, programPagination.page, eventPagination.page, debouncedSearch]);
+
+
+  // ✅ 2. Debounce search — resets pages to 1
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedSearch(search);
+    // Reset page on new search
+    if (filter === "Program") {
+      setProgramPagination(prev => ({ ...prev, page: 1 }));
+    } else {
+      setEventPagination(prev => ({ ...prev, page: 1 }));
+    }
+  }, 400);
+  return () => clearTimeout(timer);
+}, [search]);
+
+
 
   // Filter + search
-  const filteredData =
-    filter === "Program"
-      ? programs.filter((p) =>
-          p.title.toLowerCase().includes(search.toLowerCase()),
-        )
-      : events.filter((e) =>
-          e.event_title.toLowerCase().includes(search.toLowerCase()),
-        );
+  const filteredData = filter === "Program" ? programs : events;
 
   // Open program details (fetch purchases)
   const openProgramDetails = async (program) => {
@@ -188,21 +196,20 @@ const MarketplacePage = () => {
       <div className="mktplace-control-panel">
         <div className="mktplace-filter-group">
           {["Program", "Event"].map((item) => (
-            <button
-              key={item}
-              className={`mktplace-filter-option ${
-                filter === item ? "selected" : ""
-              }`}
-              onClick={() => {
-                setFilter(item);
-                // Reset pagination when switching filter
-                if (item === "Program") {
-                  setProgramPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
-                } else {
-                  setEventPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
-                }
-              }}
-            >
+  <button
+    key={item}
+    className={`mktplace-filter-option ${filter === item ? "selected" : ""}`}
+    onClick={() => {
+      setFilter(item);
+      setSearch("");           
+      setDebouncedSearch("");  
+      if (item === "Program") {
+        setProgramPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
+      } else {
+        setEventPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
+      }
+    }}
+  >
               {item === "Program" ? (
                 <ShoppingBag size={16} />
               ) : (

@@ -178,13 +178,13 @@ const DJsPage = () => {
           {selectedIds.length === 0 ? (
             <>
               <button
-                className="pagination-btn"
+                className="bulk-approve-btn"
                 onClick={() => setShowConfirm("approve")}
               >
                 ✅ Approve All({pendingApps.length})
               </button>
               <button
-                className="pagination-btn"
+                className="bulk-reject-btn"
                 onClick={() => setShowConfirm("reject")}
               >
                 ❌ Reject All({pendingApps.length})
@@ -427,8 +427,9 @@ const DJsPage = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Approve all pending applications?</h3>
+            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
             <button
-              className="dj-close-btn"
+              className="dj-approve-btn"
               onClick={async () => {
                 for (const { id } of pendingApps) {
                   await approveDJApplication(id);
@@ -449,6 +450,7 @@ const DJsPage = () => {
             >
               Cancel
             </button>
+            </div>
           </div>
         </div>
       )}
@@ -467,8 +469,9 @@ const DJsPage = () => {
               value={bulkRejectComment}
               onChange={(e) => setBulkRejectComment(e.target.value)}
             />
+            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
             <button
-              className="dj-close-btn"
+              className="dj-close-btn-reject"
               disabled={!bulkRejectComment.trim()}
               onClick={async () => {
                 for (const { id } of pendingApps) {
@@ -493,6 +496,7 @@ const DJsPage = () => {
             >
               Cancel
             </button>
+            </div>
           </div>
         </div>
       )}

@@ -391,7 +391,8 @@ const DjEvents = () => {
                       {dj.approved_events}
                     </p>
                   </div>
-                  <span className="avg-price">€{dj.average_price}</span>
+                  <div><h3 style={{ fontSize: "0.9375rem" }}>Avg Price :</h3>
+                  <span className="avg-price">€{dj.average_price}</span></div>
                 </div>
               ))}
             </div>
@@ -612,7 +613,7 @@ const DjEvents = () => {
           onClick={() => setShowApproveModal(false)}
         >
           <div
-            className="modal-content small"
+            className="modal-content-small"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header">
@@ -649,7 +650,7 @@ const DjEvents = () => {
           onClick={() => setShowRejectModal(false)}
         >
           <div
-            className="modal-content small"
+            className="modal-content-small"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header">

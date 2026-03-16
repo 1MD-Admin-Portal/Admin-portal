@@ -248,6 +248,11 @@
   transition: border-color var(--cm-transition);
 }
 
+/* .class-mod-table td:nth-child(1) {
+  font-weight: 600;
+  color: var(--cm-blue);
+} */
+
 .class-mod-filter-search:focus-within,
 .class-mod-filter-date:focus-within {
   border-color: var(--cm-blue);
