@@ -79,7 +79,14 @@ const FeedPage = () => {
     } else if (activeTab === "stats") {
       refreshModerationStats();
     }
-  }, [page, reportsPage, activeTab, filters, refreshModerationStats, refreshReportedPosts]);
+  }, [
+    page,
+    reportsPage,
+    activeTab,
+    filters,
+    refreshModerationStats,
+    refreshReportedPosts,
+  ]);
 
   const fetchFeeds = async (pageNum, appliedFilters) => {
     const res = await getFeedsService(pageNum, 12, appliedFilters);
@@ -91,7 +98,6 @@ const FeedPage = () => {
     const res = await getFeedLikesService(postId);
     setLikesData(res);
   };
-
 
   const handleApplyFilters = () => {
     setFilters({
@@ -116,7 +122,9 @@ const FeedPage = () => {
 
   const handleOpenModerationModal = (reportedPost) => {
     setSelectedReportedPost(reportedPost);
-    const firstPending = reportedPost?.reports?.find((r) => r.status === "pending");
+    const firstPending = reportedPost?.reports?.find(
+      (r) => r.status === "pending",
+    );
     setSelectedReport(firstPending || null);
     setModerationAction("");
     setAdminNotes("");
@@ -215,24 +223,27 @@ const FeedPage = () => {
         {/* Tab Navigation */}
         <div className="fp-tab-nav">
           <button
-            className={`fp-nav-tab ${activeTab === "feeds" ? "fp-tab-active" : ""
-              }`}
+            className={`fp-nav-tab ${
+              activeTab === "feeds" ? "fp-tab-active" : ""
+            }`}
             onClick={() => setActiveTab("feeds")}
           >
             <Play size={16} />
             Feeds
           </button>
           <button
-            className={`fp-nav-tab ${activeTab === "reports" ? "fp-tab-active" : ""
-              }`}
+            className={`fp-nav-tab ${
+              activeTab === "reports" ? "fp-tab-active" : ""
+            }`}
             onClick={() => setActiveTab("reports")}
           >
             <AlertTriangle size={16} />
             Reported Content
           </button>
           <button
-            className={`fp-nav-tab ${activeTab === "stats" ? "fp-tab-active" : ""
-              }`}
+            className={`fp-nav-tab ${
+              activeTab === "stats" ? "fp-tab-active" : ""
+            }`}
             onClick={() => setActiveTab("stats")}
           >
             <BarChart3 size={16} />
@@ -248,18 +259,29 @@ const FeedPage = () => {
           <div className="filter-section-feed">
             {/* Search */}
             <div style={{ flex: "2 1 220px" }}>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  marginBottom: "4px",
+                  color: "#475569",
+                }}
+              >
                 Search
               </label>
-              <input 
+              <input
                 className="fp-search-input"
                 type="text"
                 placeholder="Search by user, caption, etc..."
                 value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
+                onChange={(e) => setSearchInput(e.target.value)}
                 style={{
-                  width: "100%", padding: "8px 12px", borderRadius: "6px",
-                  border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
+                  width: "100%",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid rgba(142,92,246,0.2)",
+                  fontSize: "13px",
                   boxSizing: "border-box",
                 }}
               />
@@ -267,16 +289,28 @@ const FeedPage = () => {
 
             {/* Sort By */}
             <div style={{ flex: "1 1 150px" }}>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  marginBottom: "4px",
+                  color: "#475569",
+                }}
+              >
                 Sort By
               </label>
               <select
                 value={sortByInput}
                 onChange={(e) => setSortByInput(e.target.value)}
                 style={{
-                  width: "100%", padding: "8px 12px", borderRadius: "6px",
-                  border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-                  boxSizing: "border-box", cursor: "pointer",
+                  width: "100%",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid rgba(142,92,246,0.2)",
+                  fontSize: "13px",
+                  boxSizing: "border-box",
+                  cursor: "pointer",
                 }}
               >
                 <option value="created_at">Date Created</option>
@@ -286,16 +320,28 @@ const FeedPage = () => {
 
             {/* Order */}
             <div style={{ flex: "1 1 150px" }}>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px", color: "#475569" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  marginBottom: "4px",
+                  color: "#475569",
+                }}
+              >
                 Order
               </label>
               <select
                 value={orderInput}
                 onChange={(e) => setOrderInput(e.target.value)}
                 style={{
-                  width: "100%", padding: "8px 12px", borderRadius: "6px",
-                  border: "1px solid rgba(142,92,246,0.2)", fontSize: "13px",
-                  boxSizing: "border-box", cursor: "pointer",
+                  width: "100%",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid rgba(142,92,246,0.2)",
+                  fontSize: "13px",
+                  boxSizing: "border-box",
+                  cursor: "pointer",
                 }}
               >
                 <option value="asc">Oldest</option>
@@ -308,10 +354,14 @@ const FeedPage = () => {
               <button
                 onClick={handleApplyFilters}
                 style={{
-                  padding: "8px 16px", borderRadius: "6px",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
                   background: "linear-gradient(135deg, #6c3de8, #ec4899)",
-                  color: "white", border: "none", cursor: "pointer",
-                  fontWeight: "600", fontSize: "13px",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "13px",
                 }}
               >
                 Apply Filters
@@ -319,9 +369,14 @@ const FeedPage = () => {
               <button
                 onClick={handleClearFilters}
                 style={{
-                  padding: "8px 16px", borderRadius: "6px",
-                  background: "#f0f0f0", color: "#333", border: "1px solid #ddd",
-                  cursor: "pointer", fontWeight: "600", fontSize: "13px",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  background: "#f0f0f0",
+                  color: "#333",
+                  border: "1px solid #ddd",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "13px",
                 }}
               >
                 Clear
@@ -402,11 +457,11 @@ const FeedPage = () => {
               <span className="fp-empty-msg">No feeds found.</span>
             </div>
           )}
-            <Pagination
-              currentPage={pagination.current_page || 1}
-              totalPages={pagination.total_pages || 1}
-              onPageChange={p => setPage(p)}
-            />
+          <Pagination
+            currentPage={pagination.current_page || 1}
+            totalPages={pagination.total_pages || 1}
+            onPageChange={(p) => setPage(p)}
+          />
         </>
       )}
 
@@ -483,7 +538,7 @@ const FeedPage = () => {
                             <span>By: {report.reporter.name}</span>
                             <span>
                               {new Date(
-                                report.reported_at
+                                report.reported_at,
                               ).toLocaleDateString()}
                             </span>
                           </div>
@@ -519,7 +574,7 @@ const FeedPage = () => {
               <Pagination
                 currentPage={reportsPagination.current_page || 1}
                 totalPages={reportsPagination.total_pages || 1}
-                onPageChange={p => setReportsPage(p)}
+                onPageChange={(p) => setReportsPage(p)}
               />
             </>
           )}
@@ -894,8 +949,23 @@ const FeedPage = () => {
               </div>
 
               {error && (
-                <div className="fp-error-message" style={{ color: "#ef4444", marginBottom: "1rem", textAlign: "center", fontWeight: "500" }}>
-                  <AlertOctagon size={16} style={{ display: "inline", marginRight: "5px", verticalAlign: "text-bottom" }} />
+                <div
+                  className="fp-error-message"
+                  style={{
+                    color: "#ef4444",
+                    marginBottom: "1rem",
+                    textAlign: "center",
+                    fontWeight: "500",
+                  }}
+                >
+                  <AlertOctagon
+                    size={16}
+                    style={{
+                      display: "inline",
+                      marginRight: "5px",
+                      verticalAlign: "text-bottom",
+                    }}
+                  />
                   {error}
                 </div>
               )}
@@ -975,8 +1045,9 @@ const FeedPage = () => {
                           {likesData.analytics.engagement_insights
                             ?.peak_like_date?.like_date
                             ? new Date(
-                              likesData.analytics.engagement_insights.peak_like_date.like_date
-                            ).toLocaleDateString()
+                                likesData.analytics.engagement_insights
+                                  .peak_like_date.like_date,
+                              ).toLocaleDateString()
                             : "N/A"}
                         </div>
                         <div className="fp-analytics-desc">Peak Like Date</div>

@@ -23,10 +23,10 @@ const DJsPage = () => {
   const [bulkRejectComment, setBulkRejectComment] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [searchInput,     setSearchInput]     = useState("");
-  const [statusInput,     setStatusInput]     = useState("");
-  const [dateFromInput,   setDateFromInput]   = useState("");
-  const [dateToInput,     setDateToInput]     = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [statusInput, setStatusInput] = useState("");
+  const [dateFromInput, setDateFromInput] = useState("");
+  const [dateToInput, setDateToInput] = useState("");
   const [filters, setFilters] = useState({
     search: "",
     status: "",
@@ -38,14 +38,19 @@ const DJsPage = () => {
 
   // Debounce filter changes - input updates immediately, fetch waits 300ms
   useEffect(() => {
-    const isInitial = !searchInput && !statusInput && !dateFromInput && !dateToInput && filters.page === 1;
+    const isInitial =
+      !searchInput &&
+      !statusInput &&
+      !dateFromInput &&
+      !dateToInput &&
+      filters.page === 1;
     fetchApplications(isInitial);
   }, [filters]);
 
   // Debounced search effect
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      setFilters(prev => ({
+      setFilters((prev) => ({
         ...prev,
         search: searchInput,
         page: 1,
@@ -67,8 +72,6 @@ const DJsPage = () => {
         date_to: filters.date_to,
       });
 
-
-
       // Handle the API response structure
       let applicationsData = [];
       let paginationData = {};
@@ -85,9 +88,9 @@ const DJsPage = () => {
 
       setApplications(applicationsData);
       setPagination({
-  ...paginationData,
-  totalPages: paginationData.total_pages ?? paginationData.totalPages,
-});
+        ...paginationData,
+        totalPages: paginationData.total_pages ?? paginationData.totalPages,
+      });
     } catch (error) {
       console.error("Error fetching DJ applications:", error);
       setApplications([]);
@@ -102,8 +105,8 @@ const DJsPage = () => {
       await approveDJApplication(id);
       setApplications((prev) =>
         prev.map((app) =>
-          app.id === id ? { ...app, status: "accepted" } : app
-        )
+          app.id === id ? { ...app, status: "accepted" } : app,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -117,8 +120,8 @@ const DJsPage = () => {
         prev.map((app) =>
           app.id === selectedRejectId
             ? { ...app, status: "rejected", comment: rejectComment }
-            : app
-        )
+            : app,
+        ),
       );
       setSelectedRejectId(null);
       setRejectComment("");
@@ -143,15 +146,19 @@ const DJsPage = () => {
     setFilters({
       search: searchInput,
       status: statusInput,
-      date_from: dateFromInput ? dateFromInput.toLocaleDateString("en-CA") : undefined,
-  date_to: dateToInput ? dateToInput.toLocaleDateString("en-CA") : undefined,
+      date_from: dateFromInput
+        ? dateFromInput.toLocaleDateString("en-CA")
+        : undefined,
+      date_to: dateToInput
+        ? dateToInput.toLocaleDateString("en-CA")
+        : undefined,
       page: 1,
     });
   };
 
   const handleMainPaginationChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
-  }
+  };
   const handleClearFilters = () => {
     setSearchInput("");
     setStatusInput("");
@@ -173,40 +180,39 @@ const DJsPage = () => {
       {loading && <GlobalLoader text="Loading DJ applications..." />}
       <h2 className="professors-title">🎧 DJ Applications</h2>
 
-
       <div className="pagination-controls">
-          {selectedIds.length === 0 ? (
-            <>
-              <button
-                className="bulk-approve-btn"
-                onClick={() => setShowConfirm("approve")}
-              >
-                ✅ Approve All({pendingApps.length})
-              </button>
-              <button
-                className="bulk-reject-btn"
-                onClick={() => setShowConfirm("reject")}
-              >
-                ❌ Reject All({pendingApps.length})
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                className="pagination-btn"
-                onClick={() => setShowConfirm("approve-selected")}
-              >
-                ✅ Approve Selected
-              </button>
-              <button
-                className="pagination-btn"
-                onClick={() => setShowConfirm("reject-selected")}
-              >
-                ❌ Reject Selected
-              </button>
-            </>
-          )}
-        </div>
+        {selectedIds.length === 0 ? (
+          <>
+            <button
+              className="bulk-approve-btn"
+              onClick={() => setShowConfirm("approve")}
+            >
+              ✅ Approve All({pendingApps.length})
+            </button>
+            <button
+              className="bulk-reject-btn"
+              onClick={() => setShowConfirm("reject")}
+            >
+              ❌ Reject All({pendingApps.length})
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="pagination-btn"
+              onClick={() => setShowConfirm("approve-selected")}
+            >
+              ✅ Approve Selected
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setShowConfirm("reject-selected")}
+            >
+              ❌ Reject Selected
+            </button>
+          </>
+        )}
+      </div>
       {/* Modern SaaS-style filter toolbar */}
       <div className="professors-filter-toolbar">
         <div className="professors-filter-search">
@@ -235,32 +241,31 @@ const DJsPage = () => {
         <div className="professors-filter-date">
           <Calendar className="professors-filter-icon" />
           <DatePicker
-  selected={dateFromInput}
-  onChange={(date) => setDateFromInput(date)}
-  onChangeRaw={(e) => e.preventDefault()}
-  placeholderText="From"
-  className="class-mod-filter-input"
-  dateFormat="dd-MM-yyyy"
-  showMonthDropdown
-  showYearDropdown
-  dropdownMode="select"
-/>
+            selected={dateFromInput}
+            onChange={(date) => setDateFromInput(date)}
+            onChangeRaw={(e) => e.preventDefault()}
+            placeholderText="From"
+            className="class-mod-filter-input"
+            dateFormat="dd-MM-yyyy"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
         </div>
         <div className="professors-filter-date">
-           <Calendar className="class-mod-filter-icon" />
-    <DatePicker
-  selected={dateToInput}
-  onChange={(date) => setDateToInput(date)}
-  minDate={dateFromInput}
-
-  onChangeRaw={(e) => e.preventDefault()}
-  placeholderText="To"
-  className="class-mod-filter-input"
-  dateFormat="dd-MM-yyyy"
-  showMonthDropdown
-  showYearDropdown
-  dropdownMode="select"
-/>
+          <Calendar className="class-mod-filter-icon" />
+          <DatePicker
+            selected={dateToInput}
+            onChange={(date) => setDateToInput(date)}
+            minDate={dateFromInput}
+            onChangeRaw={(e) => e.preventDefault()}
+            placeholderText="To"
+            className="class-mod-filter-input"
+            dateFormat="dd-MM-yyyy"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
         </div>
         <button
           onClick={handleApplyFilters}
@@ -276,16 +281,21 @@ const DJsPage = () => {
         </button>
       </div>
 
-
       {tableLoading && (
-        <div style={{
-          padding: "12px 16px", background: "rgba(108, 61, 232, 0.05)",
-          borderRadius: "8px", marginBottom: "16px", fontSize: "13px",
-          color: "#666", textAlign: "center",
-        }}>Loading...</div>
+        <div
+          style={{
+            padding: "12px 16px",
+            background: "rgba(108, 61, 232, 0.05)",
+            borderRadius: "8px",
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "#666",
+            textAlign: "center",
+          }}
+        >
+          Loading...
+        </div>
       )}
-
-        
 
       <table className="professors-table">
         <thead>
@@ -322,7 +332,6 @@ const DJsPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
-
               {/* <td>
                 <input
                   type="checkbox"
@@ -340,27 +349,27 @@ const DJsPage = () => {
                 />
               </td> */}
               <td
-  onClick={() => setSelectedApplication(app)}
-  style={{ cursor: "pointer" }}
->
-  {app.id}
-</td>
+                onClick={() => setSelectedApplication(app)}
+                style={{ cursor: "pointer" }}
+              >
+                {app.id}
+              </td>
 
               <td
-  onClick={() => setSelectedApplication(app)}
-  style={{ cursor: "pointer" }}
->
-  {maskEmail(app.email)}
-</td>
+                onClick={() => setSelectedApplication(app)}
+                style={{ cursor: "pointer" }}
+              >
+                {maskEmail(app.email)}
+              </td>
 
               {/* <td>{formatField(app.genres)}</td> */}
               {/* <td>{app.dj_type}</td> */}
               <td
-  onClick={() => setSelectedApplication(app)}
-  style={{ cursor: "pointer" }}
->
-  {app.dj_experience}
-</td>
+                onClick={() => setSelectedApplication(app)}
+                style={{ cursor: "pointer" }}
+              >
+                {app.dj_experience}
+              </td>
 
               <td>{formatField(app.performance_frequency)}</td>
               <td>
@@ -379,7 +388,7 @@ const DJsPage = () => {
               <td>{new Date(app.created_at).toLocaleDateString("en-GB")}</td>
               {/* <td className={`status ${app.status}`}>{app.status}</td> */}
               <td>{app.comment || "-"}</td>
-              
+
               {/* <td>
                 <CheckCircle className={`action-icon ${app.status !== "pending" ? "disabled" : ""}`} onClick={() => app.status === "pending" && handleApprove(app.id) } />
 
@@ -387,22 +396,24 @@ const DJsPage = () => {
 
               </td> */}
               <td>
-              <div className="icon-actions">
-                                <CheckCircle
-                                  className={`action-icon ${app.status !== "pending" ? "disabled" : ""
-                                    }`}
-                                  onClick={() =>
-                                    app.status === "pending" && handleApprove(app.id)
-                                  }
-                                />
-                                <XCircle
-                                  className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
-                                    }`}
-                                  onClick={() =>
-                                    app.status === "pending" && setSelectedRejectId(app.id)
-                                  }
-                                />
-                              </div>
+                <div className="icon-actions">
+                  <CheckCircle
+                    className={`action-icon ${
+                      app.status !== "pending" ? "disabled" : ""
+                    }`}
+                    onClick={() =>
+                      app.status === "pending" && handleApprove(app.id)
+                    }
+                  />
+                  <XCircle
+                    className={`action-icon reject ${
+                      app.status !== "pending" ? "disabled" : ""
+                    }`}
+                    onClick={() =>
+                      app.status === "pending" && setSelectedRejectId(app.id)
+                    }
+                  />
+                </div>
               </td>
             </tr>
           ))}
@@ -411,13 +422,13 @@ const DJsPage = () => {
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
-  <Pagination
-    currentPage={pagination.page}
-    totalPages={pagination.totalPages}
-    onPageChange={handleMainPaginationChange}
-    isLoading={loading || tableLoading}
-  />
-)}
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={handleMainPaginationChange}
+          isLoading={loading || tableLoading}
+        />
+      )}
 
       {/* Approve All */}
       {showConfirm === "approve" && (
@@ -427,29 +438,31 @@ const DJsPage = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Approve all pending applications?</h3>
-            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
-            <button
-              className="dj-approve-btn"
-              onClick={async () => {
-                for (const { id } of pendingApps) {
-                  await approveDJApplication(id);
-                }
-                setApplications((prev) =>
-                  prev.map((a) =>
-                    a.status === "pending" ? { ...a, status: "accepted" } : a
-                  )
-                );
-                setShowConfirm(null);
-              }}
+            <div
+              style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}
             >
-              Yes, Approve All
-            </button>
-            <button
-              className="dj-close-btn"
-              onClick={() => setShowConfirm(null)}
-            >
-              Cancel
-            </button>
+              <button
+                className="dj-approve-btn"
+                onClick={async () => {
+                  for (const { id } of pendingApps) {
+                    await approveDJApplication(id);
+                  }
+                  setApplications((prev) =>
+                    prev.map((a) =>
+                      a.status === "pending" ? { ...a, status: "accepted" } : a,
+                    ),
+                  );
+                  setShowConfirm(null);
+                }}
+              >
+                Yes, Approve All
+              </button>
+              <button
+                className="dj-close-btn"
+                onClick={() => setShowConfirm(null)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -469,33 +482,39 @@ const DJsPage = () => {
               value={bulkRejectComment}
               onChange={(e) => setBulkRejectComment(e.target.value)}
             />
-            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
-            <button
-              className="dj-close-btn-reject"
-              disabled={!bulkRejectComment.trim()}
-              onClick={async () => {
-                for (const { id } of pendingApps) {
-                  await rejectDJApplication(id, bulkRejectComment);
-                }
-                setApplications((prev) =>
-                  prev.map((a) =>
-                    a.status === "pending"
-                      ? { ...a, status: "rejected", comment: bulkRejectComment }
-                      : a
-                  )
-                );
-                setShowConfirm(null);
-                setBulkRejectComment("");
-              }}
+            <div
+              style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}
             >
-              Yes, Reject All
-            </button>
-            <button
-              className="dj-close-btn"
-              onClick={() => setShowConfirm(null)}
-            >
-              Cancel
-            </button>
+              <button
+                className="dj-close-btn-reject"
+                disabled={!bulkRejectComment.trim()}
+                onClick={async () => {
+                  for (const { id } of pendingApps) {
+                    await rejectDJApplication(id, bulkRejectComment);
+                  }
+                  setApplications((prev) =>
+                    prev.map((a) =>
+                      a.status === "pending"
+                        ? {
+                            ...a,
+                            status: "rejected",
+                            comment: bulkRejectComment,
+                          }
+                        : a,
+                    ),
+                  );
+                  setShowConfirm(null);
+                  setBulkRejectComment("");
+                }}
+              >
+                Yes, Reject All
+              </button>
+              <button
+                className="dj-close-btn"
+                onClick={() => setShowConfirm(null)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -519,8 +538,8 @@ const DJsPage = () => {
                   prev.map((a) =>
                     selectedIds.includes(a.id)
                       ? { ...a, status: "accepted" }
-                      : a
-                  )
+                      : a,
+                  ),
                 );
                 setSelectedIds([]);
                 setShowConfirm(null);
@@ -563,8 +582,8 @@ const DJsPage = () => {
                   prev.map((a) =>
                     selectedIds.includes(a.id)
                       ? { ...a, status: "rejected", comment: bulkRejectComment }
-                      : a
-                  )
+                      : a,
+                  ),
                 );
                 setSelectedIds([]);
                 setShowConfirm(null);

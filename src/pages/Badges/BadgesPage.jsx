@@ -13,7 +13,6 @@ const BadgesPage = () => {
       setLoading(true);
       try {
         const data = await getAllBadgesService();
-        
 
         let list = [];
 
@@ -52,7 +51,7 @@ const BadgesPage = () => {
   }, []);
 
   const filteredBadges = (badges || []).filter(
-    (badge) => badge.user_type === activeTab
+    (badge) => badge.user_type === activeTab,
   );
 
   return (
@@ -100,8 +99,16 @@ const BadgesPage = () => {
               {filteredBadges.map((badge) => (
                 <tr key={badge.id} className="badge-table-row">
                   <td className="badge-emoji-cell">
-                    {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
-                      <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                    {badge.badge_emoji &&
+                    badge.badge_emoji.startsWith("http") ? (
+                      <img
+                        src={badge.badge_emoji}
+                        alt={badge.badge_name}
+                        className="badge-emoji-img"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
                     ) : (
                       badge.badge_emoji
                     )}

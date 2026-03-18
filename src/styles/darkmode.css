@@ -183,7 +183,7 @@ body.dark .filter-select { background: rgba(255,255,255,0.07); color: #e0e7ff; }
 body.dark .modal-body { background: rgba(255,255,255,0.03); }
 body.dark .detail-section { background: rgba(255,255,255,0.05); }
 body.dark .detail-section p { border-color: rgba(255,255,255,0.06); color: #e0e7ff; }
-body.dark .detail-section h3 { background: rgba(255,255,255,0.04); color: #a5b4fc; }
+body.dark .detail-section h3 {color: #a5b4fc; }
 body.dark .reject-textarea { background: rgba(255,255,255,0.07); color: #e0e7ff; }
 body.dark .stat-card { background: rgba(255,255,255,0.05); }
 body.dark .stat-item,

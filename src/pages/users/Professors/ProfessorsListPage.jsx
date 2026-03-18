@@ -32,7 +32,20 @@ const formatValueForDisplay = (value) => {
           ? ` (Level ${value.level})`
           : "";
       if (emoji && emoji.startsWith("http")) {
-        return <><img src={emoji} alt={value.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} /> {value.badge_name}{level}</>;
+        return (
+          <>
+            <img
+              src={emoji}
+              alt={value.badge_name}
+              className="badge-emoji-img"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />{" "}
+            {value.badge_name}
+            {level}
+          </>
+        );
       }
       return `${emoji} ${value.badge_name}${level}`;
     }
@@ -132,13 +145,13 @@ const ProfessorsListPage = () => {
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-  user_type: "instructor",
-  badge_level: nextForPersona?.level ? String(nextForPersona.level) : "",
-  custom_commission_rate: nextForPersona?.commission_rate
-    ? String(nextForPersona.commission_rate)
-    : "",
-  reason: "",
-});
+        user_type: "instructor",
+        badge_level: nextForPersona?.level ? String(nextForPersona.level) : "",
+        custom_commission_rate: nextForPersona?.commission_rate
+          ? String(nextForPersona.commission_rate)
+          : "",
+        reason: "",
+      });
     } catch (err) {
       console.error("Error loading professor badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -180,8 +193,12 @@ const ProfessorsListPage = () => {
 
       // Update professors list to refresh current_badges and badge_summary
       const updatedProfessorsData = await fetchProfessors(page);
-      const updatedProfessors = Array.isArray(updatedProfessorsData?.users) ? updatedProfessorsData.users : [];
-      const updatedProfessor = updatedProfessors.find(prof => prof.id === selectedProfessor.id);
+      const updatedProfessors = Array.isArray(updatedProfessorsData?.users)
+        ? updatedProfessorsData.users
+        : [];
+      const updatedProfessor = updatedProfessors.find(
+        (prof) => prof.id === selectedProfessor.id,
+      );
       if (updatedProfessor) {
         setSelectedProfessor(updatedProfessor);
       }
@@ -252,7 +269,7 @@ const ProfessorsListPage = () => {
               <td>{prof.id}</td>
               <td>{prof.name}</td>
               <td>{maskEmail(prof.email)}</td>
-              
+
               <td>
                 {prof.created_at
                   ? new Date(prof.created_at).toLocaleDateString("fr-FR")
@@ -297,12 +314,15 @@ const ProfessorsListPage = () => {
                   {renderProfessorInfoGrid([
                     { label: "ID", value: selectedProfessor.id },
                     { label: "Name", value: selectedProfessor.name || "N/A" },
-                    { label: "Email", value: maskEmail(selectedProfessor.email) },
+                    {
+                      label: "Email",
+                      value: maskEmail(selectedProfessor.email),
+                    },
                     {
                       label: "Location",
                       value: selectedProfessor.location || "N/A",
                     },
-                    
+
                     {
                       label: "Skill Level",
                       value: selectedProfessor.skill_level || "N/A",
@@ -318,7 +338,7 @@ const ProfessorsListPage = () => {
                     {
                       label: "Created At",
                       value: new Date(
-                        selectedProfessor.created_at
+                        selectedProfessor.created_at,
                       ).toLocaleString(),
                     },
                     {
@@ -365,13 +385,13 @@ const ProfessorsListPage = () => {
                         {
                           label: "Start Date",
                           value: new Date(
-                            selectedProfessor.active_subscription.start_date
+                            selectedProfessor.active_subscription.start_date,
                           ).toLocaleString(),
                         },
                         {
                           label: "End Date",
                           value: new Date(
-                            selectedProfessor.active_subscription.end_date
+                            selectedProfessor.active_subscription.end_date,
                           ).toLocaleString(),
                         },
                         {
@@ -431,7 +451,7 @@ const ProfessorsListPage = () => {
                               </div>
                             </div>
                           </div>
-                        )
+                        ),
                       )}
                     </div>
                   ) : (
@@ -494,7 +514,9 @@ const ProfessorsListPage = () => {
 
                 {/* Professor Specific Information */}
                 <div className="dancer-modal-section">
-                  <h4 className="dancer-section-title">🎓 Instructor Details</h4>
+                  <h4 className="dancer-section-title">
+                    🎓 Instructor Details
+                  </h4>
                   {renderProfessorInfoGrid([
                     {
                       label: "Instructor ID",
@@ -532,7 +554,7 @@ const ProfessorsListPage = () => {
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
                   {selectedProfessor.current_badges &&
                   Object.values(selectedProfessor.current_badges).some(
-                    (badge) => badge !== null
+                    (badge) => badge !== null,
                   ) ? (
                     <div className="dancer-badges-grid">
                       {renderProfessorInfoGrid([
@@ -541,7 +563,7 @@ const ProfessorsListPage = () => {
                           value:
                             selectedProfessor.current_badges.instructor ||
                             "None",
-                        }
+                        },
                       ])}
                     </div>
                   ) : (
@@ -587,7 +609,8 @@ const ProfessorsListPage = () => {
                           value: selectedProfessor.subscription_summary
                             .latest_subscription_date
                             ? new Date(
-                                selectedProfessor.subscription_summary.latest_subscription_date
+                                selectedProfessor.subscription_summary
+                                  .latest_subscription_date,
                               ).toLocaleString()
                             : "N/A",
                         },
@@ -629,34 +652,42 @@ const ProfessorsListPage = () => {
                       {badgeDetails.next_badges && (
                         <div className="dancer-next-badges">
                           {Object.entries(badgeDetails.next_badges)
-  .filter(([persona]) => persona === "instructor")
-  .map(([persona, badge]) => (
-                                <div
-                                  key={persona}
-                                  className="dancer-next-badge-card"
-                                >
-                                  <div className="dancer-next-badge-header">
-                                    <span className="dancer-next-badge-name">
-                                      {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
-                                        <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
-                                      ) : (
-                                        badge.badge_emoji
-                                      )}{" "}{badge.badge_name}
-                                    </span>
-                                    <span className="dancer-next-badge-persona">
-                                      Persona: {persona}
-                                    </span>
-                                  </div>
-                                  <div className="dancer-next-badge-body">
-                                    <div>Level: {badge.level}</div>
-                                    <div>
-                                      Commission rate: {badge.commission_rate}
-                                    </div>
-                                    <div>Description: {badge.description}</div>
-                                  </div>
+                            .filter(([persona]) => persona === "instructor")
+                            .map(([persona, badge]) => (
+                              <div
+                                key={persona}
+                                className="dancer-next-badge-card"
+                              >
+                                <div className="dancer-next-badge-header">
+                                  <span className="dancer-next-badge-name">
+                                    {badge.badge_emoji &&
+                                    badge.badge_emoji.startsWith("http") ? (
+                                      <img
+                                        src={badge.badge_emoji}
+                                        alt={badge.badge_name}
+                                        className="badge-emoji-img"
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                        }}
+                                      />
+                                    ) : (
+                                      badge.badge_emoji
+                                    )}{" "}
+                                    {badge.badge_name}
+                                  </span>
+                                  <span className="dancer-next-badge-persona">
+                                    Persona: {persona}
+                                  </span>
                                 </div>
-                              )
-                          )}
+                                <div className="dancer-next-badge-body">
+                                  <div>Level: {badge.level}</div>
+                                  <div>
+                                    Commission rate: {badge.commission_rate}
+                                  </div>
+                                  <div>Description: {badge.description}</div>
+                                </div>
+                              </div>
+                            ))}
                         </div>
                       )}
 
@@ -667,11 +698,10 @@ const ProfessorsListPage = () => {
                         <div className="dancer-badge-form-row">
                           <label>
                             Persona / User Type
-  <select value="instructor" disabled>
-    <option value="instructor">instructor</option>
-  </select>
-</label>
-                          
+                            <select value="instructor" disabled>
+                              <option value="instructor">instructor</option>
+                            </select>
+                          </label>
                         </div>
 
                         <div className="dancer-badge-form-row">
@@ -738,13 +768,6 @@ const ProfessorsListPage = () => {
                 </div>
               </div>
             </div>
-
-            {/* Footer */}
-            {/* <div className="dancer-modal-footer">
-              <button className="dancer-modal-close-btn" onClick={closeModal}>
-                Close
-              </button>
-            </div> */}
           </div>
         </div>
       )}

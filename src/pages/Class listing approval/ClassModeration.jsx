@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import GlobalLoader from "../../components/common/GlobalLoader";
 import Pagination from "../../components/common/Pagination";
 import "./ClassModeration.css";
-import { X, CheckCircle, XCircle ,Euro} from "lucide-react";
+import { X, CheckCircle, XCircle, Euro } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-date-range/dist/styles.css";
@@ -60,14 +60,13 @@ const ClassModeration = () => {
     fetchClasses();
   }, [tab, page, debouncedSearch]);
 
-
   useEffect(() => {
-  const timer = setTimeout(() => {
-    setDebouncedSearch(search);
-    setPage(1); // Reset to page 1 on new search
-  }, 400);
-  return () => clearTimeout(timer);
-}, [search]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 on new search
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleTabChange = (newTab) => {
     setTab(newTab);
@@ -77,39 +76,39 @@ const ClassModeration = () => {
   };
 
   const fetchClasses = async (
-  currentPage = page,
-  currentSearch = debouncedSearch,
-  fromDate = dateFrom,
-  toDate = dateTo
-) => {
-  setLoading(true);
-  try {
-    const payload = {
-      page: currentPage,
-      limit,
-      search: currentSearch,
-      date_from: fromDate ? fromDate.toLocaleDateString("en-CA") : undefined,
-      date_to: toDate ? toDate.toLocaleDateString("en-CA") : undefined,
-    };
+    currentPage = page,
+    currentSearch = debouncedSearch,
+    fromDate = dateFrom,
+    toDate = dateTo,
+  ) => {
+    setLoading(true);
+    try {
+      const payload = {
+        page: currentPage,
+        limit,
+        search: currentSearch,
+        date_from: fromDate ? fromDate.toLocaleDateString("en-CA") : undefined,
+        date_to: toDate ? toDate.toLocaleDateString("en-CA") : undefined,
+      };
 
-    if (tab === "pending") {
-      const data = await getPendingClassesService(payload);
-      setPendingClasses(data.classes || []);
-      setPagination(data.pagination || { page: 1, total: 0, limit });
-    } else {
-      const data = await getAllClassesService({
-        ...payload,
-        status: "approved",
-      });
-      setOngoingClasses(data.classes || []);
-      setPagination(data.pagination || { page: 1, total: 0, limit });
+      if (tab === "pending") {
+        const data = await getPendingClassesService(payload);
+        setPendingClasses(data.classes || []);
+        setPagination(data.pagination || { page: 1, total: 0, limit });
+      } else {
+        const data = await getAllClassesService({
+          ...payload,
+          status: "approved",
+        });
+        setOngoingClasses(data.classes || []);
+        setPagination(data.pagination || { page: 1, total: 0, limit });
+      }
+    } catch (err) {
+      console.error("Error fetching classes:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching classes:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleApprove = async (id) => {
     try {
@@ -214,75 +213,73 @@ const ClassModeration = () => {
 
       {/* Filter UI for both tabs */}
       {(tab === "pending" || tab === "ongoing") && (
+        <div className="class-mod-filter-toolbar">
+          <div className="class-mod-filter-search">
+            <Search className="class-mod-filter-icon" />
+            <input
+              type="text"
+              placeholder="Search by class title or instructor..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="class-mod-filter-input"
+            />
+          </div>
+          <div className="class-mod-filter-date">
+            <Calendar className="class-mod-filter-icon" />
+            <DatePicker
+              selected={dateFrom}
+              onChange={(date) => setDateFrom(date)}
+              onChangeRaw={(e) => e.preventDefault()}
+              placeholderText="From"
+              className="class-mod-filter-input"
+              dateFormat="dd-MM-yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+            />
+          </div>
+          <div className="class-mod-filter-date">
+            <Calendar className="class-mod-filter-icon" />
+            <DatePicker
+              selected={dateTo}
+              onChange={(date) => setDateTo(date)}
+              minDate={dateFrom}
+              onChangeRaw={(e) => e.preventDefault()}
+              placeholderText="To"
+              className="class-mod-filter-input"
+              dateFormat="dd-MM-yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+            />
+          </div>
+          <button
+            className="class-mod-filter-apply"
+            onClick={() => {
+              setPage(1);
+              setDebouncedSearch(search);
+              fetchClasses(1, search, dateFrom, dateTo);
+            }}
+          >
+            Apply Filters
+          </button>
 
-<div className="class-mod-filter-toolbar">
-  <div className="class-mod-filter-search">
-    <Search className="class-mod-filter-icon" />
-    <input
-      type="text"
-      placeholder="Search by class title or instructor..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="class-mod-filter-input"
-    />
-  </div>
-  <div className="class-mod-filter-date">
-    <Calendar className="class-mod-filter-icon" />
-    <DatePicker
-  selected={dateFrom}
-  onChange={(date) => setDateFrom(date)}
-  onChangeRaw={(e) => e.preventDefault()}
-  placeholderText="From"
-  className="class-mod-filter-input"
-  dateFormat="dd-MM-yyyy"
-  showMonthDropdown
-  showYearDropdown
-  dropdownMode="select"
-/>
-  </div>
-  <div className="class-mod-filter-date">
-    <Calendar className="class-mod-filter-icon" />
-    <DatePicker
-  selected={dateTo}
-  onChange={(date) => setDateTo(date)}
-  minDate={dateFrom}
+          <button
+            className="class-mod-filter-apply"
+            style={{ marginLeft: 8, background: "#f3f4f6", color: "#a78bfa" }}
+            onClick={() => {
+              setSearch("");
+              setDebouncedSearch("");
+              setDateFrom(null);
+              setDateTo(null);
+              setPage(1);
 
-  onChangeRaw={(e) => e.preventDefault()}
-  placeholderText="To"
-  className="class-mod-filter-input"
-  dateFormat="dd-MM-yyyy"
-  showMonthDropdown
-  showYearDropdown
-  dropdownMode="select"
-/>
-  </div>
-  <button
-  className="class-mod-filter-apply"
-  onClick={() => {
-    setPage(1);
-    setDebouncedSearch(search);
-    fetchClasses(1, search, dateFrom, dateTo);
-  }}
->
-  Apply Filters
-</button>
-
-<button
-  className="class-mod-filter-apply"
-  style={{ marginLeft: 8, background: '#f3f4f6', color: '#a78bfa' }}
-  onClick={() => {
-    setSearch("");
-    setDebouncedSearch("");
-    setDateFrom(null);
-    setDateTo(null);
-    setPage(1);
-
-    fetchClasses(1, "", null, null); // ✅ pass cleared values
-  }}
->
-  Clear
-</button>
-</div>
+              fetchClasses(1, "", null, null); // ✅ pass cleared values
+            }}
+          >
+            Clear
+          </button>
+        </div>
       )}
 
       {/* Remove old search UI for pending tab, now handled in filter UI above */}
@@ -290,18 +287,21 @@ const ClassModeration = () => {
       {loading ? (
         <GlobalLoader text="Loading classes..." />
       ) : (
-        <div className="class-mod-table-container" style={{
-          background: "var(--ev-white)",
-          borderRadius: "var(--ev-radius-lg)",
-          overflow: "hidden",
-          boxShadow: "var(--ev-shadow-md)",
-          border: "1px solid var(--ev-border)",
-          marginBottom: "1.5rem"
-        }}>
-        <table className="class-mod-table">
-          <thead>
-            <tr>
-              {/* {tab === "pending" && (
+        <div
+          className="class-mod-table-container"
+          style={{
+            background: "var(--ev-white)",
+            borderRadius: "var(--ev-radius-lg)",
+            overflow: "hidden",
+            boxShadow: "var(--ev-shadow-md)",
+            border: "1px solid var(--ev-border)",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <table className="class-mod-table">
+            <thead>
+              <tr>
+                {/* {tab === "pending" && (
                 <th>
                   <input
                     type="checkbox"
@@ -319,21 +319,24 @@ const ClassModeration = () => {
                   />
                 </th>
               )} */}
-              <th>Instructor</th>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Capacity</th>
-              <th>Created at</th>
-              <th><Euro size={16} />Price</th>
-              <th>Slots</th>
-              <th>Status</th>
-              {tab === "pending" && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredClasses.map((classItem) => (
-              <tr key={classItem.id} className="class-mod-clickable-row">
-                {/* {tab === "pending" && (
+                <th>Instructor</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Created at</th>
+                <th>
+                  <Euro size={16} />
+                  Price
+                </th>
+                <th>Slots</th>
+                <th>Status</th>
+                {tab === "pending" && <th>Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredClasses.map((classItem) => (
+                <tr key={classItem.id} className="class-mod-clickable-row">
+                  {/* {tab === "pending" && (
                   <td>
                     <input
                       type="checkbox"
@@ -351,52 +354,63 @@ const ClassModeration = () => {
                     />
                   </td>
                 )} */}
-                <td onClick={() => openClassDetail(classItem.id)} style={{ cursor: "pointer" }}>
-                  {classItem.instructor_name}
-                </td>
-                <td onClick={() => openClassDetail(classItem.id)} style={{ cursor: "pointer" }}>
-                  {classItem.class_title}
-                </td>
-                <td>{classItem.class_type}</td>
-                <td>{classItem.max_students}</td>
-                <td>{new Date(classItem.created_at).toLocaleDateString("en-GB")}</td>
-                <td><Euro size={14} />{classItem.price}</td>
-                <td>{classItem.current_students}</td>
-                <td>
-                  <span className={`class-mod-status ${classItem.status}`}>
-                    {classItem.status}
-                  </span>
-                </td>
-                {tab === "pending" && (
-                  <td className="class-mod-table-actions">
-                    <CheckCircle
-                      className={`class-mod-action-icon ${
-                        classItem.status !== "pending_approval"
-                          ? "class-mod-action-disabled"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        classItem.status === "pending_approval" &&
-                        handleApprove(classItem.id)
-                      }
-                    />
-                    <XCircle
-                      className={`class-mod-action-icon class-mod-reject ${
-                        classItem.status !== "pending_approval"
-                          ? "class-mod-action-disabled"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        classItem.status === "pending_approval" &&
-                        handleReject(classItem.id)
-                      }
-                    />
+                  <td
+                    onClick={() => openClassDetail(classItem.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {classItem.instructor_name}
                   </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <td
+                    onClick={() => openClassDetail(classItem.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {classItem.class_title}
+                  </td>
+                  <td>{classItem.class_type}</td>
+                  <td>{classItem.max_students}</td>
+                  <td>
+                    {new Date(classItem.created_at).toLocaleDateString("en-GB")}
+                  </td>
+                  <td>
+                    <Euro size={14} />
+                    {classItem.price}
+                  </td>
+                  <td>{classItem.current_students}</td>
+                  <td>
+                    <span className={`class-mod-status ${classItem.status}`}>
+                      {classItem.status}
+                    </span>
+                  </td>
+                  {tab === "pending" && (
+                    <td className="class-mod-table-actions">
+                      <CheckCircle
+                        className={`class-mod-action-icon ${
+                          classItem.status !== "pending_approval"
+                            ? "class-mod-action-disabled"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          classItem.status === "pending_approval" &&
+                          handleApprove(classItem.id)
+                        }
+                      />
+                      <XCircle
+                        className={`class-mod-action-icon class-mod-reject ${
+                          classItem.status !== "pending_approval"
+                            ? "class-mod-action-disabled"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          classItem.status === "pending_approval" &&
+                          handleReject(classItem.id)
+                        }
+                      />
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -443,7 +457,7 @@ const ClassModeration = () => {
                     label: "Current Students",
                     value: selectedClass.current_students,
                   },
-                  { label: "Price", value: selectedClass.price },
+                  { label: "Price ( € )", value: selectedClass.price },
                   {
                     label: "Status",
                     value: selectedClass.status,
@@ -485,5 +499,5 @@ const ClassModeration = () => {
       )}
     </div>
   );
-}
+};
 export default ClassModeration;

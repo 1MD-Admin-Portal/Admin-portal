@@ -139,10 +139,10 @@ const ReportsPage = () => {
                           width: `${Math.max(
                             (count /
                               Math.max(
-                                ...Object.values(summary.reason_breakdown)
+                                ...Object.values(summary.reason_breakdown),
                               )) *
                               100,
-                            10
+                            10,
                           )}%`,
                         }}
                       ></div>

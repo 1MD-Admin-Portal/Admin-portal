@@ -170,54 +170,54 @@ export const CONSTANTS = {
         `/api/v1/admin/referrals/users/${userId}?page=${page}&limit=${limit}`,
     },
     MASTER_DATA: {
-  COUNTRIES: (search = "", page = 1, limit = "") =>
-    `/api/v1/admin/countries?search=${search}&page=${page}&limit=${limit}`,
+      COUNTRIES: (search = "", page = 1, limit = "") =>
+        `/api/v1/admin/countries?search=${search}&page=${page}&limit=${limit}`,
 
-  CITIES: (countryId, search = "", page = 1, limit = "") =>
-    `/api/v1/admin/cities?country_id=${countryId}&search=${search}&page=${page}&limit=${limit}`,
+      CITIES: (countryId, search = "", page = 1, limit = "") =>
+        `/api/v1/admin/cities?country_id=${countryId}&search=${search}&page=${page}&limit=${limit}`,
 
-  DANCE_STYLES: (search = "", page = 1, limit = 100) =>
-    `/api/v1/admin/dance-styles?search=${search}&page=${page}&limit=${limit}`,
-},
+      DANCE_STYLES: (search = "", page = 1, limit = 100) =>
+        `/api/v1/admin/dance-styles?search=${search}&page=${page}&limit=${limit}`,
+    },
 
-// ============================================================
-// PATCH: Add GET_FLAGGED_COMMENTS inside CHALLENGE_SUBMISSIONS
-// in your constants.js CHALLENGE_SUBMISSIONS block
-// ============================================================
+    // ============================================================
+    // PATCH: Add GET_FLAGGED_COMMENTS inside CHALLENGE_SUBMISSIONS
+    // in your constants.js CHALLENGE_SUBMISSIONS block
+    // ============================================================
 
-// === CHALLENGE SUBMISSIONS MANAGEMENT ===
-CHALLENGE_SUBMISSIONS: {
-  GET_BY_CHALLENGE: (challengeId, page = 1, limit = 20) =>
-    `/api/v1/admin/challenge/${challengeId}/submissions?page=${page}&limit=${limit}`,
-  GET_PENDING: (page = 1, limit = 20) =>
-    `/api/v1/admin/challenge/submissions/pending?page=${page}&limit=${limit}`,
-  GET_DETAILS: (submissionId) =>
-    `/api/v1/admin/challenge/submissions/${submissionId}`,
-  APPROVE: (submissionId) =>
-    `/api/v1/admin/challenge/submissions/${submissionId}/approve`,
-  REJECT: (submissionId) =>
-    `/api/v1/admin/challenge/submissions/${submissionId}/reject`,
-  DELETE_SUBMISSION: (submissionId) =>
-    `/api/v1/admin/challenge/submissions/${submissionId}`,
+    // === CHALLENGE SUBMISSIONS MANAGEMENT ===
+    CHALLENGE_SUBMISSIONS: {
+      GET_BY_CHALLENGE: (challengeId, page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/${challengeId}/submissions?page=${page}&limit=${limit}`,
+      GET_PENDING: (page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/submissions/pending?page=${page}&limit=${limit}`,
+      GET_DETAILS: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}`,
+      APPROVE: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}/approve`,
+      REJECT: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}/reject`,
+      DELETE_SUBMISSION: (submissionId) =>
+        `/api/v1/admin/challenge/submissions/${submissionId}`,
 
-  // ✅ NEW — Flagged Comments
-  GET_FLAGGED_COMMENTS: (page = 1, limit = 20) =>
-    `/api/v1/admin/challenge/comments/flagged?page=${page}&limit=${limit}`,
+      // ✅ NEW — Flagged Comments
+      GET_FLAGGED_COMMENTS: (page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/comments/flagged?page=${page}&limit=${limit}`,
 
-  // Delete Comment (already existed)
-  DELETE_COMMENT: (commentId) =>
-    `/api/v1/admin/challenge/comments/${commentId}`,
+      // Delete Comment (already existed)
+      DELETE_COMMENT: (commentId) =>
+        `/api/v1/admin/challenge/comments/${commentId}`,
 
-  // Challenge Participants
-  GET_CHALLENGE_PARTICIPANTS: (challengeId, page = 1, limit = 20) =>
-    `/api/v1/admin/challenge/${challengeId}/participants?page=${page}&limit=${limit}`,
-  REMOVE_PARTICIPANT: (challengeId, userId) =>
-    `/api/v1/admin/challenge/${challengeId}/participants/${userId}`,
+      // Challenge Participants
+      GET_CHALLENGE_PARTICIPANTS: (challengeId, page = 1, limit = 20) =>
+        `/api/v1/admin/challenge/${challengeId}/participants?page=${page}&limit=${limit}`,
+      REMOVE_PARTICIPANT: (challengeId, userId) =>
+        `/api/v1/admin/challenge/${challengeId}/participants/${userId}`,
 
-  // Challenge Analytics
-  GET_CHALLENGE_ANALYTICS: (challengeId) =>
-    `/api/v1/admin/challenge/${challengeId}/analytics`,
-},
+      // Challenge Analytics
+      GET_CHALLENGE_ANALYTICS: (challengeId) =>
+        `/api/v1/admin/challenge/${challengeId}/analytics`,
+    },
 
     // === CHALLENGE SUBMISSIONS MANAGEMENT ===
     CHALLENGE_SUBMISSIONS: {
@@ -234,7 +234,7 @@ CHALLENGE_SUBMISSIONS: {
       DELETE_SUBMISSION: (submissionId) =>
         `/api/v1/admin/challenge/submissions/${submissionId}`,
       GET_FLAGGED_COMMENTS: (page = 1, limit = 20) =>
-  `/api/v1/admin/challenge/comments/flagged?page=${page}&limit=${limit}`,
+        `/api/v1/admin/challenge/comments/flagged?page=${page}&limit=${limit}`,
 
       // Challenge Participants
       GET_CHALLENGE_PARTICIPANTS: (challengeId, page = 1, limit = 20) =>
@@ -306,12 +306,17 @@ export const KPI_CARDS = [
 ];
 
 // Year options for filter
+const currentYear = new Date().getFullYear();
+
 export const YEAR_OPTIONS = [
   { value: "all", label: "All Years" },
-  { value: "2025", label: "2025" },
-  { value: "2024", label: "2024" },
-  { value: "2023", label: "2023" },
-  { value: "2022", label: "2022" },
+  ...Array.from({ length: 5 }, (_, i) => {
+    const year = currentYear - i;
+    return {
+      value: year.toString(),
+      label: year.toString(),
+    };
+  }),
 ];
 
 // Month options for filter

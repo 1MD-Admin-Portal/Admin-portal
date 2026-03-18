@@ -32,7 +32,20 @@ const formatValueForDisplay = (value) => {
           : "";
       const emoji = value.badge_emoji || "";
       if (emoji && emoji.startsWith("http")) {
-        return <><img src={emoji} alt={value.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} /> {value.badge_name}{level}</>;
+        return (
+          <>
+            <img
+              src={emoji}
+              alt={value.badge_name}
+              className="badge-emoji-img"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />{" "}
+            {value.badge_name}
+            {level}
+          </>
+        );
       }
       return `${emoji} ${value.badge_name}${level}`;
     }
@@ -89,7 +102,6 @@ const OrganizerListPage = () => {
     setLoading(true);
     try {
       const data = await fetchOrganizers(pageNum);
-      
 
       // ✅ Safe defaults in case API response is malformed or fails
       setOrganizers(Array.isArray(data?.users) ? data.users : []);
@@ -136,15 +148,13 @@ const OrganizerListPage = () => {
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-  user_type: "organizer",
-  badge_level: nextForPersona?.level
-    ? String(nextForPersona.level)
-    : "",
-  custom_commission_rate: nextForPersona?.commission_rate
-    ? String(nextForPersona.commission_rate)
-    : "",
-  reason: "",
-});
+        user_type: "organizer",
+        badge_level: nextForPersona?.level ? String(nextForPersona.level) : "",
+        custom_commission_rate: nextForPersona?.commission_rate
+          ? String(nextForPersona.commission_rate)
+          : "",
+        reason: "",
+      });
     } catch (err) {
       console.error("Error loading organizer badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -174,7 +184,8 @@ const OrganizerListPage = () => {
         user_type: badgeForm.user_type, // "organizer" or other persona
         badge_level: badgeForm.badge_level,
         custom_commission_rate: badgeForm.custom_commission_rate,
-        reason: badgeForm.reason || "Badge updated for organizer via admin dashboard",
+        reason:
+          badgeForm.reason || "Badge updated for organizer via admin dashboard",
       });
 
       // Reload badge details
@@ -182,8 +193,12 @@ const OrganizerListPage = () => {
 
       // Update organizers list to refresh current_badges and badge_summary
       const updatedOrgData = await fetchOrganizers(page);
-      const updatedOrganizers = Array.isArray(updatedOrgData?.users) ? updatedOrgData.users : [];
-      const updatedUser = updatedOrganizers.find(org => org.id === selectedUser.id);
+      const updatedOrganizers = Array.isArray(updatedOrgData?.users)
+        ? updatedOrgData.users
+        : [];
+      const updatedUser = updatedOrganizers.find(
+        (org) => org.id === selectedUser.id,
+      );
       if (updatedUser) {
         setSelectedUser(updatedUser);
       }
@@ -241,10 +256,13 @@ const OrganizerListPage = () => {
         </thead>
         <tbody>
           {organizers.map((user) => (
-            <tr key={user.id} onClick={() => {
-              setSelectedUser(user);
-              loadOrganizerBadges(user);
-            }}>
+            <tr
+              key={user.id}
+              onClick={() => {
+                setSelectedUser(user);
+                loadOrganizerBadges(user);
+              }}
+            >
               <td>{user.id}</td>
               <td>{maskEmail(user.email)}</td>
               <td>{user.name || "N/A"}</td>
@@ -270,10 +288,7 @@ const OrganizerListPage = () => {
       />
 
       {selectedUser && (
-        <div
-          className="dancer-modal-overlay"
-          onClick={closeModal}
-        >
+        <div className="dancer-modal-overlay" onClick={closeModal}>
           <div
             className="dancer-modal-content"
             onClick={(e) => e.stopPropagation()}
@@ -281,10 +296,7 @@ const OrganizerListPage = () => {
             {/* Modal Header */}
             <div className="dancer-modal-header">
               <h3>🎪 Organizer Profile Details</h3>
-              <button
-                className="dancer-modal-close-x"
-                onClick={closeModal}
-              >
+              <button className="dancer-modal-close-x" onClick={closeModal}>
                 ✕
               </button>
             </div>
@@ -360,13 +372,13 @@ const OrganizerListPage = () => {
                         {
                           label: "Start Date",
                           value: new Date(
-                            selectedUser.active_subscription.start_date
+                            selectedUser.active_subscription.start_date,
                           ).toLocaleString(),
                         },
                         {
                           label: "End Date",
                           value: new Date(
-                            selectedUser.active_subscription.end_date
+                            selectedUser.active_subscription.end_date,
                           ).toLocaleString(),
                         },
                         {
@@ -474,7 +486,7 @@ const OrganizerListPage = () => {
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
                   {selectedUser.current_badges &&
                   Object.values(selectedUser.current_badges).some(
-                    (badge) => badge !== null
+                    (badge) => badge !== null,
                   ) ? (
                     <div className="dancer-badges-grid">
                       {renderOrganizerInfoGridWithFormatter([
@@ -554,7 +566,8 @@ const OrganizerListPage = () => {
                         {
                           label: "Latest Subscription Date",
                           value: new Date(
-                            selectedUser.subscription_summary.latest_subscription_date
+                            selectedUser.subscription_summary
+                              .latest_subscription_date,
                           ).toLocaleString(),
                         },
                       ])}
@@ -595,34 +608,42 @@ const OrganizerListPage = () => {
                       {badgeDetails.next_badges && (
                         <div className="dancer-next-badges">
                           {Object.entries(badgeDetails.next_badges)
-  .filter(([persona]) => persona === "organizer")
-  .map(([persona, badge]) => (
-                                <div
-                                  key={persona}
-                                  className="dancer-next-badge-card"
-                                >
-                                  <div className="dancer-next-badge-header">
-                                    <span className="dancer-next-badge-name">
-                                      {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
-                                        <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
-                                      ) : (
-                                        badge.badge_emoji
-                                      )}{" "}{badge.badge_name}
-                                    </span>
-                                    <span className="dancer-next-badge-persona">
-                                      Persona: {persona}
-                                    </span>
-                                  </div>
-                                  <div className="dancer-next-badge-body">
-                                    <div>Level: {badge.level}</div>
-                                    <div>
-                                      Commission rate: {badge.commission_rate}
-                                    </div>
-                                    <div>Description: {badge.description}</div>
-                                  </div>
+                            .filter(([persona]) => persona === "organizer")
+                            .map(([persona, badge]) => (
+                              <div
+                                key={persona}
+                                className="dancer-next-badge-card"
+                              >
+                                <div className="dancer-next-badge-header">
+                                  <span className="dancer-next-badge-name">
+                                    {badge.badge_emoji &&
+                                    badge.badge_emoji.startsWith("http") ? (
+                                      <img
+                                        src={badge.badge_emoji}
+                                        alt={badge.badge_name}
+                                        className="badge-emoji-img"
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                        }}
+                                      />
+                                    ) : (
+                                      badge.badge_emoji
+                                    )}{" "}
+                                    {badge.badge_name}
+                                  </span>
+                                  <span className="dancer-next-badge-persona">
+                                    Persona: {persona}
+                                  </span>
                                 </div>
-                              )
-                          )}
+                                <div className="dancer-next-badge-body">
+                                  <div>Level: {badge.level}</div>
+                                  <div>
+                                    Commission rate: {badge.commission_rate}
+                                  </div>
+                                  <div>Description: {badge.description}</div>
+                                </div>
+                              </div>
+                            ))}
                         </div>
                       )}
 
@@ -634,8 +655,8 @@ const OrganizerListPage = () => {
                           <label>
                             Persona / User Type
                             <select value="organizer" disabled>
-  <option value="organizer">organizer</option>
-</select>
+                              <option value="organizer">organizer</option>
+                            </select>
                           </label>
                         </div>
 

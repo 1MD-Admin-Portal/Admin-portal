@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   fetchUsers,
@@ -44,7 +43,6 @@ const DancersList = () => {
       try {
         const data = await fetchUsers(page, 10);
         if (data && data.users) {
-          
           setDancers(data.users);
           setPagination(data.pagination || { page, totalPages: 1 });
           window.scrollTo(0, 0);
@@ -80,7 +78,20 @@ const DancersList = () => {
         const level = value.level != null ? ` (Level ${value.level})` : "";
         const emoji = value.badge_emoji || "";
         if (emoji && emoji.startsWith("http")) {
-          return <><img src={emoji} alt={value.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} /> {value.badge_name}{level}</>;
+          return (
+            <>
+              <img
+                src={emoji}
+                alt={value.badge_name}
+                className="badge-emoji-img"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />{" "}
+              {value.badge_name}
+              {level}
+            </>
+          );
         }
         return `${emoji} ${value.badge_name}${level}`;
       }
@@ -146,17 +157,17 @@ const DancersList = () => {
         data.next_badges && data.next_badges[defaultPersona];
 
       setBadgeForm({
-  user_type: "dancer",
-  badge_level:
-    nextForPersona && nextForPersona.level
-      ? String(nextForPersona.level)
-      : "",
-  custom_commission_rate:
-    nextForPersona && nextForPersona.commission_rate
-      ? String(nextForPersona.commission_rate)
-      : "",
-  reason: "",
-});
+        user_type: "dancer",
+        badge_level:
+          nextForPersona && nextForPersona.level
+            ? String(nextForPersona.level)
+            : "",
+        custom_commission_rate:
+          nextForPersona && nextForPersona.commission_rate
+            ? String(nextForPersona.commission_rate)
+            : "",
+        reason: "",
+      });
     } catch (err) {
       console.error("Error loading user badges:", err);
       setBadgeError("Failed to load badge details.");
@@ -199,8 +210,12 @@ const DancersList = () => {
 
       // Update dancers list to refresh current_badges and badge_summary
       const updatedDancersData = await fetchUsers(page, 10);
-      const updatedDancers = Array.isArray(updatedDancersData?.users) ? updatedDancersData.users : [];
-      const updatedDancer = updatedDancers.find(d => d.id === selectedDancer.id);
+      const updatedDancers = Array.isArray(updatedDancersData?.users)
+        ? updatedDancersData.users
+        : [];
+      const updatedDancer = updatedDancers.find(
+        (d) => d.id === selectedDancer.id,
+      );
       if (updatedDancer) {
         setSelectedDancer(updatedDancer);
       }
@@ -231,7 +246,7 @@ const DancersList = () => {
             <th>Email</th>
             <th>Created Date</th>
             <th>Skill Level</th>
-        
+
             <th>Subscription</th>
           </tr>
         </thead>
@@ -240,10 +255,10 @@ const DancersList = () => {
             .filter((dancer) => {
               const matchesSearch =
                 (dancer.name?.toLowerCase() || "").includes(
-                  searchTerm.toLowerCase()
+                  searchTerm.toLowerCase(),
                 ) ||
                 (dancer.location?.toLowerCase() || "").includes(
-                  searchTerm.toLowerCase()
+                  searchTerm.toLowerCase(),
                 );
 
               const matchesSubscription =
@@ -291,8 +306,10 @@ const DancersList = () => {
                 <td>{dancer.id}</td>
                 <td>{dancer.name}</td>
                 <td>{maskEmail(dancer.email)}</td>
-                <td>{new Date(dancer.created_at).toLocaleDateString("fr-FR")}</td>
-                <td>{dancer.skill_level}</td>  
+                <td>
+                  {new Date(dancer.created_at).toLocaleDateString("fr-FR")}
+                </td>
+                <td>{dancer.skill_level}</td>
                 <td>
                   {dancer.active_subscription?.subscription_name || "N/A"}
                 </td>
@@ -357,7 +374,7 @@ const DancersList = () => {
                     {
                       label: "Created At",
                       value: new Date(
-                        selectedDancer.created_at
+                        selectedDancer.created_at,
                       ).toLocaleString(),
                     },
                     {
@@ -401,13 +418,13 @@ const DancersList = () => {
                         {
                           label: "Start Date",
                           value: new Date(
-                            selectedDancer.active_subscription.start_date
+                            selectedDancer.active_subscription.start_date,
                           ).toLocaleString(),
                         },
                         {
                           label: "End Date",
                           value: new Date(
-                            selectedDancer.active_subscription.end_date
+                            selectedDancer.active_subscription.end_date,
                           ).toLocaleString(),
                         },
                         {
@@ -532,14 +549,14 @@ const DancersList = () => {
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
                   {selectedDancer.current_badges &&
                   Object.values(selectedDancer.current_badges).some(
-                    (badge) => badge !== null
+                    (badge) => badge !== null,
                   ) ? (
                     <div className="dancer-badges-grid">
                       {renderDancerInfoGrid([
                         {
                           label: "Dancer Badge",
                           value: selectedDancer.current_badges.dancer || "None",
-                        }
+                        },
                       ])}
                     </div>
                   ) : (
@@ -611,7 +628,8 @@ const DancersList = () => {
                         {
                           label: "Latest Subscription Date",
                           value: new Date(
-                            selectedDancer.subscription_summary.latest_subscription_date
+                            selectedDancer.subscription_summary
+                              .latest_subscription_date,
                           ).toLocaleString(),
                         },
                       ])}
@@ -661,11 +679,20 @@ const DancersList = () => {
                                 >
                                   <div className="dancer-next-badge-header">
                                     <span className="dancer-next-badge-name">
-                                      {badge.badge_emoji && badge.badge_emoji.startsWith("http") ? (
-                                        <img src={badge.badge_emoji} alt={badge.badge_name} className="badge-emoji-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                                      {badge.badge_emoji &&
+                                      badge.badge_emoji.startsWith("http") ? (
+                                        <img
+                                          src={badge.badge_emoji}
+                                          alt={badge.badge_name}
+                                          className="badge-emoji-img"
+                                          onError={(e) => {
+                                            e.target.style.display = "none";
+                                          }}
+                                        />
                                       ) : (
                                         badge.badge_emoji
-                                      )}{" "}{badge.badge_name}
+                                      )}{" "}
+                                      {badge.badge_name}
                                     </span>
                                     <span className="dancer-next-badge-persona">
                                       Persona: {persona}
@@ -679,7 +706,7 @@ const DancersList = () => {
                                     <div>Description: {badge.description}</div>
                                   </div>
                                 </div>
-                              )
+                              ),
                           )}
                         </div>
                       )}
@@ -692,12 +719,9 @@ const DancersList = () => {
                         <div className="dancer-badge-form-row">
                           <label>
                             Persona / User Type
-                            <select
-  value="dancer"
-  disabled
->
-  <option value="dancer">dancer</option>
-</select>
+                            <select value="dancer" disabled>
+                              <option value="dancer">dancer</option>
+                            </select>
                           </label>
                         </div>
 

@@ -3,37 +3,42 @@
    Warm whites · Coral accents · Refined typography
    ===================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&family=Nunito:wght@600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&family=Nunito:wght@600;700;800&display=swap");
 
 /* ── Design Tokens ── */
 :root {
-  --rausch:       #FF385C;
-  --rausch-dark:  #D93B4D;
-  --rausch-light: #FFF0F2;
-  --babu:         #00A699;
-  --arches:       #FC642D;
-  --hof:          #484848;
-  --foggy:        #767676;
-  --white:        #FFFFFF;
-  --off-white:    #F7F7F7;
-  --border:       #DDDDDD;
-  --border-light: #EBEBEB;
+  --rausch: #ff385c;
+  --rausch-dark: #d93b4d;
+  --rausch-light: #fff0f2;
+  --babu: #00a699;
+  --arches: #fc642d;
+  --hof: #484848;
+  --foggy: #767676;
+  --white: #ffffff;
+  --off-white: #f7f7f7;
+  --border: #dddddd;
+  --border-light: #ebebeb;
   --bs-heading-color: inherit;
-  --shadow-sm:    0 1px 2px rgba(0,0,0,0.08);
-  --shadow-md:    0 2px 8px rgba(0,0,0,0.10);
-  --shadow-lg:    0 6px 20px rgba(0,0,0,0.12);
-  --shadow-xl:    0 16px 40px rgba(0,0,0,0.16);
-  --radius-sm:    8px;
-  --radius-md:    12px;
-  --radius-lg:    16px;
-  --radius-xl:    24px;
-  --transition:   0.2s cubic-bezier(0.3, 0, 0.2, 1);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.16);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --transition: 0.2s cubic-bezier(0.3, 0, 0.2, 1);
 }
 
 /* ── Base ── */
 .professors-container {
   padding: 2.5rem 3rem;
-  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    "Nunito Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   background: var(--off-white);
   min-height: 100vh;
   color: var(--hof);
@@ -44,8 +49,7 @@
   font-family: var(--dn-font-d);
   font-size: clamp(1.75rem, 4vw, 2rem);
   font-weight: 800;
-  
- 
+
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--dn-blue);
@@ -53,9 +57,6 @@
   position: relative;
   letter-spacing: -0.5px;
 }
-
-
-
 
 /* ── Filter Toolbar ── */
 .professors-filter-toolbar {
@@ -100,7 +101,7 @@
 .professors-filter-input {
   border: none;
   background: transparent;
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 0.875rem;
   color: var(--hof);
   outline: none;
@@ -108,7 +109,7 @@
 }
 
 .professors-filter-input::placeholder {
-  color: #AAAAAA;
+  color: #aaaaaa;
 }
 
 .professors-filter-select {
@@ -118,18 +119,15 @@
 
 .professors-filter-apply {
   padding: 9px 20px;
-  background: linear-gradient(135deg, #4F7CF7 0%, #8E5CF6 100%);
+  background: linear-gradient(135deg, #4f7cf7 0%, #8e5cf6 100%);
   color: var(--white);
   border: none;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
-
 }
-
-
 
 .professors-filter-clear {
   padding: 9px 16px;
@@ -137,7 +135,7 @@
   color: var(--foggy);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -158,47 +156,44 @@
   margin-bottom: 14px;
 }
 
-
 .bulk-approve-btn {
   color: #3b82f6;
-  border: 1px solid rgba(99,102,241,0.4);
+  border: 1px solid rgba(99, 102, 241, 0.4);
 }
 
 .bulk-approve-btn:hover {
-  background: rgba(99,102,241,0.08);
-  box-shadow:
-    0 8px 25px rgba(99,102,241,0.25);
+  background: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
   transform: translateY(-1px);
 }
-
 
 .bulk-reject-btn {
   color: #3b82f6;
-  border: 1px solid rgba(99,102,241,0.4);
+  border: 1px solid rgba(99, 102, 241, 0.4);
 }
 
 .bulk-reject-btn:hover {
-  background: rgba(99,102,241,0.08);
-  box-shadow:
-    0 8px 25px rgba(99,102,241,0.25);
+  background: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
   transform: translateY(-1px);
 }
 .pagination-btn {
-   padding: 10px 18px;
+  padding: 10px 18px;
   border-radius: 12px;
   border: 1px solid transparent;
   font-weight: 600;
   cursor: pointer;
   font-size: 15px;
 
-  background: rgba(255,255,255,0.6);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
 
   transition: all 0.25s ease;
 
   box-shadow:
-    0 4px 15px rgba(59,130,246,0.15),
-    inset 0 0 0 1px rgba(255,255,255,0.4);}
+    0 4px 15px rgba(59, 130, 246, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
 
 /* ── Table ── */
 .professors-table {
@@ -213,16 +208,16 @@
   margin-top: 0;
 }
 
-.professors-table thead{
-  background: linear-gradient(135deg, #4F7CF7 0%, #8E5CF6 100%);
- 
-   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.15);
+.professors-table thead {
+  background: linear-gradient(135deg, #4f7cf7 0%, #8e5cf6 100%);
+
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.15);
 }
 .professors-table th {
   padding: 1rem 1.25rem;
   background: transparent;
-  color:white;
-  font-family: 'Nunito Sans', sans-serif;
+  color: white;
+  font-family: "Nunito Sans", sans-serif;
   font-weight: 700;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -235,7 +230,6 @@
 .professors-table tbody tr:nth-child(even) {
   background: #fafbff;
 }
-
 
 .professors-table td {
   padding: 1rem 1.25rem;
@@ -280,7 +274,9 @@
   height: 22px;
   cursor: pointer;
   color: var(--foggy);
-  transition: color var(--transition), transform var(--transition);
+  transition:
+    color var(--transition),
+    transform var(--transition);
 }
 
 .action-icon:hover {
@@ -346,13 +342,13 @@
 }
 
 .status.pending {
-  background: #FFF7ED;
-  color: #C2600A;
+  background: #fff7ed;
+  color: #c2600a;
 }
 
 .status.approved,
 .status.accepted {
-  background: #F0FDF4;
+  background: #f0fdf4;
   color: #166534;
 }
 
@@ -389,8 +385,12 @@
 }
 
 @keyframes abFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── DJ Modal Content ── */
@@ -406,19 +406,18 @@
   animation: abSlideUp 0.28s cubic-bezier(0.3, 0, 0.2, 1);
 }
 
-.dj-approve-btn{
-    padding: 0.65rem 1.5rem;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, rgb(108, 61, 232), rgb(236, 72, 153));
-    color: white;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: rgba(236, 72, 153, 0.35) 0px 4px 14px;
+.dj-approve-btn {
+  padding: 0.65rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, rgb(108, 61, 232), rgb(236, 72, 153));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: rgba(236, 72, 153, 0.35) 0px 4px 14px;
 }
-
 
 @keyframes abSlideUp {
   from {
@@ -432,12 +431,12 @@
 }
 
 .dj-modal-content h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-size: 1.3rem;
-    font-weight: 700;
-    margin: 0px 0px 1.25rem;
-    background: linear-gradient(135deg, rgb(108, 61, 232), rgb(236, 72, 153)) text;
-    -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  margin: 0px 0px 1.25rem;
+  background: linear-gradient(135deg, rgb(108, 61, 232), rgb(236, 72, 153)) text;
+  -webkit-text-fill-color: transparent;
 }
 
 .dj-modal-content p {
@@ -475,13 +474,15 @@
   padding: 12px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 0.875rem;
   resize: vertical;
   margin: 1rem 0 0.75rem;
   background: var(--off-white);
   color: var(--hof);
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
   box-sizing: border-box;
 }
 
@@ -489,40 +490,38 @@
   outline: none;
   border-color: var(--hof);
   background: var(--white);
-  box-shadow: 0 0 0 3px rgba(72,72,72,0.08);
+  box-shadow: 0 0 0 3px rgba(72, 72, 72, 0.08);
 }
 
 /* ── DJ Modal Buttons ── */
 .dj-close-btn {
   padding: 0.65rem 1.5rem;
-    border-radius: 10px;
-    border: none;
-    background: rgb(107, 114, 128);
-    color: white;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    font-family: inherit;
+  border-radius: 10px;
+  border: none;
+  background: rgb(107, 114, 128);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-
-
-.dj-close-btn-reject{
-    padding: 0.65rem 1.5rem;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, rgb(108, 61, 232), rgb(236, 72, 153));
-    color: white;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: rgba(236, 72, 153, 0.35) 0px 4px 14px;
+.dj-close-btn-reject {
+  padding: 0.65rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, rgb(108, 61, 232), rgb(236, 72, 153));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: rgba(236, 72, 153, 0.35) 0px 4px 14px;
 }
 
 .dj-close-btn-reject:disabled {
   background: var(--border);
-  color: #AAAAAA;
+  color: #aaaaaa;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -544,7 +543,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    transform var(--transition);
   z-index: 10;
   line-height: 1;
 }
@@ -557,8 +558,10 @@
 /* ── Legacy modal-overlay & modal-content (keep compatible) ── */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(34, 34, 34, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
@@ -588,7 +591,7 @@
 
 .modal-content h2,
 .modal-content h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--hof);
@@ -599,7 +602,7 @@
 }
 
 .modal-content h4 {
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -645,13 +648,15 @@
   padding: 12px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-size: 0.875rem;
   resize: vertical;
   margin: 1rem 0;
   background: var(--off-white);
   color: var(--hof);
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
   box-sizing: border-box;
 }
 
@@ -659,7 +664,7 @@
   outline: none;
   border-color: var(--hof);
   background: var(--white);
-  box-shadow: 0 0 0 3px rgba(72,72,72,0.08);
+  box-shadow: 0 0 0 3px rgba(72, 72, 72, 0.08);
 }
 
 .modal-close-btn {
@@ -673,11 +678,11 @@
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   font-weight: 700;
   font-size: 0.875rem;
   transition: all var(--transition);
-  box-shadow: 0 2px 6px rgba(255,56,92,0.28);
+  box-shadow: 0 2px 6px rgba(255, 56, 92, 0.28);
   overflow: hidden;
   position: relative;
 }
@@ -689,12 +694,12 @@
 .modal-close-btn:hover {
   background: var(--rausch-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255,56,92,0.35);
+  box-shadow: 0 4px 12px rgba(255, 56, 92, 0.35);
 }
 
 .modal-close-btn:disabled {
   background: var(--border);
-  color: #AAAAAA;
+  color: #aaaaaa;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -736,7 +741,7 @@
 }
 
 .modal-content::-webkit-scrollbar-thumb:hover {
-  background: #AAAAAA;
+  background: #aaaaaa;
 }
 
 /* ── Responsive ── */

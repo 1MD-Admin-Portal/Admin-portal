@@ -12,14 +12,25 @@ import CreateEditStudioModal from "../../components/studio/CreateEditStudioModal
 import DeleteModal from "../../components/DeleteModal";
 import StudioDetailDrawer from "../../components/studio/StudioDetailDrawer";
 import StudioStatisticsSection from "../../components/studio/StudioStatisticsSection";
-import InstructorLinkModal from "../../components/studio/InstructorLinkModal";
-import { Plus, Edit2, Trash2, Eye, AlertCircle, Check, UserPlus } from "lucide-react";
+// import InstructorLinkModal from "../../components/studio/InstructorLinkModal";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Eye,
+  AlertCircle,
+  Check,
+  UserPlus,
+} from "lucide-react";
 import "./StudioManagementPage.css";
 
 const StudioManagementPage = () => {
   // State
   const [studios, setStudios] = useState([]);
-  const [pagination, setPagination] = useState({ total_pages: 1, current_page: 1 });
+  const [pagination, setPagination] = useState({
+    total_pages: 1,
+    current_page: 1,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -41,16 +52,20 @@ const StudioManagementPage = () => {
 
   useEffect(() => {
     loadStudios(currentPage);
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, statusFilter]);
 
   const loadStudios = async (pageNum) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getStudios(pageNum, searchQuery);
+      // Map statusFilter to API param (skip if 'all')
+      const statusParam = statusFilter !== "all" ? statusFilter : undefined;
+      const response = await getStudios(pageNum, searchQuery, statusParam);
       setStudios(Array.isArray(response?.studios) ? response.studios : []);
-      const paginationData = response?.pagination || { total_pages: 1, current_page: 1 };
-      
+      const paginationData = response?.pagination || {
+        total_pages: 1,
+        current_page: 1,
+      };
       setPagination(paginationData);
     } catch (err) {
       console.error("Error loading studios:", err);
@@ -145,14 +160,13 @@ const StudioManagementPage = () => {
     setStudioToDelete(null);
   };
 
-  const handleManageInstructors = (studio) => {
-  setInstructorModalStudio(studio);
-  setInstructorModalOpen(true);
-};
+  // const handleManageInstructors = (studio) => {
+  //   setInstructorModalStudio(studio);
+  //   setInstructorModalOpen(true);
+  // };
 
-  // Filter studios by status
-  const filteredStudios =
-    statusFilter === "all" ? studios : studios.filter((s) => s.status === statusFilter);
+  // No need to filter on UI, API now returns filtered studios
+  const filteredStudios = studios;
 
   return (
     <div className="studio-management-page">
@@ -168,7 +182,6 @@ const StudioManagementPage = () => {
 
       {/* Statistics Section */}
       <StudioStatisticsSection studios={studios} />
-      
 
       {/* Messages */}
       {successMessage && (
@@ -202,7 +215,10 @@ const StudioManagementPage = () => {
 
         <div className="filter-controls">
           <label>Status:</label>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option value="all">All Studios</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -230,7 +246,7 @@ const StudioManagementPage = () => {
                 <th>Country</th>
                 <th>Capacity</th>
                 <th>Est. Year</th>
-                <th>Instructors</th>
+                {/* <th>Instructors</th> */}
                 <th>Created at</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -238,63 +254,101 @@ const StudioManagementPage = () => {
             </thead>
             <tbody>
               {filteredStudios.map((studio) => (
-                <tr key={studio.id} className="studio-row" style={{ cursor: "pointer" }} >
-                  <td className="studio-name" onClick={() => handleViewDetails(studio)}>
+                <tr
+                  key={studio.id}
+                  className="studio-row"
+                  style={{ cursor: "pointer" }}
+                >
+                  <td
+                    className="studio-name"
+                    onClick={() => handleViewDetails(studio)}
+                  >
                     {studio.logo_url && (
-                      <img src={studio.logo_url} alt={studio.name} className="studio-thumbnail" />
+                      <img
+                        src={studio.logo_url}
+                        alt={studio.name}
+                        className="studio-thumbnail"
+                      />
                     )}
                     <span>{studio.name}</span>
                   </td>
-                  <td onClick={() => handleViewDetails(studio)}>{studio.city || "N/A"}</td>
-                  <td onClick={() => handleViewDetails(studio)}>{studio.country || "N/A"}</td>
-                  <td onClick={() => handleViewDetails(studio)}>{studio.capacity || "N/A"}</td>
+                  <td onClick={() => handleViewDetails(studio)}>
+                    {studio.city || "N/A"}
+                  </td>
+                  <td onClick={() => handleViewDetails(studio)}>
+                    {studio.country || "N/A"}
+                  </td>
+                  <td onClick={() => handleViewDetails(studio)}>
+                    {studio.capacity || "N/A"}
+                  </td>
                   <td>{studio.established_year || "N/A"}</td>
+                  {/* <td>
+                    <button
+                      className="action-icon-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleManageInstructors(studio);
+                      }}
+                      title="Manage Instructors"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 5,
+                        padding: "6px 12px",
+                        width: "auto",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "#4F7CF7",
+                        borderColor: "rgba(79,124,247,0.3)",
+                      }}
+                    >
+                      <UserPlus size={14} /> Manage
+                    </button>
+                  </td> */}
                   <td>
-  <button
-    className="action-icon-btn"
-    onClick={(e) => { e.stopPropagation(); handleManageInstructors(studio); }}
-    title="Manage Instructors"
-    style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", width: "auto", fontSize: 12, fontWeight: 600, color: "#4F7CF7", borderColor: "rgba(79,124,247,0.3)" }}
-  >
-    <UserPlus size={14} /> Manage
-  </button>
-</td>
-                  <td>{new Date(studio.created_at).toLocaleDateString("en-GB")}</td>
+                    {new Date(studio.created_at).toLocaleDateString("en-GB")}
+                  </td>
                   <td>
                     <span className={`status-badge status-${studio.status}`}>
                       {studio.status}
                     </span>
                   </td>
                   <td>
-  <div className="d-flex gap-2">
+                    <div className="d-flex gap-2">
+                      <button
+                        className="action-icon-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewDetails(studio);
+                        }}
+                        title="View"
+                      >
+                        <Eye size={16} />
+                      </button>
 
-    <button
-      className="action-icon-btn"
-      onClick={(e) => { e.stopPropagation(); handleViewDetails(studio); }}
-      title="View"
-    >
-      <Eye size={16} />
-    </button>
+                      <button
+                        className="action-icon-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(studio);
+                        }}
+                        title="Edit"
+                      >
+                        <Edit2 size={16} />
+                      </button>
 
-    <button
-      className="action-icon-btn"
-      onClick={(e) => { e.stopPropagation(); handleEditClick(studio); }}
-      title="Edit"
-    >
-      <Edit2 size={16} />
-    </button>
-
-    <button
-      className="action-icon-btn delete"
-      onClick={(e) => { e.stopPropagation(); handleDeleteClick(studio); }}
-      title="Delete"
-    >
-      <Trash2 size={16} />
-    </button>
-
-  </div>
-</td>
-
+                      <button
+                        className="action-icon-btn delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(studio);
+                        }}
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -336,11 +390,14 @@ const StudioManagementPage = () => {
         studio={selectedStudio}
         loading={drawerLoading}
       />
-      <InstructorLinkModal
-  isOpen={instructorModalOpen}
-  onClose={() => { setInstructorModalOpen(false); setInstructorModalStudio(null); }}
-  studio={instructorModalStudio}
-/>
+      {/* <InstructorLinkModal
+        isOpen={instructorModalOpen}
+        onClose={() => {
+          setInstructorModalOpen(false);
+          setInstructorModalStudio(null);
+        }}
+        studio={instructorModalStudio}
+      /> */}
     </div>
   );
 };

@@ -71,51 +71,48 @@ const MarketplacePage = () => {
 
   // Fetch programs or events
   useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      if (filter === "Program") {
-        const res = await getMarketplacePrograms(
-          programPagination.page,
-          programPagination.limit,
-          debouncedSearch  // ✅ already wired
-        );
-        setPrograms(res.programs || []);
-        if (res.pagination) setProgramPagination(res.pagination);
-      } else {
-        const res = await getPublishedEvents(
-          eventPagination.page,
-          eventPagination.limit,
-          debouncedSearch  // ✅ ADD THIS — was missing
-        );
-        setEvents(res.events || []);
-        if (res.pagination) setEventPagination(res.pagination);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (filter === "Program") {
+          const res = await getMarketplacePrograms(
+            programPagination.page,
+            programPagination.limit,
+            debouncedSearch, // ✅ already wired
+          );
+          setPrograms(res.programs || []);
+          if (res.pagination) setProgramPagination(res.pagination);
+        } else {
+          const res = await getPublishedEvents(
+            eventPagination.page,
+            eventPagination.limit,
+            debouncedSearch, // ✅ ADD THIS — was missing
+          );
+          setEvents(res.events || []);
+          if (res.pagination) setEventPagination(res.pagination);
+        }
+      } catch (err) {
+        console.error("Error loading marketplace:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error loading marketplace:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, [filter, programPagination.page, eventPagination.page, debouncedSearch]);
-
+    };
+    fetchData();
+  }, [filter, programPagination.page, eventPagination.page, debouncedSearch]);
 
   // ✅ 2. Debounce search — resets pages to 1
-useEffect(() => {
-  const timer = setTimeout(() => {
-    setDebouncedSearch(search);
-    // Reset page on new search
-    if (filter === "Program") {
-      setProgramPagination(prev => ({ ...prev, page: 1 }));
-    } else {
-      setEventPagination(prev => ({ ...prev, page: 1 }));
-    }
-  }, 400);
-  return () => clearTimeout(timer);
-}, [search]);
-
-
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      // Reset page on new search
+      if (filter === "Program") {
+        setProgramPagination((prev) => ({ ...prev, page: 1 }));
+      } else {
+        setEventPagination((prev) => ({ ...prev, page: 1 }));
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Filter + search
   const filteredData = filter === "Program" ? programs : events;
@@ -125,7 +122,14 @@ useEffect(() => {
     setSelectedProgram(program);
     setShowDetails(true);
     setLoadingPurchases(true);
-    setPurchasePagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
+    setPurchasePagination({
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    });
     try {
       const res = await getProgramPurchases(program.program_id, 1, 20);
       setPurchases(res.purchases || []);
@@ -148,7 +152,7 @@ useEffect(() => {
       const res = await getProgramPurchases(
         selectedProgram.program_id,
         newPage,
-        purchasePagination.limit
+        purchasePagination.limit,
       );
       setPurchases(res.purchases || []);
       if (res.pagination) {
@@ -169,9 +173,9 @@ useEffect(() => {
       setEventPagination((prev) => ({ ...prev, page: newPage }));
     }
   };
-   
+
   const currentPagination =
-  filter === "Program" ? programPagination : eventPagination;
+    filter === "Program" ? programPagination : eventPagination;
   return (
     <div className="mktplace-main-wrapper">
       <div className="mktplace-top-header">
@@ -181,7 +185,9 @@ useEffect(() => {
           </div>
           <div>
             <h1 className="mktplace-main-title">Marketplace</h1>
-            <p className="mktplace-header-subtitle">Manage programs and events marketplace</p>
+            <p className="mktplace-header-subtitle">
+              Manage programs and events marketplace
+            </p>
           </div>
         </div>
         {/* <button
@@ -196,20 +202,34 @@ useEffect(() => {
       <div className="mktplace-control-panel">
         <div className="mktplace-filter-group">
           {["Program", "Event"].map((item) => (
-  <button
-    key={item}
-    className={`mktplace-filter-option ${filter === item ? "selected" : ""}`}
-    onClick={() => {
-      setFilter(item);
-      setSearch("");           
-      setDebouncedSearch("");  
-      if (item === "Program") {
-        setProgramPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
-      } else {
-        setEventPagination({ page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
-      }
-    }}
-  >
+            <button
+              key={item}
+              className={`mktplace-filter-option ${filter === item ? "selected" : ""}`}
+              onClick={() => {
+                setFilter(item);
+                setSearch("");
+                setDebouncedSearch("");
+                if (item === "Program") {
+                  setProgramPagination({
+                    page: 1,
+                    limit: 20,
+                    total: 0,
+                    totalPages: 0,
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                  });
+                } else {
+                  setEventPagination({
+                    page: 1,
+                    limit: 20,
+                    total: 0,
+                    totalPages: 0,
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                  });
+                }
+              }}
+            >
               {item === "Program" ? (
                 <ShoppingBag size={16} />
               ) : (
@@ -285,11 +305,19 @@ useEffect(() => {
                           : item.organizer?.name}
                       </div>
                     </td>
-                    <td>{new Date(filter === "Program" ? item.created_at : item.created_at).toLocaleDateString("en-GB")}</td>
+                    <td>
+                      {new Date(
+                        filter === "Program"
+                          ? item.created_at
+                          : item.created_at,
+                      ).toLocaleDateString("en-GB")}
+                    </td>
                     <td className="mktplace-price-column">
                       <div className="mktplace-price-display">
                         <Euro size={14} />
-                        {filter === "Program" ? item.price : item.price || "Free"}
+                        {filter === "Program"
+                          ? item.price
+                          : item.price || "Free"}
                       </div>
                     </td>
                     <td className="mktplace-status-column">
@@ -319,7 +347,7 @@ useEffect(() => {
                             : (setSelectedEvent(item), setShowEventModal(true))
                         }
                       >
-                          <Eye size={16} />
+                        <Eye size={16} />
                         {/* <TrendingUp size={14} /> */}
                       </button>
                     </td>
@@ -331,13 +359,13 @@ useEffect(() => {
 
           {/* Pagination Controls */}
           {currentPagination.totalPages > 1 && (
-  <Pagination
-    currentPage={currentPagination.page}
-    totalPages={currentPagination.totalPages}
-    onPageChange={handleMainPaginationChange}
-    isLoading={loading}
-  />
-)}
+            <Pagination
+              currentPage={currentPagination.page}
+              totalPages={currentPagination.totalPages}
+              onPageChange={handleMainPaginationChange}
+              isLoading={loading}
+            />
+          )}
         </>
       )}
 
@@ -693,15 +721,14 @@ useEffect(() => {
 
                     {/* Purchase Pagination Controls */}
                     {purchasePagination.totalPages > 1 && (
-  <Pagination
-    currentPage={purchasePagination.page}
-    totalPages={purchasePagination.totalPages}
-    onPageChange={handlePurchasePageChange}
-    isLoading={loadingPurchases}
-  />
-)}
-                    </div>
-                  
+                      <Pagination
+                        currentPage={purchasePagination.page}
+                        totalPages={purchasePagination.totalPages}
+                        onPageChange={handlePurchasePageChange}
+                        isLoading={loadingPurchases}
+                      />
+                    )}
+                  </div>
                 </>
               )}
             </div>

@@ -20,14 +20,25 @@ const getHeaders = () => {
  * @param {string} country - Filter by country (optional)
  * @returns {Promise}
  */
-export const getStudios = async (page = 1, search = "", city = "", state = "", country = "") => {
+/**
+ * Get all studios with pagination and filters
+ * @param {number} page - Page number (default: 1)
+ * @param {string} search - Search query (optional)
+ * @param {string} status - Studio status ("active" | "inactive" | undefined)
+ * @param {number} limit - Page size (optional, default 20)
+ * @returns {Promise}
+ */
+export const getStudios = async (page = 1, search = "", status = undefined, limit = 20) => {
   try {
-    const res = await axios.get(
-      `${BASE_URL}${CONSTANTS.URL.STUDIOS.GET_ALL(page, search, city, state, country)}`,
-      {
-        headers: getHeaders(),
-      }
-    );
+    const params = new URLSearchParams();
+    params.append("page", page);
+    params.append("limit", limit);
+    if (search) params.append("search", search);
+    if (status) params.append("status", status);
+    const url = `${BASE_URL}/api/v1/admin/studios?${params.toString()}`;
+    const res = await axios.get(url, {
+      headers: getHeaders(),
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching studios:", error);

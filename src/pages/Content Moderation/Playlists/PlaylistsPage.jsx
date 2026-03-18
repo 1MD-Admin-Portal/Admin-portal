@@ -50,7 +50,7 @@ const PlaylistsPage = () => {
         filters.status,
         filters.playlist_type,
         filters.search,
-        filters.sort_by
+        filters.sort_by,
       );
       setPlaylists(res.playlists || []);
       setPagination(res.pagination || { page: 1, total_pages: 1 });
@@ -130,7 +130,7 @@ const PlaylistsPage = () => {
   };
 
   const pendingPlaylists = playlists.filter(
-    (pl) => pl.status === "pending_approval"
+    (pl) => pl.status === "pending_approval",
   );
 
   const approveButtonText =
@@ -259,7 +259,7 @@ const PlaylistsPage = () => {
       )}
 
       {/* Enhanced Grid Layout */}
-      <div className="plmgmt-cards-grid">
+      {/* <div className="plmgmt-cards-grid">
         {loading ? (
           <GlobalLoader text="Loading playlists..." />
         ) : playlists.length > 0 ? (
@@ -387,7 +387,141 @@ const PlaylistsPage = () => {
             <span className="plmgmt-empty-message">No playlists found.</span>
           </div>
         )}
-      </div>
+      </div> */}
+      {/* Loader OR Content */}
+      {loading ? (
+        <div className="plmgmt-loader-wrapper">
+          <GlobalLoader text="Loading playlists..." />
+        </div>
+      ) : (
+        <div className="plmgmt-cards-grid">
+          {playlists.length > 0 ? (
+            playlists.map((playlist) => (
+              <div
+                key={playlist.id}
+                className="plmgmt-playlist-card"
+                onClick={() => setSelectedPlaylist(playlist)}
+              >
+                {activeTab === "pending" && (
+                  <div
+                    className="plmgmt-card-checkbox"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(playlist.id)}
+                      disabled={playlist.status !== "pending_approval"}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds((prev) => [...prev, playlist.id]);
+                        } else {
+                          setSelectedIds((prev) =>
+                            prev.filter((id) => id !== playlist.id),
+                          );
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="plmgmt-thumbnail-wrapper">
+                  {playlist.cover_image_url ? (
+                    <img
+                      src={playlist.cover_image_url}
+                      alt={playlist.title}
+                      className="plmgmt-cover-image"
+                    />
+                  ) : (
+                    <div className="plmgmt-cover-placeholder">
+                      <Music size={48} />
+                    </div>
+                  )}
+
+                  <div className="plmgmt-type-badge-overlay">
+                    <span
+                      className={`plmgmt-type-label plmgmt-type-${playlist.playlist_type}`}
+                    >
+                      {playlist.playlist_type}
+                    </span>
+                  </div>
+
+                  <div className="plmgmt-status-badge-overlay">
+                    <span
+                      className={`plmgmt-status-label plmgmt-status-${playlist.status?.replace(
+                        "_",
+                        "-",
+                      )}`}
+                    >
+                      {playlist.status === "pending_approval"
+                        ? "Pending"
+                        : "Approved"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="plmgmt-card-details">
+                  <div className="plmgmt-card-header">
+                    <h3 className="plmgmt-card-title">{playlist.title}</h3>
+                    <div className="plmgmt-card-meta">
+                      <div className="plmgmt-dj-info">
+                        {playlist.dj?.avatar && (
+                          <img
+                            src={playlist.dj.avatar}
+                            alt={playlist.dj.name}
+                            className="plmgmt-dj-avatar"
+                          />
+                        )}
+                        <span className="plmgmt-dj-name">
+                          {playlist.dj?.name}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="plmgmt-card-stats">
+                    <div className="plmgmt-stat-item">
+                      <Music size={16} />
+                      <span>{playlist.total_songs} Songs</span>
+                    </div>
+                    <div className="plmgmt-stat-item">
+                      <Clock size={16} />
+                      <span>{playlist.duration_minutes} min</span>
+                    </div>
+                  </div>
+
+                  {activeTab === "pending" &&
+                    playlist.status === "pending_approval" && (
+                      <div
+                        className="plmgmt-card-buttons"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          className="plmgmt-approve-btn"
+                          onClick={() => handleApprove(playlist.id)}
+                        >
+                          <CheckCircle size={16} />
+                          Approve
+                        </button>
+                        <button
+                          className="plmgmt-reject-btn"
+                          onClick={() => handleReject(playlist.id)}
+                        >
+                          <XCircle size={16} />
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="plmgmt-empty-display">
+              <span className="plmgmt-empty-icon">🎵</span>
+              <span className="plmgmt-empty-message">No playlists found.</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Enhanced Pagination */}
       <Pagination
@@ -473,7 +607,7 @@ const PlaylistsPage = () => {
                       <span
                         className={`plmgmt-status-label plmgmt-status-${selectedPlaylist.status?.replace(
                           "_",
-                          "-"
+                          "-",
                         )}`}
                       >
                         {selectedPlaylist.status === "pending_approval"

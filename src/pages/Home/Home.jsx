@@ -237,7 +237,7 @@ const Home = () => {
             const value = metrics[card.key];
             const formattedValue = dashboardService.formatMetric(
               value,
-              card.format
+              card.format,
             );
 
             return (
@@ -341,7 +341,7 @@ const Home = () => {
                   {metrics.total_users > 0
                     ? Math.round(
                         (metrics.active_subscriptions / metrics.total_users) *
-                          100
+                          100,
                       )
                     : 0}
                   %
@@ -356,7 +356,7 @@ const Home = () => {
                         ? Math.round(
                             (metrics.active_subscriptions /
                               metrics.total_users) *
-                              100
+                              100,
                           )
                         : 0
                     }%`,
@@ -378,7 +378,7 @@ const Home = () => {
                     metrics.total_users > 0
                       ? parseFloat(metrics.total_revenue) / metrics.total_users
                       : 0,
-                    "currency"
+                    "currency",
                   )}
                 </span>
               </div>

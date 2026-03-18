@@ -1,5 +1,5 @@
-import React from 'react';
-import '../styles/Dashboard.css';
+import React from "react";
+import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   // const metrics = [
@@ -53,14 +53,14 @@ const Dashboard = () => {
   // };
 
   const quickActions = [
-    { title: 'Add New Program', icon: '➕' },
-    { title: 'Create New Challenge', icon: '🚩' },
-    { title: 'Create New Event', icon: '👥' }
+    { title: "Add New Program", icon: "➕" },
+    { title: "Create New Challenge", icon: "🚩" },
+    { title: "Create New Event", icon: "👥" },
   ];
 
   const renderChart = (data, title) => {
-    const maxValue = Math.max(...data.map(d => d.value));
-    const minValue = Math.min(...data.map(d => d.value));
+    const maxValue = Math.max(...data.map((d) => d.value));
+    const minValue = Math.min(...data.map((d) => d.value));
     const range = maxValue - minValue;
 
     return (
@@ -78,21 +78,33 @@ const Dashboard = () => {
             <div className="chart-area">
               <svg viewBox="0 0 300 200" className="chart-svg">
                 <defs>
-                  <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1"/>
+                  <linearGradient
+                    id="gradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1" />
                   </linearGradient>
                 </defs>
                 <path
-                  d={`M 0 ${200 - ((data[0].value - minValue) / range) * 150} ${data.map((d, i) => 
-                    `L ${(i * 60)} ${200 - ((d.value - minValue) / range) * 150}`
-                  ).join(' ')} L 300 200 L 0 200 Z`}
+                  d={`M 0 ${200 - ((data[0].value - minValue) / range) * 150} ${data
+                    .map(
+                      (d, i) =>
+                        `L ${i * 60} ${200 - ((d.value - minValue) / range) * 150}`,
+                    )
+                    .join(" ")} L 300 200 L 0 200 Z`}
                   fill="url(#gradient)"
                 />
                 <path
-                  d={`M 0 ${200 - ((data[0].value - minValue) / range) * 150} ${data.map((d, i) => 
-                    `L ${(i * 60)} ${200 - ((d.value - minValue) / range) * 150}`
-                  ).join(' ')}`}
+                  d={`M 0 ${200 - ((data[0].value - minValue) / range) * 150} ${data
+                    .map(
+                      (d, i) =>
+                        `L ${i * 60} ${200 - ((d.value - minValue) / range) * 150}`,
+                    )
+                    .join(" ")}`}
                   stroke="#3b82f6"
                   strokeWidth="2"
                   fill="none"
@@ -140,15 +152,17 @@ const Dashboard = () => {
             <div className="metric-content">
               <div className="metric-value">{metric.value}</div>
               <div className="metric-title">{metric.title}</div>
-              {metric.change && <div className="metric-change">{metric.change}</div>}
+              {metric.change && (
+                <div className="metric-change">{metric.change}</div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
       <div className="charts-section">
-        {renderChart(chartData.userGrowth, 'User Growth')}
-        {renderChart(chartData.subscriptionGrowth, 'Subscription Growth')}
+        {renderChart(chartData.userGrowth, "User Growth")}
+        {renderChart(chartData.subscriptionGrowth, "Subscription Growth")}
       </div>
 
       <div className="quick-actions">

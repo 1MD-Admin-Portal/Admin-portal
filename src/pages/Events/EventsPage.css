@@ -226,7 +226,7 @@
 }
 
 /* ── Table Cell Styles ── */
-.event-title-column.clickable { cursor: pointer; }
+.event-title-column{ cursor: pointer; }
 
 .event-title-wrapper {
   display: flex;
@@ -247,7 +247,7 @@
   white-space: nowrap;
 }
 
-.event-type-column { min-width: 110px; }
+.event-type-column { min-width: 110px; cursor: pointer; }
 
 .event-type-badges {
   display: flex;

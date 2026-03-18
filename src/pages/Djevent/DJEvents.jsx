@@ -9,7 +9,7 @@ import {
 } from "../../services/djEvents.service";
 import "./DJEvents.css";
 import Pagination from "../../components/common/Pagination";
-import { AlignCenter, CheckCircle, XCircle } from "lucide-react";
+import { AlignCenter, CheckCircle, XCircle,Search} from "lucide-react";
 
 const DjEvents = () => {
   const [events, setEvents] = useState([]);
@@ -30,14 +30,21 @@ const DjEvents = () => {
   const [pagination, setPagination] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [showApproveModal,setShowApproveModal]= useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
   const [rejectNotes, setRejectNotes] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000,
+    );
   };
 
   useEffect(() => {
@@ -48,7 +55,13 @@ const DjEvents = () => {
     } else if (activeTab === "statistics") {
       fetchStatistics();
     }
-  }, [filters.status, filters.playlist_type, filters.page, filters.limit, activeTab]);
+  }, [
+    filters.status,
+    filters.playlist_type,
+    filters.page,
+    filters.limit,
+    activeTab,
+  ]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -59,7 +72,7 @@ const DjEvents = () => {
         filters.playlist_type,
         "",
         filters.page,
-        filters.limit
+        filters.limit,
       );
       setEvents(data.events || []);
       setPagination(data.pagination || {});
@@ -270,6 +283,8 @@ const DjEvents = () => {
       {/* Filters - Show only on All Events tab */}
       {activeTab === "all" && (
         <div className="filters-section">
+          <div className="search-box">
+          <Search size={18} classname="search-box-icon" />
           <input
             type="text"
             placeholder="Search events..."
@@ -277,6 +292,7 @@ const DjEvents = () => {
             onChange={(e) => handleFilterChange("search", e.target.value)}
             className="search-input"
           />
+          </div>
 
           <select
             value={filters.status}
@@ -349,7 +365,7 @@ const DjEvents = () => {
               <p className="stat-value">
                 €
                 {statistics.overall_statistics?.average_event_price?.toFixed(
-                  2
+                  2,
                 ) || 0}
               </p>
             </div>
@@ -391,8 +407,10 @@ const DjEvents = () => {
                       {dj.approved_events}
                     </p>
                   </div>
-                  <div><h3 style={{ fontSize: "0.9375rem" }}>Avg Price :</h3>
-                  <span className="avg-price">€{dj.average_price}</span></div>
+                  <div>
+                    <h3 style={{ fontSize: "0.9375rem" }}>Avg Price :</h3>
+                    <span className="avg-price">€{dj.average_price}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -456,19 +474,37 @@ const DjEvents = () => {
                       </div>
                     </td>
                     <td>€{event.price}</td>
-                    <td>{new Date(event.created_at).toLocaleDateString("en-GB")}</td>
+                    <td>
+                      {new Date(event.created_at).toLocaleDateString("en-GB")}
+                    </td>
                     <td>{getStatusBadge(event.status)}</td>
                     <td>
                       <div className="icon-actions">
                         <CheckCircle
                           className={`action-icon ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => { e.stopPropagation(); if (event.status === "pending_approval") handleApproveClick(event.id, e); }}
-                          title={event.status === "pending_approval" ? "Approve" : "Already processed"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (event.status === "pending_approval")
+                              handleApproveClick(event.id, e);
+                          }}
+                          title={
+                            event.status === "pending_approval"
+                              ? "Approve"
+                              : "Already processed"
+                          }
                         />
                         <XCircle
                           className={`action-icon reject ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => { e.stopPropagation(); if (event.status === "pending_approval") handleRejectClick(event, e); }}
-                          title={event.status === "pending_approval" ? "Reject" : "Already processed"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (event.status === "pending_approval")
+                              handleRejectClick(event, e);
+                          }}
+                          title={
+                            event.status === "pending_approval"
+                              ? "Reject"
+                              : "Already processed"
+                          }
                         />
                       </div>
                     </td>
@@ -479,132 +515,146 @@ const DjEvents = () => {
           </div>
 
           {/* Pagination */}
-          {(
+          {
             <Pagination
               currentPage={pagination.page || 1}
               totalPages={pagination.totalPages || 1}
               onPageChange={handlePageChange}
               isLoading={loading}
             />
-          )}
+          }
         </>
       )}
 
       {/* Event Details Modal */}
-      {showModal && selectedEvent && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{selectedEvent.event?.event_title}</h2>
-              <button onClick={closeModal} className="close-btn">
-                ×
-              </button>
-            </div>
+      {/* Event Details Modal */}
+{showModal && selectedEvent && (
+  <div className="dj-modal-overlay" onClick={closeModal}>
+    <div className="dj-modal-content" onClick={(e) => e.stopPropagation()}>
+      
+      {/* Header */}
+      <div className="dj-modal-header">
+        <h2>{selectedEvent.event?.event_title}</h2>
+        <button onClick={closeModal} className="close-btn">×</button>
+      </div>
 
-            <div className="modal-body">
-              <div className="event-details-grid">
-                <div className="detail-section">
-                  <h3>Event Information</h3>
-                  <p>
-                    <strong>Description:</strong>{" "}
-                    {selectedEvent.event?.event_description}
-                  </p>
-                  <p>
-                    <strong>Genre:</strong> {selectedEvent.event?.music_genre}
-                  </p>
-                  <p>
-                    <strong>Type:</strong> {selectedEvent.event?.event_type}
-                  </p>
-                  <p>
-                    <strong>Price:</strong> €{selectedEvent.event?.price}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    {getStatusBadge(selectedEvent.event?.status)}
-                  </p>
-                </div>
+      {/* Body */}
+      <div className="dj-modal-body">
+        <div className="event-details-grid">
 
-                <div className="detail-section">
-                  <h3>DJ Information</h3>
-                  <div className="dj-details">
-                    <img
-                      src={selectedEvent.event?.dj_image}
-                      alt={selectedEvent.event?.dj_name}
-                      className="dj-avatar-large"
-                    />
-                    <div>
-                      <p>
-                        {selectedEvent.event?.dj_name}
-                      </p>
-                      <p>
-                        {selectedEvent.event?.dj_email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+          {/* Event Information */}
+          <div className="detail-section">
+            <h3>Event Information</h3>
+            <p>
+              <strong>Description:</strong>
+              <span>{selectedEvent.event?.event_description}</span>
+            </p>
+            <p>
+              <strong>Genre:</strong>
+              <span>{selectedEvent.event?.music_genre}</span>
+            </p>
+            <p>
+              <strong>Type:</strong>
+              <span>{selectedEvent.event?.event_type}</span>
+            </p>
+            <p>
+              <strong>Price:</strong>
+              <span>€{selectedEvent.event?.price}</span>
+            </p>
+            <p>
+              <strong>Status:</strong>
+              <span>{getStatusBadge(selectedEvent.event?.status)}</span>
+            </p>
+          </div>
 
-                <div className="detail-section">
-                  <h3>Statistics</h3>
-                  <p>
-                    <strong>Total Enrollments:</strong>{" "}
-                    {selectedEvent.statistics?.total_enrollments || 0}
-                  </p>
-                  <p>
-                    <strong>Paid Enrollments:</strong>{" "}
-                    {selectedEvent.statistics?.paid_enrollments || 0}
-                  </p>
-                  <p>
-                    <strong>Total Revenue:</strong> €
-                    {selectedEvent.statistics?.total_revenue || 0}
-                  </p>
-                  <p>
-                    <strong>Average Rating:</strong>{" "}
-                    {selectedEvent.statistics?.average_rating || "N/A"}
-                  </p>
-                </div>
-
-                {selectedEvent.enrollments?.length > 0 && (
-                  <div className="detail-section full-width">
-                    <h3>Enrollments</h3>
-                    <table className="enrollments-table">
-                      <thead>
-                        <tr>
-                          <th>User</th>
-                          <th>Email</th>
-                          <th>Status</th>
-                          <th>Payment</th>
-                          <th>Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedEvent.enrollments.map((enrollment) => (
-                          <tr key={enrollment.enrollment_id}>
-                            <td>
-                              <div className="user-info">
-                                <img
-                                  src={enrollment.user_image}
-                                  alt={enrollment.user_name}
-                                  className="user-avatar"
-                                />
-                                <span>{enrollment.user_name}</span>
-                              </div>
-                            </td>
-                            <td>{enrollment.user_email}</td>
-                            <td>{enrollment.status}</td>
-                            <td>{enrollment.payment_status}</td>
-                            <td>€{enrollment.amount_paid}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+          {/* DJ Information */}
+          <div className="detail-section">
+            <h3>DJ Information</h3>
+            <div className="dj-details">
+              <img
+                src={selectedEvent.event?.dj_image}
+                alt={selectedEvent.event?.dj_name}
+                className="dj-avatar-large"
+              />
+              <div>
+                <p>
+                  <strong>Name:</strong>
+                  <span>{selectedEvent.event?.dj_name}</span>
+                </p>
+                <p>
+                  <strong>Email:</strong>
+                  <span>{selectedEvent.event?.dj_email}</span>
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
+          {/* Statistics */}
+          <div className="detail-section">
+            <h3>Statistics</h3>
+            <p>
+              <strong>Total Enrollments:</strong>
+              <span>{selectedEvent.statistics?.total_enrollments || 0}</span>
+            </p>
+            <p>
+              <strong>Paid Enrollments:</strong>
+              <span>{selectedEvent.statistics?.paid_enrollments || 0}</span>
+            </p>
+            <p>
+              <strong>Total Revenue:</strong>
+              <span>€{selectedEvent.statistics?.total_revenue || 0}</span>
+            </p>
+            <p>
+              <strong>Average Rating:</strong>
+              <span>{selectedEvent.statistics?.average_rating || "N/A"}</span>
+            </p>
+          </div>
+
+          {/* Enrollments Table */}
+          {selectedEvent.enrollments?.length > 0 && (
+            <div className="detail-section full-width">
+              <h3>Enrollments</h3>
+              <div className="table-responsive">
+                <table className="enrollments-table">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Status</th>
+                      <th>Payment</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedEvent.enrollments.map((enrollment) => (
+                      <tr key={enrollment.enrollment_id}>
+                        <td>
+                          <div className="user-info">
+                            <img
+                              src={enrollment.user_image}
+                              alt={enrollment.user_name}
+                              className="user-avatar"
+                            />
+                            <span>{enrollment.user_name}</span>
+                          </div>
+                        </td>
+                        <td>{enrollment.user_email}</td>
+                        <td>{getStatusBadge(enrollment.status)}</td>
+                        <td>{enrollment.payment_status}</td>
+                        <td>€{enrollment.amount_paid}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {/*Approve Modal*/}
       {showApproveModal && (
@@ -695,7 +745,9 @@ const DjEvents = () => {
           <span className="toast-message">{toast.message}</span>
           <button
             className="toast-close"
-            onClick={() => setToast({ show: false, message: "", type: "success" })}
+            onClick={() =>
+              setToast({ show: false, message: "", type: "success" })
+            }
           >
             ×
           </button>

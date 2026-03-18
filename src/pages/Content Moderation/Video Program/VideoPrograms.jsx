@@ -33,11 +33,10 @@ const VideoPrograms = () => {
     totalPages: 1,
   });
 
-
-const isDirectVideo = (url) => {
-  if (!url) return false;
-  return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
-};
+  const isDirectVideo = (url) => {
+    if (!url) return false;
+    return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+  };
 
   useEffect(() => {
     if (currentView === "all") {
@@ -51,7 +50,7 @@ const isDirectVideo = (url) => {
     try {
       setLoading(true);
       const res = await getProgramsService();
-      
+
       if (Array.isArray(res)) {
         setPrograms(res);
       } else if (res && Array.isArray(res.programs)) {
@@ -71,9 +70,9 @@ const isDirectVideo = (url) => {
       setLoading(true);
       const res = await getPendingProgramsService(
         pagination.page,
-        pagination.limit
+        pagination.limit,
       );
-      
+
       setPendingPrograms(res.programs || []);
       setPagination((prev) => ({
         ...prev,
@@ -91,7 +90,6 @@ const isDirectVideo = (url) => {
     try {
       setLoading(true);
       const result = await approveProgramService(programId, adminNotes);
-      
 
       // Refresh the pending programs list
       await loadPendingPrograms();
@@ -115,7 +113,6 @@ const isDirectVideo = (url) => {
     try {
       setLoading(true);
       const result = await rejectProgramService(programId, rejectionReason);
-      
 
       // Refresh the pending programs list
       await loadPendingPrograms();
@@ -244,7 +241,7 @@ const isDirectVideo = (url) => {
       await handleRejectProgram(selectedProgram.program_id, reason);
     } else {
       // Handle other actions (Delete, Retire, Pause) as before
-      
+
       setSelectedProgram(null);
       setAction(null);
       setReason("");
@@ -431,7 +428,7 @@ const isDirectVideo = (url) => {
       </div>
 
       {/* Pagination for pending programs */}
-      {(
+      {
         <Pagination
           currentPage={pagination.page}
           totalPages={pagination.totalPages}
@@ -440,7 +437,7 @@ const isDirectVideo = (url) => {
           }
           isLoading={loading}
         />
-      )}
+      }
 
       {/* create modal */}
       <CreateProgramModal
@@ -572,7 +569,10 @@ const isDirectVideo = (url) => {
                         controls
                         controlsList="nodownload"
                         preload="metadata"
-                        poster={selectedProgram.image_url || "https://via.placeholder.com/800x450?text=Loading"}
+                        poster={
+                          selectedProgram.image_url ||
+                          "https://via.placeholder.com/800x450?text=Loading"
+                        }
                         src={selectedVideo.video_url}
                         onLoadStart={() => setVideoLoading(true)}
                         onCanPlay={() => setVideoLoading(false)}
@@ -581,8 +581,12 @@ const isDirectVideo = (url) => {
                       </video>
                     </div>
                     <div className="video-player-info">
-                      <h4 className="video-player-title">{selectedVideo.title}</h4>
-                      <p className="video-player-duration">Duration: {selectedVideo.duration}s</p>
+                      <h4 className="video-player-title">
+                        {selectedVideo.title}
+                      </h4>
+                      <p className="video-player-duration">
+                        Duration: {selectedVideo.duration}s
+                      </p>
                       <button
                         className="close-video-btn"
                         onClick={() => setSelectedVideo(null)}
@@ -597,21 +601,27 @@ const isDirectVideo = (url) => {
                       <div key={video.id} className="video-item">
                         <div className="video-info">
                           <div className="video-title">{video.title}</div>
-                          <div className="video-duration">{video.duration}s</div>
+                          <div className="video-duration">
+                            {video.duration}s
+                          </div>
                         </div>
-<button
-  className="watch-link"
-  onClick={(e) => {
-    e.stopPropagation();
-    if (isDirectVideo(video.video_url)) {
-      setSelectedVideo(video);
-    } else {
-      window.open(video.video_url, "_blank", "noopener,noreferrer");
-    }
-  }}
->
-  Watch Video
-</button>
+                        <button
+                          className="watch-link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isDirectVideo(video.video_url)) {
+                              setSelectedVideo(video);
+                            } else {
+                              window.open(
+                                video.video_url,
+                                "_blank",
+                                "noopener,noreferrer",
+                              );
+                            }
+                          }}
+                        >
+                          Watch Video
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -626,8 +636,8 @@ const isDirectVideo = (url) => {
                     {action === "Approve"
                       ? "Admin Notes:"
                       : action === "Reject"
-                      ? "Rejection Reason:"
-                      : `${action} Reason:`}
+                        ? "Rejection Reason:"
+                        : `${action} Reason:`}
                   </h4>
                   <textarea
                     className="reason-textarea"

@@ -32,20 +32,19 @@ const ReferralsPage = () => {
   //   if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
   // }, [activeTab, leaderboardPage, page]);
   useEffect(() => {
-  if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
-  if (activeTab === "stats") fetchStats();
-  if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
-}, [activeTab, leaderboardPage, page]);
-
+    if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
+    if (activeTab === "stats") fetchStats();
+    if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
+  }, [activeTab, leaderboardPage, page]);
 
   // Add this useEffect after your existing ones
-useEffect(() => {
-  if (activeTab !== "leaderboard") return;
-  const debounceTimer = setTimeout(() => {
-    fetchLeaderboard(1);
-  }, 400);
-  return () => clearTimeout(debounceTimer);
-}, [searchTerm, dateFrom, activeTab]);
+  useEffect(() => {
+    if (activeTab !== "leaderboard") return;
+    const debounceTimer = setTimeout(() => {
+      fetchLeaderboard(1);
+    }, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, dateFrom, activeTab]);
 
   // const fetchLeaderboard = async (pageNum = 1) => {
   //   setLoading(true);
@@ -56,12 +55,11 @@ useEffect(() => {
   //       page: pageNum,
   //       limit: limit,
   //     });
-     
-      
+
   //     // Handle different response structures
   //     let leaderboardData = [];
   //     let paginationData = {};
-      
+
   //     if (Array.isArray(data)) {
   //       // If response is directly an array
   //       leaderboardData = data;
@@ -74,7 +72,7 @@ useEffect(() => {
   //       leaderboardData = data.leaderboard;
   //       paginationData = data.pagination || {};
   //     }
-      
+
   //     setLeaderboard(leaderboardData);
   //     setLeaderboardPagination(paginationData);
   //   } catch (err) {
@@ -85,38 +83,43 @@ useEffect(() => {
   //   }
   // };
 
-  const fetchLeaderboard = useCallback(async (pageNum = 1) => {
-  setTableLoading(true); 
-  try {
-    const data = await getReferralLeaderboardService({
-      date_from: dateFrom ? dateFrom.toLocaleDateString("en-GB") : undefined,
-      search: searchTerm,
-      page: pageNum,
-      limit: limit,
-    });
+  const fetchLeaderboard = useCallback(
+    async (pageNum = 1) => {
+      setTableLoading(true);
+      try {
+        const data = await getReferralLeaderboardService({
+          date_from: dateFrom
+            ? dateFrom.toLocaleDateString("en-GB")
+            : undefined,
+          search: searchTerm,
+          page: pageNum,
+          limit: limit,
+        });
 
-    let leaderboardData = [];
-    let paginationData = {};
+        let leaderboardData = [];
+        let paginationData = {};
 
-    if (Array.isArray(data)) {
-      leaderboardData = data;
-    } else if (data?.data && Array.isArray(data.data)) {
-      leaderboardData = data.data;
-      paginationData = data.pagination || {};
-    } else if (Array.isArray(data?.leaderboard)) {
-      leaderboardData = data.leaderboard;
-      paginationData = data.pagination || {};
-    }
+        if (Array.isArray(data)) {
+          leaderboardData = data;
+        } else if (data?.data && Array.isArray(data.data)) {
+          leaderboardData = data.data;
+          paginationData = data.pagination || {};
+        } else if (Array.isArray(data?.leaderboard)) {
+          leaderboardData = data.leaderboard;
+          paginationData = data.pagination || {};
+        }
 
-    setLeaderboard(leaderboardData);
-    setLeaderboardPagination(paginationData);
-  } catch (err) {
-    console.error("❌ Error fetching leaderboard:", err);
-    setLeaderboard([]);
-  } finally {
-    setTableLoading(false);
-  }
-}, [dateFrom, searchTerm]); // <-- dependencies here
+        setLeaderboard(leaderboardData);
+        setLeaderboardPagination(paginationData);
+      } catch (err) {
+        console.error("❌ Error fetching leaderboard:", err);
+        setLeaderboard([]);
+      } finally {
+        setTableLoading(false);
+      }
+    },
+    [dateFrom, searchTerm],
+  ); // <-- dependencies here
 
   const fetchStats = async () => {
     setLoading(true);
@@ -173,11 +176,9 @@ useEffect(() => {
       {/* {loading && <GlobalLoader text="Loading referral data..." />} */}
       {/* Add this inside the leaderboard table section */}
 
-
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (
         <div className="referral-content-section">
-
           {/* Modern SaaS-style filter toolbar */}
           <div className="referral-filter-toolbar">
             <div className="referral-filter-search">
@@ -195,19 +196,19 @@ useEffect(() => {
               />
             </div>
             <div className="class-mod-filter-date">
-    <Calendar className="class-mod-filter-icon" />
-    <DatePicker
-  selected={dateFrom}
-  onChange={(date) => setDateFrom(date)}
-  onChangeRaw={(e) => e.preventDefault()}
-  placeholderText="From"
-  className="class-mod-filter-input"
-  dateFormat="dd-MM-yyyy"
-  showMonthDropdown
-  showYearDropdown
-  dropdownMode="select"
-/>
-  </div>
+              <Calendar className="class-mod-filter-icon" />
+              <DatePicker
+                selected={dateFrom}
+                onChange={(date) => setDateFrom(date)}
+                onChangeRaw={(e) => e.preventDefault()}
+                placeholderText="From"
+                className="class-mod-filter-input"
+                dateFormat="dd-MM-yyyy"
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+              />
+            </div>
             <button
               onClick={() => {
                 setSearchTerm("");
@@ -219,8 +220,6 @@ useEffect(() => {
               Clear
             </button>
           </div>
-
-          
 
           <table className="referral-data-table">
             <thead>
@@ -244,7 +243,7 @@ useEffect(() => {
               ))}
             </tbody>
           </table>
-          
+
           <Pagination
             currentPage={leaderboardPagination.current_page || leaderboardPage}
             totalPages={leaderboardPagination.last_page || 1}
@@ -261,23 +260,33 @@ useEffect(() => {
             <h3 className="referral-section-title">Overall Stats</h3>
             <div className="referral-stats-grid">
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.total_referrals}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.total_referrals}
+                </div>
                 <div className="referral-stat-label">Total Referrals</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.paid_referrals}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.paid_referrals}
+                </div>
                 <div className="referral-stat-label">Paid Referrals</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.unpaid_referrals}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.unpaid_referrals}
+                </div>
                 <div className="referral-stat-label">Unpaid Referrals</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.active_referrers}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.active_referrers}
+                </div>
                 <div className="referral-stat-label">Active Referrers</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.conversion_rate.toFixed(2)}%</div>
+                <div className="referral-stat-number">
+                  {stats.overall.conversion_rate.toFixed(2)}%
+                </div>
                 <div className="referral-stat-label">Conversion Rate</div>
               </div>
             </div>
@@ -311,8 +320,12 @@ useEffect(() => {
             <h3 className="referral-section-title">Top Referrer</h3>
             <div className="referral-performer-card">
               <div className="referral-performer-info">
-                <div className="referral-performer-name">{stats.top_referrer.name}</div>
-                <div className="referral-performer-email">{stats.top_referrer.email}</div>
+                <div className="referral-performer-name">
+                  {stats.top_referrer.name}
+                </div>
+                <div className="referral-performer-email">
+                  {stats.top_referrer.email}
+                </div>
               </div>
               <div className="referral-performer-stats">
                 <span className="referral-performer-metric">
@@ -338,7 +351,7 @@ useEffect(() => {
               onChange={(e) => setUserId(e.target.value)}
               className="referral-search-input"
             />
-            <button 
+            <button
               onClick={() => fetchUserReferrals(userId, 1)}
               className="referral-search-button"
             >
@@ -369,14 +382,14 @@ useEffect(() => {
             </table>
           )}
 
-          {(
+          {
             <Pagination
               currentPage={pagination.current_page || page}
               totalPages={pagination.last_page || 1}
               onPageChange={setPage}
               isLoading={loading}
             />
-          )}
+          }
         </div>
       )}
     </div>
