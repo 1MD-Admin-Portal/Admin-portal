@@ -229,10 +229,10 @@
 .mktplace-data-table-wrapper {
   background: var(--mk-white);
   border-radius: var(--mk-radius-lg);
-  overflow: hidden;
   box-shadow: var(--mk-shadow-md);
   border: 1px solid var(--mk-border);
   margin-bottom: 1.75rem;
+  overflow: auto;
 }
 
 .mktplace-data-table {

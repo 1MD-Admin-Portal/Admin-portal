@@ -132,6 +132,10 @@
   transform: translateY(-1px);
 }
 
+.dancer-max-level-card {
+  border: 1px solid #f0c040;
+  background: #fffbea;
+}
 /* ── Data Table ── */
 .dancers-data-table {
   width: 100%;

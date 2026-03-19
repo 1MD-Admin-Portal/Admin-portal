@@ -432,6 +432,7 @@ const OrganizersPage = () => {
           - If something selected -> show Approve Selected / Reject Selected (only)
       */}
 
+      <div className="professors-table-wrapper">
       <table className="professors-table">
         <thead>
           <tr>
@@ -539,6 +540,7 @@ const OrganizersPage = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (

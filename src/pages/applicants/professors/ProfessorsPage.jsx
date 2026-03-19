@@ -485,7 +485,7 @@ const ProfessorsPage = () => {
       )}
 
       {/* Action bar */}
-
+      <div className="professors-table-wrapper">
       <table className="professors-table">
         <thead>
           <tr>
@@ -549,7 +549,7 @@ const ProfessorsPage = () => {
           ))}
         </tbody>
       </table>
-
+      </div>
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <Pagination

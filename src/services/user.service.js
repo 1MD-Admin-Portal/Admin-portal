@@ -117,3 +117,16 @@ export const assignUserBadge = async ({
     throw error;
   }
 };
+
+export const fetchAllBadges = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`${BASE_URL}/api/v1/admin/badges/all`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching all badges:", error);
+    return null;
+  }
+};

@@ -4,32 +4,27 @@ import "../Dancers/DancersList.css";
 import {
   fetchUserBadges,
   assignUserBadge,
-} from "../../../services/badge.service";
+  fetchAllBadges
+} from "../../../services/user.service";
 import { maskEmail } from "../../../components/maskEmail";
 import GlobalLoader from "../../../components/common/GlobalLoader";
 import Pagination from "../../../components/common/Pagination";
 
-// 🔹 Helper to safely display values (avoids object-as-child crash)
+const getMaxBadgeLevel = (allBadges, persona) => {
+  if (!Array.isArray(allBadges) || allBadges.length === 0) return null;
+  const personaBadges = allBadges.filter((b) => b.user_type === persona);
+  if (personaBadges.length === 0) return null;
+  return Math.max(...personaBadges.map((b) => b.level));
+};
+
 const formatValueForDisplay = (value) => {
   if (value === null || value === undefined) return "N/A";
-
   const t = typeof value;
-
-  if (t === "string" || t === "number" || t === "boolean") {
-    return String(value);
-  }
-
-  if (Array.isArray(value)) {
-    return value.join(", ");
-  }
-
-  // Badge-like object
+  if (t === "string" || t === "number" || t === "boolean") return String(value);
+  if (Array.isArray(value)) return value.join(", ");
   if (value && typeof value === "object") {
     if (value.badge_name) {
-      const level =
-        value.level !== undefined && value.level !== null
-          ? ` (Level ${value.level})`
-          : "";
+      const level = value.level != null ? ` (Level ${value.level})` : "";
       const emoji = value.badge_emoji || "";
       if (emoji && emoji.startsWith("http")) {
         return (
@@ -50,7 +45,6 @@ const formatValueForDisplay = (value) => {
       return `${emoji} ${value.badge_name}${level}`;
     }
   }
-
   try {
     return JSON.stringify(value);
   } catch (e) {
@@ -58,21 +52,18 @@ const formatValueForDisplay = (value) => {
   }
 };
 
-// 🔹 Grid renderer using formatter
-const renderDJInfoGrid = (items) => {
-  return (
-    <div className="dancer-info-grid">
-      {items.map((item, index) => (
-        <div key={index} className={`dancer-info-item ${item.status || ""}`}>
-          <div className="dancer-info-label">{item.label}</div>
-          <div className="dancer-info-value">
-            {formatValueForDisplay(item.value)}
-          </div>
+const renderDJInfoGrid = (items) => (
+  <div className="dancer-info-grid">
+    {items.map((item, index) => (
+      <div key={index} className={`dancer-info-item ${item.status || ""}`}>
+        <div className="dancer-info-label">{item.label}</div>
+        <div className="dancer-info-value">
+          {formatValueForDisplay(item.value)}
         </div>
-      ))}
-    </div>
-  );
-};
+      </div>
+    ))}
+  </div>
+);
 
 const DJListPage = () => {
   const [djs, setDJs] = useState([]);
@@ -80,15 +71,14 @@ const DJListPage = () => {
   const [pagination, setPagination] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);
-
-  // 🔹 Badge-related state
+  const [allBadges, setAllBadges] = useState([]);
   const [badgeDetails, setBadgeDetails] = useState(null);
   const [loadingBadges, setLoadingBadges] = useState(false);
   const [badgeError, setBadgeError] = useState(null);
   const [savingBadge, setSavingBadge] = useState(false);
 
   const [badgeForm, setBadgeForm] = useState({
-    user_type: "dj", // default persona for DJs
+    user_type: "dj",
     badge_level: "",
     custom_commission_rate: "",
     reason: "",
@@ -97,6 +87,14 @@ const DJListPage = () => {
   useEffect(() => {
     loadDJs(page);
   }, [page]);
+
+  // REPLACE WITH (guaranteed array):
+useEffect(() => {
+  fetchAllBadges().then((data) => {
+    if (Array.isArray(data?.badges)) setAllBadges(data.badges);
+    else setAllBadges([]);
+  });
+}, []);
 
   const loadDJs = async (pageNum) => {
     setLoading(true);
@@ -109,6 +107,11 @@ const DJListPage = () => {
     }
   };
 
+  // ─── Helper: check if a badge level is already assigned ───────────────────
+  const isLevelAlreadyAssigned = (persona, level) => {
+  const assignedBadges = badgeDetails?.badges_by_persona?.[persona] || [];
+  return assignedBadges.some((b) => b.level === Number(level));
+};
   const loadDJBadges = async (user) => {
     setLoadingBadges(true);
     setBadgeError(null);
@@ -122,31 +125,34 @@ const DJListPage = () => {
       }
 
       const ALLOWED_PERSONAS = ["dancer", "instructor", "dj", "organizer"];
-
       const personasFromApi = Array.isArray(data.user_personas)
         ? data.user_personas.filter((p) => ALLOWED_PERSONAS.includes(p))
         : [];
-
       const finalPersonas =
         personasFromApi.length > 0 ? personasFromApi : ALLOWED_PERSONAS;
 
-      setBadgeDetails({
-        ...data,
-        user_personas: finalPersonas,
-      });
+      setBadgeDetails({ ...data, user_personas: finalPersonas });
 
-      // For DJs, default to "dj" if available
       const defaultPersona = "dj";
-
-      const nextForPersona =
-        data.next_badges && data.next_badges[defaultPersona];
+      const nextForPersona = data.next_badges?.[defaultPersona];
+      const assignedBadges = data.badges_by_persona?.[defaultPersona] || [];
+      const highestAssigned = assignedBadges.reduce(
+        (max, b) => (b.level > (max?.level ?? 0) ? b : max),
+        null,
+      );
 
       setBadgeForm({
         user_type: "dj",
-        badge_level: nextForPersona?.level ? String(nextForPersona.level) : "",
+        badge_level: nextForPersona?.level
+          ? String(nextForPersona.level)
+          : highestAssigned
+            ? String(highestAssigned.level)
+            : "",
         custom_commission_rate: nextForPersona?.commission_rate
           ? String(nextForPersona.commission_rate)
-          : "",
+          : highestAssigned
+            ? String(highestAssigned.commission_rate)
+            : "",
         reason: "",
       });
     } catch (err) {
@@ -166,41 +172,44 @@ const DJListPage = () => {
       return;
     }
 
+    // 🚫 Block already-assigned levels
+    if (isLevelAlreadyAssigned(badgeForm.user_type, badgeForm.badge_level)) {
+      setBadgeError(
+        `Level ${badgeForm.badge_level} is already assigned to this user. Please choose a different level.`,
+      );
+      return;
+    }
+
     const targetUserId =
       selectedUser.user_id != null ? selectedUser.user_id : selectedUser.id;
-
     setSavingBadge(true);
     setBadgeError(null);
 
     try {
       await assignUserBadge({
         target_user_id: targetUserId,
-        user_type: badgeForm.user_type, // "dj" or other persona
+        user_type: badgeForm.user_type,
         badge_level: badgeForm.badge_level,
         custom_commission_rate: badgeForm.custom_commission_rate,
         reason: badgeForm.reason || "Badge updated for DJ via admin dashboard",
       });
 
-      // Reload badge details
       await loadDJBadges(selectedUser);
 
-      // Update DJs list to refresh current_badges and badge_summary
       const updatedDJData = await fetchDJs(page);
       const updatedDJs = Array.isArray(updatedDJData?.users)
         ? updatedDJData.users
         : [];
       const updatedUser = updatedDJs.find((dj) => dj.id === selectedUser.id);
-      if (updatedUser) {
-        setSelectedUser(updatedUser);
-      }
+      if (updatedUser) setSelectedUser(updatedUser);
     } catch (err) {
       console.error("Error assigning badge:", err);
-      const backendMsg =
+      setBadgeError(
         err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Failed to assign badge. Please try again.";
-      setBadgeError(backendMsg);
+          err.response?.data?.error ||
+          err.message ||
+          "Failed to assign badge. Please try again.",
+      );
     } finally {
       setSavingBadge(false);
     }
@@ -246,7 +255,6 @@ const DJListPage = () => {
                 <td>{user.id}</td>
                 <td>{user.name}</td>
                 <td>{maskEmail(user.email)}</td>
-                {/* <td>{user.created_at || "N/A"}</td> */}
                 <td>
                   {user.created_at
                     ? new Date(user.created_at).toLocaleDateString("fr-FR")
@@ -260,7 +268,6 @@ const DJListPage = () => {
         </tbody>
       </table>
 
-      {/* Pagination */}
       {(pagination.totalPages || 1) > 1 && (
         <Pagination
           currentPage={pagination.page || page}
@@ -276,7 +283,6 @@ const DJListPage = () => {
             className="dancer-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
             <div className="dancer-modal-header">
               <h3>🎧 DJ Profile Details</h3>
               <button className="dancer-modal-close-x" onClick={closeModal}>
@@ -284,11 +290,9 @@ const DJListPage = () => {
               </button>
             </div>
 
-            {/* Modal Body - Organized in Columns */}
             <div className="dancer-modal-body">
               {/* Left Column */}
               <div className="dancer-modal-column dancer-modal-left">
-                {/* Basic Information Section */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">👤 Basic Information</h4>
                   {renderDJInfoGrid([
@@ -307,10 +311,6 @@ const DJListPage = () => {
                       label: "User Type",
                       value: selectedUser.profile_user_type || "N/A",
                     },
-                    // {
-                    //   label: "Provider",
-                    //   value: selectedUser.provider || "N/A",
-                    // },
                     {
                       label: "Created At",
                       value: new Date(selectedUser.created_at).toLocaleString(),
@@ -322,7 +322,6 @@ const DJListPage = () => {
                   ])}
                 </div>
 
-                {/* Active Subscription Section */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     💳 Active Subscription
@@ -378,7 +377,6 @@ const DJListPage = () => {
                   )}
                 </div>
 
-                {/* Subscription History Section */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📈 Subscription History
@@ -395,11 +393,7 @@ const DJListPage = () => {
                               {sub.subscription_name}
                             </span>
                             <span
-                              className={`dancer-history-status ${
-                                sub.is_active
-                                  ? "dancer-status-active"
-                                  : "dancer-status-inactive"
-                              }`}
+                              className={`dancer-history-status ${sub.is_active ? "dancer-status-active" : "dancer-status-inactive"}`}
                             >
                               {sub.payment_status}
                             </span>
@@ -430,14 +424,9 @@ const DJListPage = () => {
 
               {/* Right Column */}
               <div className="dancer-modal-column dancer-modal-right">
-                {/* DJ Specific Information Section */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">🎵 DJ Details</h4>
                   {renderDJInfoGrid([
-                    {
-                      label: "DJ ID",
-                      value: selectedUser.active_subscription?.id || "N/A",
-                    },
                     {
                       label: "Stripe Subscription ID",
                       value:
@@ -450,11 +439,6 @@ const DJListPage = () => {
                         selectedUser.active_subscription?.stripe_customer_id ||
                         "N/A",
                     },
-                    // {
-                    //   label: "Price ID",
-                    //   value:
-                    //     selectedUser.active_subscription?.price_id || "N/A",
-                    // },
                     {
                       label: "Payment Reference",
                       value:
@@ -464,21 +448,80 @@ const DJListPage = () => {
                   ])}
                 </div>
 
-                {/* Current Badges Section (from list object) */}
+                {/* ─── Current Badges: read from badgeDetails API ─── */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
-                  {selectedUser.current_badges &&
-                  Object.values(selectedUser.current_badges).some(
-                    (badge) => badge !== null,
-                  ) ? (
-                    <div className="dancer-badges-grid">
-                      {renderDJInfoGrid([
-                        {
-                          label: "DJ Badge",
-                          value: selectedUser.current_badges.dj || "None",
-                        },
-                      ])}
+                  {loadingBadges ? (
+                    <div className="dancer-loading-state">
+                      Loading badges...
                     </div>
+                  ) : badgeDetails?.badges_by_persona?.dj?.length > 0 ? (
+                    (() => {
+                      const currentBadge =
+                        badgeDetails.badges_by_persona.dj.reduce(
+                          (max, b) => (b.level > (max?.level ?? 0) ? b : max),
+                          null,
+                        );
+                      return (
+                        <div
+                          className="dancer-info-item"
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 6,
+                          }}
+                        >
+                          <div className="dancer-info-label">
+                            DJ — Current Badge
+                          </div>
+                          <div
+                            className="dancer-info-value"
+                          >
+                            {currentBadge.badge_emoji?.startsWith("http") ? (
+                              <img
+                                src={currentBadge.badge_emoji}
+                                alt={currentBadge.badge_name}
+                                style={{
+                                  width: 32,
+                                  height: 32,
+                                  objectFit: "contain",
+                                }}
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <span style={{ fontSize: 24 }}>
+                                {currentBadge.badge_emoji}
+                              </span>
+                            )}
+                            <div>
+                              <div style={{ fontWeight: 600, fontSize: 14 }}>
+                                {currentBadge.badge_name}
+                              </div>
+                              <div style={{ fontSize: 12, color: "#6b7280" }}>
+                                Level {currentBadge.level} · Commission:{" "}
+                                {currentBadge.commission_rate}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: "#9ca3af",
+                                  marginTop: 2,
+                                }}
+                              >
+                                Assigned:{" "}
+                                {currentBadge.assigned_at
+                                  ? new Date(
+                                      currentBadge.assigned_at,
+                                    ).toLocaleDateString()
+                                  : "N/A"}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
                   ) : (
                     <div className="dancer-empty-state">
                       No Badges Available
@@ -486,7 +529,6 @@ const DJListPage = () => {
                   )}
                 </div>
 
-                {/* Badge Summary Section */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">📊 Badge Summary</h4>
                   {selectedUser.badge_summary ? (
@@ -514,7 +556,6 @@ const DJListPage = () => {
                   )}
                 </div>
 
-                {/* Subscription Summary Section */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📋 Subscription Summary
@@ -561,7 +602,7 @@ const DJListPage = () => {
                   )}
                 </div>
 
-                {/* 🏅 Badge Details (Admin) */}
+                {/* ─── Badge Details (Admin) ─── */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     🏅 Badge Details (Admin)
@@ -572,7 +613,6 @@ const DJListPage = () => {
                       Loading badge details...
                     </div>
                   )}
-
                   {badgeError && (
                     <div className="dancer-error-state">{badgeError}</div>
                   )}
@@ -581,49 +621,97 @@ const DJListPage = () => {
                     <>
                       <div className="dancer-badge-personas">
                         <strong>User Personas:</strong>{" "}
+                        {badgeDetails.user_personas?.length > 0
+                          ? badgeDetails.user_personas.join(", ")
+                          : "N/A"}
                       </div>
 
-                      {badgeDetails.next_badges && (
-                        <div className="dancer-next-badges">
-                          {Object.entries(badgeDetails.next_badges)
-                            .filter(([persona]) => persona === "dj")
-                            .map(([persona, badge]) => (
-                              <div
-                                key={persona}
-                                className="dancer-next-badge-card"
-                              >
-                                <div className="dancer-next-badge-header">
-                                  <span className="dancer-next-badge-name">
-                                    {badge.badge_emoji &&
-                                    badge.badge_emoji.startsWith("http") ? (
-                                      <img
-                                        src={badge.badge_emoji}
-                                        alt={badge.badge_name}
-                                        className="badge-emoji-img"
-                                        onError={(e) => {
-                                          e.target.style.display = "none";
-                                        }}
-                                      />
-                                    ) : (
-                                      badge.badge_emoji
-                                    )}{" "}
-                                    {badge.badge_name}
-                                  </span>
-                                  <span className="dancer-next-badge-persona">
-                                    Persona: {persona}
-                                  </span>
+                      {/* Next badge OR max level reached */}
+                      {(() => {
+                        const persona = "dj";
+                        const nextBadge = badgeDetails.next_badges?.[persona];
+                        const assignedBadges =
+                          badgeDetails.badges_by_persona?.[persona] || [];
+                        const highestAssigned = assignedBadges.reduce(
+                          (max, b) => (b.level > (max?.level ?? 0) ? b : max),
+                          null,
+                        );
+                        const maxLevel = getMaxBadgeLevel(allBadges, persona); 
+const isMaxReached = !nextBadge && maxLevel !== null && highestAssigned?.level >= maxLevel;
+
+
+                        if (nextBadge) {
+                          return (
+                            <div className="dancer-next-badge-card">
+                              <div className="dancer-next-badge-header">
+                                <span className="dancer-next-badge-name">
+                                  {nextBadge.badge_emoji?.startsWith("http") ? (
+                                    <img
+                                      src={nextBadge.badge_emoji}
+                                      alt={nextBadge.badge_name}
+                                      className="badge-emoji-img"
+                                      onError={(e) => {
+                                        e.target.style.display = "none";
+                                      }}
+                                    />
+                                  ) : (
+                                    nextBadge.badge_emoji
+                                  )}{" "}
+                                  {nextBadge.badge_name}
+                                </span>
+                                <span className="dancer-next-badge-persona">
+                                  Next for: {persona}
+                                </span>
+                              </div>
+                              <div className="dancer-next-badge-body">
+                                <div>Level: {nextBadge.level}</div>
+                                <div>
+                                  Commission rate: {nextBadge.commission_rate}
                                 </div>
-                                <div className="dancer-next-badge-body">
-                                  <div>Level: {badge.level}</div>
-                                  <div>
-                                    Commission rate: {badge.commission_rate}
-                                  </div>
-                                  <div>Description: {badge.description}</div>
+                                <div>Description: {nextBadge.description}</div>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (isMaxReached) {
+                          return (
+                            <div
+                              style={{
+                                background:
+                                  "linear-gradient(135deg, #f0fdf4, #dcfce7)",
+                                border: "1px solid #86efac",
+                                borderRadius: 8,
+                                padding: "12px 16px",
+                                marginBottom: 8,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <span style={{ fontSize: 20 }}>🏆</span>
+                              <div>
+                                <strong style={{ color: "#16a34a" }}>
+                                  Max Badge Level Reached!
+                                </strong>
+                                <div
+                                  style={{
+                                    fontSize: 12,
+                                    color: "#15803d",
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  {highestAssigned.badge_name} · Level{" "}
+                                  {highestAssigned.level} · Commission:{" "}
+                                  {highestAssigned.commission_rate}
                                 </div>
                               </div>
-                            ))}
-                        </div>
-                      )}
+                            </div>
+                          );
+                        }
+
+                        return null;
+                      })()}
 
                       <form
                         className="dancer-badge-form"
@@ -644,15 +732,57 @@ const DJListPage = () => {
                             <input
                               type="number"
                               min="1"
+                              max={getMaxBadgeLevel(allBadges, badgeForm.user_type) ?? undefined} 
+
                               value={badgeForm.badge_level}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                setBadgeError(null);
                                 setBadgeForm((prev) => ({
                                   ...prev,
                                   badge_level: e.target.value,
-                                }))
-                              }
+                                }));
+                              }}
+                              style={{
+                                borderColor:
+                                  badgeForm.badge_level &&
+                                  isLevelAlreadyAssigned(
+                                    "dj",
+                                    badgeForm.badge_level,
+                                  )
+                                    ? "#ef4444"
+                                    : undefined,
+                              }}
                             />
                           </label>
+                          {badgeForm.badge_level &&
+                            isLevelAlreadyAssigned(
+                              "dj",
+                              badgeForm.badge_level,
+                            ) && (
+                              <div
+                                style={{
+                                  marginTop: 6,
+                                  padding: "6px 10px",
+                                  background: "#fef2f2",
+                                  border: "1px solid #fca5a5",
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  color: "#dc2626",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 6,
+                                }}
+                              >
+                                ⚠️ Level {badgeForm.badge_level} (
+                                {
+                                  badgeDetails?.badges_by_persona?.dj?.find(
+                                    (b) =>
+                                      b.level === Number(badgeForm.badge_level),
+                                  )?.badge_name
+                                }
+                                ) is already assigned to this user.
+                              </div>
+                            )}
                         </div>
 
                         <div className="dancer-badge-form-row">
@@ -692,7 +822,28 @@ const DJListPage = () => {
                         <button
                           type="submit"
                           className="dancer-badge-save-btn"
-                          disabled={savingBadge}
+                          disabled={
+                            savingBadge ||
+                            !badgeForm.badge_level ||
+                            isLevelAlreadyAssigned("dj", badgeForm.badge_level)
+                          }
+                          style={{
+                            opacity:
+                              savingBadge ||
+                              !badgeForm.badge_level ||
+                              isLevelAlreadyAssigned(
+                                "dj",
+                                badgeForm.badge_level,
+                              )
+                                ? 0.5
+                                : 1,
+                            cursor: isLevelAlreadyAssigned(
+                              "dj",
+                              badgeForm.badge_level,
+                            )
+                              ? "not-allowed"
+                              : "pointer",
+                          }}
                         >
                           {savingBadge ? "Saving..." : "Assign / Update Badge"}
                         </button>
@@ -702,13 +853,6 @@ const DJListPage = () => {
                 </div>
               </div>
             </div>
-
-            {/* Modal Footer */}
-            {/* <div className="dancer-modal-footer">
-              <button className="dancer-modal-close-btn" onClick={closeModal}>
-                Close
-              </button>
-            </div> */}
           </div>
         </div>
       )}

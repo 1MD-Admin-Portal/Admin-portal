@@ -1,0 +1,578 @@
+/* ─── CSS Variables ─────────────────────────────────────────────────────────── */
+:root {
+  --cpm-purple: #6c3de8;
+  --cpm-pink: #ec4899;
+  --cpm-gradient: linear-gradient(135deg, #6c3de8 0%, #ec4899 100%);
+  --cpm-border: #e2e8f0;
+  --cpm-bg-input: #f8fafc;
+  --cpm-bg-body: #f5f7fa;
+  --cpm-text-primary: #1e293b;
+  --cpm-text-muted: #94a3b8;
+  --cpm-text-label: #412969;
+  --cpm-radius-sm: 6px;
+  --cpm-radius-md: 8px;
+  --cpm-radius-lg: 10px;
+  --cpm-radius-xl: 16px;
+  --cpm-shadow-dropdown: 0 8px 24px rgba(108, 61, 232, 0.15);
+  --cpm-shadow-modal: 0 24px 48px -8px rgba(108, 61, 232, 0.22);
+  --cpm-focus-ring: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* ─── Overlay ────────────────────────────────────────────────────────────────── */
+.cpm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 5, 30, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+/* ─── Modal ──────────────────────────────────────────────────────────────────── */
+.cpm-modal {
+  background: white;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  border-radius: var(--cpm-radius-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--cpm-shadow-modal);
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────────── */
+.cpm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1.25rem;
+  background: var(--cpm-gradient);
+  flex-shrink: 0;
+}
+
+.cpm-header-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.cpm-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--cpm-radius-sm);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  transition: background 0.2s;
+}
+
+.cpm-close-btn:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* ─── Body ───────────────────────────────────────────────────────────────────── */
+.cpm-body {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--cpm-bg-body);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ─── Card ───────────────────────────────────────────────────────────────────── */
+.cpm-card {
+  background: white;
+  border: 1px solid #e8edf3;
+  border-radius: var(--cpm-radius-lg);
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cpm-card-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cpm-text-primary);
+  margin: 0 0 0.875rem;
+  text-align: left;
+  -webkit-text-fill-color: var(--cpm-text-primary);
+}
+
+.cpm-card-title--no-margin {
+  margin: 0;
+}
+
+.cpm-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* ─── Grid ───────────────────────────────────────────────────────────────────── */
+.cpm-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.cpm-full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Label ──────────────────────────────────────────────────────────────────── */
+.cpm-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cpm-text-label);
+  margin-bottom: 4px;
+}
+
+/* ─── Input / Select ─────────────────────────────────────────────────────────── */
+.cpm-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--cpm-text-primary);
+  background: var(--cpm-bg-input);
+  border: 1.5px solid var(--cpm-border);
+  border-radius: var(--cpm-radius-md);
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.cpm-input:focus {
+  border-color: var(--cpm-pink);
+  background: white;
+  box-shadow: var(--cpm-focus-ring);
+}
+
+/* ─── Textarea ───────────────────────────────────────────────────────────────── */
+.cpm-textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--cpm-text-primary);
+  background: var(--cpm-bg-input);
+  border: 1.5px solid var(--cpm-border);
+  border-radius: var(--cpm-radius-md);
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.cpm-textarea:focus {
+  border-color: var(--cpm-pink);
+  background: white;
+  box-shadow: var(--cpm-focus-ring);
+}
+
+.cpm-textarea--md {
+  min-height: 72px;
+}
+
+.cpm-textarea--sm {
+  min-height: 56px;
+}
+
+/* ─── File Upload Label ──────────────────────────────────────────────────────── */
+.cpm-file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  background: var(--cpm-bg-input);
+  border: 1.5px dashed #c4b5fd;
+  border-radius: var(--cpm-radius-md);
+  color: var(--cpm-purple);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+  box-sizing: border-box;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.cpm-file-label:hover {
+  background: rgba(108, 61, 232, 0.04);
+  border-color: var(--cpm-purple);
+}
+
+.cpm-file-label--video {
+  background: white;
+}
+
+.cpm-file-input {
+  display: none;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────────── */
+.cpm-footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #e8edf3;
+  background: white;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Create Button ──────────────────────────────────────────────────────────── */
+.cpm-btn-create {
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--cpm-radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: var(--cpm-gradient);
+  color: white;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+  font-family: inherit;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.cpm-btn-create--loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ─── Add Video Button ───────────────────────────────────────────────────────── */
+.cpm-btn-add-video {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.35rem 0.75rem;
+  background: white;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 7px;
+  color: var(--cpm-purple);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.cpm-btn-add-video:hover {
+  background: rgba(108, 61, 232, 0.04);
+  border-color: var(--cpm-purple);
+}
+
+/* ─── Remove Video Button ────────────────────────────────────────────────────── */
+.cpm-btn-remove {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--cpm-radius-sm);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #dc2626;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.cpm-btn-remove:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* ─── Outline / Gradient small buttons (dropdown footer) ────────────────────── */
+.cpm-btn-outline {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--cpm-border);
+  border-radius: var(--cpm-radius-sm);
+  background: white;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.cpm-btn-outline:hover {
+  background: #f1f5f9;
+}
+
+.cpm-btn-gradient {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: var(--cpm-radius-sm);
+  background: var(--cpm-gradient);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ─── Videos List ────────────────────────────────────────────────────────────── */
+.cpm-videos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.cpm-video-item {
+  background: var(--cpm-bg-input);
+  border: 1.5px solid #e8edf3;
+  border-radius: 9px;
+  padding: 0.875rem;
+}
+
+.cpm-video-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.cpm-video-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cpm-purple);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ─── Success Toast ──────────────────────────────────────────────────────────── */
+.cpm-success-toast {
+  position: fixed;
+  top: 18%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--cpm-gradient);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 16px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(108, 61, 232, 0.18);
+  z-index: 2000;
+  letter-spacing: 0.02em;
+  text-align: center;
+  opacity: 0.97;
+}
+
+/* ─── Dropdown Shared ────────────────────────────────────────────────────────── */
+.cpm-dropdown-wrapper {
+  position: relative;
+}
+
+.cpm-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--cpm-bg-input);
+  border: 1.5px solid var(--cpm-border);
+  border-radius: var(--cpm-radius-md);
+  cursor: pointer;
+  min-height: 38px;
+  box-shadow: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.cpm-dropdown-trigger--open {
+  border-color: var(--cpm-pink);
+  box-shadow: var(--cpm-focus-ring);
+}
+
+.cpm-dropdown-trigger--instructor {
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--cpm-text-primary);
+}
+
+.cpm-dropdown-trigger--empty {
+  color: var(--cpm-text-muted);
+}
+
+.cpm-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: white;
+  border: 1.5px solid var(--cpm-border);
+  border-radius: var(--cpm-radius-lg);
+  box-shadow: var(--cpm-shadow-dropdown);
+  overflow: hidden;
+}
+
+.cpm-dropdown-search-wrap {
+  padding: 8px;
+}
+
+.cpm-dropdown-search {
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  border: 1.5px solid var(--cpm-border);
+  border-radius: 7px;
+  font-size: 0.8rem;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.cpm-dropdown-search:focus {
+  border-color: var(--cpm-pink);
+}
+
+.cpm-dropdown-list {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.cpm-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.875rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  background: transparent;
+  color: var(--cpm-text-primary);
+  transition: background 0.15s;
+}
+
+.cpm-dropdown-item:hover {
+  background: rgba(108, 61, 232, 0.04);
+}
+
+.cpm-dropdown-item--checked {
+  background: rgba(108, 61, 232, 0.05);
+  color: var(--cpm-purple);
+}
+
+.cpm-dropdown-item--instructor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cpm-dropdown-none {
+  color: var(--cpm-text-muted);
+}
+
+.cpm-dropdown-empty {
+  padding: 0.75rem;
+  color: var(--cpm-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.cpm-dropdown-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.cpm-dropdown-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Tags (Dance Styles) ────────────────────────────────────────────────────── */
+.cpm-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+/* Hide number input spinner arrows */
+.cpm-input[type="number"]::-webkit-outer-spin-button,
+.cpm-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cpm-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.cpm-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, rgba(108, 61, 232, 0.1), rgba(236, 72, 153, 0.1));
+  border: 1px solid rgba(108, 61, 232, 0.2);
+  border-radius: 20px;
+  padding: 1px 8px 1px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cpm-purple);
+}
+
+.cpm-tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  color: var(--cpm-purple);
+}
+
+.cpm-placeholder {
+  color: var(--cpm-text-muted);
+  font-size: 0.875rem;
+}
+
+.cpm-chevron {
+  color: var(--cpm-text-muted);
+  font-size: 0.7rem;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+.cpm-checkmark {
+  color: var(--cpm-pink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cpm-checkbox {
+  accent-color: var(--cpm-pink);
+}
+
+.cpm-instructor-email {
+  color: var(--cpm-text-muted);
+  font-size: 0.75rem;
+}

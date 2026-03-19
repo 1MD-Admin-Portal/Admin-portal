@@ -782,7 +782,6 @@
 .ds-left span {
   font-size: 13px;
   font-weight: 500;
-  color: #2d3748;
 }
 
 .ds-check {
@@ -801,7 +800,7 @@
 }
 
 .dance-styles-action {
-  background: none;
+  background: #cda5a5;
   border: none;
   font-size: 12px;
   cursor: pointer;

@@ -9,7 +9,7 @@ import {
 } from "../../services/djEvents.service";
 import "./DJEvents.css";
 import Pagination from "../../components/common/Pagination";
-import { AlignCenter, CheckCircle, XCircle,Search} from "lucide-react";
+import { AlignCenter, CheckCircle, XCircle, Search } from "lucide-react";
 
 const DjEvents = () => {
   const [events, setEvents] = useState([]);
@@ -63,28 +63,54 @@ const DjEvents = () => {
     activeTab,
   ]);
 
+  // const fetchEvents = async () => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const data = await getAllDjEvents(
+  //       filters.status,
+  //       filters.playlist_type,
+  //       "",
+  //       filters.page,
+  //       filters.limit,
+  //     );
+  //     setEvents(data.events || []);
+  //     setPagination(data.pagination || {});
+  //   } catch (err) {
+  //     setError("Failed to fetch DJ events");
+  //     setEvents([]);
+  //     console.error(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // REPLACE WITH:
   const fetchEvents = async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await getAllDjEvents(
-        filters.status,
-        filters.playlist_type,
-        "",
+        filters.status || undefined,
+        filters.playlist_type || undefined,
+        filters.search || undefined,
         filters.page,
         filters.limit,
       );
-      setEvents(data.events || []);
-      setPagination(data.pagination || {});
+      // API may return null/undefined events when no results — treat as empty
+      setEvents(Array.isArray(data?.events) ? data.events : []);
+      setPagination(data?.pagination || {});
     } catch (err) {
-      setError("Failed to fetch DJ events");
+      console.error("fetchEvents error:", err);
+      // Always clear events on filter errors — backend returns error
+      // when no results exist for a filter instead of empty array
       setEvents([]);
-      console.error(err);
+      setPagination({});
+      setError(null);
     } finally {
       setLoading(false);
     }
   };
-
   const fetchPendingEvents = async () => {
     setLoading(true);
     setError(null);
@@ -284,14 +310,14 @@ const DjEvents = () => {
       {activeTab === "all" && (
         <div className="filters-section">
           <div className="search-box">
-          <Search size={18} classname="search-box-icon" />
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={filters.search}
-            onChange={(e) => handleFilterChange("search", e.target.value)}
-            className="search-input"
-          />
+            <Search size={18} classname="search-box-icon" />
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={filters.search}
+              onChange={(e) => handleFilterChange("search", e.target.value)}
+              className="search-input"
+            />
           </div>
 
           <select
@@ -436,80 +462,97 @@ const DjEvents = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredEvents.map((event) => (
-                  <tr
-                    key={event.id}
-                    onClick={() => handleViewDetails(event)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <td>
-                      <div className="event-info">
-                        <strong>{event.event_title}</strong>
-                        <small>{event.event_description}</small>
-                      </div>
+                {filteredEvents.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="7"
+                      style={{
+                        textAlign: "center",
+                        padding: "40px",
+                        color: "#6b7280",
+                      }}
+                    >
+                      {filters.status
+                        ? `No events found with status "${filters.status.replace(/_/g, " ")}"`
+                        : "No events found"}
                     </td>
-                    <td>
-                      <div className="dj-info">
-                        <img
-                          src={event.dj_image}
-                          alt={event.dj_name}
-                          className="dj-avatar"
-                        />
-                        <span>{event.dj_name}</span>
-                      </div>
-                    </td>
-                    {/* <td>
+                  </tr>
+                ) : (
+                  filteredEvents.map((event) => (
+                    <tr
+                      key={event.id}
+                      onClick={() => handleViewDetails(event)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <td>
+                        <div className="event-info">
+                          <strong>{event.event_title}</strong>
+                          <small>{event.event_description}</small>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="dj-info">
+                          <img
+                            src={event.dj_image}
+                            alt={event.dj_name}
+                            className="dj-avatar"
+                          />
+                          <span>{event.dj_name}</span>
+                        </div>
+                      </td>
+                      {/* <td>
                       <div>
                         <div>{event.event_type}</div>
                         <small>{event.music_genre}</small>
                       </div>
                     </td> */}
-                    <td>
-                      <div>
-                        <div>{formatDate(event.scheduled_date)}</div>
-                        <small>
-                          {formatTime(event.start_time)} -{" "}
-                          {formatTime(event.end_time)}
-                        </small>
-                      </div>
-                    </td>
-                    <td>€{event.price}</td>
-                    <td>
-                      {new Date(event.created_at).toLocaleDateString("en-GB")}
-                    </td>
-                    <td>{getStatusBadge(event.status)}</td>
-                    <td>
-                      <div className="icon-actions">
-                        <CheckCircle
-                          className={`action-icon ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (event.status === "pending_approval")
-                              handleApproveClick(event.id, e);
-                          }}
-                          title={
-                            event.status === "pending_approval"
-                              ? "Approve"
-                              : "Already processed"
-                          }
-                        />
-                        <XCircle
-                          className={`action-icon reject ${event.status !== "pending_approval" ? "disabled" : ""}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (event.status === "pending_approval")
-                              handleRejectClick(event, e);
-                          }}
-                          title={
-                            event.status === "pending_approval"
-                              ? "Reject"
-                              : "Already processed"
-                          }
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td>
+                        <div>
+                          <div>{formatDate(event.scheduled_date)}</div>
+                          <small>
+                            {formatTime(event.start_time)} -{" "}
+                            {formatTime(event.end_time)}
+                          </small>
+                        </div>
+                      </td>
+                      <td>€{event.price}</td>
+                      <td>
+                        {new Date(event.created_at).toLocaleDateString("en-GB")}
+                      </td>
+                      <td>{getStatusBadge(event.status)}</td>
+                      <td>
+                        <div className="icon-actions">
+                          <CheckCircle
+                            className={`action-icon ${event.status !== "pending_approval" ? "disabled" : ""}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (event.status === "pending_approval")
+                                handleApproveClick(event.id, e);
+                            }}
+                            title={
+                              event.status === "pending_approval"
+                                ? "Approve"
+                                : "Already processed"
+                            }
+                          />
+                          <XCircle
+                            className={`action-icon reject ${event.status !== "pending_approval" ? "disabled" : ""}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (event.status === "pending_approval")
+                                handleRejectClick(event, e);
+                            }}
+                            title={
+                              event.status === "pending_approval"
+                                ? "Reject"
+                                : "Already processed"
+                            }
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -528,133 +571,141 @@ const DjEvents = () => {
 
       {/* Event Details Modal */}
       {/* Event Details Modal */}
-{showModal && selectedEvent && (
-  <div className="dj-modal-overlay" onClick={closeModal}>
-    <div className="dj-modal-content" onClick={(e) => e.stopPropagation()}>
-      
-      {/* Header */}
-      <div className="dj-modal-header">
-        <h2>{selectedEvent.event?.event_title}</h2>
-        <button onClick={closeModal} className="close-btn">×</button>
-      </div>
+      {showModal && selectedEvent && (
+        <div className="dj-modal-overlay" onClick={closeModal}>
+          <div
+            className="dj-modal-contents"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="dj-modal-header">
+              <h2>{selectedEvent.event?.event_title}</h2>
+              <button onClick={closeModal} className="close-btn">
+                ×
+              </button>
+            </div>
 
-      {/* Body */}
-      <div className="dj-modal-body">
-        <div className="event-details-grid">
+            {/* Body */}
+            <div className="dj-modal-body">
+              <div className="event-details-grid">
+                {/* Event Information */}
+                <div className="detail-section">
+                  <h3>Event Information</h3>
+                  <p>
+                    <strong>Description:</strong>
+                    <span>{selectedEvent.event?.event_description}</span>
+                  </p>
+                  <p>
+                    <strong>Genre:</strong>
+                    <span>{selectedEvent.event?.music_genre}</span>
+                  </p>
+                  <p>
+                    <strong>Type:</strong>
+                    <span>{selectedEvent.event?.event_type}</span>
+                  </p>
+                  <p>
+                    <strong>Price:</strong>
+                    <span>€{selectedEvent.event?.price}</span>
+                  </p>
+                  <p>
+                    <strong>Status:</strong>
+                    <span>{getStatusBadge(selectedEvent.event?.status)}</span>
+                  </p>
+                </div>
 
-          {/* Event Information */}
-          <div className="detail-section">
-            <h3>Event Information</h3>
-            <p>
-              <strong>Description:</strong>
-              <span>{selectedEvent.event?.event_description}</span>
-            </p>
-            <p>
-              <strong>Genre:</strong>
-              <span>{selectedEvent.event?.music_genre}</span>
-            </p>
-            <p>
-              <strong>Type:</strong>
-              <span>{selectedEvent.event?.event_type}</span>
-            </p>
-            <p>
-              <strong>Price:</strong>
-              <span>€{selectedEvent.event?.price}</span>
-            </p>
-            <p>
-              <strong>Status:</strong>
-              <span>{getStatusBadge(selectedEvent.event?.status)}</span>
-            </p>
-          </div>
+                {/* DJ Information */}
+                <div className="detail-section">
+                  <h3>DJ Information</h3>
+                  <div className="dj-details">
+                    <img
+                      src={selectedEvent.event?.dj_image}
+                      alt={selectedEvent.event?.dj_name}
+                      className="dj-avatar-large"
+                    />
+                    <div>
+                      <p>
+                        <strong>Name:</strong>
+                        <span>{selectedEvent.event?.dj_name}</span>
+                      </p>
+                      <p>
+                        <strong>Email:</strong>
+                        <span>{selectedEvent.event?.dj_email}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-          {/* DJ Information */}
-          <div className="detail-section">
-            <h3>DJ Information</h3>
-            <div className="dj-details">
-              <img
-                src={selectedEvent.event?.dj_image}
-                alt={selectedEvent.event?.dj_name}
-                className="dj-avatar-large"
-              />
-              <div>
-                <p>
-                  <strong>Name:</strong>
-                  <span>{selectedEvent.event?.dj_name}</span>
-                </p>
-                <p>
-                  <strong>Email:</strong>
-                  <span>{selectedEvent.event?.dj_email}</span>
-                </p>
+                {/* Statistics */}
+                <div className="detail-section">
+                  <h3>Statistics</h3>
+                  <p>
+                    <strong>Total Enrollments:</strong>
+                    <span>
+                      {selectedEvent.statistics?.total_enrollments || 0}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Paid Enrollments:</strong>
+                    <span>
+                      {selectedEvent.statistics?.paid_enrollments || 0}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Total Revenue:</strong>
+                    <span>€{selectedEvent.statistics?.total_revenue || 0}</span>
+                  </p>
+                  <p>
+                    <strong>Average Rating:</strong>
+                    <span>
+                      {selectedEvent.statistics?.average_rating || "N/A"}
+                    </span>
+                  </p>
+                </div>
+
+                {/* Enrollments Table */}
+                {selectedEvent.enrollments?.length > 0 && (
+                  <div className="detail-section full-width">
+                    <h3>Enrollments</h3>
+                    <div className="table-responsive">
+                      <table className="enrollments-table">
+                        <thead>
+                          <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedEvent.enrollments.map((enrollment) => (
+                            <tr key={enrollment.enrollment_id}>
+                              <td>
+                                <div className="user-info">
+                                  <img
+                                    src={enrollment.user_image}
+                                    alt={enrollment.user_name}
+                                    className="user-avatar"
+                                  />
+                                  <span>{enrollment.user_name}</span>
+                                </div>
+                              </td>
+                              <td>{enrollment.user_email}</td>
+                              <td>{getStatusBadge(enrollment.status)}</td>
+                              <td>{enrollment.payment_status}</td>
+                              <td>€{enrollment.amount_paid}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
-          {/* Statistics */}
-          <div className="detail-section">
-            <h3>Statistics</h3>
-            <p>
-              <strong>Total Enrollments:</strong>
-              <span>{selectedEvent.statistics?.total_enrollments || 0}</span>
-            </p>
-            <p>
-              <strong>Paid Enrollments:</strong>
-              <span>{selectedEvent.statistics?.paid_enrollments || 0}</span>
-            </p>
-            <p>
-              <strong>Total Revenue:</strong>
-              <span>€{selectedEvent.statistics?.total_revenue || 0}</span>
-            </p>
-            <p>
-              <strong>Average Rating:</strong>
-              <span>{selectedEvent.statistics?.average_rating || "N/A"}</span>
-            </p>
-          </div>
-
-          {/* Enrollments Table */}
-          {selectedEvent.enrollments?.length > 0 && (
-            <div className="detail-section full-width">
-              <h3>Enrollments</h3>
-              <div className="table-responsive">
-                <table className="enrollments-table">
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th>Payment</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedEvent.enrollments.map((enrollment) => (
-                      <tr key={enrollment.enrollment_id}>
-                        <td>
-                          <div className="user-info">
-                            <img
-                              src={enrollment.user_image}
-                              alt={enrollment.user_name}
-                              className="user-avatar"
-                            />
-                            <span>{enrollment.user_name}</span>
-                          </div>
-                        </td>
-                        <td>{enrollment.user_email}</td>
-                        <td>{getStatusBadge(enrollment.status)}</td>
-                        <td>{enrollment.payment_status}</td>
-                        <td>€{enrollment.amount_paid}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {/*Approve Modal*/}
       {showApproveModal && (

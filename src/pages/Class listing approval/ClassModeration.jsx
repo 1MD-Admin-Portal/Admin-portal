@@ -296,6 +296,7 @@ const ClassModeration = () => {
             boxShadow: "var(--ev-shadow-md)",
             border: "1px solid var(--ev-border)",
             marginBottom: "1.5rem",
+            overflowX: "auto",
           }}
         >
           <table className="class-mod-table">
@@ -334,7 +335,26 @@ const ClassModeration = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredClasses.map((classItem) => (
+  {filteredClasses.length === 0 ? (
+    <tr>
+      <td
+        colSpan={tab === "pending" ? 9 : 8}
+        style={{
+          textAlign: "center",
+          padding: "40px",
+          color: "#6b7280",
+          fontSize: 14,
+        }}
+      >
+        {search || dateFrom || dateTo
+          ? "No classes found matching your filters."
+          : tab === "pending"
+          ? "⚠️ No classes for pending approval."
+          : "⚠️ No ongoing classes found."}
+      </td>
+    </tr>
+  ) : (
+    filteredClasses.map((classItem) => (
                 <tr key={classItem.id} className="class-mod-clickable-row">
                   {/* {tab === "pending" && (
                   <td>
@@ -408,6 +428,7 @@ const ClassModeration = () => {
                     </td>
                   )}
                 </tr>
+    )
               ))}
             </tbody>
           </table>

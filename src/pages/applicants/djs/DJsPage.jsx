@@ -296,7 +296,7 @@ const DJsPage = () => {
           Loading...
         </div>
       )}
-
+      <div className="Applicants-table-wrapper">
       <table className="professors-table">
         <thead>
           <tr>
@@ -419,7 +419,7 @@ const DJsPage = () => {
           ))}
         </tbody>
       </table>
-
+      </div>
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <Pagination

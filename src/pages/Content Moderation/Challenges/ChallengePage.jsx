@@ -449,6 +449,14 @@ const ChallengePage = () => {
     }
   };
 
+
+  const toLocalDateString = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
   const openSubmissions = async (challenge) => {
     try {
       setSelectedChallenge(challenge);
@@ -606,9 +614,21 @@ const ChallengePage = () => {
     }
   };
 
+  
+
   const handleCreateChallenge = async () => {
-    try {
-      await createChallengeService({
+  // ── Client-side validation ──
+  if (!newChallenge.title.trim()) {
+    setError("Title is required.");
+    return;
+  }
+  if (!newChallenge.description.trim()) {
+    setError("Description is required.");
+    return;
+  }
+
+  try {
+    await createChallengeService({
         ...newChallenge,
         dance_style: Array.isArray(newChallenge.dance_style)
           ? newChallenge.dance_style.join(", ")
@@ -1190,7 +1210,6 @@ const ChallengePage = () => {
           </div>
           <div className="form-row">
             <Field label="Start Date">
-              <Calendar className="class-mod-filter-icon" />
               <DatePicker
                 selected={
                   newChallenge.start_date
@@ -1200,12 +1219,12 @@ const ChallengePage = () => {
                 onChange={(date) =>
                   setNewChallenge({
                     ...newChallenge,
-                    start_date: date ? date.toISOString().split("T")[0] : "",
+                    start_date: date ? toLocalDateString(date) : "",
                   })
                 }
                 placeholderText="Select start date"
                 className="class-mod-filter-input"
-                dateFormat="MM-dd-yyyy"
+                dateFormat="dd-MM-yyyy"
                 showMonthDropdown
                 showYearDropdown
                 dropdownMode="select"
@@ -1219,12 +1238,12 @@ const ChallengePage = () => {
                 onChange={(date) =>
                   setNewChallenge({
                     ...newChallenge,
-                    end_date: date ? date.toISOString().split("T")[0] : "",
+                    end_date: date ? toLocalDateString(date) : "",
                   })
                 }
                 placeholderText="Select end date"
                 className="class-mod-filter-input"
-                dateFormat="MM-dd-yyyy"
+                dateFormat="dd-MM-yyyy"
                 showMonthDropdown
                 showYearDropdown
                 dropdownMode="select"

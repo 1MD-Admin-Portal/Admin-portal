@@ -639,7 +639,7 @@
   animation: fadeIn 0.2s ease-out;
 }
 
-.dj-modal-content {
+.dj-modal-contents {
   background: var(--air-white, #fff);
   width: 100%;
   max-width: 860px;
