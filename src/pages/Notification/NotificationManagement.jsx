@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import {
   Bell,
   Send,
@@ -24,7 +25,9 @@ import {
   uploadNotificationImageService,
 } from "../../services/notification.service";
 import "./NotificationManagement.css";
+import Pagination from "../../components/common/Pagination";
 import { uploadMediaFile } from "../../services/upload.service";
+import DatePicker from "react-datepicker";
 
 const NotificationManagement = () => {
   const [notifications, setNotifications] = useState([]);
@@ -38,6 +41,9 @@ const NotificationManagement = () => {
     total: 0,
     totalPages: 1,
   });
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedNotificationId, setSelectedNotificationId] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -99,12 +105,16 @@ const NotificationManagement = () => {
     fetchNotifications();
   }, [pagination.page]);
 
+  const openCancelModal = (id) => {
+    setSelectedNotificationId(id);
+    setShowCancelModal(true);
+  };
   const fetchNotifications = async () => {
     try {
       setLoading(true);
       const response = await getNotificationsService(
         pagination.page,
-        pagination.limit
+        pagination.limit,
       );
       setNotifications(response.notifications);
       setPagination((prev) => ({
@@ -192,8 +202,6 @@ const NotificationManagement = () => {
         : [];
     }
 
-    console.log("📤 Final Payload sending:", submitData);
-
     try {
       await createNotificationService(submitData);
       fetchNotifications();
@@ -232,18 +240,14 @@ const NotificationManagement = () => {
     }
   };
 
-  const handleCancelNotification = async (notificationId) => {
-    if (!window.confirm("Are you sure you want to cancel this notification?"))
-      return;
-
+  const handleCancelNotification = async () => {
     try {
-      await cancelNotificationService(notificationId);
+      await cancelNotificationService(selectedNotificationId);
       fetchNotifications();
+      setShowCancelModal(false);
       setShowModal(false);
-      alert("Notification cancelled successfully!");
     } catch (error) {
       console.error("Failed to cancel notification:", error);
-      alert("Failed to cancel notification.");
     }
   };
 
@@ -383,7 +387,7 @@ const NotificationManagement = () => {
                   <div className="notification-mgmt-selected-tags">
                     {formData.user_types.map((selectedType) => {
                       const typeLabel = USER_TYPES_OPTIONS.find(
-                        (t) => t.value === selectedType
+                        (t) => t.value === selectedType,
                       )?.label;
                       return (
                         <span
@@ -396,7 +400,7 @@ const NotificationManagement = () => {
                             onClick={() =>
                               handleMultiSelectChange(
                                 "user_types",
-                                selectedType
+                                selectedType,
                               )
                             }
                             className="notification-mgmt-tag-remove"
@@ -442,7 +446,7 @@ const NotificationManagement = () => {
                   <div className="notification-mgmt-selected-tags">
                     {formData.subscription_types.map((selectedType) => {
                       const typeLabel = SUBSCRIPTION_TYPES_OPTIONS.find(
-                        (t) => t.value === selectedType
+                        (t) => t.value === selectedType,
                       )?.label;
                       return (
                         <span
@@ -455,7 +459,7 @@ const NotificationManagement = () => {
                             onClick={() =>
                               handleMultiSelectChange(
                                 "subscription_types",
-                                selectedType
+                                selectedType,
                               )
                             }
                             className="notification-mgmt-tag-remove"
@@ -474,7 +478,7 @@ const NotificationManagement = () => {
                       ) {
                         handleMultiSelectChange(
                           "subscription_types",
-                          e.target.value
+                          e.target.value,
                         );
                       }
                       e.target.value = "";
@@ -514,7 +518,7 @@ const NotificationManagement = () => {
                             setFormData((prev) => ({
                               ...prev,
                               specific_user_ids: prev.specific_user_ids.filter(
-                                (_, i) => i !== index
+                                (_, i) => i !== index,
                               ),
                             }));
                           }}
@@ -673,12 +677,7 @@ const NotificationManagement = () => {
         </div>
 
         {loading && !showModal ? (
-          <div className="notification-mgmt-loading-container">
-            <div className="notification-mgmt-loading-spinner"></div>
-            <p className="notification-mgmt-loading-text">
-              Loading notifications...
-            </p>
-          </div>
+          <GlobalLoader text="Loading notifications..." />
         ) : (
           <>
             <div className="notification-mgmt-table-wrapper">
@@ -722,7 +721,9 @@ const NotificationManagement = () => {
                       </td>
                       <td className="notification-mgmt-table-cell">
                         {notification.sent_at
-                          ? new Date(notification.sent_at).toLocaleString()
+                          ? new Date(notification.sent_at).toLocaleString(
+                              "en-GB",
+                            )
                           : "-"}
                       </td>
                       <td>
@@ -735,9 +736,6 @@ const NotificationManagement = () => {
                           </div>
                         </div>
                       </td>
-                      <td>
-                        {/* Action column removed - click on title to view details */}
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -745,7 +743,7 @@ const NotificationManagement = () => {
             </div>
 
             {/* Pagination */}
-            <div className="notification-mgmt-pagination-container">
+            {/* <div className="notification-mgmt-pagination-container">
               <div className="notification-mgmt-pagination-info">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
                 {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
@@ -774,10 +772,15 @@ const NotificationManagement = () => {
                   Next
                 </button>
               </div>
-            </div>
+            </div> */}
           </>
         )}
       </div>
+      <Pagination
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
+        onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+      />
 
       {/* Notification Details Modal */}
       {showModal && selectedNotification && (
@@ -848,7 +851,7 @@ const NotificationManagement = () => {
                         </span>
                         <div className="notification-mgmt-info-value">
                           {getStatusBadge(
-                            selectedNotification.notification.status
+                            selectedNotification.notification.status,
                           )}
                         </div>
                       </div>
@@ -899,8 +902,8 @@ const NotificationManagement = () => {
                         </span>
                         <span className="notification-mgmt-info-value">
                           {new Date(
-                            selectedNotification.notification.created_at
-                          ).toLocaleString()}
+                            selectedNotification.notification.created_at,
+                          ).toLocaleString("en-GB")}
                         </span>
                       </div>
                       {selectedNotification.notification.sent_at && (
@@ -910,8 +913,8 @@ const NotificationManagement = () => {
                           </span>
                           <span className="notification-mgmt-info-value">
                             {new Date(
-                              selectedNotification.notification.sent_at
-                            ).toLocaleString()}
+                              selectedNotification.notification.sent_at,
+                            ).toLocaleString("en-GB")}
                           </span>
                         </div>
                       )}
@@ -941,7 +944,7 @@ const NotificationManagement = () => {
                       </span>
                       <p className="notification-mgmt-info-value">
                         {selectedNotification.notification.user_types.join(
-                          ", "
+                          ", ",
                         )}
                       </p>
                     </div>
@@ -954,7 +957,7 @@ const NotificationManagement = () => {
                       </span>
                       <p className="notification-mgmt-info-value">
                         {selectedNotification.notification.subscription_types.join(
-                          ", "
+                          ", ",
                         )}
                       </p>
                     </div>
@@ -1040,14 +1043,14 @@ const NotificationManagement = () => {
                                 <td className="notification-mgmt-delivery-date">
                                   {delivery.delivered_at
                                     ? new Date(
-                                        delivery.delivered_at
-                                      ).toLocaleString()
+                                        delivery.delivered_at,
+                                      ).toLocaleString("en-GB")
                                     : new Date(
-                                        delivery.created_at
-                                      ).toLocaleString()}
+                                        delivery.created_at,
+                                      ).toLocaleString("en-GB")}
                                 </td>
                               </tr>
-                            )
+                            ),
                           )}
                         </tbody>
                       </table>
@@ -1080,9 +1083,7 @@ const NotificationManagement = () => {
                   selectedNotification.notification.status === "scheduled") && (
                   <button
                     onClick={() =>
-                      handleCancelNotification(
-                        selectedNotification.notification.id
-                      )
+                      openCancelModal(selectedNotification.notification.id)
                     }
                     className="notification-mgmt-btn notification-mgmt-btn-danger"
                   >
@@ -1091,14 +1092,36 @@ const NotificationManagement = () => {
                   </button>
                 )}
               </div>
-              <div className="notification-mgmt-modal-actions-right">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="notification-mgmt-btn notification-mgmt-btn-secondary"
-                >
-                  Close
-                </button>
-              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showCancelModal && (
+        <div
+          className="notification-mgmt-modal-overlay"
+          onClick={() => setShowCancelModal(false)}
+        >
+          <div
+            className="notification-mgmt-confirm-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Cancel Notification</h3>
+            <p>Are you sure you want to cancel this notification?</p>
+
+            <div className="notification-mgmt-confirm-actions">
+              <button
+                className="notification-mgmt-btn notification-mgmt-btn-secondary"
+                onClick={() => setShowCancelModal(false)}
+              >
+                Keep Notification
+              </button>
+
+              <button
+                className="notification-mgmt-btn notification-mgmt-btn-danger"
+                onClick={handleCancelNotification}
+              >
+                Cancel Notification
+              </button>
             </div>
           </div>
         </div>

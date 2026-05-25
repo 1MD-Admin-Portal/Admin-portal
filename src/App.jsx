@@ -42,6 +42,7 @@ import ReferralsPage from "./pages/Referrals/ReferralsPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DJEvents from "./pages/Djevent/DJEvents.jsx";
 import BetaTesterBugsPage from "./pages/Admin/BetaTesterBugsPage/BetaTesterBugsPage.jsx";
+import StudioManagementPage from "./pages/Studios/StudioManagementPage.jsx";
 
 function App() {
   return (
@@ -105,6 +106,7 @@ function App() {
           <Route path="/users/Dancers" element={<DancersList />} />
           <Route path="/playlists" element={<PlaylistsPage />} />
           <Route path="/badges" element={<BadgesPage />} />
+          <Route path="/studios" element={<StudioManagementPage />} />
 
           {/* ⭐ NEW: Beta Testers Bug Management */}
           <Route path="/beta-testers/bugs" element={<BetaTesterBugsPage />} />

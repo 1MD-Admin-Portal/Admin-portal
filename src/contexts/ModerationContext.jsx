@@ -18,8 +18,12 @@ const toBackendModerationAction = (adminAction) => {
       return "warning_sent";
     case "hide_post":
       return "post_hidden";
+    case "delete_post":
+      return "post_deleted";
+    case "suspend_user":
+      return "user_suspended";
     case "resolve":
-      return "resolve";
+      return "post_deleted"; // Resolve by deleting the problematic post
     default:
       return "";
   }

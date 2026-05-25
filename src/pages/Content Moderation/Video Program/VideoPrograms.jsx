@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./VideoPrograms.css";
+import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 import CreateProgramModal from "./CreateProgramModal";
 import { X, Check, XCircle, Clock } from "lucide-react";
 import {
@@ -22,12 +24,19 @@ const VideoPrograms = () => {
   const [action, setAction] = useState(null);
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoLoading, setVideoLoading] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     total: 0,
     totalPages: 1,
   });
+
+  const isDirectVideo = (url) => {
+    if (!url) return false;
+    return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+  };
 
   useEffect(() => {
     if (currentView === "all") {
@@ -41,7 +50,7 @@ const VideoPrograms = () => {
     try {
       setLoading(true);
       const res = await getProgramsService();
-      console.log("Loaded programs response:", res);
+
       if (Array.isArray(res)) {
         setPrograms(res);
       } else if (res && Array.isArray(res.programs)) {
@@ -61,9 +70,9 @@ const VideoPrograms = () => {
       setLoading(true);
       const res = await getPendingProgramsService(
         pagination.page,
-        pagination.limit
+        pagination.limit,
       );
-      console.log("Loaded pending programs response:", res);
+
       setPendingPrograms(res.programs || []);
       setPagination((prev) => ({
         ...prev,
@@ -81,7 +90,6 @@ const VideoPrograms = () => {
     try {
       setLoading(true);
       const result = await approveProgramService(programId, adminNotes);
-      console.log("Program approved:", result);
 
       // Refresh the pending programs list
       await loadPendingPrograms();
@@ -105,7 +113,6 @@ const VideoPrograms = () => {
     try {
       setLoading(true);
       const result = await rejectProgramService(programId, rejectionReason);
-      console.log("Program rejected:", result);
 
       // Refresh the pending programs list
       await loadPendingPrograms();
@@ -181,7 +188,7 @@ const VideoPrograms = () => {
       return (
         <div className="program-actions">
           <button
-            className="action-btn success-btn"
+            className="success-btn"
             onClick={() => setAction("Approve")}
             disabled={loading}
           >
@@ -189,7 +196,7 @@ const VideoPrograms = () => {
             Approve
           </button>
           <button
-            className="action-btn danger-btn"
+            className="danger-btn"
             onClick={() => setAction("Reject")}
             disabled={loading}
           >
@@ -201,28 +208,28 @@ const VideoPrograms = () => {
     }
 
     // Original action buttons for regular programs
-    return (
-      <div className="program-actions">
-        <button
-          className="action-btn danger-btn"
-          onClick={() => setAction("Delete")}
-        >
-          Delete
-        </button>
-        <button
-          className="action-btn warning-btn"
-          onClick={() => setAction("Retire")}
-        >
-          Retire
-        </button>
-        <button
-          className="action-btn pause-btn"
-          onClick={() => setAction("Pause")}
-        >
-          Pause
-        </button>
-      </div>
-    );
+    // return (
+    //   <div className="program-actions">
+    //     <button
+    //       className="danger-btn"
+    //       onClick={() => setAction("Delete")}
+    //     >
+    //       Delete
+    //     </button>
+    //     <button
+    //       className="warning-btn"
+    //       onClick={() => setAction("Retire")}
+    //     >
+    //       Retire
+    //     </button>
+    //     <button
+    //       className="pause-btn"
+    //       onClick={() => setAction("Pause")}
+    //     >
+    //       Pause
+    //     </button>
+    //   </div>
+    // );
   };
 
   const handleSubmitAction = async () => {
@@ -234,9 +241,7 @@ const VideoPrograms = () => {
       await handleRejectProgram(selectedProgram.program_id, reason);
     } else {
       // Handle other actions (Delete, Retire, Pause) as before
-      console.log(
-        `${action} program ${selectedProgram.title} for reason: ${reason}`
-      );
+
       setSelectedProgram(null);
       setAction(null);
       setReason("");
@@ -339,7 +344,7 @@ const VideoPrograms = () => {
       {/* table */}
       <div className="video-programs-table-container">
         {loading ? (
-          <div className="loading-state">Loading programs...</div>
+          <GlobalLoader text="Loading programs..." />
         ) : (
           <table className="video-programs-table">
             <thead>
@@ -348,6 +353,7 @@ const VideoPrograms = () => {
                 <th>Host</th>
                 <th>Level</th>
                 <th>Videos</th>
+                <th>Created at </th>
                 <th>Status</th>
                 {currentView === "pending" && <th>Submitted</th>}
               </tr>
@@ -388,6 +394,9 @@ const VideoPrograms = () => {
                       {prog.videos?.length || 0}
                     </span>
                   </td>
+                  <td className="program-created-at">
+                    {new Date(prog.created_at).toLocaleDateString("en-GB")}
+                  </td>
                   <td className="program-status">{getStatusDisplay(prog)}</td>
                   {currentView === "pending" && (
                     <td className="program-submitted">
@@ -419,29 +428,16 @@ const VideoPrograms = () => {
       </div>
 
       {/* Pagination for pending programs */}
-      {currentView === "pending" && pagination.totalPages > 1 && (
-        <div className="pagination">
-          <button
-            disabled={pagination.page === 1}
-            onClick={() =>
-              setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
-            }
-          >
-            Previous
-          </button>
-          <span>
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <button
-            disabled={pagination.page === pagination.totalPages}
-            onClick={() =>
-              setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-            }
-          >
-            Next
-          </button>
-        </div>
-      )}
+      {
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={(newPage) =>
+            setPagination((prev) => ({ ...prev, page: newPage }))
+          }
+          isLoading={loading}
+        />
+      }
 
       {/* create modal */}
       <CreateProgramModal
@@ -459,6 +455,7 @@ const VideoPrograms = () => {
             setSelectedProgram(null);
             setAction(null);
             setReason("");
+            setSelectedVideo(null);
           }}
         >
           <div
@@ -473,6 +470,7 @@ const VideoPrograms = () => {
                   setSelectedProgram(null);
                   setAction(null);
                   setReason("");
+                  setSelectedVideo(null);
                 }}
               >
                 <X />
@@ -556,24 +554,78 @@ const VideoPrograms = () => {
 
               <div className="popup-section">
                 <h3 className="section-title">Videos</h3>
-                <div className="videos-list">
-                  {selectedProgram.videos?.map((video) => (
-                    <div key={video.id} className="video-item">
-                      <div className="video-info">
-                        <div className="video-title">{video.title}</div>
-                        <div className="video-duration">{video.duration}s</div>
-                      </div>
-                      <a
-                        href={video.video_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="watch-link"
+                {selectedVideo ? (
+                  <div className="video-player-section">
+                    <div className="video-player-container">
+                      {videoLoading && (
+                        <div className="video-loading-overlay">
+                          <div className="video-loading-spinner"></div>
+                          <p className="video-loading-text">Loading video...</p>
+                        </div>
+                      )}
+                      <video
+                        width="100%"
+                        height="400"
+                        controls
+                        controlsList="nodownload"
+                        preload="metadata"
+                        poster={
+                          selectedProgram.image_url ||
+                          "https://via.placeholder.com/800x450?text=Loading"
+                        }
+                        src={selectedVideo.video_url}
+                        onLoadStart={() => setVideoLoading(true)}
+                        onCanPlay={() => setVideoLoading(false)}
                       >
-                        Watch Video
-                      </a>
+                        Your browser does not support the video tag.
+                      </video>
                     </div>
-                  ))}
-                </div>
+                    <div className="video-player-info">
+                      <h4 className="video-player-title">
+                        {selectedVideo.title}
+                      </h4>
+                      <p className="video-player-duration">
+                        Duration: {selectedVideo.duration}s
+                      </p>
+                      <button
+                        className="close-video-btn"
+                        onClick={() => setSelectedVideo(null)}
+                      >
+                        Close Video
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="videos-list">
+                    {selectedProgram.videos?.map((video) => (
+                      <div key={video.id} className="video-item">
+                        <div className="video-info">
+                          <div className="video-title">{video.title}</div>
+                          <div className="video-duration">
+                            {video.duration}s
+                          </div>
+                        </div>
+                        <button
+                          className="watch-link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isDirectVideo(video.video_url)) {
+                              setSelectedVideo(video);
+                            } else {
+                              window.open(
+                                video.video_url,
+                                "_blank",
+                                "noopener,noreferrer",
+                              );
+                            }
+                          }}
+                        >
+                          Watch Video
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {renderActionButtons()}
@@ -584,8 +636,8 @@ const VideoPrograms = () => {
                     {action === "Approve"
                       ? "Admin Notes:"
                       : action === "Reject"
-                      ? "Rejection Reason:"
-                      : `${action} Reason:`}
+                        ? "Rejection Reason:"
+                        : `${action} Reason:`}
                   </h4>
                   <textarea
                     className="reason-textarea"

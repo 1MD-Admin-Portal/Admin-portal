@@ -1,11 +1,17 @@
 import axios from "axios";
 import { CONSTANTS } from "../utils/constants.js";
 
-export const getFeedsService = async (page = 1, limit = 12) => {
+export const getFeedsService = async (page = 1, limit = 12, filters = {}) => {
   try {
     const token = localStorage.getItem("token");
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...filters,
+    });
+
     const res = await axios.get(
-      `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.GET_FEEDS}?page=${page}&limit=${limit}`,
+      `${CONSTANTS.URL.BASE_URL}${CONSTANTS.URL.GET_FEEDS}?${queryParams}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }

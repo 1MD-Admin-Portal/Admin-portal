@@ -8,7 +8,7 @@ export const fetchUsers = async (page = 1, limit = 10) => {
 
   try {
     const url = `${BASE_URL}/api/v1/admin/users?userType=user&page=${page}&limit=${limit}`;
-    console.log("Fetching URL:", url);
+    
 
     const res = await axios.get(url, {
       headers: {
@@ -98,7 +98,7 @@ export const assignUserBadge = async ({
     payload.custom_commission_rate = Number(custom_commission_rate);
   }
 
-  console.log("🔹 Assign badge payload:", payload);
+  
 
   try {
     const res = await axios.post(url, payload, {
@@ -115,5 +115,18 @@ export const assignUserBadge = async ({
       error.response?.data || error.message
     );
     throw error;
+  }
+};
+
+export const fetchAllBadges = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`${BASE_URL}/api/v1/admin/badges/all`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching all badges:", error);
+    return null;
   }
 };

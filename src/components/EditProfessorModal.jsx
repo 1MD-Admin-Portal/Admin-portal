@@ -5,14 +5,14 @@ const EditProfessorModal = ({ professor, onClose }) => {
   const [email, setEmail] = useState(professor.email);
 
   const handleSubmit = () => {
-    console.log('Updated Professor:', { name, email });
+    
     onClose();
   };
 
   return (
 
       <div className="modal-content">
-        <h2>Edit Professor</h2>
+        <h2>Edit Instructor</h2>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
         <button onClick={handleSubmit}>Save</button>

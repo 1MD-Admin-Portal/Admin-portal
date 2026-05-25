@@ -1,0 +1,128 @@
+/* ============================================================
+   Pagination.css — Reusable Pagination Component
+   ============================================================ */
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: rgb(242, 242, 242);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, #4f7cff 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.pagination-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.pagination-btn--prev svg {
+  margin-right: 0.25rem;
+}
+
+.pagination-btn--next svg {
+  margin-left: 0.25rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3);
+}
+
+.pagination-btn:hover:not(:disabled) svg {
+  transform: scale(1.1);
+}
+
+.pagination-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  min-width: 120px;
+  text-align: center;
+}
+
+.pagination-info strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* ──── Responsive Design ──── */
+
+@media (max-width: 768px) {
+  .pagination-controls {
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .pagination-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .pagination-info {
+    min-width: auto;
+    flex-basis: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-container {
+    margin-top: 1.5rem;
+  }
+
+  .pagination-controls {
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+  }
+
+  .pagination-btn {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .pagination-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pagination-info {
+    font-size: 0.8125rem;
+  }
+}

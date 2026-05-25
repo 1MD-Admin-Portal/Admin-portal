@@ -1,223 +1,347 @@
-import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { X, Upload, Plus, Trash2 } from "lucide-react";
 import { createProgramService } from "../../../services/program.service";
 import { uploadMediaFile } from "../../../services/upload.service";
-import { fetchProfessors } from "../../../services/professor.service"; // ✅ fixed import
+import { fetchProfessors } from "../../../services/professor.service";
+import { getDanceStyles } from "../../../services/masterData.service";
+import "./CreateProgramModal.css";
 
-const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
-  if (!isOpen) return null;
+// ─── Dance Styles Multi-Select ────────────────────────────────────────────────
+const DanceStylesSelect = ({ selected, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef(null);
 
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const toggle = (name) =>
+    onChange(
+      selected.includes(name)
+        ? selected.filter((s) => s !== name)
+        : [...selected, name]
+    );
+
+  const filtered = options.filter((d) =>
+    (d?.name || "").toLowerCase().includes((query || "").toLowerCase().trim())
+  );
+
+  return (
+    <div className="cpm-dropdown-wrapper" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`cpm-dropdown-trigger ${open ? "cpm-dropdown-trigger--open" : ""}`}
+      >
+        <div className="cpm-tags-row">
+          {selected.length ? (
+            selected.map((name) => (
+              <span key={name} className="cpm-tag">
+                {name}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange(selected.filter((s) => s !== name));
+                  }}
+                  className="cpm-tag-remove"
+                >
+                  <X size={11} />
+                </button>
+              </span>
+            ))
+          ) : (
+            <span className="cpm-placeholder">Select dance styles</span>
+          )}
+        </div>
+        <span className="cpm-chevron">▾</span>
+      </button>
+
+      {open && (
+        <div className="cpm-dropdown-menu">
+          <div className="cpm-dropdown-search-wrap">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search styles..."
+              autoFocus
+              className="cpm-dropdown-search"
+            />
+          </div>
+          <div className="cpm-dropdown-list">
+            {filtered.map((d) => {
+              const name = d?.name || "";
+              const checked = selected.includes(name);
+              return (
+                <div
+                  key={d.id ?? name}
+                  onClick={() => toggle(name)}
+                  className={`cpm-dropdown-item ${checked ? "cpm-dropdown-item--checked" : ""}`}
+                >
+                  <div className="cpm-dropdown-item-left">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggle(name)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="cpm-checkbox"
+                    />
+                    {name}
+                  </div>
+                  {checked && <span className="cpm-checkmark">✓</span>}
+                </div>
+              );
+            })}
+            {!options.length && (
+              <div className="cpm-dropdown-empty">No dance styles available.</div>
+            )}
+            {!!options.length && !filtered.length && (
+              <div className="cpm-dropdown-empty">No matches.</div>
+            )}
+          </div>
+          <div className="cpm-dropdown-footer">
+            <button type="button" onClick={() => onChange([])} className="cpm-btn-outline">
+              Clear
+            </button>
+            <button type="button" onClick={() => setOpen(false)} className="cpm-btn-gradient">
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Instructor Searchable Dropdown ──────────────────────────────────────────
+const InstructorSelect = ({ instructors, value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selected = instructors.find((i) => i.id === value);
+  const filtered = instructors.filter((i) =>
+    (i?.name || "").toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div className="cpm-dropdown-wrapper" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`cpm-dropdown-trigger cpm-dropdown-trigger--instructor ${open ? "cpm-dropdown-trigger--open" : ""} ${!selected ? "cpm-dropdown-trigger--empty" : ""}`}
+      >
+        {selected ? `${selected.name} (${selected.email})` : "Select instructor"}
+        <span className="cpm-chevron">▾</span>
+      </button>
+
+      {open && (
+        <div className="cpm-dropdown-menu">
+          <div className="cpm-dropdown-search-wrap">
+            <input
+              type="text"
+              placeholder="Search instructor..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              autoFocus
+              className="cpm-dropdown-search"
+            />
+          </div>
+          <div className="cpm-dropdown-list">
+            <div
+              onClick={() => { onChange(""); setOpen(false); setQuery(""); }}
+              className="cpm-dropdown-item cpm-dropdown-none"
+            >
+              — None —
+            </div>
+            {filtered.map((inst) => (
+              <div
+                key={inst.id}
+                onClick={() => { onChange(inst.id); setOpen(false); setQuery(""); }}
+                className={`cpm-dropdown-item cpm-dropdown-item--instructor ${inst.id === value ? "cpm-dropdown-item--checked" : ""}`}
+              >
+                <span>{inst.name}</span>
+                <span className="cpm-instructor-email">{inst.email}</span>
+              </div>
+            ))}
+            {!filtered.length && (
+              <div className="cpm-dropdown-empty">No instructors found</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Tiny reusable field wrapper ──────────────────────────────────────────────
+const Field = ({ label, className, children }) => (
+  <div className={className}>
+    <label className="cpm-label">{label}</label>
+    {children}
+  </div>
+);
+
+// ─── Main Modal ───────────────────────────────────────────────────────────────
+const CreateProgramModal = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [danceStyle, setDanceStyle] = useState(danceStyles[0] || "");
+  const [danceStyles, setDanceStyles] = useState([]);
   const [danceLevel, setDanceLevel] = useState("Professional");
   const [pricingType, setPricingType] = useState("paid");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState("");
   const [overview, setOverview] = useState("");
-
-  // 🔹 Instructor states
   const [instructorId, setInstructorId] = useState("");
-  const [instructors, setInstructors] = useState([]);
-  const [search, setSearch] = useState("");
-
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [videos, setVideos] = useState([
     { title: "", duration: "", description: "", file: null },
   ]);
+  const [danceStyleOptions, setDanceStyleOptions] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
-    const loadInstructors = async () => {
+    if (!isOpen) return;
+    (async () => {
       try {
-        const response = await fetchProfessors();
-        console.log("📌 Fetched instructors response:", response); // 👈 add this
-
-        if (Array.isArray(response?.users)) {
-          setInstructors(response.users);
-        } else {
-          setInstructors([]);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching instructors:", error);
-        setInstructors([]);
+        const [stylesRes, profRes] = await Promise.all([
+          getDanceStyles(),
+          fetchProfessors(),
+        ]);
+        setDanceStyleOptions(Array.isArray(stylesRes) ? stylesRes : []);
+        setInstructors(Array.isArray(profRes?.users) ? profRes.users : []);
+      } catch (err) {
+        console.error("Failed to load modal data:", err);
       }
-    };
+    })();
+  }, [isOpen]);
 
-    loadInstructors();
-  }, []);
-
-  // ✅ Filter instructors by search text
-  const filteredInstructors = instructors.filter((inst) =>
-    (inst?.name || "").toLowerCase().includes(search.toLowerCase())
-  );
-
-  // ✅ Handle video field changes
-  const handleVideoChange = (index, field, value) => {
-    const updated = [...videos];
-    updated[index][field] = value;
-    setVideos(updated);
+  const handleVideoChange = (i, field, val) => {
+    const u = [...videos];
+    u[i][field] = val;
+    setVideos(u);
   };
+  const addVideo = () =>
+    setVideos([...videos, { title: "", duration: "", description: "", file: null }]);
+  const removeVideo = (i) => setVideos(videos.filter((_, idx) => idx !== i));
 
-  // ✅ Add/remove video cards
-  const addVideo = () => {
-    setVideos([
-      ...videos,
-      { title: "", duration: "", description: "", file: null },
-    ]);
-  };
-  const removeVideo = (index) => {
-    const updated = [...videos];
-    updated.splice(index, 1);
-    setVideos(updated);
-  };
-
-  // ✅ Submit program
-  const handleCreateProgram = async () => {
+  const handleCreate = async () => {
+    if (!danceStyles.length) {
+      alert("Please select at least one dance style.");
+      return;
+    }
+    if (!videos.some((v) => v.title && v.file)) {
+      alert("Please add at least one video with a title and file.");
+      return;
+    }
     try {
       setLoading(true);
-
-      console.log("📌 Selected instructorId state:", instructorId);
-      console.log("📌 Instructors list:", instructors);
-
-      // 1️⃣ Upload cover image
-      let uploadedImageUrl = "";
+      let imageUrl = "";
       if (imageFile) {
         try {
-          const uploadRes = await uploadMediaFile(imageFile);
-          uploadedImageUrl = uploadRes || "";
-          console.log("✅ Uploaded image URL:", uploadedImageUrl);
-        } catch (err) {
-          console.error("❌ Image upload failed:", err);
+          imageUrl = (await uploadMediaFile(imageFile)) || "";
+        } catch (e) {
+          console.error(e);
         }
       }
-
-      // 2️⃣ Upload videos
       const uploadedVideos = [];
-      for (const [index, video] of videos.entries()) {
-        let videoUrl = "";
-        if (video.file) {
+      for (const v of videos) {
+        let url = v.video_url || "";
+        if (v.file) {
           try {
-            const uploadRes = await uploadMediaFile(video.file);
-            videoUrl = uploadRes || "";
-
-            console.log(`✅ Video ${index + 1} uploaded:`, videoUrl);
-          } catch (err) {
-            console.error(`❌ Failed to upload video ${index + 1}:`, err);
+            url = (await uploadMediaFile(v.file)) || "";
+          } catch (e) {
+            console.error(e);
           }
-        } else {
-          videoUrl = video.video_url || "";
         }
-
-        uploadedVideos.push({
-          title: video.title,
-          duration: video.duration,
-          description: video.description,
-          video_url: videoUrl,
-        });
+        uploadedVideos.push({ title: v.title, duration: v.duration, video_url: url });
       }
 
-      // 3️⃣ Final payload
       const payload = {
         title,
         description,
         overview,
-        dance_style: danceStyle,
+        dance_style: danceStyles[0],
         dance_level: danceLevel,
         pricing_type: pricingType,
-        price: pricingType === "paid" ? price : 0,
         instructor_id: instructorId ? parseInt(instructorId, 10) : null,
         videos: uploadedVideos,
-        image_url: uploadedImageUrl,
+        image_url: imageUrl,
       };
-
-      console.log("🚀 Final payload:", payload);
+      if (pricingType === "paid") payload.price = price === "" ? 0 : Number(price);
 
       await createProgramService(payload);
-      alert("✅ Program created successfully!");
-      onClose();
-    } catch (error) {
-      console.error(
-        "❌ Error creating program:",
-        error?.response?.data || error
-      );
-      alert("Failed to create program.");
+      setSuccessMsg("Program created successfully!");
+      setTimeout(() => {
+        setSuccessMsg("");
+        onClose();
+      }, 2000);
+    } catch (err) {
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "Failed to create program.";
+      alert(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-content create-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-header">
-          <h2 className="modal-title">Create Video Program</h2>
-          <button className="modal-close-btn" onClick={onClose}>
-            <X />
+    <div className="cpm-overlay" onClick={onClose}>
+      {/* Success Notification */}
+      {successMsg && (
+        <div className="cpm-success-toast">{successMsg}</div>
+      )}
+
+      <div className="cpm-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="cpm-header">
+          <h2 className="cpm-header-title">Create Video Program</h2>
+          <button
+            className="cpm-close-btn"
+            onClick={onClose}
+          >
+            <X size={13} color="white" />
           </button>
         </div>
 
-        <div className="modal-body">
-          <div className="modal-section">
-            <h3 className="section-title">Basic Information</h3>
-            <div className="form-grid">
-              {/* 🔹 Title */}
-              <div className="form-group">
-                <label className="form-label">Program Title</label>
+        {/* Body */}
+        <div className="cpm-body">
+          {/* ── Basic Information ── */}
+          <div className="cpm-card">
+            <h3 className="cpm-card-title">Basic Information</h3>
+            <div className="cpm-grid-2">
+              <Field label="Program Title">
                 <input
-                  className="form-input"
+                  className="cpm-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter program title"
                 />
-              </div>
+              </Field>
 
-              {/* 🔹 Description */}
-              <div className="form-group full-width">
-                <label className="form-label">Description</label>
-                <textarea
-                  className="form-textarea"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter program description"
-                  rows="4"
-                />
-              </div>
-              {/* 🔹 Overview */}
-              <div className="form-group full-width">
-                <label className="form-label">Overview</label>
-                <textarea
-                  className="form-textarea"
-                  value={overview}
-                  onChange={(e) => setOverview(e.target.value)}
-                  placeholder="Enter program overview"
-                  rows="3"
-                />
-              </div>
-
-              {/* 🔹 Dance Style */}
-              <div className="form-group">
-                <label className="form-label">Dance Style</label>
+              <Field label="Level">
                 <select
-                  className="form-select"
-                  value={danceStyle}
-                  onChange={(e) => setDanceStyle(e.target.value)}
-                >
-                  {danceStyles.map((style) => (
-                    <option key={style} value={style}>
-                      {style}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 🔹 Dance Level */}
-              <div className="form-group">
-                <label className="form-label">Level</label>
-                <select
-                  className="form-select"
+                  className="cpm-input"
                   value={danceLevel}
                   onChange={(e) => setDanceLevel(e.target.value)}
                 >
@@ -226,171 +350,150 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
                   <option value="Advance">Advance</option>
                   <option value="Professional">Professional</option>
                 </select>
-              </div>
+              </Field>
 
-              {/* 🔹 Pricing */}
-              <div className="form-group">
-                <label className="form-label">Pricing Type</label>
+              <Field label="Description" className="cpm-full">
+                <textarea
+                  className="cpm-textarea cpm-textarea--md"
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter program description"
+                />
+              </Field>
+
+              <Field label="Overview" className="cpm-full">
+                <textarea
+                  className="cpm-textarea cpm-textarea--sm"
+                  rows={2}
+                  value={overview}
+                  onChange={(e) => setOverview(e.target.value)}
+                  placeholder="Enter program overview"
+                />
+              </Field>
+
+              <Field label="Dance Styles" className="cpm-full">
+                <DanceStylesSelect
+                  selected={danceStyles}
+                  onChange={setDanceStyles}
+                  options={danceStyleOptions}
+                />
+              </Field>
+
+              <Field label="Instructor" className="cpm-full">
+                <InstructorSelect
+                  instructors={instructors}
+                  value={instructorId}
+                  onChange={setInstructorId}
+                />
+              </Field>
+
+              <Field label="Cover Image">
+                <label className="cpm-file-label">
+                  <Upload size={13} />
+                  {imageFile ? imageFile.name : "Choose cover image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="cpm-file-input"
+                    onChange={(e) => setImageFile(e.target.files[0])}
+                  />
+                </label>
+              </Field>
+
+              <Field label="Pricing Type">
                 <select
-                  className="form-select"
+                  className="cpm-input"
                   value={pricingType}
                   onChange={(e) => setPricingType(e.target.value)}
                 >
                   <option value="free">Free</option>
                   <option value="paid">Paid</option>
                 </select>
-              </div>
+              </Field>
 
               {pricingType === "paid" && (
-                <div className="form-group">
-                  <label className="form-label">Price (€)</label>
+                <Field label="Price (€)">
                   <input
-                    className="form-input"
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(Number(e.target.value))}
-                  />
-                </div>
+  className="cpm-input"
+  type="number"
+  min={0}
+  value={price}
+  onWheel={(e) => e.target.blur()}
+  onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+  placeholder="0.00"
+/>
+                </Field>
               )}
-
-              {/* 🔹 Instructor Search + Dropdown */}
-              <div className="form-group full-width">
-                <label className="form-label">Instructor</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Search instructor..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <select
-                  className="form-select"
-                  value={instructorId || ""}
-                  onChange={(e) =>
-                    setInstructorId(
-                      e.target.value ? Number(e.target.value) : ""
-                    )
-                  }
-                >
-                  <option value="">Select Instructor</option>
-                  {filteredInstructors.map((inst) => (
-                    <option key={inst.id} value={inst.id}>
-                      {inst.name} ({inst.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 🔹 Cover Image */}
-              <div className="form-group">
-                <label className="form-label">Cover Image</label>
-                <div className="file-input-container">
-                  <input
-                    className="file-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files[0])}
-                    id="cover-image"
-                  />
-                  <label htmlFor="cover-image" className="file-input-label">
-                    {imageFile ? imageFile.name : "Choose cover image"}
-                  </label>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* 🔹 Videos Section */}
-          <div className="modal-section">
-            <div className="section-header">
-              <h3 className="section-title">Videos</h3>
-              <button
-                type="button"
-                className="add-video-btn"
-                onClick={addVideo}
-              >
-                + Add Video
+          {/* ── Videos ── */}
+          <div className="cpm-card">
+            <div className="cpm-card-header">
+              <h3 className="cpm-card-title cpm-card-title--no-margin">Videos</h3>
+              <button type="button" onClick={addVideo} className="cpm-btn-add-video">
+                <Plus size={12} /> Add Video
               </button>
             </div>
 
-            <div className="videos-container">
-              {videos.map((vid, index) => (
-                <div key={index} className="video-form-card">
-                  <div className="video-card-header">
-                    <span className="video-number">Video {index + 1}</span>
+            <div className="cpm-videos-list">
+              {videos.map((vid, idx) => (
+                <div key={idx} className="cpm-video-item">
+                  <div className="cpm-video-item-header">
+                    <span className="cpm-video-label">Video {idx + 1}</span>
                     {videos.length > 1 && (
                       <button
                         type="button"
-                        className="remove-video-btn"
-                        onClick={() => removeVideo(index)}
+                        onClick={() => removeVideo(idx)}
+                        className="cpm-btn-remove"
                       >
-                        <X size={16} />
+                        <Trash2 size={11} /> Remove
                       </button>
                     )}
                   </div>
 
-                  <div className="video-form-grid">
-                    <div className="form-group">
-                      <label className="form-label">Title</label>
+                  <div className="cpm-grid-2">
+                    <Field label="Title">
                       <input
-                        className="form-input"
+                        className="cpm-input"
                         placeholder="Video title"
                         value={vid.title}
-                        onChange={(e) =>
-                          handleVideoChange(index, "title", e.target.value)
-                        }
+                        onChange={(e) => handleVideoChange(idx, "title", e.target.value)}
                       />
-                    </div>
+                    </Field>
 
-                    <div className="form-group">
-                      <label className="form-label">Duration</label>
+                    <Field label="Duration">
                       <input
-                        className="form-input"
+                        className="cpm-input"
                         placeholder="e.g. 9:20"
                         value={vid.duration}
-                        onChange={(e) =>
-                          handleVideoChange(index, "duration", e.target.value)
-                        }
+                        onChange={(e) => handleVideoChange(idx, "duration", e.target.value)}
                       />
-                    </div>
+                    </Field>
 
-                    <div className="form-group full-width">
-                      <label className="form-label">Description</label>
+                    <Field label="Description" className="cpm-full">
                       <textarea
-                        className="form-textarea"
+                        className="cpm-textarea cpm-textarea--sm"
+                        rows={2}
                         placeholder="Video description"
                         value={vid.description}
-                        onChange={(e) =>
-                          handleVideoChange(
-                            index,
-                            "description",
-                            e.target.value
-                          )
-                        }
-                        rows="3"
+                        onChange={(e) => handleVideoChange(idx, "description", e.target.value)}
                       />
-                    </div>
+                    </Field>
 
-                    <div className="form-group full-width">
-                      <label className="form-label">Video File</label>
-                      <div className="file-input-container">
+                    <Field label="Video File" className="cpm-full">
+                      <label className="cpm-file-label cpm-file-label--video">
+                        <Upload size={13} />
+                        {vid.file ? vid.file.name : "Choose video file"}
                         <input
-                          className="file-input"
                           type="file"
                           accept="video/*"
-                          onChange={(e) =>
-                            handleVideoChange(index, "file", e.target.files[0])
-                          }
-                          id={`video-file-${index}`}
+                          className="cpm-file-input"
+                          onChange={(e) => handleVideoChange(idx, "file", e.target.files[0])}
                         />
-                        <label
-                          htmlFor={`video-file-${index}`}
-                          className="file-input-label"
-                        >
-                          {vid.file ? vid.file.name : "Choose video file"}
-                        </label>
-                      </div>
-                    </div>
+                      </label>
+                    </Field>
                   </div>
                 </div>
               ))}
@@ -398,18 +501,12 @@ const CreateProgramModal = ({ isOpen, onClose, danceStyles }) => {
           </div>
         </div>
 
-        <div className="modal-footer">
+        {/* Footer */}
+        <div className="cpm-footer">
           <button
-            className="modal-btn cancel-btn"
-            onClick={onClose}
+            onClick={handleCreate}
             disabled={loading}
-          >
-            Cancel
-          </button>
-          <button
-            className="modal-btn create-btn"
-            onClick={handleCreateProgram}
-            disabled={loading}
+            className={`cpm-btn-create ${loading ? "cpm-btn-create--loading" : ""}`}
           >
             {loading ? "Creating..." : "Create Program"}
           </button>

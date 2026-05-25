@@ -4,47 +4,200 @@ import {
   getInstructorApplications,
   rejectInstructorApplication,
 } from "../../../services/professor.service";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import "./ProfessorsPage.css";
-import { CheckCircle, XCircle } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Pagination from "../../../components/common/Pagination";
+import { CheckCircle, XCircle, Search, Calendar, Filter } from "lucide-react";
+import { maskEmail } from "../../../components/maskEmail";
+// ─── Confirmation Popup ───────────────────────────────────────────────────────
+const ConfirmPopup = ({
+  title,
+  confirmLabel = "Confirm",
+  onConfirm,
+  onCancel,
+  children,
+}) => (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 1000,
+      background: "rgba(0,0,0,0.35)",
+      backdropFilter: "blur(6px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "1rem",
+    }}
+    onClick={onCancel}
+  >
+    <div
+      style={{
+        background: "white",
+        borderRadius: "20px",
+        padding: "2rem 2.5rem",
+        maxWidth: "420px",
+        width: "100%",
+        boxShadow: "0 20px 60px rgba(108,61,232,0.18)",
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h3
+        style={{
+          fontSize: "1.3rem",
+          fontWeight: 700,
+          margin: "0 0 1.25rem",
+          background: "linear-gradient(135deg, #6c3de8, #ec4899)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+        }}
+      >
+        {title}
+      </h3>
 
+      {children}
+
+      <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
+        <button
+          onClick={onConfirm}
+          style={{
+            padding: "0.65rem 1.5rem",
+            borderRadius: "10px",
+            border: "none",
+            background: "linear-gradient(135deg, #6c3de8, #ec4899)",
+            color: "white",
+            fontWeight: 700,
+            fontSize: "0.9rem",
+            cursor: "pointer",
+            fontFamily: "inherit",
+            boxShadow: "0 4px 14px rgba(236,72,153,0.35)",
+          }}
+        >
+          {confirmLabel}
+        </button>
+        <button
+          onClick={onCancel}
+          style={{
+            padding: "0.65rem 1.5rem",
+            borderRadius: "10px",
+            border: "none",
+            background: "#6b7280",
+            color: "white",
+            fontWeight: 600,
+            fontSize: "0.9rem",
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 const ProfessorsPage = () => {
   const [applications, setApplications] = useState([]);
+  const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [selectedRejectId, setSelectedRejectId] = useState(null);
   const [rejectComment, setRejectComment] = useState("");
   const [bulkComment, setBulkComment] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [statusInput, setStatusInput] = useState("");
+  const [dateFromInput, setDateFromInput] = useState("");
+  const [dateToInput, setDateToInput] = useState("");
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "",
+    date_from: "",
+    date_to: "",
+    page: 1,
+  });
+  const limit = 10;
   const modalRef = useRef(null);
   const selectAllRef = useRef(null);
-  const [showConfirm, setShowConfirm] = useState(null); // "approve-all", "reject-all", "approve-selected", "reject-selected"
+  const isInitialLoadRef = useRef(true);
 
   const pendingApps = applications.filter((a) => a.status === "pending");
 
   useEffect(() => {
-    fetchApplications();
-  }, []);
+    const isInitial =
+      isInitialLoadRef.current &&
+      !filters.search &&
+      !filters.status &&
+      filters.page === 1;
+    if (isInitial) isInitialLoadRef.current = false;
+    fetchApplications(isInitial);
+  }, [filters]);
 
-  const fetchApplications = async () => {
+  // Debounced search effect
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setFilters((prev) => ({
+        ...prev,
+        search: searchInput,
+        page: 1,
+      }));
+    }, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchInput]);
+
+  const fetchApplications = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
+    else setTableLoading(true);
     try {
-      const data = await getInstructorApplications();
-      setApplications(data);
-    } catch (error) {
-      console.error("Error fetching instructor applications:", error);
+      const data = await getInstructorApplications({
+        search: filters.search,
+        page: filters.page,
+        limit,
+        status: filters.status,
+        date_from: filters.date_from,
+        date_to: filters.date_to,
+      });
+
+      // Handle the API response structure
+      let applicationsData = [];
+      let paginationData = {};
+
+      if (data?.application && Array.isArray(data.application)) {
+        applicationsData = data.application;
+        paginationData = data.pagination || {};
+      } else if (Array.isArray(data)) {
+        applicationsData = data;
+      } else if (data?.data && Array.isArray(data.data)) {
+        applicationsData = data.data;
+        paginationData = data.pagination || {};
+      }
+
+      setApplications(applicationsData);
+      setPagination({
+        ...paginationData,
+        totalPages: paginationData.total_pages ?? paginationData.totalPages,
+      });
+    } catch (err) {
+      console.error("Error fetching instructor applications:", err);
+      setApplications([]);
     } finally {
       setLoading(false);
+      setTableLoading(false);
     }
   };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
+      if (modalRef.current && !modalRef.current.contains(e.target))
         setSelectedApp(null);
-      }
     };
-    if (selectedApp) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    if (selectedApp) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [selectedApp]);
 
@@ -60,12 +213,10 @@ const ProfessorsPage = () => {
     try {
       await approveInstructorApplication(id);
       setApplications((prev) =>
-        prev.map((app) =>
-          app.id === id ? { ...app, status: "approved" } : app
-        )
+        prev.map((a) => (a.id === id ? { ...a, status: "approved" } : a)),
       );
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -73,28 +224,28 @@ const ProfessorsPage = () => {
     try {
       await rejectInstructorApplication(selectedRejectId, rejectComment);
       setApplications((prev) =>
-        prev.map((app) =>
-          app.id === selectedRejectId
-            ? { ...app, status: "rejected", comment: rejectComment }
-            : app
-        )
+        prev.map((a) =>
+          a.id === selectedRejectId
+            ? { ...a, status: "rejected", comment: rejectComment }
+            : a,
+        ),
       );
       setSelectedRejectId(null);
       setRejectComment("");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const performApproveAll = async () => {
     try {
       await Promise.all(
-        pendingApps.map((a) => approveInstructorApplication(a.id))
+        pendingApps.map((a) => approveInstructorApplication(a.id)),
       );
       setApplications((prev) =>
         prev.map((a) =>
-          a.status === "pending" ? { ...a, status: "approved" } : a
-        )
+          a.status === "pending" ? { ...a, status: "approved" } : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -107,14 +258,14 @@ const ProfessorsPage = () => {
   const performRejectAll = async () => {
     try {
       await Promise.all(
-        pendingApps.map((a) => rejectInstructorApplication(a.id, bulkComment))
+        pendingApps.map((a) => rejectInstructorApplication(a.id, bulkComment)),
       );
       setApplications((prev) =>
         prev.map((a) =>
           a.status === "pending"
             ? { ...a, status: "rejected", comment: bulkComment }
-            : a
-        )
+            : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -125,15 +276,18 @@ const ProfessorsPage = () => {
     }
   };
 
+  const handleMainPaginationChange = (newPage) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  };
   const performApproveSelected = async () => {
     try {
       await Promise.all(
-        selectedIds.map((id) => approveInstructorApplication(id))
+        selectedIds.map((id) => approveInstructorApplication(id)),
       );
       setApplications((prev) =>
         prev.map((a) =>
-          selectedIds.includes(a.id) ? { ...a, status: "approved" } : a
-        )
+          selectedIds.includes(a.id) ? { ...a, status: "approved" } : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -146,14 +300,14 @@ const ProfessorsPage = () => {
   const performRejectSelected = async () => {
     try {
       await Promise.all(
-        selectedIds.map((id) => rejectInstructorApplication(id, bulkComment))
+        selectedIds.map((id) => rejectInstructorApplication(id, bulkComment)),
       );
       setApplications((prev) =>
         prev.map((a) =>
           selectedIds.includes(a.id)
             ? { ...a, status: "rejected", comment: bulkComment }
-            : a
-        )
+            : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -165,12 +319,14 @@ const ProfessorsPage = () => {
   };
 
   const toggleSelectAll = () => {
-    const selectable = pendingApps.map((app) => app.id);
-    if (selectedIds.length === selectable.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(selectable);
-    }
+    const selectable = pendingApps.map((a) => a.id);
+    setSelectedIds(selectedIds.length === selectable.length ? [] : selectable);
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    );
   };
 
   const formatField = (field) => {
@@ -185,71 +341,160 @@ const ProfessorsPage = () => {
     return field;
   };
 
-  const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+  const handleApplyFilters = () => {
+    setFilters({
+      search: searchInput,
+      status: statusInput,
+      date_from: dateFromInput
+        ? dateFromInput.toLocaleDateString("en-CA")
+        : undefined,
+      date_to: dateToInput
+        ? dateToInput.toLocaleDateString("en-CA")
+        : undefined,
+      page: 1,
+    });
   };
 
-  if (loading) return <div className="professors-container">Loading...</div>;
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setStatusInput("");
+    setDateFromInput("");
+    setDateToInput("");
+    setFilters({
+      search: "",
+      status: "",
+      date_from: "",
+      date_to: "",
+      page: 1,
+    });
+  };
+
+  const isValidUrl = (url) => {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   return (
     <div className="professors-container">
-      <h1 className="professors-title">Professor Applications</h1>
+      {loading && <GlobalLoader text="Loading instructor applications..." />}
+      <h1 className="professors-title">👨‍🏫 Instructor Applications</h1>
+
+      <div className="bulk-actions-bar">
+        <button
+          className="bulk-approve-btn"
+          onClick={() => setShowConfirm("approve-all")}
+        >
+          ✅ Approve All ({pendingApps.length})
+        </button>
+        <button
+          className="bulk-reject-btn"
+          onClick={() => setShowConfirm("reject-all")}
+        >
+          ❌ Reject All ({pendingApps.length})
+        </button>
+      </div>
+
+      {/* Filters Section */}
+      {/* Modern SaaS-style filter toolbar */}
+      <div className="professors-filter-toolbar">
+        <div className="professors-filter-search">
+          <Search className="professors-filter-icon" />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="professors-filter-input"
+          />
+        </div>
+        <div className="professors-filter-status">
+          <Filter className="professors-filter-icon" />
+          <select
+            value={statusInput}
+            onChange={(e) => setStatusInput(e.target.value)}
+            className="professors-filter-input professors-filter-select"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div className="professors-filter-date">
+          <Calendar className="professors-filter-icon" />
+          <DatePicker
+            selected={dateFromInput}
+            onChange={(date) => setDateFromInput(date)}
+            onChangeRaw={(e) => e.preventDefault()}
+            placeholderText="From"
+            className="class-mod-filter-input"
+            dateFormat="dd-MM-yyyy"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
+        </div>
+        <div className="professors-filter-date">
+          <Calendar className="class-mod-filter-icon" />
+          <DatePicker
+            selected={dateToInput}
+            onChange={(date) => setDateToInput(date)}
+            minDate={dateFromInput}
+            onChangeRaw={(e) => e.preventDefault()}
+            placeholderText="To"
+            className="class-mod-filter-input"
+            dateFormat="dd-MM-yyyy"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
+        </div>
+        <button
+          onClick={handleApplyFilters}
+          className="professors-filter-apply"
+        >
+          Apply Filters
+        </button>
+        <button
+          onClick={handleClearFilters}
+          className="professors-filter-clear"
+        >
+          Clear
+        </button>
+      </div>
+
+      {tableLoading && (
+        <div
+          style={{
+            padding: "12px 16px",
+            background: "rgba(108, 61, 232, 0.05)",
+            borderRadius: "8px",
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "#666",
+            textAlign: "center",
+          }}
+        >
+          Loading...
+        </div>
+      )}
 
       {/* Action bar */}
-      {/* <div className="bulk-actions-bar">
-        {selectedIds.length === 0 ? (
-          <>
-            <button
-              className="bulk-approve-btn"
-              onClick={() => setShowConfirm("approve-all")}
-            >
-              ✅ Approve All ({pendingApps.length})
-            </button>
-            <button
-              className="bulk-reject-btn"
-              onClick={() => setShowConfirm("reject-all")}
-            >
-              ❌ Reject All ({pendingApps.length})
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              className="bulk-approve-btn"
-              onClick={() => setShowConfirm("approve-selected")}
-            >
-              ✅ Approve Selected ({selectedIds.length})
-            </button>
-            <button
-              className="bulk-reject-btn"
-              onClick={() => setShowConfirm("reject-selected")}
-            >
-              ❌ Reject Selected ({selectedIds.length})
-            </button>
-          </>
-        )}
-      </div> */}
-
+      <div className="professors-table-wrapper">
       <table className="professors-table">
         <thead>
           <tr>
-            {/* <th>
-              <input
-                ref={selectAllRef}
-                type="checkbox"
-                onChange={toggleSelectAll}
-                disabled={pendingApps.length === 0}
-              />
-            </th> */}
             <th>ID</th>
             <th>Email</th>
-            {/* <th>Dance Styles</th> */}
             <th>Availability</th>
             <th>Experience</th>
             <th>Document</th>
-            {/* <th>Status</th> */}
+            <th>Created at </th>
             <th>Comment</th>
             <th>Actions</th>
           </tr>
@@ -257,31 +502,23 @@ const ProfessorsPage = () => {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
-              {/* <td>
-                {app.status === "pending" && (
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(app.id)}
-                    onChange={() => toggleSelect(app.id)}
-                  />
-                )}
-              </td> */}
               <td>{app.id}</td>
               <td
                 className="clickable-email"
                 onClick={() => setSelectedApp(app)}
+                style={{ cursor: "pointer" }}
               >
-                {app.email}
+                {maskEmail(app.email)}{" "}
               </td>
-              {/* <td>{formatField(app.dance_style)}</td> */}
               <td>{formatField(app.availability)}</td>
               <td>{app.experience}</td>
               <td>
-                {app.document_url ? (
+                {isValidUrl(app.document_url) ? (
                   <a
                     href={app.document_url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     View
                   </a>
@@ -289,20 +526,19 @@ const ProfessorsPage = () => {
                   "No document"
                 )}
               </td>
-              {/* <td className={`status ${app.status}`}>{app.status}</td> */}
+              <td>{new Date(app.created_at).toLocaleDateString("en-GB")}</td>
               <td>{app.comment || "-"}</td>
               <td>
                 <div className="icon-actions">
                   <CheckCircle
-                    className={`action-icon ${app.status !== "pending" ? "disabled" : ""
-                      }`}
+                    className={`action-icon ${app.status !== "pending" ? "disabled" : ""}`}
                     onClick={() =>
-                      app.status === "pending" && handleApprove(app.id)
+                      app.status === "pending" &&
+                      setShowConfirm({ type: "approve-one", id: app.id })
                     }
                   />
                   <XCircle
-                    className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
-                      }`}
+                    className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""}`}
                     onClick={() =>
                       app.status === "pending" && setSelectedRejectId(app.id)
                     }
@@ -313,8 +549,103 @@ const ProfessorsPage = () => {
           ))}
         </tbody>
       </table>
+      </div>
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={handleMainPaginationChange}
+          isLoading={loading || tableLoading}
+        />
+      )}
 
-      {/* Single Reject Modal */}
+      {/* ── Approve All Confirm ── */}
+      {showConfirm === "approve-all" && (
+        <ConfirmPopup
+          title="Approve all pending applications?"
+          confirmLabel="Yes, Approve All"
+          onConfirm={performApproveAll}
+          onCancel={() => setShowConfirm(null)}
+        />
+      )}
+
+      {/* ── Approve Single Confirm ── */}
+      {showConfirm?.type === "approve-one" && (
+        <ConfirmPopup
+          title="Approve this application?"
+          confirmLabel="Yes, Approve"
+          onConfirm={() => {
+            handleApprove(showConfirm.id);
+            setShowConfirm(null);
+          }}
+          onCancel={() => setShowConfirm(null)}
+        />
+      )}
+
+      {/* ── Reject All Confirm (with comment) ── */}
+      {showConfirm === "reject-all" && (
+        <ConfirmPopup
+          title="Reject all pending applications?"
+          confirmLabel="Yes, Reject All"
+          onConfirm={performRejectAll}
+          onCancel={() => {
+            setShowConfirm(null);
+            setBulkComment("");
+          }}
+        >
+          <textarea
+            rows={3}
+            placeholder="Add a comment for rejection (optional)"
+            value={bulkComment}
+            onChange={(e) => setBulkComment(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.625rem 0.75rem",
+              border: "1.5px solid #e2e8f0",
+              borderRadius: "10px",
+              fontSize: "0.875rem",
+              fontFamily: "inherit",
+              resize: "vertical",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        </ConfirmPopup>
+      )}
+
+      {/* ── Reject Selected Confirm ── */}
+      {showConfirm === "reject-selected" && (
+        <ConfirmPopup
+          title="Reject selected applications?"
+          confirmLabel="Yes, Reject Selected"
+          onConfirm={performRejectSelected}
+          onCancel={() => {
+            setShowConfirm(null);
+            setBulkComment("");
+          }}
+        >
+          <textarea
+            rows={3}
+            placeholder="Add a comment for rejection (optional)"
+            value={bulkComment}
+            onChange={(e) => setBulkComment(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.625rem 0.75rem",
+              border: "1.5px solid #e2e8f0",
+              borderRadius: "10px",
+              fontSize: "0.875rem",
+              fontFamily: "inherit",
+              resize: "vertical",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        </ConfirmPopup>
+      )}
+
+      {/* ── Single Reject Modal ── */}
       {selectedRejectId && (
         <div className="reject-modal" onClick={() => setSelectedRejectId(null)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
@@ -340,46 +671,14 @@ const ProfessorsPage = () => {
         </div>
       )}
 
-      {/* Bulk Reject Modal (all or selected) */}
-      {(showConfirm === "reject-all" || showConfirm === "reject-selected") && (
-        <div className="reject-modal" onClick={() => setShowConfirm(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>
-              Reject {showConfirm === "reject-all" ? "All Pending" : "Selected"}{" "}
-              Applications
-            </h3>
-            <textarea
-              rows="4"
-              placeholder="Add a comment for rejection (optional)"
-              value={bulkComment}
-              onChange={(e) => setBulkComment(e.target.value)}
-            />
-            <div className="modal-button-group">
-              <button
-                className="modal-btn cancel-btn"
-                onClick={() => setShowConfirm(null)}
-              >
-                Cancel
-              </button>
-              <button
-                className="modal-btn"
-                onClick={
-                  showConfirm === "reject-all"
-                    ? performRejectAll
-                    : performRejectSelected
-                }
-              >
-                Confirm Reject
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Detail Modal */}
+      {/* ── Detail Modal ── */}
       {selectedApp && (
         <div className="modal-overlay">
-          <div className="detail-modal" ref={modalRef}>
+          <div
+            className="detail-modal"
+            ref={modalRef}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="modal-close-icon"
               onClick={() => setSelectedApp(null)}
@@ -391,7 +690,7 @@ const ProfessorsPage = () => {
               <strong>ID:</strong> {selectedApp.id}
             </p>
             <p>
-              <strong>Email:</strong> {selectedApp.email}
+              <strong>Email:</strong> {maskEmail(selectedApp.email)}
             </p>
             <p>
               <strong>Dance Styles:</strong>{" "}
@@ -409,11 +708,12 @@ const ProfessorsPage = () => {
             </p>
             <p>
               <strong>Document:</strong>{" "}
-              {selectedApp.document_url ? (
+              {isValidUrl(selectedApp.document_url) ? (
                 <a
                   href={selectedApp.document_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   View
                 </a>
@@ -430,9 +730,6 @@ const ProfessorsPage = () => {
             <p>
               <strong>Goal:</strong> {selectedApp.goal}
             </p>
-            <button onClick={() => setSelectedApp(null)} className="close-btn">
-              Close
-            </button>
           </div>
         </div>
       )}

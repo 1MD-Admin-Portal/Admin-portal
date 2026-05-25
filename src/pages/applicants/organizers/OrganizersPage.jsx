@@ -4,12 +4,18 @@ import {
   getOrganizerApplications,
   rejectOrganizerApplication,
 } from "../../../services/organizer.service";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import "../professors/ProfessorsPage.css";
-import { CheckCircle, XCircle } from "lucide-react";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Pagination from "../../../components/common/Pagination";
+import { CheckCircle, XCircle, Search, Calendar, Filter } from "lucide-react";
+import { maskEmail } from "../../../components/maskEmail";
 const OrganizersPage = () => {
   const [applications, setApplications] = useState([]);
+  const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
 
   // single-reject modal state
   const [selectedRejectId, setSelectedRejectId] = useState(null);
@@ -21,22 +27,87 @@ const OrganizersPage = () => {
   const [showConfirm, setShowConfirm] = useState(null); // "approve-all", "reject-all", "approve-selected", "reject-selected"
   const [selectedApp, setSelectedApp] = useState(null);
 
+  // Filter states
+  const [searchInput, setSearchInput] = useState("");
+  const [statusInput, setStatusInput] = useState("");
+  const [dateFromInput, setDateFromInput] = useState("");
+  const [dateToInput, setDateToInput] = useState("");
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "",
+    date_from: "",
+    date_to: "",
+    page: 1,
+  });
+  const limit = 10;
+
   const modalRef = useRef(null);
   const selectAllRef = useRef(null);
+  const isInitialLoadRef = useRef(true);
 
+  // Debounce filter changes - input updates immediately, fetch waits 300ms
   useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const data = await getOrganizerApplications();
-        setApplications(data);
-      } catch (error) {
-        console.error("Error fetching organizer applications:", error);
-      } finally {
-        setLoading(false);
+    const isInitial =
+      isInitialLoadRef.current &&
+      !filters.search &&
+      !filters.status &&
+      filters.page === 1;
+    if (isInitial) isInitialLoadRef.current = false;
+    fetchApplications(isInitial);
+  }, [filters]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setFilters((prev) => ({
+        ...prev,
+        search: searchInput,
+        page: 1,
+      }));
+    }, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchInput]);
+
+  const fetchApplications = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
+    else setTableLoading(true);
+    try {
+      const data = await getOrganizerApplications({
+        search: filters.search,
+        page: filters.page,
+        limit,
+        status: filters.status,
+        date_from: filters.date_from,
+        date_to: filters.date_to,
+      });
+
+      // Handle the API response structure
+      let applicationsData = [];
+      let paginationData = {};
+
+      if (data?.applications && Array.isArray(data.applications)) {
+        applicationsData = data.applications;
+        paginationData = data.pagination || {};
+      } else if (Array.isArray(data)) {
+        applicationsData = data;
+      } else if (data?.data && Array.isArray(data.data)) {
+        applicationsData = data.data;
+        paginationData = data.pagination || {};
       }
-    };
-    fetchApplications();
-  }, []);
+
+      setApplications(applicationsData);
+      setPagination({
+        ...paginationData,
+        totalPages: paginationData.total_pages ?? paginationData.totalPages,
+      });
+    } catch (error) {
+      console.error("Error fetching organizer applications:", error);
+      setApplications([]);
+    } finally {
+      setLoading(false);
+      setTableLoading(false);
+    }
+  };
 
   // click outside detail modal to close
   useEffect(() => {
@@ -63,13 +134,41 @@ const OrganizersPage = () => {
     return field;
   };
 
+  const handleApplyFilters = () => {
+    setFilters({
+      search: searchInput,
+      status: statusInput,
+      date_from: dateFromInput
+        ? dateFromInput.toLocaleDateString("en-CA")
+        : undefined,
+      date_to: dateToInput
+        ? dateToInput.toLocaleDateString("en-CA")
+        : undefined,
+      page: 1,
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setStatusInput("");
+    setDateFromInput("");
+    setDateToInput("");
+    setFilters({
+      search: "",
+      status: "",
+      date_from: "",
+      date_to: "",
+      page: 1,
+    });
+  };
+
   const handleApprove = async (id) => {
     try {
       await approveOrganizerApplication(id);
       setApplications((prev) =>
         prev.map((app) =>
-          app.id === id ? { ...app, status: "approved" } : app
-        )
+          app.id === id ? { ...app, status: "accepted" } : app,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -83,8 +182,8 @@ const OrganizersPage = () => {
         prev.map((app) =>
           app.id === selectedRejectId
             ? { ...app, status: "rejected", comment: rejectComment }
-            : app
-        )
+            : app,
+        ),
       );
       setSelectedRejectId(null);
       setRejectComment("");
@@ -93,6 +192,9 @@ const OrganizersPage = () => {
     }
   };
 
+  const handleMainPaginationChange = (newPage) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  };
   // selection helpers
   const pendingApps = applications.filter((a) => a.status === "pending");
 
@@ -112,7 +214,7 @@ const OrganizersPage = () => {
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id],
     );
   };
 
@@ -129,12 +231,12 @@ const OrganizersPage = () => {
   const performApproveAll = async () => {
     try {
       await Promise.all(
-        pendingApps.map((a) => approveOrganizerApplication(a.id))
+        pendingApps.map((a) => approveOrganizerApplication(a.id)),
       );
       setApplications((prev) =>
         prev.map((a) =>
-          a.status === "pending" ? { ...a, status: "approved" } : a
-        )
+          a.status === "pending" ? { ...a, status: "accepted" } : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -147,12 +249,12 @@ const OrganizersPage = () => {
   const performRejectAll = async (comment) => {
     try {
       await Promise.all(
-        pendingApps.map((a) => rejectOrganizerApplication(a.id, comment))
+        pendingApps.map((a) => rejectOrganizerApplication(a.id, comment)),
       );
       setApplications((prev) =>
         prev.map((a) =>
-          a.status === "pending" ? { ...a, status: "rejected", comment } : a
-        )
+          a.status === "pending" ? { ...a, status: "rejected", comment } : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -166,12 +268,12 @@ const OrganizersPage = () => {
   const performApproveSelected = async () => {
     try {
       await Promise.all(
-        selectedIds.map((id) => approveOrganizerApplication(id))
+        selectedIds.map((id) => approveOrganizerApplication(id)),
       );
       setApplications((prev) =>
         prev.map((a) =>
-          selectedIds.includes(a.id) ? { ...a, status: "approved" } : a
-        )
+          selectedIds.includes(a.id) ? { ...a, status: "accepted" } : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -184,12 +286,14 @@ const OrganizersPage = () => {
   const performRejectSelected = async (comment) => {
     try {
       await Promise.all(
-        selectedIds.map((id) => rejectOrganizerApplication(id, comment))
+        selectedIds.map((id) => rejectOrganizerApplication(id, comment)),
       );
       setApplications((prev) =>
         prev.map((a) =>
-          selectedIds.includes(a.id) ? { ...a, status: "rejected", comment } : a
-        )
+          selectedIds.includes(a.id)
+            ? { ...a, status: "rejected", comment }
+            : a,
+        ),
       );
     } catch (err) {
       console.error(err);
@@ -200,17 +304,12 @@ const OrganizersPage = () => {
     }
   };
 
-  if (loading) return <div className="professors-container">Loading...</div>;
-
   return (
     <div className="professors-container">
-      <h1 className="professors-title">Organizer Applications</h1>
+      {loading && <GlobalLoader text="Loading organizer applications..." />}
+      <h1 className="professors-title">🎪 Organizer Applications</h1>
 
-      {/* Bulk actions bar:
-          - If nothing selected -> show Approve All / Reject All
-          - If something selected -> show Approve Selected / Reject Selected (only)
-      */}
-      {/* <div className="bulk-actions-bar">
+      <div className="bulk-actions-bar">
         {selectedIds.length === 0 ? (
           <>
             <button
@@ -242,8 +341,98 @@ const OrganizersPage = () => {
             </button>
           </>
         )}
-      </div> */}
+      </div>
 
+      {/* Modern SaaS-style filter toolbar */}
+      <div className="professors-filter-toolbar">
+        <div className="professors-filter-search">
+          <Search className="professors-filter-icon" />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="professors-filter-input"
+          />
+        </div>
+        <div className="professors-filter-status">
+          <Filter className="professors-filter-icon" />
+          <select
+            value={statusInput}
+            onChange={(e) => setStatusInput(e.target.value)}
+            className="professors-filter-input professors-filter-select"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div className="professors-filter-date">
+          <Calendar className="professors-filter-icon" />
+          <DatePicker
+            selected={dateFromInput}
+            onChange={(date) => setDateFromInput(date)}
+            onChangeRaw={(e) => e.preventDefault()}
+            placeholderText="From"
+            className="class-mod-filter-input"
+            dateFormat="dd-MM-yyyy"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
+        </div>
+        <div className="professors-filter-date">
+          <Calendar className="class-mod-filter-icon" />
+          <DatePicker
+            selected={dateToInput}
+            onChange={(date) => setDateToInput(date)}
+            minDate={dateFromInput}
+            onChangeRaw={(e) => e.preventDefault()}
+            placeholderText="To"
+            className="class-mod-filter-input"
+            dateFormat="dd-MM-yyyy"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
+        </div>
+        <button
+          onClick={handleApplyFilters}
+          className="professors-filter-apply"
+        >
+          Apply Filters
+        </button>
+        <button
+          onClick={handleClearFilters}
+          className="professors-filter-clear"
+        >
+          Clear
+        </button>
+      </div>
+
+      {tableLoading && (
+        <div
+          style={{
+            padding: "12px 16px",
+            background: "rgba(108, 61, 232, 0.05)",
+            borderRadius: "8px",
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "#666",
+            textAlign: "center",
+          }}
+        >
+          Loading...
+        </div>
+      )}
+
+      {/* Bulk actions bar:
+          - If nothing selected -> show Approve All / Reject All
+          - If something selected -> show Approve Selected / Reject Selected (only)
+      */}
+
+      <div className="professors-table-wrapper">
       <table className="professors-table">
         <thead>
           <tr>
@@ -263,6 +452,7 @@ const OrganizersPage = () => {
             <th>Expected Size</th>
             <th>Total Events</th>
             <th>Document</th>
+            <th>Created at </th>
             {/* <th>Status</th> */}
             <th>Comment</th>
             <th>Actions</th>
@@ -280,19 +470,35 @@ const OrganizersPage = () => {
                 />
               </td> */}
 
-              <td>{app.id}</td>
-
               <td
-                className="clickable-email"
                 onClick={() => setSelectedApp(app)}
                 style={{ cursor: "pointer" }}
               >
-                {app.email}
+                {app.id}
+              </td>
+
+              <td
+                onClick={() => setSelectedApp(app)}
+                style={{ cursor: "pointer" }}
+              >
+                {maskEmail(app.email)}
               </td>
 
               {/* <td>{formatField(app.event_types)}</td> */}
-              <td>{app.expected_event_size}</td>
-              <td>{app.total_organized_event}</td>
+              <td
+                onClick={() => setSelectedApp(app)}
+                style={{ cursor: "pointer" }}
+              >
+                {app.expected_event_size}
+              </td>
+
+              <td
+                onClick={() => setSelectedApp(app)}
+                style={{ cursor: "pointer" }}
+              >
+                {app.total_organized_event}
+              </td>
+
               <td>
                 {app.document_url ? (
                   <a
@@ -308,19 +514,22 @@ const OrganizersPage = () => {
                 )}
               </td>
               {/* <td className={`status ${app.status}`}>{app.status}</td> */}
+              <td>{new Date(app.created_at).toLocaleDateString("en-GB")}</td>
               <td>{app.comment || "-"}</td>
               <td>
                 <div className="icon-actions">
                   <CheckCircle
-                    className={`action-icon ${app.status !== "pending" ? "disabled" : ""
-                      }`}
+                    className={`action-icon ${
+                      app.status !== "pending" ? "disabled" : ""
+                    }`}
                     onClick={() =>
                       app.status === "pending" && handleApprove(app.id)
                     }
                   />
                   <XCircle
-                    className={`action-icon reject ${app.status !== "pending" ? "disabled" : ""
-                      }`}
+                    className={`action-icon reject ${
+                      app.status !== "pending" ? "disabled" : ""
+                    }`}
                     onClick={() =>
                       app.status === "pending" && setSelectedRejectId(app.id)
                     }
@@ -331,6 +540,17 @@ const OrganizersPage = () => {
           ))}
         </tbody>
       </table>
+      </div>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={handleMainPaginationChange}
+          isLoading={loading || tableLoading}
+        />
+      )}
 
       {/* Confirm modals */}
       {showConfirm === "approve-all" && (
@@ -489,7 +709,7 @@ const OrganizersPage = () => {
               <strong>ID:</strong> {selectedApp.id}
             </p>
             <p>
-              <strong>Email:</strong> {selectedApp.email}
+              <strong>Email:</strong> {maskEmail(selectedApp.email)}
             </p>
             <p>
               <strong>Event Types:</strong>{" "}
@@ -525,9 +745,9 @@ const OrganizersPage = () => {
             <p>
               <strong>Comment:</strong> {selectedApp.comment || "-"}
             </p>
-            <button onClick={() => setSelectedApp(null)} className="close-btn">
+            {/* <button onClick={() => setSelectedApp(null)} className="close-btn">
               Close
-            </button>
+            </button> */}
           </div>
         </div>
       )}

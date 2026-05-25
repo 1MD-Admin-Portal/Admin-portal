@@ -39,11 +39,16 @@ export const rejectOrganizerApplication = async (
   return res.data;
 };
 
-export const getOrganizerApplications = async () => {
+export const getOrganizerApplications = async (params = {}) => {
+  const { search = "", page = 1, limit = 10, status = "", date_from = "", date_to = "" } = params;
   const token = localStorage.getItem("token");
-
+  const queryParams = new URLSearchParams({ page, limit });
+  if (search) queryParams.append("search", search);
+  if (status) queryParams.append("status", status);
+  if (date_from) queryParams.append("date_from", date_from);
+  if (date_to) queryParams.append("date_to", date_to);
   const res = await axios.get(
-    `${BASE_URL}${CONSTANTS.URL.ORGANIZER_APPLICATION_LIST}`,
+    `${BASE_URL}${CONSTANTS.URL.ORGANIZER_APPLICATION_LIST}?${queryParams.toString()}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -51,7 +56,7 @@ export const getOrganizerApplications = async () => {
     }
   );
 
-  return res.data.applications;
+  return res.data;
 };
 
 // ✅ Add this to fetch organizer users list with pagination

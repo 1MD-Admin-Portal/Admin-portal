@@ -1,111 +1,162 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-
-
-// import React, { useState } from "react";
-// import { Link, useNavigate } from "react-router-dom"; // ✅ added useNavigate
-import logo from "../assets/logo.png"; // Add this import - replace with your actual logo filename
+import logo from "../assets/logo1.png";
 import {
-  Home,
-  Users,
-  Video,
-  Euro,
-  Send,
-  Megaphone,
-  FileText,
-  BadgeCheck,
-  Bell,
-  Cog,
-  User,
-  LogOut,
-  Ticket,
-  Clipboard,
-  Film,
-  Swords,
-  GraduationCap,
-  Store,
-  Book,
-  Disc,
-  FileEdit,
-  Wallet,
-  Banknote,
-  Gavel,
-  Play,
-  Building,
-  Search,
-  BarChart,
-  Download,
-  ChevronDown,
-  ChevronRight,
-  PersonStanding,
-  Bug, // ✅ NEW: for Beta Tester Bugs (admin)
+  Home, Users, Video, Euro, Send, Megaphone, BadgeCheck,
+  Bell, Cog, User, LogOut, Ticket, Clipboard, Film, Swords,
+  GraduationCap, Store, Book, Disc, FileEdit, Wallet, Banknote,
+  Play, ChevronDown, ChevronRight, Bug, Building2,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
+import {useTheme} from "../contexts/ThemeContext";
+
 const Sidebar = () => {
   const sidebarScrollRef = useRef(null);
-const location = useLocation();
+  const location = useLocation();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const sprinklesRef = useRef(null);
 
+  const [activePanel, setActivePanel] = useState("main");
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [earningDropdownOpen, setEarningDropdownOpen] = useState(false);
   const [operationDropdownOpen, setOperationDropdownOpen] = useState(false);
   const [applicantDropdownOpen, setApplicantDropdownOpen] = useState(false);
   const [contentDropdownOpen, setContentDropdownOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState("/home");
-  const { logout } = useAuth();
-  const navigate = useNavigate(); // ✅ so handleLogout works
 
-  const handleLogout = () => {
-    logout(); // clear token
-    navigate("/", { replace: true }); // redirect
+  const handleActivityClick = (id) => {
+    if (activePanel === id && isPanelOpen) setIsPanelOpen(false);
+    else { setActivePanel(id); setIsPanelOpen(true); }
   };
 
-  const toggleContentDropdown = () =>
-    setContentDropdownOpen(!contentDropdownOpen);
-  const toggleOperationDropdown = () =>
-    setOperationDropdownOpen(!operationDropdownOpen);
-  const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
-  const toggleApplicantDropdown = () =>
-    setApplicantDropdownOpen(!applicantDropdownOpen);
-  const toggleEarningDropdown = () =>
-    setEarningDropdownOpen(!earningDropdownOpen);
+  const handleLogout = () => { logout(); navigate("/", { replace: true }); };
+  const isRouteActive = (href) => location.pathname === href;
+  const isSubmenuActive = (items) => items.some((item) => location.pathname === item.href);
 
-  const MenuItem = ({
-    href,
-    icon: Icon,
-    children,
-    isActive = false,
-    onClick,
-  }) => (
-    <li className={`menu-item ${isActive ? "active" : ""}`} onClick={onClick}>
-      <Link to={href} className="menu-link">
-        <Icon size={18} className="menu-icon" />
-        <span>{children}</span>
-      </Link>
-    </li>
-  );
+  const userSubmenuItems = [
+    { href: "/users/Dancers", icon: User, label: "Dancers" },
+    { href: "/users/Professors", icon: GraduationCap, label: "Instructors" },
+    { href: "/users/DJs", icon: Disc, label: "D.Js" },
+    { href: "/users/Organizers", icon: FileEdit, label: "Organizers" },
+  ];
+  const applicantSubmenuItems = [
+    { href: "/Applicants/Professors", icon: GraduationCap, label: "Instructors" },
+    { href: "/Applicants/DJs", icon: Disc, label: "D.Js" },
+    { href: "/Applicants/Organizers", icon: FileEdit, label: "Organizers" },
+  ];
+  const contentSubmenuItems = [
+    { href: "/FeedPage", icon: Film, label: "User Generated Content" },
+    { href: "/VideoPrograms", icon: Book, label: "Video Programs" },
+    { href: "/playlists", icon: Play, label: "Playlists" },
+    { href: "/CreateChallenge", icon: Swords, label: "Challenges" },
+  ];
+  const earningSubmenuItems = [
+    { href: "/payouts/earnings", icon: Wallet, label: "Earnings" },
+    { href: "/payouts/payouts", icon: Banknote, label: "Payouts" },
+  ];
+  const operationSubmenuItems = [
+    { href: "/support/ticket-raise", icon: FileEdit, label: "Ticket Raise" },
+  ];
 
-  const DropdownMenuItem = ({
-    icon: Icon,
-    children,
-    isOpen,
-    onToggle,
-    submenuItems,
-  }) => (
-    <li className="dropdown-item">
-      <div className="dropdown-trigger" onClick={onToggle}>
-        <Icon size={18} className="menu-icon" />
-        <span>{children}</span>
-        <div className={`chevron ${isOpen ? "open" : ""}`}>
-          {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        </div>
+  useEffect(() => {
+    if (isSubmenuActive(userSubmenuItems)) setUserDropdownOpen(true);
+    if (isSubmenuActive(applicantSubmenuItems)) setApplicantDropdownOpen(true);
+    if (isSubmenuActive(contentSubmenuItems)) setContentDropdownOpen(true);
+    if (isSubmenuActive(earningSubmenuItems)) setEarningDropdownOpen(true);
+    if (isSubmenuActive(operationSubmenuItems)) setOperationDropdownOpen(true);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.marginLeft = isPanelOpen ? "280px" : "56px";
+    document.body.style.transition = "margin-left 0.22s cubic-bezier(0.4,0,0.2,1)";
+  }, [isPanelOpen]);
+
+  useEffect(() => {
+    const sidebar = sidebarScrollRef.current;
+    if (!sidebar) return;
+    const saved = sessionStorage.getItem("sidebar-scroll");
+    if (saved !== null) sidebar.scrollTop = Number(saved);
+    const onScroll = () => sessionStorage.setItem("sidebar-scroll", sidebar.scrollTop);
+    sidebar.addEventListener("scroll", onScroll);
+    return () => sidebar.removeEventListener("scroll", onScroll);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const container = sprinklesRef.current;
+    if (!container) return;
+    container.innerHTML = "";
+    const count = 32;
+    const colors = [
+  "rgba(244,208,63,VAR)",   // gold
+  "rgba(255,220,80,VAR)",   // light gold
+  "rgba(180,80,255,VAR)",   // purple ← add this
+  "rgba(160,60,240,VAR)",   // deep purple ← add this
+  "rgba(255,240,140,VAR)",  // pale gold
+];
+
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement("div");
+      el.className = "vs-sprinkle";
+      const size = Math.random() * 3 + 1;
+      const left = Math.random() * 96 + 2;
+      const bottom = Math.random() * 55;
+      const duration = Math.random() * 9 + 7;
+      const delay = Math.random() * 12;
+      const colorTemplate = colors[Math.floor(Math.random() * colors.length)];
+      const opacity = (Math.random() * 0.45 + 0.25).toFixed(2);
+      const color = colorTemplate.replace("VAR", opacity);
+      const isDiamond = Math.random() < 0.28;
+      el.style.cssText = `width:${size}px;height:${size}px;left:${left}%;bottom:${bottom}%;background:${color};animation:sprinkleFloat ${duration}s ${delay}s linear infinite;box-shadow:0 0 ${size * 2}px ${color};${isDiamond ? "border-radius:1px;transform:rotate(45deg);" : "border-radius:50%;"}`;
+      if (Math.random() < 0.4) {
+        el.style.animation = `sprinkleFloat ${duration}s ${delay}s linear infinite, sprinkleTwinkle ${(Math.random() * 2 + 1.5).toFixed(1)}s ${(Math.random() * 2).toFixed(1)}s ease-in-out infinite`;
+      }
+      container.appendChild(el);
+    }
+  }, []);
+
+
+  const { isDark, toggleTheme } = useTheme();
+  const activityItems = [
+    { id: "main", icon: Home, label: "Main" },
+    { id: "users", icon: Users, label: "Users" },
+    { id: "content", icon: Video, label: "Content" },
+    { id: "earnings", icon: Euro, label: "Earnings" },
+    { id: "operations", icon: Clipboard, label: "Operations" },
+    { id: "settings", icon: Cog, label: "Settings" },
+  ];
+
+  const MenuItem = ({ href, icon: Icon, children }) => {
+    const active = isRouteActive(href);
+    return (
+      <li className={`vs-menu-item ${active ? "active" : ""}`}>
+        <Link to={href} className="vs-menu-link">
+          <span className="vs-menu-icon-wrap">
+            <Icon size={14} />
+          </span>
+          <span className="vs-menu-label">{children}</span>
+          {active && <span className="vs-active-dot" />}
+        </Link>
+      </li>
+    );
+  };
+
+  const DropdownMenuItem = ({ icon: Icon, children, isOpen, onToggle, submenuItems }) => (
+    <li className="vs-dropdown-item">
+      <div className="vs-dropdown-trigger" onClick={onToggle}>
+        <span className="vs-menu-icon-wrap"><Icon size={14} /></span>
+        <span className="vs-menu-label">{children}</span>
+        <span className={`vs-chevron ${isOpen ? "open" : ""}`}>
+          <ChevronRight size={12} />
+        </span>
       </div>
-      <div className={`submenu-container ${isOpen ? "open" : ""}`}>
-        <ul className="submenu">
-          {submenuItems.map((item, index) => (
-            <li key={index} className="submenu-item">
-              <Link to={item.href} className="submenu-link">
-                <item.icon size={16} />
+      <div className={`vs-submenu-container ${isOpen ? "open" : ""}`}>
+        <ul className="vs-submenu">
+          {submenuItems.map((item, i) => (
+            <li key={i} className={`vs-submenu-item ${isRouteActive(item.href) ? "active" : ""}`}>
+              <Link to={item.href} className="vs-submenu-link">
+                <item.icon size={12} />
                 <span>{item.label}</span>
               </Link>
             </li>
@@ -115,457 +166,452 @@ const location = useLocation();
     </li>
   );
 
-  const userSubmenuItems = [
-    { href: "/users/Dancers", icon: User, label: "Dancers" },
-    { href: "/users/Professors", icon: GraduationCap, label: "Professors" },
-    { href: "/users/DJs", icon: Disc, label: "D.Js" },
-    { href: "/users/Organizers", icon: FileEdit, label: "Organizers" },
-  ];
-
-  const applicantSubmenuItems = [
-    {
-      href: "/Applicants/Professors",
-      icon: GraduationCap,
-      label: "Professors",
-    },
-    { href: "/Applicants/DJs", icon: Disc, label: "D.Js" },
-    { href: "/Applicants/Organizers", icon: FileEdit, label: "Organizers" },
-  ];
-
-  const contentSubmenuItems = [
-    { href: "/FeedPage", icon: Film, label: "User Generated Content" },
-    { href: "/VideoPrograms", icon: Book, label: "Video Program Management" },
-    { href: "/playlists", icon: Play, label: "Playlists" },
-    { href: "/CreateChallenge", icon: Swords, label: "Challenges" },
-  ];
-
-  const earningSubmenuItems = [
-    { href: "/payouts/earnings", icon: Wallet, label: "Earnings" },
-    { href: "/payouts/payouts", icon: Banknote, label: "Payouts" },
-    // { href: "/payouts/disputes", icon: Gavel, label: "Disputes" },
-    // { href: "/payouts/payoutslabs", icon: BarChart, label: "Payout Slabs" },
-  ];
-
-  const operationSubmenuItems = [
-    // {
-    //   href: "/support/class-disputes",
-    //   icon: GraduationCap,
-    //   label: "Class Related Dispute",
-    // },
-    { href: "/support/ticket-raise", icon: FileEdit, label: "Ticket Raise" },
-    // {
-    //   href: "/support/redemption-spotlight",
-    //   icon: Search,
-    //   label: "Redemption & Spotlight",
-    // },
-  ];
-
-  useEffect(() => {
-  const sidebar = sidebarScrollRef.current;
-  if (!sidebar) return;
-
-  // restore scroll
-  const savedScroll = sessionStorage.getItem("sidebar-scroll");
-  if (savedScroll !== null) {
-    sidebar.scrollTop = Number(savedScroll);
-  }
-
-  // save scroll on scroll
-  const handleScroll = () => {
-    sessionStorage.setItem("sidebar-scroll", sidebar.scrollTop);
-  };
-
-  sidebar.addEventListener("scroll", handleScroll);
-
-  return () => {
-    sidebar.removeEventListener("scroll", handleScroll);
-  };
-}, [location.pathname]);
-
-
-  return (
-    <div className="sidebar-container">
-      <style>{`
-        .sidebar-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          height: 100vh;
-          width: 280px;
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-          color: white;
-          display: flex;
-          flex-direction: column;
-          z-index: 100;
-          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-          border-right: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .sidebar-header {
-          padding: 24px 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.02);
-          backdrop-filter: blur(10px);
-        }
-
-        .logo-section {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .logo-icon {
-          width: 48px;
-          height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 12px;
-        }
-
-        .logo-image {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          border-radius: 12px;
-        }
-
-        .app-title {
-          font-size: 20px;
-          font-weight: 700;
-          color: #f4d03f;
-          margin: 0;
-          line-height: 1.2;
-          background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .app-subtitle {
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.6);
-          margin: 0;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          font-weight: 500;
-        }
-
-        .sidebar-content {
-          flex: 1;
-          overflow-y: auto;
-          padding: 16px 0;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-        }
-
-        .sidebar-content::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .sidebar-content::-webkit-scrollbar-track {
-          background: transparent;
-        }
-
-        .sidebar-content::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 2px;
-        }
-
-        .menu-section {
-          margin-bottom: 32px;
-        }
-
-        .menu-section-title {
-          font-size: 11px;
-          font-weight: 700;
-          color: rgba(255, 255, 255, 0.5);
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          margin: 0 20px 16px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .menu-list {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-
-        .menu-item, .dropdown-item {
-          margin: 2px 12px;
-        }
-
-        .menu-link, .dropdown-trigger {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px 16px;
-          text-decoration: none;
-          color: rgba(255, 255, 255, 0.8);
-          border-radius: 12px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .menu-link::before, .dropdown-trigger::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(244, 208, 63, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          border-radius: 12px;
-        }
-
-        .menu-link:hover, .dropdown-trigger:hover {
-          color: white;
-          background: rgba(255, 255, 255, 0.05);
-          transform: translateX(4px);
-        }
-
-        .menu-link:hover::before, .dropdown-trigger:hover::before {
-          opacity: 1;
-        }
-
-        .menu-item.active .menu-link {
-          background: linear-gradient(135deg, rgba(244, 208, 63, 0.15) 0%, rgba(212, 175, 55, 0.15) 100%);
-          color: #f4d03f;
-          border: 1px solid rgba(244, 208, 63, 0.3);
-          box-shadow: 0 4px 15px rgba(244, 208, 63, 0.1);
-        }
-
-        .chevron {
-          margin-left: auto;
-          color: rgba(255, 255, 255, 0.5);
-          transition: all 0.3s ease;
-        }
-
-        .chevron.open {
-          color: #f4d03f;
-          transform: rotate(0deg);
-        }
-
-        .submenu-container {
-          overflow: hidden;
-          transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          max-height: 0;
-        }
-
-        .submenu-container.open {
-          max-height: 300px;
-        }
-
-        .submenu {
-          list-style: none;
-          margin: 8px 0 0;
-          padding: 0;
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-        }
-
-        .submenu-item {
-          margin: 0;
-        }
-
-        .submenu-link {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 10px 20px;
-          text-decoration: none;
-          color: rgba(255, 255, 255, 0.7);
-          font-size: 13px;
-          font-weight: 500;
-          border-radius: 6px;
-          margin: 4px 8px;
-          transition: all 0.3s ease;
-        }
-
-        .submenu-link:hover {
-          color: white;
-          background: rgba(255, 255, 255, 0.08);
-          transform: translateX(4px);
-        }
-
-        .logout-section {
-          padding: 20px;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(0, 0, 0, 0.1);
-        }
-
-        .logout-link {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px 16px;
-          text-decoration: none;
-          color: #ff6b6b;
-          border-radius: 12px;
-          transition: all 0.3s ease;
-          font-weight: 500;
-          background: rgba(255, 107, 107, 0.1);
-          border: 1px solid rgba(255, 107, 107, 0.2);
-          width: 100%;
-          text-align: left;
-        }
-
-        .logout-link:hover {
-          background: rgba(255, 107, 107, 0.2);
-          transform: translateX(4px);
-          box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
-        }
-
-        .menu-icon {
-          color: rgba(255, 255, 255, 0.8);
-          transition: color 0.3s ease;
-        }
-
-        .menu-link:hover .menu-icon,
-        .dropdown-trigger:hover .menu-icon {
-          color: #f4d03f;
-        }
-
-        .menu-item.active .menu-icon {
-          color: #f4d03f;
-        }
-      `}</style>
-
-      <div className="sidebar-header">
-        <div className="logo-section">
-          <div className="logo-icon">
-            <img src={logo} alt="Dance with me Logo" className="logo-image" />
-          </div>
-          <div>
-            <h2 className="app-title">Dance with me</h2>
-            <p className="app-subtitle">Admin Panel</p>
-          </div>
-        </div>
+  const PanelContent = ({ children }) => (
+    <div className="vs-panel-body-inner">
+      <div className="vs-panel-content" ref={sidebarScrollRef}>
+        <nav><div className="vs-section"><ul className="vs-menu-list">{children}</ul></div></nav>
       </div>
-
-      {/* <div className="sidebar-content"> */}
-        <div className="sidebar-content" ref={sidebarScrollRef}>
-
-        <nav className="sidebar-nav">
-          <div className="menu-section">
-            <p className="menu-section-title">Main</p>
-            <ul className="menu-list">
-              <MenuItem
-                href="/home"
-                icon={Home}
-                isActive={activeItem === "/home"}
-                onClick={() => setActiveItem("/home")}
-              >
-                Dashboard
-              </MenuItem>
-
-              <DropdownMenuItem
-                icon={Users}
-                isOpen={userDropdownOpen}
-                onToggle={toggleUserDropdown}
-                submenuItems={userSubmenuItems}
-              >
-                Users
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                icon={Users}
-                isOpen={applicantDropdownOpen}
-                onToggle={toggleApplicantDropdown}
-                submenuItems={applicantSubmenuItems}
-              >
-                Applicants
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                icon={Video}
-                isOpen={contentDropdownOpen}
-                onToggle={toggleContentDropdown}
-                submenuItems={contentSubmenuItems}
-              >
-                Content Moderation
-              </DropdownMenuItem>
-
-              <MenuItem href="/ClassModeration" icon={Video}>
-                Class Listing Approval
-              </MenuItem>
-
-              <MenuItem href="/EventsPage" icon={Ticket}>
-                Events
-              </MenuItem>
-
-              <MenuItem href="/MarketplacePage" icon={Store}>
-                Marketplace
-              </MenuItem>
-
-              <DropdownMenuItem
-                icon={Euro}
-                isOpen={earningDropdownOpen}
-                onToggle={toggleEarningDropdown}
-                submenuItems={earningSubmenuItems}
-              >
-                Earnings & Payouts
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                icon={Clipboard}
-                isOpen={operationDropdownOpen}
-                onToggle={toggleOperationDropdown}
-                submenuItems={operationSubmenuItems}
-              >
-                Operation & Support
-              </DropdownMenuItem>
-
-              <MenuItem href="/badges" icon={BadgeCheck}>
-                Badges
-              </MenuItem>
-
-              <MenuItem href="/referrals" icon={Send}>
-                Referrals
-              </MenuItem>
-
-              <MenuItem href="/djevents" icon={Megaphone}>
-                Dj Events
-              </MenuItem>
-
-              {/* ⭐ NEW: Admin – Beta Tester Bugs */}
-              <MenuItem href="/beta-testers/bugs" icon={Bug}>
-                Beta Tester Bugs
-              </MenuItem>
-            </ul>
-          </div>
-
-          <div className="menu-section">
-            <p className="menu-section-title">Settings</p>
-            <ul className="menu-list">
-              <MenuItem href="/NotificationPage" icon={Bell}>
-                Notifications
-              </MenuItem>
-              <MenuItem href="/SettingsPage" icon={Cog}>
-                Settings
-              </MenuItem>
-            </ul>
-          </div>
-        </nav>
-      </div>
-
-      <div className="logout-section">
-        <button className="logout-link" onClick={handleLogout}>
-          <LogOut size={18} />
-          Logout
+      <div className="vs-logout-section">
+        <button className="vs-logout-btn" onClick={handleLogout}>
+          <LogOut size={14} />
+          <span>Sign out</span>
         </button>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&display=swap');
+
+        * { box-sizing: border-box; }
+
+        /* ══ ACTIVITY BAR ══ */
+        .vs-activity-bar {
+          position: fixed; top: 0; left: 0;
+          width: 56px; height: 100vh;
+          background: #0a0518;
+          display: flex; flex-direction: column; align-items: center;
+          z-index: 1000;
+          border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .vs-activity-bar::before {
+          content: '';
+          position: absolute; top: -60px; left: -30px;
+          width: 110px; height: 320px;
+          background: linear-gradient(160deg, rgba(180,80,255,0.08) 0%, rgba(244,160,30,0.05) 50%, transparent 100%);
+          border-radius: 50%; filter: blur(28px); pointer-events: none;
+          animation: driftLight 8s ease-in-out infinite alternate;
+        }
+        .vs-activity-bar::after {
+          content: '';
+          position: absolute; bottom: 40px; left: -20px;
+          width: 90px; height: 200px;
+          background: radial-gradient(ellipse at center, rgba(244,208,63,0.08) 0%, transparent 70%);
+          filter: blur(20px); pointer-events: none;
+          animation: driftLight 8s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes driftLight {
+          0%   { transform: translateY(0) scale(1); opacity: 0.7; }
+          100% { transform: translateY(30px) scale(1.1); opacity: 1; }
+        }
+
+        .vs-activity-logo {
+          width: 56px; height: 56px;
+          display: flex; align-items: center; justify-content: center;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+          flex-shrink: 0; position: relative; z-index: 2;
+        }
+        .vs-activity-logo img {
+          width: 38px; height: 44px; object-fit: contain;
+          filter: drop-shadow(0 0 8px rgba(244,208,63,0.4)) drop-shadow(0 0 20px rgba(244,208,63,0.15));
+        }
+
+        .vs-activity-nav {
+          display: flex; flex-direction: column; align-items: center;
+          flex: 1; padding: 10px 0; gap: 1px; width: 100%; position: relative; z-index: 2;
+        }
+
+        .vs-activity-btn {
+          position: relative; width: 100%; height: 46px;
+          display: flex; align-items: center; justify-content: center;
+          background: none; border: none;
+          color: rgba(255,255,255,0.22); cursor: pointer;
+          transition: color 0.18s ease;
+        }
+        .vs-activity-btn:hover { color: rgba(255,255,255,0.7); }
+        .vs-activity-btn.active { color: #f4d03f; }
+
+        /* Active left bar */
+        .vs-activity-btn.active::before {
+          content: '';
+          position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px;
+          background: linear-gradient(180deg, #ffe066, #f4a800);
+          border-radius: 0 2px 2px 0;
+          box-shadow: 0 0 8px rgba(244,208,63,0.7), 0 0 16px rgba(244,208,63,0.3);
+        }
+
+        .vs-icon-wrap {
+          display: flex; align-items: center; justify-content: center;
+          width: 34px; height: 34px; border-radius: 9px;
+          transition: background 0.18s ease;
+        }
+        .vs-activity-btn:hover .vs-icon-wrap { background: rgba(255,255,255,0.05); }
+        .vs-activity-btn.active .vs-icon-wrap {
+          background: rgba(244,208,63,0.09);
+          box-shadow: 0 0 0 1px rgba(244,208,63,0.16);
+        }
+
+        /* Tooltip */
+        .vs-activity-tooltip {
+          position: absolute; left: 62px;
+          background: #0d0b1a;
+          color: rgba(255,255,255,0.88);
+          font-size: 11.5px; font-family: 'Figtree', sans-serif; font-weight: 500;
+          padding: 5px 10px; border-radius: 6px;
+          white-space: nowrap; pointer-events: none;
+          opacity: 0; transform: translateX(-4px);
+          transition: opacity 0.15s ease, transform 0.15s ease;
+          z-index: 9999;
+          border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+        }
+        .vs-activity-btn:hover .vs-activity-tooltip { opacity: 1; transform: translateX(0); }
+
+        .vs-activity-bottom {
+          padding: 8px 0 14px;
+          display: flex; flex-direction: column; align-items: center;
+          width: 100%; position: relative; z-index: 2;
+        }
+        .vs-activity-bottom::before {
+          content: ''; display: block; width: 24px; height: 1px;
+          background: rgba(255,255,255,0.08); margin: 0 auto 8px;
+        }
+
+        
+
+
+        /* ══ SIDEBAR PANEL ══ */
+        .vs-sidebar-panel {
+          position: fixed; top: 0; left: 56px;
+          width: 224px; height: 100vh;
+          background: linear-gradient(170deg, #12082e 0%, #1a0d3d 45%, #0e0820 100%);
+          display: flex; flex-direction: column;
+          z-index: 999;
+          border-right: 1px solid rgba(255,255,255,0.06);
+          overflow: hidden;
+          transition: width 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.18s ease;
+        }
+
+        /* Right edge shimmer */
+        .vs-sidebar-panel::after {
+          content: '';
+          position: absolute; top: 0; right: 0; width: 1px; height: 100%;
+          background: linear-gradient(180deg, transparent 0%, rgba(180,80,255,0.2) 25%, rgba(244,208,63,0.14) 55%, rgba(180,80,255,0.08) 80%, transparent 100%);
+          pointer-events: none;
+        }
+
+        .vs-sidebar-panel.collapsed { width: 0; opacity: 0; border-right: none; pointer-events: none; }
+
+        /* ── Panel Header ── */
+        .vs-panel-header {
+          height: 56px;
+          display: flex; align-items: center; padding: 0 16px;
+          border-bottom: 1px solid rgba(255,255,255,0.055);
+          flex-shrink: 0;
+          background: rgba(8,3,20,0.6); 
+          position: relative; z-index: 1;
+        }
+        .vs-panel-header::after {
+          content: '';
+          position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, rgba(244,208,63,0.35) 0%, rgba(180,80,255,0.12) 60%, transparent 100%);
+        }
+        .vs-panel-title {
+          font-size: 9.5px; font-weight: 600;
+          letter-spacing: 2.5px; text-transform: uppercase; margin: 0;
+          font-family: 'Figtree', sans-serif;
+          background: linear-gradient(90deg, rgba(255,255,255,0.85) 0%, rgba(244,208,63,0.75) 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+          white-space: nowrap;
+        }
+
+        /* ── Panel Body ── */
+        .vs-panel-body { display: none; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
+        .vs-panel-body.visible { display: flex; }
+        .vs-panel-body-inner { display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
+
+        .vs-panel-content {
+          flex: 1; overflow-y: auto; padding: 8px 0 4px;
+          scrollbar-width: thin; scrollbar-color: rgba(244,208,63,0.12) transparent;
+          position: relative; z-index: 1;
+        }
+        .vs-panel-content::-webkit-scrollbar { width: 2px; }
+        .vs-panel-content::-webkit-scrollbar-track { background: transparent; }
+        .vs-panel-content::-webkit-scrollbar-thumb { background: rgba(244,208,63,0.15); border-radius: 2px; }
+
+        .vs-section { margin-bottom: 4px; }
+
+        .vs-section-label {
+          font-size: 9px; font-weight: 700;
+          color: rgba(244,208,63,0.28); text-transform: uppercase; letter-spacing: 2px;
+          padding: 14px 16px 6px; margin: 0;
+          font-family: 'Figtree', sans-serif; white-space: nowrap;
+        }
+
+        .vs-menu-list { list-style: none; margin: 0; padding: 0 6px; }
+
+        /* ── Menu Items ── */
+        .vs-menu-item, .vs-dropdown-item { margin: 1px 0; }
+
+        .vs-menu-link, .vs-dropdown-trigger {
+          display: flex; align-items: center; gap: 9px;
+          padding: 7px 10px; border-radius: 7px;
+          text-decoration: none;
+          color: rgba(255,255,255,0.42);
+          font-size: 13px; font-weight: 400;
+          font-family: 'Figtree', sans-serif;
+          cursor: pointer;
+          transition: background 0.15s ease, color 0.15s ease;
+          user-select: none; white-space: nowrap;
+          position: relative;
+        }
+
+        .vs-menu-link:hover, .vs-dropdown-trigger:hover {
+          background: rgba(255,255,255,0.05);
+          color: rgba(255,255,255,0.82);
+        }
+
+        /* Active item */
+        .vs-menu-item.active .vs-menu-link {
+          background: rgba(244,208,63,0.08);
+          color: #f4d03f;
+          font-weight: 500;
+        }
+        .vs-menu-item.active .vs-menu-link:hover { background: rgba(244,208,63,0.11); }
+
+        /* Icon wrap */
+        .vs-menu-icon-wrap {
+          display: flex; align-items: center; justify-content: center;
+          width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0;
+          color: rgba(255,255,255,0.28);
+          transition: color 0.15s ease, background 0.15s ease;
+        }
+        .vs-menu-link:hover .vs-menu-icon-wrap,
+        .vs-dropdown-trigger:hover .vs-menu-icon-wrap { color: rgba(255,255,255,0.65); }
+        .vs-menu-item.active .vs-menu-link .vs-menu-icon-wrap {
+          color: #f4d03f;
+          background: rgba(244,208,63,0.1);
+        }
+
+        .vs-menu-label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Active dot */
+        .vs-active-dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: #f4d03f;
+          box-shadow: 0 0 6px rgba(244,208,63,0.8);
+          flex-shrink: 0;
+        }
+
+        /* Chevron */
+        .vs-chevron {
+          margin-left: auto; color: rgba(255,255,255,0.18);
+          display: flex; align-items: center; flex-shrink: 0;
+          transition: color 0.15s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        .vs-chevron.open { transform: rotate(90deg); color: rgba(244,208,63,0.5); }
+        .vs-dropdown-trigger:hover .vs-chevron { color: rgba(255,255,255,0.38); }
+
+        /* Submenu */
+        .vs-submenu-container { overflow: hidden; max-height: 0; transition: max-height 0.26s cubic-bezier(0.4,0,0.2,1); }
+        .vs-submenu-container.open { max-height: 400px; }
+
+        .vs-submenu {
+          list-style: none;
+          margin: 2px 0 2px 14px; padding: 3px 0;
+          border-left: 1px solid rgba(244,208,63,0.1);
+        }
+        .vs-submenu-item { margin: 0; }
+
+        .vs-submenu-link {
+          display: flex; align-items: center; gap: 8px;
+          padding: 6px 12px; border-radius: 0 6px 6px 0;
+          text-decoration: none;
+          color: rgba(255,255,255,0.36);
+          font-size: 12.5px; font-family: 'Figtree', sans-serif;
+          transition: background 0.13s ease, color 0.13s ease;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .vs-submenu-link:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.75); }
+        .vs-submenu-item.active .vs-submenu-link {
+          background: rgba(244,208,63,0.06);
+          color: #f4d03f; font-weight: 500;
+        }
+
+        /* ── Logout ── */
+        .vs-logout-section {
+          padding: 10px 12px 14px;
+          flex-shrink: 0; position: relative; z-index: 1;
+          border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .vs-logout-btn {
+          display: flex; align-items: center; gap: 8px;
+          padding: 8px 12px; width: 100%;
+          background: rgba(220,60,60,0.06);
+          border: 1px solid rgba(220,60,60,0.16);
+          border-radius: 7px;
+          color: rgba(255,100,100,0.72);
+          font-size: 12.5px; font-family: 'Figtree', sans-serif; font-weight: 500;
+          cursor: pointer; text-align: left;
+          transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .vs-logout-btn:hover {
+          background: rgba(220,60,60,0.12);
+          border-color: rgba(255,100,100,0.3);
+          color: #ff8080;
+        }
+
+        /* ── Sprinkles ── */
+        .vs-sprinkles {
+          position: absolute; bottom: 0; left: 0;
+          width: 100%; height: 55%;
+          pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .vs-sprinkle { position: absolute; border-radius: 50%; animation: sprinkleFloat linear infinite; opacity: 0; }
+
+        @keyframes sprinkleFloat {
+          0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 0; }
+          8%   { opacity: 1; }
+          85%  { opacity: 0.5; }
+          100% { transform: translateY(-260px) rotate(360deg) scale(0.3); opacity: 0; }
+        }
+        @keyframes sprinkleTwinkle {
+          0%, 100% { opacity: 0.12; transform: scale(1); }
+          50%       { opacity: 0.75; transform: scale(1.5); }
+        }
+        @keyframes bloomPulse {
+          0%   { opacity: 0.5; transform: scale(1); }
+          100% { opacity: 0.9; transform: scale(1.06); }
+        }
+      `}</style>
+
+      {/* ── Activity Bar ── */}
+      <div className="vs-activity-bar">
+        <div className="vs-activity-logo">
+          <img src={logo} alt="Logo" />
+        </div>
+        <div className="vs-activity-nav">
+          {activityItems.map((item) => (
+            <button
+              key={item.id}
+              className={`vs-activity-btn ${activePanel === item.id ? "active" : ""}`}
+              onClick={() => handleActivityClick(item.id)}
+              aria-label={item.label}
+            >
+              <span className="vs-icon-wrap"><item.icon size={18} /></span>
+              <span className="vs-activity-tooltip">{item.label}</span>
+            </button>
+          ))}
+        </div>
+        
+        <div className="vs-activity-bottom">
+          <button className="vs-activity-btn" onClick={handleLogout} aria-label="Logout">
+            <span className="vs-icon-wrap"><LogOut size={17} /></span>
+            <span className="vs-activity-tooltip">Sign out</span>
+          </button>
+        </div>
+      </div>
+
+
+
+      {/* ── Sidebar Panel ── */}
+      <div className={`vs-sidebar-panel ${!isPanelOpen ? "collapsed" : ""}`}>
+        <div className="vs-panel-header">
+          <p className="vs-panel-title">One Trillion Dancers</p>
+        </div>
+
+        <div style={{
+  display: 'flex', alignItems: 'center', gap: '77px',
+  marginTop: '12px',padding: '22px',paddingBottom: '0px',
+  borderTop: '1px solid rgba(255,255,255,0.08)'
+}}>
+  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+    {isDark ? 'Dark Mode' : 'Light Mode'}
+  </span>
+  <div onClick={toggleTheme} style={{
+    width: '40px', height: '22px', borderRadius: '11px', cursor: 'pointer',
+    background: isDark ? '#6d28d9' : 'rgba(255,255,255,0.2)',
+    position: 'relative', transition: 'background 0.3s'
+  }}>
+    <div style={{
+      position: 'absolute', top: '3px',
+      left: isDark ? '21px' : '3px',
+      width: '16px', height: '16px', borderRadius: '50%',
+      background: 'white', transition: 'left 0.3s'
+    }} />
+  </div>
+</div>
+
+        {/* MAIN */}
+        <div className={`vs-panel-body ${activePanel === "main" ? "visible" : ""}`}>
+          <PanelContent>
+            <MenuItem href="/home" icon={Home}>Dashboard</MenuItem>
+            <MenuItem href="/ClassModeration" icon={Video}>Class Listing Approval</MenuItem>
+            <MenuItem href="/EventsPage" icon={Ticket}>Events</MenuItem>
+            <MenuItem href="/MarketplacePage" icon={Store}>Marketplace</MenuItem>
+            <MenuItem href="/studios" icon={Building2}>Studios</MenuItem>
+            <MenuItem href="/badges" icon={BadgeCheck}>Badges</MenuItem>
+            <MenuItem href="/referrals" icon={Send}>Referrals</MenuItem>
+            <MenuItem href="/djevents" icon={Megaphone}>Dj Events</MenuItem>
+            <MenuItem href="/beta-testers/bugs" icon={Bug}>Beta Tester Bugs</MenuItem>
+          </PanelContent>
+        </div>
+
+        {/* USERS */}
+        <div className={`vs-panel-body ${activePanel === "users" ? "visible" : ""}`}>
+          <PanelContent>
+            <DropdownMenuItem icon={Users} isOpen={userDropdownOpen} onToggle={() => setUserDropdownOpen(p => !p)} submenuItems={userSubmenuItems}>Users</DropdownMenuItem>
+            <DropdownMenuItem icon={Users} isOpen={applicantDropdownOpen} onToggle={() => setApplicantDropdownOpen(p => !p)} submenuItems={applicantSubmenuItems}>Applicants</DropdownMenuItem>
+          </PanelContent>
+        </div>
+
+        {/* CONTENT */}
+        <div className={`vs-panel-body ${activePanel === "content" ? "visible" : ""}`}>
+          <PanelContent>
+            <DropdownMenuItem icon={Video} isOpen={contentDropdownOpen} onToggle={() => setContentDropdownOpen(p => !p)} submenuItems={contentSubmenuItems}>Content Moderation</DropdownMenuItem>
+            <MenuItem href="/ClassModeration" icon={Video}>Class Listing Approval</MenuItem>
+          </PanelContent>
+        </div>
+
+        {/* EARNINGS */}
+        <div className={`vs-panel-body ${activePanel === "earnings" ? "visible" : ""}`}>
+          <PanelContent>
+            <DropdownMenuItem icon={Euro} isOpen={earningDropdownOpen} onToggle={() => setEarningDropdownOpen(p => !p)} submenuItems={earningSubmenuItems}>Earnings & Payouts</DropdownMenuItem>
+          </PanelContent>
+        </div>
+
+        {/* OPERATIONS */}
+        <div className={`vs-panel-body ${activePanel === "operations" ? "visible" : ""}`}>
+          <PanelContent>
+            <DropdownMenuItem icon={Clipboard} isOpen={operationDropdownOpen} onToggle={() => setOperationDropdownOpen(p => !p)} submenuItems={operationSubmenuItems}>Operations & Support</DropdownMenuItem>
+          </PanelContent>
+        </div>
+
+        {/* SETTINGS */}
+        <div className={`vs-panel-body ${activePanel === "settings" ? "visible" : ""}`}>
+          <PanelContent>
+            <MenuItem href="/NotificationPage" icon={Bell}>Notifications</MenuItem>
+            <MenuItem href="/SettingsPage" icon={Cog}>Settings</MenuItem>
+          </PanelContent>
+        </div>
+
+        <div className="vs-sprinkles" ref={sprinklesRef} />
+      </div>
+    </>
   );
 };
 

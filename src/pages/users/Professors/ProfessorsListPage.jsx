@@ -5,34 +5,40 @@ import { fetchUserBookedDates } from "../../../services/user.Service";
 import {
   fetchUserBadges,
   assignUserBadge,
+  fetchAllBadges,
 } from "../../../services/badge.service";
+import { maskEmail } from "../../../components/maskEmail";
+import GlobalLoader from "../../../components/common/GlobalLoader";
+import Pagination from "../../../components/common/Pagination";
 
-// 🔹 Helper to safely display values (avoids object-as-child crash)
 const formatValueForDisplay = (value) => {
   if (value === null || value === undefined) return "N/A";
-
   const t = typeof value;
-
-  if (t === "string" || t === "number" || t === "boolean") {
-    return String(value);
-  }
-
-  if (Array.isArray(value)) {
-    return value.join(", ");
-  }
-
-  // Badge-like object
+  if (t === "string" || t === "number" || t === "boolean") return String(value);
+  if (Array.isArray(value)) return value.join(", ");
   if (value && typeof value === "object") {
     if (value.badge_name) {
       const emoji = value.badge_emoji || "";
-      const level =
-        value.level !== undefined && value.level !== null
-          ? ` (Level ${value.level})`
-          : "";
+      const level = value.level != null ? ` (Level ${value.level})` : "";
+      if (emoji && emoji.startsWith("http")) {
+        return (
+          <>
+            <img
+              src={emoji}
+              alt={value.badge_name}
+              className="badge-emoji-img"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />{" "}
+            {value.badge_name}
+            {level}
+          </>
+        );
+      }
       return `${emoji} ${value.badge_name}${level}`;
     }
   }
-
   try {
     return JSON.stringify(value);
   } catch (e) {
@@ -40,40 +46,44 @@ const formatValueForDisplay = (value) => {
   }
 };
 
-// 🔹 Grid renderer using formatter
-const renderProfessorInfoGrid = (items) => {
-  return (
-    <div className="dancer-info-grid">
-      {items.map((item, index) => (
-        <div key={index} className={`dancer-info-item ${item.status || ""}`}>
-          <div className="dancer-info-label">{item.label}</div>
-          <div className="dancer-info-value">
-            {formatValueForDisplay(item.value)}
-          </div>
+const renderProfessorInfoGrid = (items) => (
+  <div className="dancer-info-grid">
+    {items.map((item, index) => (
+      <div key={index} className={`dancer-info-item ${item.status || ""}`}>
+        <div className="dancer-info-label">{item.label}</div>
+        <div className="dancer-info-value">
+          {formatValueForDisplay(item.value)}
         </div>
-      ))}
-    </div>
+      </div>
+    ))}
+  </div>
+);
+const getMaxBadgeLevel = (allBadges, persona) => {
+  const personaBadges = (allBadges || []).filter(
+    (b) => b.user_type === persona,
   );
+  if (personaBadges.length === 0) return null;
+  return Math.max(...personaBadges.map((b) => b.level));
 };
 
 const ProfessorsListPage = () => {
   const [professors, setProfessors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({});
   const [selectedProfessor, setSelectedProfessor] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [allBadges, setAllBadges] = useState([]);
   const [calendarData, setCalendarData] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
 
-  // 🔹 Badge-related state
   const [badgeDetails, setBadgeDetails] = useState(null);
   const [loadingBadges, setLoadingBadges] = useState(false);
   const [badgeError, setBadgeError] = useState(null);
   const [savingBadge, setSavingBadge] = useState(false);
 
   const [badgeForm, setBadgeForm] = useState({
-    user_type: "instructor", // default persona for professors
+    user_type: "instructor",
     badge_level: "",
     custom_commission_rate: "",
     reason: "",
@@ -82,11 +92,26 @@ const ProfessorsListPage = () => {
   useEffect(() => {
     loadProfessors(page);
   }, [page]);
-
+  useEffect(() => {
+    fetchAllBadges().then((data) => {
+      if (data?.badges) setAllBadges(data.badges);
+    });
+  }, []);
   const loadProfessors = async (pg) => {
-    const data = await fetchProfessors(pg);
-    setProfessors(data.users || []);
-    setPagination(data.pagination || {});
+    setLoading(true);
+    try {
+      const data = await fetchProfessors(pg);
+      setProfessors(data.users || []);
+      setPagination(data.pagination || {});
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ─── Helper: check if a badge level is already assigned ───────────────────
+  const isLevelAlreadyAssigned = (persona, level) => {
+    const assignedBadges = badgeDetails?.badges_by_persona?.[persona] || [];
+    return assignedBadges.some((b) => b.level === Number(level));
   };
 
   const loadProfessorBadges = async (prof) => {
@@ -101,37 +126,27 @@ const ProfessorsListPage = () => {
         return;
       }
 
-      const ALLOWED_PERSONAS = ["dancer", "instructor", "dj", "organizer"];
+      setBadgeDetails({ ...data, user_personas: ["instructor"] });
 
-      const personasFromApi = Array.isArray(data.user_personas)
-        ? data.user_personas.filter((p) => ALLOWED_PERSONAS.includes(p))
-        : [];
-
-      const finalPersonas =
-        personasFromApi.length > 0 ? personasFromApi : ALLOWED_PERSONAS;
-
-      setBadgeDetails({
-        ...data,
-        user_personas: finalPersonas,
-      });
-
-      // For professors, default to instructor if present, else first persona
-      const defaultPersona = finalPersonas.includes("instructor")
-        ? "instructor"
-        : finalPersonas[0];
-
-      const nextForPersona =
-        data.next_badges && data.next_badges[defaultPersona];
+      const defaultPersona = "instructor";
+      const nextForPersona = data.next_badges?.[defaultPersona];
+      const assignedBadges = data.badges_by_persona?.[defaultPersona] || [];
+      const highestAssigned = assignedBadges.reduce(
+        (max, b) => (b.level > (max?.level ?? 0) ? b : max),
+        null,
+      );
 
       setBadgeForm({
-        user_type: defaultPersona,
-        badge_level:
-          nextForPersona && nextForPersona.level
-            ? String(nextForPersona.level)
+        user_type: "instructor",
+        badge_level: nextForPersona?.level
+          ? String(nextForPersona.level)
+          : highestAssigned
+            ? String(highestAssigned.level)
             : "",
-        custom_commission_rate:
-          nextForPersona && nextForPersona.commission_rate
-            ? String(nextForPersona.commission_rate)
+        custom_commission_rate: nextForPersona?.commission_rate
+          ? String(nextForPersona.commission_rate)
+          : highestAssigned
+            ? String(highestAssigned.commission_rate)
             : "",
         reason: "",
       });
@@ -152,18 +167,25 @@ const ProfessorsListPage = () => {
       return;
     }
 
+    // 🚫 Block already-assigned levels
+    if (isLevelAlreadyAssigned(badgeForm.user_type, badgeForm.badge_level)) {
+      setBadgeError(
+        `Level ${badgeForm.badge_level} is already assigned to this user. Please choose a different level.`,
+      );
+      return;
+    }
+
     const targetUserId =
       selectedProfessor.user_id != null
         ? selectedProfessor.user_id
         : selectedProfessor.id;
-
     setSavingBadge(true);
     setBadgeError(null);
 
     try {
       await assignUserBadge({
         target_user_id: targetUserId,
-        user_type: badgeForm.user_type, // e.g. "instructor"
+        user_type: badgeForm.user_type,
         badge_level: badgeForm.badge_level,
         custom_commission_rate: badgeForm.custom_commission_rate,
         reason:
@@ -172,14 +194,23 @@ const ProfessorsListPage = () => {
       });
 
       await loadProfessorBadges(selectedProfessor);
+
+      const updatedProfessorsData = await fetchProfessors(page);
+      const updatedProfessors = Array.isArray(updatedProfessorsData?.users)
+        ? updatedProfessorsData.users
+        : [];
+      const updatedProfessor = updatedProfessors.find(
+        (prof) => prof.id === selectedProfessor.id,
+      );
+      if (updatedProfessor) setSelectedProfessor(updatedProfessor);
     } catch (err) {
       console.error("Error assigning badge:", err);
-      const backendMsg =
+      setBadgeError(
         err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Failed to assign badge. Please try again.";
-      setBadgeError(backendMsg);
+          err.response?.data?.error ||
+          err.message ||
+          "Failed to assign badge. Please try again.",
+      );
     } finally {
       setSavingBadge(false);
     }
@@ -193,9 +224,11 @@ const ProfessorsListPage = () => {
     setBadgeError(null);
   };
 
+  if (loading) return <GlobalLoader text="Loading professors..." />;
+
   return (
     <div className="dancers-main-container">
-      <h2 className="dancers-page-title">👨‍🏫 All Professors</h2>
+      <h2 className="dancers-page-title">👨‍🏫 All Instructors</h2>
 
       <table className="dancers-data-table">
         <thead>
@@ -203,6 +236,7 @@ const ProfessorsListPage = () => {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Created Date</th>
             <th>Skill Level</th>
             <th>Roles</th>
             <th>Subscription Name</th>
@@ -212,11 +246,10 @@ const ProfessorsListPage = () => {
           {professors.map((prof) => (
             <tr
               key={prof.id}
+              style={{ cursor: "pointer" }}
               onClick={async () => {
                 setSelectedProfessor(prof);
                 setIsModalOpen(true);
-
-                // Calendar
                 setLoadingCalendar(true);
                 setCalendarData(null);
                 try {
@@ -228,14 +261,17 @@ const ProfessorsListPage = () => {
                 } finally {
                   setLoadingCalendar(false);
                 }
-
-                // Badges
                 loadProfessorBadges(prof);
               }}
             >
               <td>{prof.id}</td>
               <td>{prof.name}</td>
-              <td>{prof.email}</td>
+              <td>{maskEmail(prof.email)}</td>
+              <td>
+                {prof.created_at
+                  ? new Date(prof.created_at).toLocaleDateString("fr-FR")
+                  : "N/A"}
+              </td>
               <td>{prof.skill_level}</td>
               <td>{prof.roles?.join(", ")}</td>
               <td>{prof.active_subscription?.subscription_name || "-"}</td>
@@ -244,27 +280,12 @@ const ProfessorsListPage = () => {
         </tbody>
       </table>
 
-      <div className="dancers-pagination-controls">
-        <button
-          className="dancers-pagination-btn"
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          Previous
-        </button>
-
-        <span className="dancers-page-indicator">
-          Page {pagination.page} of {pagination.totalPages}
-        </span>
-
-        <button
-          className="dancers-pagination-btn"
-          disabled={page === pagination.totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page || page}
+        totalPages={pagination.totalPages || 1}
+        onPageChange={setPage}
+        isLoading={loading}
+      />
 
       {isModalOpen && selectedProfessor && (
         <div className="dancer-modal-overlay" onClick={closeModal}>
@@ -272,25 +293,25 @@ const ProfessorsListPage = () => {
             className="dancer-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="dancer-modal-header">
-              <h3>👨‍🏫 Professor Profile Details</h3>
+              <h3>👨‍🏫 Instructor Profile Details</h3>
               <button className="dancer-modal-close-x" onClick={closeModal}>
                 ✕
               </button>
             </div>
 
-            {/* Body */}
             <div className="dancer-modal-body">
-              {/* Left column */}
+              {/* Left Column */}
               <div className="dancer-modal-column dancer-modal-left">
-                {/* Basic Information */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">👤 Basic Information</h4>
                   {renderProfessorInfoGrid([
                     { label: "ID", value: selectedProfessor.id },
                     { label: "Name", value: selectedProfessor.name || "N/A" },
-                    { label: "Email", value: selectedProfessor.email },
+                    {
+                      label: "Email",
+                      value: maskEmail(selectedProfessor.email),
+                    },
                     {
                       label: "Location",
                       value: selectedProfessor.location || "N/A",
@@ -310,7 +331,7 @@ const ProfessorsListPage = () => {
                     {
                       label: "Created At",
                       value: new Date(
-                        selectedProfessor.created_at
+                        selectedProfessor.created_at,
                       ).toLocaleString(),
                     },
                     {
@@ -320,7 +341,6 @@ const ProfessorsListPage = () => {
                   ])}
                 </div>
 
-                {/* Active Subscription */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     💳 Active Subscription
@@ -357,13 +377,13 @@ const ProfessorsListPage = () => {
                         {
                           label: "Start Date",
                           value: new Date(
-                            selectedProfessor.active_subscription.start_date
+                            selectedProfessor.active_subscription.start_date,
                           ).toLocaleString(),
                         },
                         {
                           label: "End Date",
                           value: new Date(
-                            selectedProfessor.active_subscription.end_date
+                            selectedProfessor.active_subscription.end_date,
                           ).toLocaleString(),
                         },
                         {
@@ -381,13 +401,11 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* Subscription History */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📈 Subscription History
                   </h4>
-                  {selectedProfessor.subscription_history &&
-                  selectedProfessor.subscription_history.length > 0 ? (
+                  {selectedProfessor.subscription_history?.length > 0 ? (
                     <div className="dancer-history-container">
                       {selectedProfessor.subscription_history.map(
                         (sub, idx) => (
@@ -400,11 +418,7 @@ const ProfessorsListPage = () => {
                                 {sub.subscription_name}
                               </span>
                               <span
-                                className={`dancer-history-status ${
-                                  sub.is_active
-                                    ? "dancer-status-active"
-                                    : "dancer-status-inactive"
-                                }`}
+                                className={`dancer-history-status ${sub.is_active ? "dancer-status-active" : "dancer-status-inactive"}`}
                               >
                                 {sub.payment_status}
                               </span>
@@ -423,7 +437,7 @@ const ProfessorsListPage = () => {
                               </div>
                             </div>
                           </div>
-                        )
+                        ),
                       )}
                     </div>
                   ) : (
@@ -434,9 +448,8 @@ const ProfessorsListPage = () => {
                 </div>
               </div>
 
-              {/* Right column */}
+              {/* Right Column */}
               <div className="dancer-modal-column dancer-modal-right">
-                {/* Calendar */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📅 Booked Dates & Slots
@@ -445,7 +458,7 @@ const ProfessorsListPage = () => {
                     <div className="dancer-loading-state">
                       Loading calendar...
                     </div>
-                  ) : calendarData && calendarData.booked_dates?.length > 0 ? (
+                  ) : calendarData?.booked_dates?.length > 0 ? (
                     <div className="dancer-calendar-list">
                       {calendarData.booked_dates.map((dateEntry) => (
                         <div
@@ -484,14 +497,11 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* Professor Specific Information */}
                 <div className="dancer-modal-section">
-                  <h4 className="dancer-section-title">🎓 Professor Details</h4>
+                  <h4 className="dancer-section-title">
+                    🎓 Instructor Details
+                  </h4>
                   {renderProfessorInfoGrid([
-                    {
-                      label: "Professor ID",
-                      value: selectedProfessor.active_subscription?.id || "N/A",
-                    },
                     {
                       label: "Stripe Subscription ID",
                       value:
@@ -519,38 +529,82 @@ const ProfessorsListPage = () => {
                   ])}
                 </div>
 
-                {/* Current Badges (from list object) */}
+                {/* ─── Current Badges: read from badgeDetails API ─── */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">🏆 Current Badges</h4>
-                  {selectedProfessor.current_badges &&
-                  Object.values(selectedProfessor.current_badges).some(
-                    (badge) => badge !== null
-                  ) ? (
-                    <div className="dancer-badges-grid">
-                      {renderProfessorInfoGrid([
-                        {
-                          label: "Dancer Badge",
-                          value:
-                            selectedProfessor.current_badges.dancer || "None",
-                        },
-                        {
-                          label: "Instructor Badge",
-                          value:
-                            selectedProfessor.current_badges.instructor ||
-                            "None",
-                        },
-                        {
-                          label: "DJ Badge",
-                          value: selectedProfessor.current_badges.dj || "None",
-                        },
-                        {
-                          label: "Organizer Badge",
-                          value:
-                            selectedProfessor.current_badges.organizer ||
-                            "None",
-                        },
-                      ])}
+                  {loadingBadges ? (
+                    <div className="dancer-loading-state">
+                      Loading badges...
                     </div>
+                  ) : badgeDetails?.badges_by_persona?.instructor?.length >
+                    0 ? (
+                    (() => {
+                      const currentBadge =
+                        badgeDetails.badges_by_persona.instructor.reduce(
+                          (max, b) => (b.level > (max?.level ?? 0) ? b : max),
+                          null,
+                        );
+                      return (
+                        <div
+                          className="dancer-info-item"
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 6,
+                          }}
+                        >
+                          <div className="dancer-info-label">
+                            Instructor — Current Badge
+                          </div>
+                          <div
+                            className="dancer-info-value"
+                            
+                          >
+                            {currentBadge.badge_emoji?.startsWith("http") ? (
+                              <img
+                                src={currentBadge.badge_emoji}
+                                alt={currentBadge.badge_name}
+                                style={{
+                                  width: 32,
+                                  height: 32,
+                                  objectFit: "contain",
+                                }}
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <span style={{ fontSize: 24 }}>
+                                {currentBadge.badge_emoji}
+                              </span>
+                            )}
+                            <div>
+                              <div style={{ fontWeight: 600, fontSize: 14 }}>
+                                {currentBadge.badge_name}
+                              </div>
+                              <div style={{ fontSize: 12, color: "#6b7280" }}>
+                                Level {currentBadge.level} · Commission:{" "}
+                                {currentBadge.commission_rate}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: "#9ca3af",
+                                  marginTop: 2,
+                                }}
+                              >
+                                Assigned:{" "}
+                                {currentBadge.assigned_at
+                                  ? new Date(
+                                      currentBadge.assigned_at,
+                                    ).toLocaleDateString()
+                                  : "N/A"}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
                   ) : (
                     <div className="dancer-empty-state">
                       No Badges Available
@@ -558,7 +612,6 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* Subscription Summary */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     📋 Subscription Summary
@@ -594,7 +647,8 @@ const ProfessorsListPage = () => {
                           value: selectedProfessor.subscription_summary
                             .latest_subscription_date
                             ? new Date(
-                                selectedProfessor.subscription_summary.latest_subscription_date
+                                selectedProfessor.subscription_summary
+                                  .latest_subscription_date,
                               ).toLocaleString()
                             : "N/A",
                         },
@@ -607,7 +661,7 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
 
-                {/* 🏅 Badge Details (Admin) */}
+                {/* ─── Badge Details (Admin) ─── */}
                 <div className="dancer-modal-section">
                   <h4 className="dancer-section-title">
                     🏅 Badge Details (Admin)
@@ -618,7 +672,6 @@ const ProfessorsListPage = () => {
                       Loading badge details...
                     </div>
                   )}
-
                   {badgeError && (
                     <div className="dancer-error-state">{badgeError}</div>
                   )}
@@ -627,41 +680,99 @@ const ProfessorsListPage = () => {
                     <>
                       <div className="dancer-badge-personas">
                         <strong>User Personas:</strong>{" "}
-                        {badgeDetails.user_personas &&
-                        badgeDetails.user_personas.length > 0
+                        {badgeDetails.user_personas?.length > 0
                           ? badgeDetails.user_personas.join(", ")
                           : "N/A"}
                       </div>
 
-                      {badgeDetails.next_badges && (
-                        <div className="dancer-next-badges">
-                          {Object.entries(badgeDetails.next_badges).map(
-                            ([persona, badge]) =>
-                              badge && (
-                                <div
-                                  key={persona}
-                                  className="dancer-next-badge-card"
-                                >
-                                  <div className="dancer-next-badge-header">
-                                    <span className="dancer-next-badge-name">
-                                      {badge.badge_emoji} {badge.badge_name}
-                                    </span>
-                                    <span className="dancer-next-badge-persona">
-                                      Persona: {persona}
-                                    </span>
-                                  </div>
-                                  <div className="dancer-next-badge-body">
-                                    <div>Level: {badge.level}</div>
-                                    <div>
-                                      Commission rate: {badge.commission_rate}
-                                    </div>
-                                    <div>Description: {badge.description}</div>
-                                  </div>
+                      {/* Next badge OR max level reached */}
+                      {(() => {
+                        const persona = "instructor";
+                        const nextBadge = badgeDetails.next_badges?.[persona];
+                        const assignedBadges =
+                          badgeDetails.badges_by_persona?.[persona] || [];
+                        const highestAssigned = assignedBadges.reduce(
+                          (max, b) => (b.level > (max?.level ?? 0) ? b : max),
+                          null,
+                        );
+                        const maxLevel = getMaxBadgeLevel(allBadges, persona);
+                        const isMaxReached =
+                          !nextBadge &&
+                          maxLevel !== null &&
+                          highestAssigned?.level >= maxLevel;
+
+                        if (nextBadge) {
+                          return (
+                            <div className="dancer-next-badge-card">
+                              <div className="dancer-next-badge-header">
+                                <span className="dancer-next-badge-name">
+                                  {nextBadge.badge_emoji?.startsWith("http") ? (
+                                    <img
+                                      src={nextBadge.badge_emoji}
+                                      alt={nextBadge.badge_name}
+                                      className="badge-emoji-img"
+                                      onError={(e) => {
+                                        e.target.style.display = "none";
+                                      }}
+                                    />
+                                  ) : (
+                                    nextBadge.badge_emoji
+                                  )}{" "}
+                                  {nextBadge.badge_name}
+                                </span>
+                                <span className="dancer-next-badge-persona">
+                                  Next for: {persona}
+                                </span>
+                              </div>
+                              <div className="dancer-next-badge-body">
+                                <div>Level: {nextBadge.level}</div>
+                                <div>
+                                  Commission rate: {nextBadge.commission_rate}
                                 </div>
-                              )
-                          )}
-                        </div>
-                      )}
+                                <div>Description: {nextBadge.description}</div>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (isMaxReached) {
+                          return (
+                            <div
+                              style={{
+                                background:
+                                  "linear-gradient(135deg, #f0fdf4, #dcfce7)",
+                                border: "1px solid #86efac",
+                                borderRadius: 8,
+                                padding: "12px 16px",
+                                marginBottom: 8,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <span style={{ fontSize: 20 }}>🏆</span>
+                              <div>
+                                <strong style={{ color: "#16a34a" }}>
+                                  Max Badge Level Reached!
+                                </strong>
+                                <div
+                                  style={{
+                                    fontSize: 12,
+                                    color: "#15803d",
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  {highestAssigned.badge_name} · Level{" "}
+                                  {highestAssigned.level} · Commission:{" "}
+                                  {highestAssigned.commission_rate}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return null;
+                      })()}
 
                       <form
                         className="dancer-badge-form"
@@ -670,22 +781,8 @@ const ProfessorsListPage = () => {
                         <div className="dancer-badge-form-row">
                           <label>
                             Persona / User Type
-                            <select
-                              value={badgeForm.user_type}
-                              onChange={(e) =>
-                                setBadgeForm((prev) => ({
-                                  ...prev,
-                                  user_type: e.target.value,
-                                }))
-                              }
-                            >
-                              <option value="">Select persona</option>
-                              {badgeDetails.user_personas &&
-                                badgeDetails.user_personas.map((p) => (
-                                  <option key={p} value={p}>
-                                    {p}
-                                  </option>
-                                ))}
+                            <select value="instructor" disabled>
+                              <option value="instructor">instructor</option>
                             </select>
                           </label>
                         </div>
@@ -696,15 +793,56 @@ const ProfessorsListPage = () => {
                             <input
                               type="number"
                               min="1"
+                              max={getMaxBadgeLevel(allBadges, "instructor") ?? undefined}
                               value={badgeForm.badge_level}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                setBadgeError(null);
                                 setBadgeForm((prev) => ({
                                   ...prev,
                                   badge_level: e.target.value,
-                                }))
-                              }
+                                }));
+                              }}
+                              style={{
+                                borderColor:
+                                  badgeForm.badge_level &&
+                                  isLevelAlreadyAssigned(
+                                    "instructor",
+                                    badgeForm.badge_level,
+                                  )
+                                    ? "#ef4444"
+                                    : undefined,
+                              }}
                             />
                           </label>
+                          {badgeForm.badge_level &&
+                            isLevelAlreadyAssigned(
+                              "instructor",
+                              badgeForm.badge_level,
+                            ) && (
+                              <div
+                                style={{
+                                  marginTop: 6,
+                                  padding: "6px 10px",
+                                  background: "#fef2f2",
+                                  border: "1px solid #fca5a5",
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  color: "#dc2626",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 6,
+                                }}
+                              >
+                                ⚠️ Level {badgeForm.badge_level} (
+                                {
+                                  badgeDetails?.badges_by_persona?.instructor?.find(
+                                    (b) =>
+                                      b.level === Number(badgeForm.badge_level),
+                                  )?.badge_name
+                                }
+                                ) is already assigned to this user.
+                              </div>
+                            )}
                         </div>
 
                         <div className="dancer-badge-form-row">
@@ -744,7 +882,31 @@ const ProfessorsListPage = () => {
                         <button
                           type="submit"
                           className="dancer-badge-save-btn"
-                          disabled={savingBadge}
+                          disabled={
+                            savingBadge ||
+                            !badgeForm.badge_level ||
+                            isLevelAlreadyAssigned(
+                              "instructor",
+                              badgeForm.badge_level,
+                            )
+                          }
+                          style={{
+                            opacity:
+                              savingBadge ||
+                              !badgeForm.badge_level ||
+                              isLevelAlreadyAssigned(
+                                "instructor",
+                                badgeForm.badge_level,
+                              )
+                                ? 0.5
+                                : 1,
+                            cursor: isLevelAlreadyAssigned(
+                              "instructor",
+                              badgeForm.badge_level,
+                            )
+                              ? "not-allowed"
+                              : "pointer",
+                          }}
                         >
                           {savingBadge ? "Saving..." : "Assign / Update Badge"}
                         </button>
@@ -753,13 +915,6 @@ const ProfessorsListPage = () => {
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* Footer */}
-            <div className="dancer-modal-footer">
-              <button className="dancer-modal-close-btn" onClick={closeModal}>
-                Close
-              </button>
             </div>
           </div>
         </div>

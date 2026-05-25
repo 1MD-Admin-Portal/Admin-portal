@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Play,
   Eye,
@@ -11,21 +11,18 @@ import {
   Clock,
   BarChart3,
   UserMinus,
-  MessageSquare,
   ThumbsUp,
   Upload,
   Calendar,
   Award,
   Plus,
   Search,
-  Filter,
   X,
   AlertCircle,
-  Download,
-  Settings,
+  Flag,
+  MessageSquare,
 } from "lucide-react";
 
-// Import your services
 import {
   createChallengeService,
   getAllChallengesService,
@@ -43,15 +40,274 @@ import {
   removeParticipantService,
   getChallengeAnalyticsService,
   deleteCommentService,
+  getFlaggedCommentsService,
 } from "../../../services/challenge.service";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Pagination from "../../../components/common/Pagination";
 import { uploadMediaFile } from "../../../services/upload.service";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { getDanceStyles } from "../../../services/masterData.service";
 import "./ChallengePage.css";
 
+// ─── Dance Styles Multi-Select ────────────────────────────────────────────────
+const DanceStylesSelect = ({ selected, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const toggle = (name) =>
+    onChange(
+      selected.includes(name)
+        ? selected.filter((s) => s !== name)
+        : [...selected, name],
+    );
+  const filtered = options.filter((d) =>
+    (d?.name || "").toLowerCase().includes((query || "").toLowerCase().trim()),
+  );
+
+  return (
+    <div className="ds-wrap" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`ds-trigger ${open ? "ds-trigger--open" : ""}`}
+      >
+        <div className="ds-selected-list">
+          {selected.length ? (
+            selected.map((name) => (
+              <span key={name} className="ds-chip">
+                {name}
+                <span
+                  className="ds-chip__remove"
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange(selected.filter((s) => s !== name));
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onChange(selected.filter((s) => s !== name));
+                    }
+                  }}
+                >
+                  <X size={11} />
+                </span>
+              </span>
+            ))
+          ) : (
+            <span className="ds-placeholder">Select dance styles</span>
+          )}
+        </div>
+        <span className="ds-arrow">▾</span>
+      </button>
+
+      {open && (
+        <div className="ds-dropdown">
+          <div className="ds-search-wrap">
+            <input
+              type="text"
+              className="ds-search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search styles..."
+              autoFocus
+            />
+          </div>
+          <div className="ds-options">
+            {filtered.map((d) => {
+              const name = d?.name || "";
+              const checked = selected.includes(name);
+              return (
+                <label
+                  key={d.id ?? name}
+                  className={`ds-option ${checked ? "ds-option--checked" : ""}`}
+                  onClick={() => toggle(name)}
+                >
+                  <div className="ds-option__left">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {}}
+                      className="ds-checkbox"
+                    />
+                    {name}
+                  </div>
+                  {checked && <span className="ds-check">✓</span>}
+                </label>
+              );
+            })}
+            {!options.length && (
+              <div className="ds-empty">No dance styles available.</div>
+            )}
+            {!!options.length && !filtered.length && (
+              <div className="ds-empty">No matches.</div>
+            )}
+          </div>
+          <div className="ds-footer">
+            <button
+              type="button"
+              className="ds-clear"
+              onClick={() => onChange([])}
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              className="ds-done"
+              onClick={() => setOpen(false)}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Modal Shell ──────────────────────────────────────────────────────────────
+const ModalShell = ({
+  title,
+  onClose,
+  maxWidth = "600px",
+  children,
+  footer,
+}) => (
+  <div className="modal-overlay-custom" onClick={onClose}>
+    <div
+      className="modal-shell"
+      style={{ maxWidth }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="modal-header-custom">
+        <h5 className="modal-title-custom">{title}</h5>
+        <button className="modal-close-custom" onClick={onClose}>
+          <X size={16} />
+        </button>
+      </div>
+      <div className="modal-body-custom">{children}</div>
+      {footer && <div className="modal-footer-custom">{footer}</div>}
+    </div>
+  </div>
+);
+
+// ─── Alert Banner ─────────────────────────────────────────────────────────────
+const AlertBanner = ({ type, message, onClose }) => (
+  <div className={`alert-banner alert-banner--${type}`}>
+    <AlertCircle size={18} className="alert-banner__icon" />
+    <span className="alert-banner__msg">{message}</span>
+    <button className="alert-banner__close" onClick={onClose}>
+      <X size={14} />
+    </button>
+  </div>
+);
+
+// ─── Form Field Wrapper ───────────────────────────────────────────────────────
+const Field = ({ label, children }) => (
+  <div className="cp-form-group">
+    <label className="cp-form-label">{label}</label>
+    {children}
+  </div>
+);
+
+// ─── Severity Badge ───────────────────────────────────────────────────────────
+const SeverityBadge = ({ count }) => {
+  const level = count >= 5 ? "high" : count >= 2 ? "medium" : "low";
+  return (
+    <span className={`severity-badge severity-badge--${level}`}>
+      {level} · {count} {count === 1 ? "report" : "reports"}
+    </span>
+  );
+};
+
+// ─── Confirm Dialog ───────────────────────────────────────────────────────────
+const ConfirmDialog = ({ message, onConfirm, onClose }) => (
+  <div
+    className="modal-overlay-custom"
+    style={{ zIndex: 2000 }}
+    onClick={onClose}
+  >
+    <div
+      className="modal-shell"
+      style={{ maxWidth: "420px" }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="modal-header-custom"
+        style={{ background: "linear-gradient(135deg,#ef4444,#dc2626)" }}
+      >
+        <h5 className="modal-title-custom">Confirm Action</h5>
+        <button className="modal-close-custom" onClick={onClose}>
+          <X size={16} />
+        </button>
+      </div>
+      <div className="modal-body-custom">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+            padding: "0.5rem 0",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: "50%",
+              background: "rgba(239,68,68,0.1)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Trash2 size={24} color="#ef4444" />
+          </div>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "0.9rem",
+              color: "#374151",
+              lineHeight: 1.6,
+            }}
+          >
+            {message}
+          </p>
+        </div>
+      </div>
+      <div className="modal-footer-custom">
+        {/* <button className="btn-cancel" onClick={onClose}>Cancel</button> */}
+        <button
+          className="reject-btn-large"
+          style={{ flex: "none", minWidth: "auto" }}
+          onClick={() => {
+            onConfirm();
+            onClose();
+          }}
+        >
+          <Trash2 size={14} /> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 const ChallengePage = () => {
-  // State for challenges
   const [challenges, setChallenges] = useState([]);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [pagination, setPagination] = useState({});
@@ -62,7 +318,6 @@ const ChallengePage = () => {
   const [activeTab, setActiveTab] = useState("challenges");
   const [uploading, setUploading] = useState(false);
 
-  // Modal states
   const [challengeDetailsModal, setChallengeDetailsModal] = useState(false);
   const [createChallengeModal, setCreateChallengeModal] = useState(false);
   const [editChallengeModal, setEditChallengeModal] = useState(false);
@@ -71,20 +326,28 @@ const ChallengePage = () => {
   const [analyticsModal, setAnalyticsModal] = useState(false);
   const [submissionDetailModal, setSubmissionDetailModal] = useState(false);
 
-  // Data states
   const [submissions, setSubmissions] = useState([]);
   const [pendingSubmissions, setPendingSubmissions] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
 
-  // Form states
+  // const [flaggedComments,        setFlaggedComments]        = useState([]);
+  const [flaggedPage, setFlaggedPage] = useState(1);
+  const [flaggedPagination, setFlaggedPagination] = useState({});
+  const [flaggedSearch, setFlaggedSearch] = useState("");
+  const [flaggedLoading, setFlaggedLoading] = useState(false);
+  // const [selectedFlaggedComment, setSelectedFlaggedComment] = useState(null);
+  const [flaggedDetailModal, setFlaggedDetailModal] = useState(false);
+
+  const [danceStyleOptions, setDanceStyleOptions] = useState([]);
+
   const [newChallenge, setNewChallenge] = useState({
     title: "",
     challenger_type: "public",
     description: "",
     image_url: "",
-    dance_style: "",
+    dance_style: [],
     dance_level: "",
     start_date: "",
     end_date: "",
@@ -97,29 +360,58 @@ const ChallengePage = () => {
   const [tasks, setTasks] = useState([
     { task_type: "watch_video", task_title: "", video_url: "" },
   ]);
-
   const [editChallenge, setEditChallenge] = useState({});
   const [feedbackText, setFeedbackText] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    message: "",
+    onConfirm: null,
+  });
 
-  // Load initial data
+  const showConfirm = (message, onConfirm) =>
+    setConfirmDialog({ open: true, message, onConfirm });
+  const closeConfirm = () =>
+    setConfirmDialog({ open: false, message: "", onConfirm: null });
+
+  // Load dance styles
   useEffect(() => {
-    fetchChallenges();
-    if (activeTab === "pending-submissions") {
-      fetchPendingSubmissions();
+    getDanceStyles()
+      .then((res) => setDanceStyleOptions(Array.isArray(res) ? res : []))
+      .catch((err) => console.error("Failed to load dance styles", err));
+  }, []);
+
+  // Auto-dismiss alerts
+  useEffect(() => {
+    if (error) {
+      const t = setTimeout(() => setError(""), 3000);
+      return () => clearTimeout(t);
     }
+  }, [error]);
+  useEffect(() => {
+    if (success) {
+      const t = setTimeout(() => setSuccess(""), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [success]);
+
+  // Tab data fetch
+  useEffect(() => {
+    if (activeTab === "challenges") fetchChallenges();
+    if (activeTab === "pending-submissions") fetchPendingSubmissions();
+    // if (activeTab === "flagged-comments")    fetchFlaggedComments();
   }, [page, activeTab]);
 
+  // ── Fetch functions ──────────────────────────────────────────────────────────
   const fetchChallenges = async () => {
     try {
       setLoading(true);
-      const response = await getAllChallengesService(page, 20);
-      setChallenges(response.challenges || []);
-      setPagination(response.pagination || {});
-    } catch (error) {
+      const r = await getAllChallengesService(page, 20);
+      setChallenges(r.challenges || []);
+      setPagination(r.pagination || {});
+    } catch {
       setError("Failed to fetch challenges");
-      console.error("Error fetching challenges:", error);
     } finally {
       setLoading(false);
     }
@@ -128,32 +420,50 @@ const ChallengePage = () => {
   const fetchPendingSubmissions = async () => {
     try {
       setLoading(true);
-      const response = await getPendingSubmissionsService(page, 20);
-      setPendingSubmissions(response.submissions || []);
-    } catch (error) {
+      const r = await getPendingSubmissionsService(page, 20);
+      setPendingSubmissions(r.submissions || []);
+    } catch {
       setError("Failed to fetch pending submissions");
     } finally {
       setLoading(false);
     }
   };
 
+  // const fetchFlaggedComments = async () => {
+  //   try {
+  //     setFlaggedLoading(true);
+  //     const r = await getFlaggedCommentsService(flaggedPage, 20);
+  //     setFlaggedComments(r.comments || r.data || []);
+  //     setFlaggedPagination(r.pagination || {});
+  //   } catch { setError("Failed to fetch flagged comments"); } finally { setFlaggedLoading(false); }
+  // };
+
+  // ── Open modals ──────────────────────────────────────────────────────────────
   const openChallengeDetails = async (challenge) => {
     try {
-      const response = await getChallengeDetailsService(challenge.id);
-      setSelectedChallenge(response || challenge);
+      const r = await getChallengeDetailsService(challenge.id);
+      setSelectedChallenge(r || challenge);
       setChallengeDetailsModal(true);
-    } catch (error) {
+    } catch {
       setError("Failed to fetch challenge details");
     }
   };
 
+
+  const toLocalDateString = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
   const openSubmissions = async (challenge) => {
     try {
       setSelectedChallenge(challenge);
-      const response = await getChallengeSubmissionsService(challenge.id);
-      setSubmissions(response.submissions || []);
+      const r = await getChallengeSubmissionsService(challenge.id);
+      setSubmissions(r.submissions || []);
       setSubmissionsModal(true);
-    } catch (error) {
+    } catch {
       setError("Failed to fetch submissions");
     }
   };
@@ -161,10 +471,10 @@ const ChallengePage = () => {
   const openParticipants = async (challenge) => {
     try {
       setSelectedChallenge(challenge);
-      const response = await getChallengeParticipantsService(challenge.id);
-      setParticipants(response.participants || []);
+      const r = await getChallengeParticipantsService(challenge.id);
+      setParticipants(r.participants || []);
       setParticipantsModal(true);
-    } catch (error) {
+    } catch {
       setError("Failed to fetch participants");
     }
   };
@@ -172,141 +482,159 @@ const ChallengePage = () => {
   const openAnalytics = async (challenge) => {
     try {
       setSelectedChallenge(challenge);
-      const response = await getChallengeAnalyticsService(challenge.id);
-      setAnalytics(response);
+      const r = await getChallengeAnalyticsService(challenge.id);
+      setAnalytics(r);
       setAnalyticsModal(true);
-    } catch (error) {
+    } catch {
       setError("Failed to fetch analytics");
     }
   };
 
   const openSubmissionDetail = async (submission) => {
     try {
-      const response = await getSubmissionDetailsService(submission.id);
-      setSelectedSubmission(response || submission);
+      const r = await getSubmissionDetailsService(submission.id);
+      setSelectedSubmission(r?.submission || r?.data || r || submission);
       setSubmissionDetailModal(true);
-    } catch (error) {
+    } catch {
       setError("Failed to fetch submission details");
     }
   };
 
-  const handleApproveSubmission = async (submissionId) => {
+  // const openFlaggedDetail = (comment) => { setSelectedFlaggedComment(comment); setFlaggedDetailModal(true); };
+
+  // ── Actions ──────────────────────────────────────────────────────────────────
+  const handleApproveSubmission = async (id) => {
     try {
-      await approveSubmissionService(submissionId, feedbackText);
-      setSuccess("Submission approved successfully");
+      await approveSubmissionService(id, feedbackText);
+      setSuccess("Submission approved");
       setFeedbackText("");
       setSubmissionDetailModal(false);
       fetchPendingSubmissions();
-    } catch (error) {
+    } catch {
       setError("Failed to approve submission");
     }
   };
 
-  const handleRejectSubmission = async (submissionId) => {
+  const handleRejectSubmission = async (id) => {
     try {
-      await rejectSubmissionService(submissionId, feedbackText);
+      await rejectSubmissionService(id, feedbackText);
       setSuccess("Submission rejected");
       setFeedbackText("");
       setSubmissionDetailModal(false);
       fetchPendingSubmissions();
-    } catch (error) {
+    } catch {
       setError("Failed to reject submission");
     }
   };
 
-  const handleDeleteSubmission = async (submissionId) => {
-    if (window.confirm("Are you sure you want to delete this submission?")) {
-      try {
-        await deleteSubmissionService(submissionId);
-        setSuccess("Submission deleted successfully");
-        setSubmissionDetailModal(false);
-        fetchPendingSubmissions();
-      } catch (error) {
-        setError("Failed to delete submission");
-      }
-    }
+  const handleDeleteSubmission = (id) => {
+    showConfirm(
+      "Delete this submission? This action cannot be undone.",
+      async () => {
+        try {
+          await deleteSubmissionService(id);
+          setSubmissions((prev) => prev.filter((s) => s.id !== id));
+          setSuccess("Submission deleted");
+          setSubmissionDetailModal(false);
+          fetchPendingSubmissions();
+        } catch {
+          setError("Failed to delete submission");
+        }
+      },
+    );
   };
 
-  const handleRemoveParticipant = async (challengeId, userId) => {
-    if (window.confirm("Are you sure you want to remove this participant?")) {
+  const handleRemoveParticipant = (challengeId, userId) => {
+    showConfirm("Remove this participant from the challenge?", async () => {
       try {
         await removeParticipantService(challengeId, userId);
-        setSuccess("Participant removed successfully");
+        setSuccess("Participant removed");
         openParticipants(selectedChallenge);
-      } catch (error) {
+      } catch {
         setError("Failed to remove participant");
       }
-    }
+    });
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
-      try {
-        await deleteCommentService(commentId);
-        setSuccess("Comment deleted successfully");
-        // Refresh the submission details if needed
-        if (selectedSubmission) {
-          openSubmissionDetail(selectedSubmission);
+  const handleDeleteComment = (id) => {
+    showConfirm(
+      "Delete this comment? This action cannot be undone.",
+      async () => {
+        try {
+          await deleteCommentService(id);
+          setSuccess("Comment deleted");
+          if (selectedSubmission) openSubmissionDetail(selectedSubmission);
+        } catch {
+          setError("Failed to delete comment");
         }
-      } catch (error) {
-        setError("Failed to delete comment");
-      }
-    }
+      },
+    );
   };
 
-  // Tasks management functions
-  const addTask = () => {
+  // const handleDeleteFlaggedComment = (id) => {
+  //   showConfirm("Permanently delete this flagged comment?", async () => {
+  //     try { await deleteCommentService(id); setSuccess("Flagged comment deleted"); setFlaggedDetailModal(false); setSelectedFlaggedComment(null); fetchFlaggedComments(); }
+  //     catch { setError("Failed to delete flagged comment"); }
+  //   });
+  // };
+
+  const addTask = () =>
     setTasks([
       ...tasks,
       { task_type: "watch_video", task_title: "", video_url: "" },
     ]);
-  };
-
-  const removeTask = (index) => {
+  const removeTask = (i) => {
     if (tasks.length > 1) {
-      const newTasks = [...tasks];
-      newTasks.splice(index, 1);
-      setTasks(newTasks);
+      const t = [...tasks];
+      t.splice(i, 1);
+      setTasks(t);
     }
   };
-
-  const updateTask = (index, field, value) => {
-    const newTasks = [...tasks];
-    newTasks[index][field] = value;
-    setTasks(newTasks);
+  const updateTask = (i, field, val) => {
+    const t = [...tasks];
+    t[i][field] = val;
+    setTasks(t);
   };
 
-  // File upload handler
   const handleFileUpload = async (event, fieldName, taskIndex = null) => {
     const file = event.target.files[0];
     if (!file) return;
-
     setUploading(true);
     try {
-      const fileUrl = await uploadMediaFile(file);
-
-      if (fieldName === "image_url") {
-        setNewChallenge({ ...newChallenge, image_url: fileUrl });
-      } else if (fieldName === "video_url" && taskIndex !== null) {
-        updateTask(taskIndex, "video_url", fileUrl);
-      }
-
+      const url = await uploadMediaFile(file);
+      if (fieldName === "image_url")
+        setNewChallenge((prev) => ({ ...prev, image_url: url }));
+      else if (fieldName === "video_url" && taskIndex !== null)
+        updateTask(taskIndex, "video_url", url);
       setSuccess("File uploaded successfully");
-    } catch (error) {
+    } catch {
       setError("Failed to upload file");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleCreateChallenge = async () => {
-    try {
-      const challengeData = {
-        ...newChallenge,
-        tasks: tasks.filter((task) => task.task_title.trim() !== ""),
-      };
+  
 
-      await createChallengeService(challengeData);
+  const handleCreateChallenge = async () => {
+  // ── Client-side validation ──
+  if (!newChallenge.title.trim()) {
+    setError("Title is required.");
+    return;
+  }
+  if (!newChallenge.description.trim()) {
+    setError("Description is required.");
+    return;
+  }
+
+  try {
+    await createChallengeService({
+        ...newChallenge,
+        dance_style: Array.isArray(newChallenge.dance_style)
+          ? newChallenge.dance_style.join(", ")
+          : newChallenge.dance_style,
+        tasks: tasks.filter((t) => t.task_title.trim() !== ""),
+      });
       setSuccess("Challenge created successfully");
       setCreateChallengeModal(false);
       setNewChallenge({
@@ -314,7 +642,7 @@ const ChallengePage = () => {
         challenger_type: "public",
         description: "",
         image_url: "",
-        dance_style: "",
+        dance_style: [],
         dance_level: "",
         start_date: "",
         end_date: "",
@@ -325,18 +653,30 @@ const ChallengePage = () => {
       });
       setTasks([{ task_type: "watch_video", task_title: "", video_url: "" }]);
       fetchChallenges();
-    } catch (error) {
+    } catch {
       setError("Failed to create challenge");
     }
   };
 
   const handleUpdateChallenge = async () => {
     try {
-      await updateChallengeService(editChallenge.id, editChallenge);
-      setSuccess("Challenge updated successfully");
+      const payload = {
+        title: editChallenge.title,
+        description: editChallenge.description,
+        dance_style: Array.isArray(editChallenge.dance_style)
+          ? editChallenge.dance_style.join(", ")
+          : editChallenge.dance_style,
+        dance_level: editChallenge.dance_level,
+        prize_details: editChallenge.prize_details,
+        max_participants: editChallenge.max_participants,
+        image_url: editChallenge.image_url,
+        is_trending: editChallenge.is_trending,
+      };
+      await updateChallengeService(editChallenge.id, payload);
+      setSuccess("Challenge updated");
       setEditChallengeModal(false);
       fetchChallenges();
-    } catch (error) {
+    } catch {
       setError("Failed to update challenge");
     }
   };
@@ -344,1876 +684,1488 @@ const ChallengePage = () => {
   const handleStatusChange = async (challengeId, newStatus) => {
     try {
       await updateChallengeStatusService(challengeId, newStatus);
-      setSuccess("Challenge status updated");
+      setSuccess("Status updated");
       fetchChallenges();
-    } catch (error) {
-      setError("Failed to update challenge status");
+    } catch {
+      setError("Failed to update status");
     }
   };
 
-  const handleDeleteChallenge = async (challengeId) => {
-    if (window.confirm("Are you sure you want to delete this challenge?")) {
-      try {
-        await deleteChallengeService(challengeId);
-        setSuccess("Challenge deleted successfully");
-        fetchChallenges();
-      } catch (error) {
-        setError("Failed to delete challenge");
-      }
-    }
+  const handleDeleteChallenge = (id) => {
+    showConfirm(
+      "Delete this challenge? This action cannot be undone.",
+      async () => {
+        try {
+          await deleteChallengeService(id);
+          setSuccess("Challenge deleted");
+          fetchChallenges();
+        } catch {
+          setError("Failed to delete challenge");
+        }
+      },
+    );
   };
 
-  const filteredChallenges = challenges.filter((challenge) => {
-    const matchSearch = challenge.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchStatus = statusFilter ? challenge.status === statusFilter : true;
+  const openEditModal = (challenge) => {
+    setEditChallenge({
+      ...challenge,
+      dance_style:
+        typeof challenge.dance_style === "string"
+          ? challenge.dance_style
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : challenge.dance_style || [],
+    });
+    setEditChallengeModal(true);
+  };
+
+  // ── Filters ──────────────────────────────────────────────────────────────────
+  const filteredChallenges = challenges.filter((c) => {
+    const matchSearch = c.title.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter ? c.status === statusFilter : true;
     return matchSearch && matchStatus;
   });
 
-  // Alert Component
-  const Alert = ({ type, message, onClose }) => (
-    <div
-      className={`alert alert-${
-        type === "error" ? "danger" : "success"
-      } alert-dismissible fade show position-fixed`}
-      style={{ top: "20px", right: "20px", zIndex: 2000, maxWidth: "400px" }}
-    >
-      <div className="d-flex align-items-center">
-        <AlertCircle className="me-2" size={20} />
-        <span>{message}</span>
-        <button type="button" className="btn-close" onClick={onClose}></button>
-      </div>
-    </div>
-  );
+  // const filteredFlaggedComments = flaggedComments.filter(c => {
+  //   const q = flaggedSearch.toLowerCase();
+  //   return !q ||
+  //     (c.content || c.comment || "").toLowerCase().includes(q) ||
+  //     (c.username || c.user?.username || "").toLowerCase().includes(q) ||
+  //     (c.challenge_title || "").toLowerCase().includes(q);
+  // });
 
+  // ════════════════════════════════════════════════════════════════════════════
   return (
-    <div
-      className="container-fluid py-3 py-md-4"
-      style={{
-        marginLeft: "0",
-        paddingLeft: "15px",
-        paddingRight: "15px",
-        background: "#ffffff",
-        minHeight: "100vh",
-      }}
-    >
-      {/* Responsive wrapper for sidebar offset */}
-      <div
-        className="challenge-wrapper"
-        style={{
-          marginLeft: "0",
-          paddingLeft: "0",
-        }}
-      >
-        {/* Add responsive styles */}
-        <style>{`
-          @media (min-width: 992px) {
-            .challenge-wrapper {
-              margin-left: 280px !important;
-              padding-left: 15px !important;
-            }
-          }
-          
-          @media (max-width: 991.98px) {
-            .challenge-wrapper {
-              margin-left: 0 !important;
-              padding-left: 0 !important;
-            }
-          }
-          
-          .modal-dialog {
-            max-width: 95vw;
-            margin: 0.5rem auto;
-          }
-          
-          @media (min-width: 576px) {
-            .modal-dialog {
-              max-width: 540px;
-              margin: 1.75rem auto;
-            }
-          }
-          
-          @media (min-width: 992px) {
-            .modal-lg {
-              max-width: 800px;
-            }
-            .modal-xl {
-              max-width: 1140px;
-            }
-          }
-          
-          .card-img-top {
-            height: 200px;
-            object-fit: cover;
-          }
-          
-          @media (max-width: 767.98px) {
-            .card-img-top {
-              height: 150px;
-            }
-          }
-          
-          .btn-group-responsive {
-            flex-wrap: wrap;
-            gap: 0.25rem;
-          }
-          
-          .btn-group-responsive .btn {
-            flex: 0 0 auto;
-            margin-bottom: 0.25rem;
-          }
-          
-          @media (max-width: 575.98px) {
-            .btn-group-responsive .btn {
-              font-size: 0.75rem;
-              padding: 0.25rem 0.5rem;
-            }
-            
-            .btn-group-responsive .btn svg {
-              width: 14px;
-              height: 14px;
-            }
-          }
-        `}</style>
+    <div className="fp-main-container">
+      {/* ── Header + Tabs ── */}
+      <div className="fp-header-section">
+        <h2 className="fp-main-title">Challenge Management</h2>
+        <div className="fp-tab-nav">
+          {[
+            { id: "challenges", label: "Challenges", icon: Award },
+            {
+              id: "pending-submissions",
+              label: "Pending Submissions",
+              icon: Clock,
+            },
+            // { id: "flagged-comments",    label: "Flagged Comments",    icon: Flag  },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              className={`fp-nav-tab ${activeTab === tab.id ? "fp-tab-active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* Alerts */}
-        {error && (
-          <Alert type="error" message={error} onClose={() => setError("")} />
-        )}
-        {success && (
-          <Alert
-            type="success"
-            message={success}
-            onClose={() => setSuccess("")}
-          />
-        )}
+      {error && (
+        <AlertBanner
+          type="error"
+          message={error}
+          onClose={() => setError("")}
+        />
+      )}
+      {success && (
+        <AlertBanner
+          type="success"
+          message={success}
+          onClose={() => setSuccess("")}
+        />
+      )}
 
-        {/* <div className="challenge-page">
-  <div className="challenge-bg">
-    <div className="challenge-content">
-      {/* yahin tumhara pura Challenge UI rahega */}
-    {/* </div>
-  </div>
-</div> // */}
-
-
-        <div className="challenge-content">
-          <div className="text-center mb-4 mb-md-5">
-            <h1 className="text-dark fw-bold display-6 display-md-4 mb-2">
-              Challenge Management
-            </h1>
-            <p className="text-secondary fs-6 fs-md-5">
-              Manage challenges, submissions, and participants
-            </p>
-          </div>
-          {/* Tab Navigation */}
-          <div className="card mb-4 bg-transparent border-light">
-            <div className="card-body p-2">
-              <ul className="nav nav-pills justify-content-center flex-column flex-sm-row">
-                {[
-                  { id: "challenges", label: "Challenges", icon: Award },
-                  {
-                    id: "pending-submissions",
-                    label: "Pending Submissions",
-                    icon: Clock,
-                  },
-                ].map((tab) => (
-                  <li className="nav-item mb-2 mb-sm-0" key={tab.id}>
-                    <button
-                      className={`nav-link ${
-                        activeTab === tab.id
-                          ? "active bg-primary text-white"
-                          : "text-dark"
-                      }`}
-                      onClick={() => setActiveTab(tab.id)}
-                    >
-                      <tab.icon className="me-2" size={18} />
-                      <span className="d-none d-sm-inline">{tab.label}</span>
-                      <span className="d-sm-none">
-                        {tab.label.split(" ")[0]}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+      {/* ══ Challenges Tab ══ */}
+      {activeTab === "challenges" && (
+        <>
+          {/* Filters */}
+          <div className="filters-section">
+            <div className="filters-container">
+              <div className="filters-left">
+                <div className="search-container">
+                  <Search size={16} className="search-icon" />
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search challenges..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                <select
+                  className="status-filter"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="">All Status</option>
+                  <option value="draft">Draft</option>
+                  <option value="active">Active</option>
+                  {/* <option value="completed">Completed</option> */}
+                  <option value="ended">Ended</option>
+                </select>
+              </div>
+              <button
+                className="create-button"
+                onClick={() => setCreateChallengeModal(true)}
+              >
+                <Plus size={16} className="button-icon" /> Create Challenge
+              </button>
             </div>
           </div>
-          {/* Challenges Tab */}
-          {activeTab === "challenges" && (
-            <div className="tab-content">
-              {/* Filters and Create Button */}
-              <div className="card mb-4 bg-transparent border-light">
-                <div className="card-body">
-                  <div className="d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center gap-3">
-                    <div className="d-flex flex-column flex-md-row gap-2 flex-grow-1">
-                      <div className="position-relative flex-grow-1">
-                        <Search
-                          className="position-absolute top-50 start-0 translate-middle-y ms-3"
-                          size={20}
+
+          {loading ? (
+            <div className="loading-container">
+              <div className="loading-spinner" />
+            </div>
+          ) : (
+            <>
+              {/* ── Cards Grid ── */}
+              <div className="fp-content-grid">
+                {filteredChallenges.map((challenge) => (
+                  <div
+                    key={challenge.id}
+                    className="fp-content-card"
+                    onClick={() => openChallengeDetails(challenge)}
+                  >
+                    {/* Thumbnail */}
+                    <div className="fp-thumbnail-wrap">
+                      {challenge.image_url ? (
+                        <img
+                          src={challenge.image_url}
+                          alt={challenge.title}
+                          className="fp-media-thumb"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
                         />
-                        <input
-                          type="text"
-                          className="form-control ps-5"
-                          placeholder="Search challenges..."
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                        />
+                      ) : (
+                        <div className="fp-media-thumb fp-media-placeholder">
+                          <Award size={36} />
+                        </div>
+                      )}
+                      <div className="fp-likes-badge">
+                        <span className={`status-badge ${challenge.status}`}>
+                          {challenge.status}
+                        </span>
                       </div>
-                      <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="form-select"
-                        style={{ minWidth: "150px" }}
-                      >
-                        <option value="">All Status</option>
-                        <option value="draft">Draft</option>
-                        <option value="active">Active</option>
-                        <option value="completed">Completed</option>
-                        <option value="ended">Ended</option>
-                      </select>
                     </div>
+
+                    {/* Card Body */}
+                    <div className="fp-card-body">
+                      {/* ── TOP: title, tags, description, stats — does NOT grow ── */}
+
+                      <div className="fp-user-details">
+                        <h3 className="fp-username">{challenge.title}</h3>
+                        <div className="fp-meta-tags">
+                          {challenge.dance_style &&
+                            challenge.dance_style.split(",").map((style, i) => {
+                              const trimmed = style.trim();
+                              return (
+                                <span
+                                  key={i}
+                                  className={`fp-style-tag fp-style-${trimmed.toLowerCase().replace(/\s+/g, "-")}`}
+                                >
+                                  {trimmed}
+                                </span>
+                              );
+                            })}
+                          {challenge.dance_level && (
+                            <span
+                              className={`fp-level-tag fp-level-${challenge.dance_level?.toLowerCase()}`}
+                            >
+                              {challenge.dance_level}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="fp-post-caption">{challenge.description}</p>
+                      <div className="fp-card-top">
+                        <div className="fp-engagement-stats">
+                          <div className="fp-stat-group">
+                            <Users size={14} />
+                            <span>
+                              {challenge.participants_count || 0} Participants
+                            </span>
+                          </div>
+                          <div className="fp-stat-group">
+                            <Upload size={14} />
+                            <span>
+                              {challenge.submissions_count || 0} Submissions
+                            </span>
+                          </div>
+                          <div className="fp-stat-group">
+                            <Clock size={14} />
+                            <span>
+                              {challenge.pending_submissions || 0} Pending
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* ── END TOP ── */}
+
+                        <div
+                          className="challenge-actions"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="challenge-actions__left">
+                            <button
+                              className="action-btn"
+                              title="Edit"
+                              onClick={() => openEditModal(challenge)}
+                            >
+                              <Edit3 size={13} />
+                            </button>
+                            <button
+                              className="action-btn"
+                              title="Submissions"
+                              onClick={() => openSubmissions(challenge)}
+                            >
+                              <Upload size={13} />
+                            </button>
+                            <button
+                              className="action-btn"
+                              title="Participants"
+                              onClick={() => openParticipants(challenge)}
+                            >
+                              <Users size={13} />
+                            </button>
+                            <button
+                              className="action-btn"
+                              title="Analytics"
+                              onClick={() => openAnalytics(challenge)}
+                            >
+                              <BarChart3 size={13} />
+                            </button>
+                          </div>
+                          <div className="challenge-actions__right">
+                            <select
+                              className="status-select"
+                              value={challenge.status}
+                              onChange={(e) =>
+                                handleStatusChange(challenge.id, e.target.value)
+                              }
+                            >
+                              <option value="draft">Draft</option>
+                              <option value="active">Active</option>
+                              {/* <option value="completed">Completed</option> */}
+                              <option value="ended">Ended</option>
+                            </select>
+                            <button
+                              className="delete-btn"
+                              title="Delete"
+                              onClick={() =>
+                                handleDeleteChallenge(challenge.id)
+                              }
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </div>
+                        {/* ── END BOTTOM ── */}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredChallenges.length === 0 && (
+                <div className="fp-empty-view">
+                  <span className="fp-empty-emoji">🏆</span>
+                  <span className="fp-empty-msg">No challenges found.</span>
+                </div>
+              )}
+
+              {
+                <Pagination
+                  currentPage={pagination.current_page || 1}
+                  totalPages={pagination.total_pages || 1}
+                  onPageChange={(p) => setPage(p)}
+                />
+              }
+            </>
+          )}
+        </>
+      )}
+
+      {/* ══ Pending Submissions Tab ══ */}
+      {activeTab === "pending-submissions" && (
+        <div className="submissions-container">
+          <div className="submissions-header">
+            <h2 className="submissions-title">Pending Submissions</h2>
+          </div>
+          {loading ? (
+            <div className="loading-container">
+              <div className="loading-spinner" />
+            </div>
+          ) : pendingSubmissions.length === 0 ? (
+            <div className="empty-state">
+              <Clock size={48} className="empty-icon" />
+              <p className="empty-text">No pending submissions found</p>
+            </div>
+          ) : (
+            <div className="submissions-list">
+              {pendingSubmissions.map((submission) => (
+                <div key={submission.id} className="submission-item">
+                  <div className="submission-info">
+                    <img
+                      src={
+                        submission.profile_image_url || "/default-avatar.png"
+                      }
+                      alt={submission.username}
+                      className="submission-avatar"
+                      onError={(e) => {
+                        e.target.src = "/default-avatar.png";
+                      }}
+                    />
+                    <div className="submission-details">
+                      <h3>{submission.title}</h3>
+                      <p className="submission-meta">
+                        by {submission.username} ·{" "}
+                        {new Date(submission.submitted_at).toLocaleDateString()}
+                      </p>
+                      <p className="submission-challenge">
+                        {submission.challenge_title}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="submission-actions">
                     <button
-                      onClick={() => setCreateChallengeModal(true)}
-                      className="btn btn-primary d-flex align-items-center justify-content-center"
+                      className="review-btn"
+                      onClick={() => openSubmissionDetail(submission)}
                     >
-                      <Plus size={18} className="me-2" />
-                      <span className="d-none d-sm-inline">
-                        Create Challenge
-                      </span>
-                      <span className="d-sm-none">Create</span>
+                      Review
+                    </button>
+                    <button
+                      className="approve-btn"
+                      onClick={() => handleApproveSubmission(submission.id)}
+                    >
+                      Approve
                     </button>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-              {loading ? (
-                <div className="d-flex justify-content-center py-5">
-                  <div className="spinner-border text-light" role="status">
-                    <span className="visually-hidden">Loading...</span>
+      {/* ══ Flagged Comments Tab ══ */}
+      {/* {activeTab === "flagged-comments" && (
+        <div className="submissions-container">
+          <div className="submissions-header">
+            <div className="flagged-header-title">
+              <Flag size={18} className="flagged-icon" />
+              <h2 className="submissions-title">Flagged Comments</h2>
+              {flaggedComments.length > 0 && (
+                <span className="flagged-count-badge">{filteredFlaggedComments.length}</span>
+              )}
+            </div>
+            <div className="flagged-search-wrap">
+              <Search size={14} className="flagged-search-icon" />
+              <input type="text" className="flagged-search-input" placeholder="Search comments, users…"
+                value={flaggedSearch} onChange={e => setFlaggedSearch(e.target.value)} />
+            </div>
+          </div>
+
+          {flaggedLoading ? (
+            <div className="loading-container"><div className="loading-spinner" /></div>
+          ) : filteredFlaggedComments.length === 0 ? (
+            <div className="empty-state">
+              <Flag size={48} className="empty-icon" />
+              <p className="empty-text">
+                {flaggedSearch ? "No flagged comments match your search" : "No flagged comments found"}
+              </p>
+            </div>
+          ) : (
+            <div className="flagged-list">
+              {filteredFlaggedComments.map((comment) => {
+                const commentId       = comment.id || comment.comment_id;
+                const content         = comment.content || comment.comment || "";
+                const username        = comment.username || comment.user?.username || "Unknown User";
+                const avatar          = comment.profile_image_url || comment.user?.profile_image_url || "/default-avatar.png";
+                const challengeTitle  = comment.challenge_title || comment.submission?.challenge_title || "—";
+                const submissionTitle = comment.submission_title || comment.submission?.title || "—";
+                const flagCount       = comment.flag_count || comment.reports_count || comment.flagged_count || 1;
+                const createdAt       = comment.created_at || comment.commented_at;
+
+                return (
+                  <div key={commentId} className="flagged-item">
+                    <img src={avatar} alt={username} className="flagged-avatar"
+                      onError={e => { e.target.src = "/default-avatar.png"; }} />
+                    <div className="flagged-body">
+                      <div className="flagged-user-row">
+                        <span className="flagged-username">{username}</span>
+                        <SeverityBadge count={flagCount} />
+                      </div>
+                      <p className="flagged-content">{content}</p>
+                      <div className="flagged-meta">
+                        {challengeTitle !== "—" && (
+                          <span className="flagged-meta-challenge">
+                            <Award size={11} /><span>{challengeTitle}</span>
+                          </span>
+                        )}
+                        {submissionTitle !== "—" && (
+                          <span className="flagged-meta-submission">
+                            <Upload size={11} /> {submissionTitle}
+                          </span>
+                        )}
+                        {createdAt && (
+                          <span className="flagged-meta-date">{new Date(createdAt).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flagged-actions">
+                      <button className="review-btn" onClick={() => openFlaggedDetail(comment)}>
+                        <Eye size={12} /> Review
+                      </button>
+                      <button className="reject-btn" onClick={() => handleDeleteFlaggedComment(commentId)}>
+                        <Trash2 size={12} /> Delete
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {flaggedPagination.pages > 1 && (
+            <div className="fp-pagination-wrapper">
+              <button className="fp-page-btn" onClick={() => setFlaggedPage(p => Math.max(1, p - 1))} disabled={flaggedPage === 1}>Previous</button>
+              <span className="fp-page-info">Page {flaggedPagination.page} of {flaggedPagination.pages} ({flaggedPagination.total} total)</span>
+              <button className="fp-page-btn" onClick={() => setFlaggedPage(p => Math.min(flaggedPagination.pages, p + 1))} disabled={flaggedPage === flaggedPagination.pages}>Next</button>
+            </div>
+          )}
+        </div>
+      )} */}
+
+      {/* ══ CREATE CHALLENGE MODAL ══ */}
+      {createChallengeModal && (
+        <ModalShell
+          title="Create New Challenge"
+          onClose={() => setCreateChallengeModal(false)}
+          maxWidth="640px"
+          footer={
+            <>
+              {/* <button className="btn-cancel" onClick={() => setCreateChallengeModal(false)}>Cancel</button> */}
+              <button className="btn-primary" onClick={handleCreateChallenge}>
+                Create Challenge
+              </button>
+            </>
+          }
+        >
+          <Field label="Title">
+            <input
+              type="text"
+              className="form-input"
+              value={newChallenge.title}
+              onChange={(e) =>
+                setNewChallenge({ ...newChallenge, title: e.target.value })
+              }
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              className="form-textarea"
+              rows={3}
+              value={newChallenge.description}
+              onChange={(e) =>
+                setNewChallenge({
+                  ...newChallenge,
+                  description: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <div className="form-row">
+            <Field label="Dance Style">
+              <DanceStylesSelect
+                selected={newChallenge.dance_style}
+                onChange={(val) =>
+                  setNewChallenge({ ...newChallenge, dance_style: val })
+                }
+                options={danceStyleOptions}
+              />
+            </Field>
+            <Field label="Dance Level">
+              <select
+                className="form-select"
+                value={newChallenge.dance_level}
+                onChange={(e) =>
+                  setNewChallenge({
+                    ...newChallenge,
+                    dance_level: e.target.value,
+                  })
+                }
+              >
+                <option value="">Select Level</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </Field>
+          </div>
+          <div className="form-row">
+            <Field label="Start Date">
+              <DatePicker
+                selected={
+                  newChallenge.start_date
+                    ? new Date(newChallenge.start_date)
+                    : null
+                }
+                onChange={(date) =>
+                  setNewChallenge({
+                    ...newChallenge,
+                    start_date: date ? toLocalDateString(date) : "",
+                  })
+                }
+                placeholderText="Select start date"
+                className="class-mod-filter-input"
+                dateFormat="dd-MM-yyyy"
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+              />
+            </Field>
+            <Field label="End Date">
+              <DatePicker
+                selected={
+                  newChallenge.end_date ? new Date(newChallenge.end_date) : null
+                }
+                onChange={(date) =>
+                  setNewChallenge({
+                    ...newChallenge,
+                    end_date: date ? toLocalDateString(date) : "",
+                  })
+                }
+                placeholderText="Select end date"
+                className="class-mod-filter-input"
+                dateFormat="dd-MM-yyyy"
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                minDate={
+                  newChallenge.start_date
+                    ? new Date(newChallenge.start_date)
+                    : null
+                }
+              />
+            </Field>
+          </div>
+          <Field label="Prize Details">
+            <input
+              type="text"
+              className="form-input"
+              value={newChallenge.prize_details}
+              onChange={(e) =>
+                setNewChallenge({
+                  ...newChallenge,
+                  prize_details: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Max Participants">
+            <input
+              type="number"
+              className="form-input"
+              value={newChallenge.max_participants}
+              onChange={(e) =>
+                setNewChallenge({
+                  ...newChallenge,
+                  max_participants: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Challenge Image">
+            <input
+              type="file"
+              className="form-input"
+              accept="image/*"
+              onChange={(e) => handleFileUpload(e, "image_url")}
+              disabled={uploading}
+            />
+            {newChallenge.image_url && (
+              <div className="cp-img-preview">
+                <img
+                  src={newChallenge.image_url}
+                  alt="Preview"
+                  className="cp-img-preview__img"
+                />
+                <button
+                  className="cp-img-preview__remove"
+                  onClick={() =>
+                    setNewChallenge({ ...newChallenge, image_url: "" })
+                  }
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
+          </Field>
+          <Field label="Challenge Type">
+            <select
+              className="form-select"
+              value={newChallenge.challenger_type}
+              onChange={(e) =>
+                setNewChallenge({
+                  ...newChallenge,
+                  challenger_type: e.target.value,
+                })
+              }
+            >
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </Field>
+          <div className="cp-form-group">
+            <label className="form-checkbox">
+              <input
+                type="checkbox"
+                checked={newChallenge.is_trending}
+                onChange={(e) =>
+                  setNewChallenge({
+                    ...newChallenge,
+                    is_trending: e.target.checked,
+                  })
+                }
+              />
+              Mark as Trending
+            </label>
+          </div>
+
+          {/* Tasks */}
+          <div className="cp-form-group">
+            <div className="cp-tasks-header">
+              <label className="cp-form-label">Challenge Tasks</label>
+              <button className="btn-primary btn-sm-custom" onClick={addTask}>
+                <Plus size={14} /> Add Task
+              </button>
+            </div>
+            {tasks.map((task, index) => (
+              <div key={index} className="cp-task-card">
+                <div className="form-row">
+                  <Field label="Task Title">
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={task.task_title}
+                      onChange={(e) =>
+                        updateTask(index, "task_title", e.target.value)
+                      }
+                      placeholder="Enter task title"
+                    />
+                  </Field>
+                  <Field label="Task Type">
+                    <select
+                      className="form-select"
+                      value={task.task_type}
+                      onChange={(e) =>
+                        updateTask(index, "task_type", e.target.value)
+                      }
+                    >
+                      <option value="watch_video">Watch Video</option>
+                      <option value="upload_video">Upload Video</option>
+                    </select>
+                  </Field>
+                  <div className="cp-task-remove-wrap">
+                    <button
+                      className="delete-btn"
+                      onClick={() => removeTask(index)}
+                      disabled={tasks.length === 1}
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
                 </div>
-              ) : (
-                <>
-                  {/* Challenges Grid */}
-                  {filteredChallenges.length > 0 ? (
-                    <>
-                      <div className="alert alert-info">
-                        Total Challenges: {challenges.length} | Filtered: {filteredChallenges.length}
+                {task.task_type === "upload_video" && (
+                  <Field label="Upload Submission Template (Optional)">
+                    <input
+                      type="file"
+                      className="form-input"
+                      accept="video/*"
+                      onChange={(e) => handleFileUpload(e, "video_url", index)}
+                      disabled={uploading}
+                    />
+                    {task.video_url && (
+                      <div className="cp-img-preview">
+                        <video
+                          src={task.video_url}
+                          className="cp-img-preview__img"
+                          controls
+                        />
+                        <button
+                          className="cp-img-preview__remove"
+                          onClick={() => updateTask(index, "video_url", "")}
+                        >
+                          <X size={12} />
+                        </button>
                       </div>
-                      <div className="row g-3 g-md-4 mb-4">
-                        {filteredChallenges.map((challenge) => (
+                    )}
+                  </Field>
+                )}
+              </div>
+            ))}
+          </div>
+        </ModalShell>
+      )}
+
+      {/* ══ EDIT CHALLENGE MODAL ══ */}
+      {editChallengeModal && (
+        <ModalShell
+          title="Edit Challenge"
+          onClose={() => setEditChallengeModal(false)}
+          maxWidth="580px"
+          footer={
+            <>
+              {/* <button className="btn-cancel" onClick={() => setEditChallengeModal(false)}>Cancel</button> */}
+              <button className="btn-primary" onClick={handleUpdateChallenge}>
+                Update Challenge
+              </button>
+            </>
+          }
+        >
+          <Field label="Title">
+            <input
+              type="text"
+              className="form-input"
+              value={editChallenge.title || ""}
+              onChange={(e) =>
+                setEditChallenge({ ...editChallenge, title: e.target.value })
+              }
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              className="form-textarea"
+              rows={3}
+              value={editChallenge.description || ""}
+              onChange={(e) =>
+                setEditChallenge({
+                  ...editChallenge,
+                  description: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <div className="form-row">
+            <Field label="Dance Style">
+              <DanceStylesSelect
+                selected={editChallenge.dance_style || []}
+                onChange={(val) =>
+                  setEditChallenge({ ...editChallenge, dance_style: val })
+                }
+                options={danceStyleOptions}
+              />
+            </Field>
+            <Field label="Dance Level">
+              <select
+                className="form-select"
+                value={editChallenge.dance_level || ""}
+                onChange={(e) =>
+                  setEditChallenge({
+                    ...editChallenge,
+                    dance_level: e.target.value,
+                  })
+                }
+              >
+                <option value="">Select Level</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </Field>
+          </div>
+          <Field label="Prize Details">
+            <input
+              type="text"
+              className="form-input"
+              value={editChallenge.prize_details || ""}
+              onChange={(e) =>
+                setEditChallenge({
+                  ...editChallenge,
+                  prize_details: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Max Participants">
+            <input
+              type="number"
+              className="form-input"
+              value={editChallenge.max_participants || ""}
+              onChange={(e) =>
+                setEditChallenge({
+                  ...editChallenge,
+                  max_participants: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Image URL">
+            <input
+              type="url"
+              className="form-input"
+              value={editChallenge.image_url || ""}
+              onChange={(e) =>
+                setEditChallenge({
+                  ...editChallenge,
+                  image_url: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <div className="cp-form-group">
+            <label className="form-checkbox">
+              <input
+                type="checkbox"
+                checked={editChallenge.is_trending || false}
+                onChange={(e) =>
+                  setEditChallenge({
+                    ...editChallenge,
+                    is_trending: e.target.checked,
+                  })
+                }
+              />
+              Mark as Trending
+            </label>
+          </div>
+        </ModalShell>
+      )}
+
+      {/* ══ CHALLENGE DETAILS MODAL ══ */}
+      {challengeDetailsModal && selectedChallenge && (
+        <ModalShell
+          title="Challenge Details"
+          onClose={() => setChallengeDetailsModal(false)}
+          maxWidth="860px"
+        >
+          <div className="challenge-details">
+            <div>
+              {selectedChallenge.challenge?.image_url && (
+                <img
+                  src={selectedChallenge.challenge.image_url}
+                  alt={selectedChallenge.challenge.title}
+                  className="details-image"
+                />
+              )}
+              <h4 className="details-title">
+                {selectedChallenge.challenge?.title}
+              </h4>
+              <p className="details-description">
+                {selectedChallenge.challenge?.description}
+              </p>
+              <div className="details-info">
+                <div className="info-item">
+                  <Calendar size={16} className="info-icon" />
+                  {new Date(
+                    selectedChallenge.challenge?.start_date,
+                  ).toLocaleDateString()}{" "}
+                  –{" "}
+                  {new Date(
+                    selectedChallenge.challenge?.end_date,
+                  ).toLocaleDateString()}
+                </div>
+                <div className="info-item">
+                  <Award size={16} className="info-icon" />
+                  {selectedChallenge.challenge?.dance_style}
+                </div>
+                <div className="info-item">
+                  <TrendingUp size={16} className="info-icon" />
+                  {selectedChallenge.challenge?.dance_level}
+                </div>
+                {selectedChallenge.challenge?.prize_details && (
+                  <div className="info-item">
+                    <Award size={16} className="info-icon" />
+                    {selectedChallenge.challenge.prize_details}
+                  </div>
+                )}
+                <div className="info-item">
+                  <Users size={16} className="info-icon" />
+                  Max:{" "}
+                  {selectedChallenge.challenge?.max_participants ||
+                    "Unlimited"}{" "}
+                  participants
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="detail-stats-row">
+                {[
+                  {
+                    icon: Users,
+                    val: selectedChallenge.challenge?.total_participants || 0,
+                    label: "Participants",
+                  },
+                  {
+                    icon: Upload,
+                    val: selectedChallenge.challenge?.total_submissions || 0,
+                    label: "Submissions",
+                  },
+                  {
+                    icon: Clock,
+                    val: selectedChallenge.challenge?.pending_submissions || 0,
+                    label: "Pending",
+                  },
+                ].map(({ icon: Icon, val, label }) => (
+                  <div key={label} className="detail-stat-card">
+                    <Icon size={18} />
+                    <h4>{val}</h4>
+                    <p>{label}</p>
+                  </div>
+                ))}
+              </div>
+              {selectedChallenge.challenge?.tasks?.length > 0 && (
+                <div className="challenge-tasks">
+                  <h4>Challenge Tasks</h4>
+                  <div className="tasks-list">
+                    {selectedChallenge.challenge.tasks.map((task, i) => (
+                      <div key={i} className="task-item">
+                        <div className="task-header">
+                          <span className="task-type">{task.task_type}</span>
+                          <span className="task-title">{task.task_title}</span>
+                        </div>
+                        {task.video_url && (
                           <div
-                            key={challenge.id}
-                            className="col-12 col-md-6 col-xl-4"
+                            className="video-container"
+                            style={{ marginTop: "0.5rem" }}
                           >
-                        <div className="card h-100 shadow-sm">
-                          {challenge.image_url && (
-                            <img
-                              src={challenge.image_url}
-                              alt={challenge.title}
-                              className="card-img-top"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                              }}
+                            <video
+                              key={task.video_url}
+                              src={task.video_url}
+                              controls
+                              preload="metadata"
+                              controlsList="nodownload"
+                              onEnded={(e) => e.target.pause()}
+                              style={{ width: "100%", borderRadius: "8px" }}
                             />
-                          )}
-                          <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-start mb-3">
-                              <h5 className="card-title">{challenge.title}</h5>
-                              <span
-                                className={`badge ${
-                                  challenge.status === "draft"
-                                    ? "bg-warning"
-                                    : challenge.status === "active"
-                                    ? "bg-success"
-                                    : challenge.status === "completed"
-                                    ? "bg-primary"
-                                    : "bg-secondary"
-                                }`}
-                              >
-                                {challenge.status}
-                              </span>
-                            </div>
-
-                            <p className="card-text text-muted">
-                              {challenge.description}
-                            </p>
-
-                            <div className="d-flex flex-wrap gap-2 gap-md-3 mb-3">
-                              <div className="d-flex align-items-center">
-                                <Users
-                                  size={16}
-                                  className="me-1 text-primary"
-                                />
-                                <small>
-                                  {challenge.participants_count || 0}
-                                  <span className="d-none d-sm-inline">
-                                    {" "}
-                                    participants
-                                  </span>
-                                </small>
-                              </div>
-                              <div className="d-flex align-items-center">
-                                <Upload
-                                  size={16}
-                                  className="me-1 text-primary"
-                                />
-                                <small>
-                                  {challenge.submissions_count || 0}
-                                  <span className="d-none d-sm-inline">
-                                    {" "}
-                                    submissions
-                                  </span>
-                                </small>
-                              </div>
-                              <div className="d-flex align-items-center">
-                                <Clock
-                                  size={16}
-                                  className="me-1 text-primary"
-                                />
-                                <small>
-                                  {challenge.pending_submissions || 0}
-                                  <span className="d-none d-sm-inline">
-                                    {" "}
-                                    pending
-                                  </span>
-                                </small>
-                              </div>
-                            </div>
-
-                            <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                              <div className="d-flex gap-1 btn-group-responsive">
-                                <button
-                                  onClick={() =>
-                                    openChallengeDetails(challenge)
-                                  }
-                                  className="btn btn-sm btn-outline-secondary"
-                                  title="View Details"
-                                >
-                                  <Eye size={16} />
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setEditChallenge(challenge);
-                                    setEditChallengeModal(true);
-                                  }}
-                                  className="btn btn-sm btn-outline-secondary"
-                                  title="Edit"
-                                >
-                                  <Edit3 size={16} />
-                                </button>
-                                <button
-                                  onClick={() => openSubmissions(challenge)}
-                                  className="btn btn-sm btn-outline-secondary"
-                                  title="View Submissions"
-                                >
-                                  <Upload size={16} />
-                                </button>
-                                <button
-                                  onClick={() => openParticipants(challenge)}
-                                  className="btn btn-sm btn-outline-secondary"
-                                  title="View Participants"
-                                >
-                                  <Users size={16} />
-                                </button>
-                                <button
-                                  onClick={() => openAnalytics(challenge)}
-                                  className="btn btn-sm btn-outline-secondary"
-                                  title="Analytics"
-                                >
-                                  <BarChart3 size={16} />
-                                </button>
-                              </div>
-
-                              <div className="d-flex gap-1 align-items-center mt-2 mt-sm-0">
-                                <select
-                                  value={challenge.status}
-                                  onChange={(e) =>
-                                    handleStatusChange(
-                                      challenge.id,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="form-select form-select-sm"
-                                  style={{ width: "auto", minWidth: "90px" }}
-                                >
-                                  <option value="draft">Draft</option>
-                                  <option value="active">Active</option>
-                                  <option value="completed">Completed</option>
-                                  <option value="ended">Ended</option>
-                                </select>
-                                <button
-                                  onClick={() =>
-                                    handleDeleteChallenge(challenge.id)
-                                  }
-                                  className="btn btn-sm btn-outline-danger"
-                                  title="Delete"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
-                            </div>
                           </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </ModalShell>
+      )}
+
+      {/* ══ SUBMISSIONS MODAL ══ */}
+      {submissionsModal && selectedChallenge && (
+        <ModalShell
+          title={`Submissions — ${selectedChallenge.title}`}
+          onClose={() => setSubmissionsModal(false)}
+          maxWidth="1000px"
+        >
+          {submissions.length === 0 ? (
+            <div className="empty-state">
+              <Upload size={48} className="empty-icon" />
+              <p className="empty-text">No submissions found</p>
+            </div>
+          ) : (
+            <div className="submissions-grid">
+              {submissions.map((sub) => (
+                <div key={sub.id} className="submission-card">
+                  <div className="submission-header">
+                    <img
+                      src={sub.profile_image_url || "/default-avatar.png"}
+                      alt={sub.username}
+                      className="submission-user-avatar"
+                      onError={(e) => {
+                        e.target.src = "/default-avatar.png";
+                      }}
+                    />
+                    <div className="submission-user-info">
+                      <h4>{sub.username}</h4>
+                      <p>{new Date(sub.submitted_at).toLocaleDateString()}</p>
+                    </div>
+                    <span className={`submission-status ${sub.status}`}>
+                      {sub.status}
+                    </span>
+                  </div>
+                  <div className="submission-content">
+                    <h5>{sub.title}</h5>
+                    {sub.description && (
+                      <p className="submission-desc">{sub.description}</p>
+                    )}
+                    {sub.video_url && (
+                      <div className="submission-video">
+                        <a
+                          href={sub.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="video-link"
+                        >
+                          <Play size={13} /> Watch Submission
+                        </a>
+                      </div>
+                    )}
+                    <div className="submission-actions">
+                      <button
+                        className="view-detail-btn"
+                        onClick={() => openSubmissionDetail(sub)}
+                      >
+                        <Eye size={13} /> View
+                      </button>
+                      {sub.status === "pending" && (
+                        <>
+                          <button
+                            className="approve-btn-sm"
+                            onClick={() => handleApproveSubmission(sub.id)}
+                          >
+                            <CheckCircle size={13} /> Approve
+                          </button>
+                          <button
+                            className="reject-btn"
+                            onClick={() => handleRejectSubmission(sub.id)}
+                          >
+                            <XCircle size={13} /> Reject
+                          </button>
+                        </>
+                      )}
+                      <button
+                        className="reject-btn"
+                        onClick={() => handleDeleteSubmission(sub.id)}
+                      >
+                        <Trash2 size={13} /> Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ModalShell>
+      )}
+
+      {/* ══ PARTICIPANTS MODAL ══ */}
+      {participantsModal && selectedChallenge && (
+        <ModalShell
+          title={`Participants — ${selectedChallenge.title}`}
+          onClose={() => setParticipantsModal(false)}
+          maxWidth="720px"
+        >
+          {participants.length === 0 ? (
+            <div className="empty-state">
+              <Users size={48} className="empty-icon" />
+              <p className="empty-text">No participants found</p>
+            </div>
+          ) : (
+            <div className="participants-list">
+              {participants.map((p) => (
+                <div key={p.user_id} className="participant-item">
+                  <img
+                    src={p.profile_image_url || "/default-avatar.png"}
+                    alt={p.username}
+                    className="participant-avatar"
+                    onError={(e) => {
+                      e.target.src = "/default-avatar.png";
+                    }}
+                  />
+                  <div className="participant-info">
+                    <div className="participant-name">{p.username}</div>
+                    <div className="participant-email">{p.email}</div>
+                    <div className="participant-stats">
+                      <span className="participant-stat-date">
+                        Joined: {new Date(p.joined_at).toLocaleDateString()}
+                      </span>
+                      <span className="participant-stat-sub">
+                        <Upload size={11} /> {p.submissions_count || 0}{" "}
+                        submissions
+                      </span>
+                      <span className="participant-stat-like">
+                        <ThumbsUp size={11} /> {p.likes_received || 0} likes
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="remove-participant-btn"
+                    onClick={() =>
+                      handleRemoveParticipant(selectedChallenge.id, p.user_id)
+                    }
+                  >
+                    <UserMinus size={13} /> Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </ModalShell>
+      )}
+
+      {/* ══ ANALYTICS MODAL ══ */}
+      {analyticsModal && selectedChallenge && analytics && (
+        <ModalShell
+          title={`Analytics — ${selectedChallenge.title}`}
+          onClose={() => setAnalyticsModal(false)}
+          maxWidth="1000px"
+        >
+          <div className="analytics-container">
+            <div className="analytics-card">
+              <div className="analytics-card-header">
+                <h3>Overview</h3>
+                <BarChart3 size={20} className="analytics-icon" />
+              </div>
+              <div className="analytics-stats-grid">
+                {[
+                  {
+                    val: analytics.analytics?.total_participants || 0,
+                    label: "Total Participants",
+                  },
+                  {
+                    val: analytics.analytics?.total_submissions || 0,
+                    label: "Total Submissions",
+                  },
+                  {
+                    val: analytics.analytics?.approved_submissions || 0,
+                    label: "Approved",
+                  },
+                  {
+                    val: analytics.analytics?.pending_submissions || 0,
+                    label: "Pending",
+                  },
+                  {
+                    val: analytics.analytics?.total_likes || 0,
+                    label: "Total Likes",
+                  },
+                  {
+                    val: analytics.analytics?.total_comments || 0,
+                    label: "Total Comments",
+                  },
+                ].map(({ val, label }) => (
+                  <div key={label} className="analytics-stat">
+                    <span className="stat-value">{val}</span>
+                    <span className="stat-label">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {analytics.analytics?.top_performers?.length > 0 && (
+              <div className="analytics-overview">
+                <div className="analytics-card">
+                  <div className="analytics-card-header">
+                    <h3>Top Performers</h3>
+                    <Award size={18} className="analytics-icon" />
+                  </div>
+                  <div className="top-performers-list">
+                    {analytics.analytics.top_performers.map((p, i) => (
+                      <div key={p.user_id} className="top-performer-item">
+                        <div className="performer-rank">{i + 1}</div>
+                        <img
+                          src={p.profile_image_url || "/default-avatar.png"}
+                          alt={p.username}
+                          className="performer-avatar"
+                          onError={(e) => {
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                        <div className="performer-info">
+                          <span className="performer-name">{p.username}</span>
+                          <span className="performer-stats">
+                            {p.likes_count} likes · {p.submissions_count}{" "}
+                            submissions
+                          </span>
                         </div>
                       </div>
                     ))}
                   </div>
+                </div>
+                <div className="analytics-card">
+                  <div className="analytics-card-header">
+                    <h3>Engagement Metrics</h3>
+                    <TrendingUp size={18} className="analytics-icon" />
+                  </div>
+                  <div className="engagement-metrics">
+                    {[
+                      {
+                        label: "Avg Likes / Submission",
+                        val:
+                          analytics.analytics?.engagement_metrics
+                            ?.avg_likes_per_submission || 0,
+                      },
+                      {
+                        label: "Avg Comments / Submission",
+                        val:
+                          analytics.analytics?.engagement_metrics
+                            ?.avg_comments_per_submission || 0,
+                      },
+                      {
+                        label: "Participation Rate",
+                        val: `${analytics.engagement_metrics?.participation_rate || 0}%`,
+                      },
+                      {
+                        label: "Completion Rate",
+                        val: `${analytics.engagement_metrics?.completion_rate || 0}%`,
+                      },
+                    ].map(({ label, val }) => (
+                      <div key={label} className="metric-item">
+                        <span className="metric-label">{label}</span>
+                        <span className="metric-value">{val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </ModalShell>
+      )}
 
-                  {/* Pagination */}
-                  {pagination.pages > 1 && filteredChallenges.length > 0 && (
-                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center text-dark gap-3">
-                      <div>
-                        <p className="mb-0 text-center text-sm-start">
-                          Page {pagination.page} of {pagination.pages} (
-                          {pagination.total} total)
-                        </p>
-                      </div>
-                      <div className="d-flex gap-2">
-                        <button
-                          onClick={() =>
-                            setPage((prev) => Math.max(1, prev - 1))
-                          }
-                          disabled={page === 1}
-                          className="btn btn-sm btn-outline-light"
-                        >
-                          Previous
-                        </button>
-                        <button
-                          onClick={() =>
-                            setPage((prev) =>
-                              Math.min(pagination.pages, prev + 1)
-                            )
-                          }
-                          disabled={page === pagination.pages}
-                          className="btn btn-sm btn-outline-light"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                    </>
-                  ) : (
-                    <div className="text-center py-5">
-                      <Award size={48} className="text-muted mb-3" />
-                      <p className="text-muted fs-5">No challenges found</p>
-                    </div>
-                  )}
-                </>
+      {/* ══ SUBMISSION DETAIL MODAL ══ */}
+      {submissionDetailModal && selectedSubmission && (
+        <ModalShell
+          title="Submission Review"
+          onClose={() => setSubmissionDetailModal(false)}
+          maxWidth="720px"
+        >
+          <div className="submission-detail">
+            <div className="submission-detail-header">
+              <img
+                src={
+                  selectedSubmission.profile_image_url ||
+                  selectedSubmission.avatar ||
+                  selectedSubmission.user?.profile_image_url ||
+                  "/default-avatar.png"
+                }
+                alt={
+                  selectedSubmission.username ||
+                  selectedSubmission.user_name ||
+                  selectedSubmission.user?.username ||
+                  "User"
+                }
+                className="submission-detail-avatar"
+                onError={(e) => {
+                  e.target.src = "/default-avatar.png";
+                }}
+              />
+              <div className="submission-detail-info">
+                <h3>
+                  {selectedSubmission.title ||
+                    selectedSubmission.challenge_title ||
+                    "Untitled Submission"}
+                </h3>
+                <p>
+                  by{" "}
+                  {selectedSubmission.username ||
+                    selectedSubmission.user_name ||
+                    selectedSubmission.user?.username ||
+                    selectedSubmission.user?.name ||
+                    "Unknown User"}
+                </p>
+                <span className="submission-date">
+                  {selectedSubmission.submitted_at ||
+                  selectedSubmission.created_at ||
+                  selectedSubmission.createdAt
+                    ? new Date(
+                        selectedSubmission.submitted_at ||
+                          selectedSubmission.created_at ||
+                          selectedSubmission.createdAt,
+                      ).toLocaleDateString()
+                    : ""}
+                </span>
+              </div>
+              <span
+                className={`submission-detail-status submission-status ${selectedSubmission.status}`}
+              >
+                {selectedSubmission.status}
+              </span>
+            </div>
+            <div className="submission-detail-content">
+              {selectedSubmission.description && (
+                <div className="detail-section">
+                  <h4>Description</h4>
+                  <p>{selectedSubmission.description}</p>
+                </div>
               )}
-            </div>
-          )}
-          {/* Pending Submissions Tab */}
-          {activeTab === "pending-submissions" && (
-            <div className="tab-content">
-              <div className="card border-0 shadow-sm">
-                <div className="card-header bg-primary text-white">
-                  <h2 className="card-title mb-0 fs-5 fs-md-4">
-                    Pending Submissions
-                  </h2>
-                </div>
-                <div className="card-body">
-                  {loading ? (
-                    <div className="d-flex justify-content-center py-5">
-                      <div
-                        className="spinner-border text-primary"
-                        role="status"
-                      >
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    </div>
-                  ) : pendingSubmissions.length === 0 ? (
-                    <div className="text-center py-5">
-                      <Clock size={48} className="text-muted mb-3" />
-                      <p className="text-muted">No pending submissions found</p>
-                    </div>
-                  ) : (
-                    <div className="list-group list-group-flush">
-                      {pendingSubmissions.map((submission) => (
-                        <div
-                          key={submission.id}
-                          className="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3"
-                        >
-                          <div className="d-flex align-items-center flex-grow-1">
-                            <img
-                              src={
-                                submission.profile_image_url ||
-                                "/default-avatar.png"
-                              }
-                              alt={submission.username}
-                              className="rounded-circle me-3"
-                              width="48"
-                              height="48"
-                              onError={(e) => {
-                                e.target.src = "/default-avatar.png";
-                              }}
-                            />
-                            <div className="flex-grow-1 min-width-0">
-                              <h6 className="mb-1 text-truncate">
-                                {submission.title}
-                              </h6>
-                              <p className="mb-1 text-muted small">
-                                by {submission.username} •{" "}
-                                {new Date(
-                                  submission.submitted_at
-                                ).toLocaleDateString()}
-                              </p>
-                              <p className="mb-0 text-primary small text-truncate">
-                                {submission.challenge_title}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="d-flex gap-2 flex-nowrap">
-                            <button
-                              onClick={() => openSubmissionDetail(submission)}
-                              className="btn btn-sm btn-outline-primary"
-                            >
-                              Review
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleApproveSubmission(submission.id)
-                              }
-                              className="btn btn-sm btn-success"
-                            >
-                              <span className="d-none d-sm-inline">Quick </span>
-                              Approve
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-          {/* All your existing modals remain the same but with responsive modal classes */}
-          {/* Create Challenge Modal */}
-          {createChallengeModal && (
-            <div
-              className="modal fade show d-block modal-center"
-              tabIndex="-1"
-            >
-              <div className="modal-dialog modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">Create New Challenge</h5>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setCreateChallengeModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label className="form-label">Title</label>
-                      <input
-                        type="text"
-                        value={newChallenge.title}
-                        onChange={(e) =>
-                          setNewChallenge({
-                            ...newChallenge,
-                            title: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Description</label>
-                      <textarea
-                        value={newChallenge.description}
-                        onChange={(e) =>
-                          setNewChallenge({
-                            ...newChallenge,
-                            description: e.target.value,
-                          })
-                        }
-                        rows={3}
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="row mb-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Dance Style</label>
-                        <input
-                          type="text"
-                          value={newChallenge.dance_style}
-                          onChange={(e) =>
-                            setNewChallenge({
-                              ...newChallenge,
-                              dance_style: e.target.value,
-                            })
-                          }
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Dance Level</label>
-                        <select
-                          value={newChallenge.dance_level}
-                          onChange={(e) =>
-                            setNewChallenge({
-                              ...newChallenge,
-                              dance_level: e.target.value,
-                            })
-                          }
-                          className="form-select"
-                        >
-                          <option value="">Select Level</option>
-                          <option value="Beginner">Beginner</option>
-                          <option value="Intermediate">Intermediate</option>
-                          <option value="Advanced">Advanced</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="row mb-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Start Date</label>
-                        <input
-                          type="date"
-                          value={newChallenge.start_date}
-                          onChange={(e) =>
-                            setNewChallenge({
-                              ...newChallenge,
-                              start_date: e.target.value,
-                            })
-                          }
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">End Date</label>
-                        <input
-                          type="date"
-                          value={newChallenge.end_date}
-                          onChange={(e) =>
-                            setNewChallenge({
-                              ...newChallenge,
-                              end_date: e.target.value,
-                            })
-                          }
-                          className="form-control"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Prize Details</label>
-                      <input
-                        type="text"
-                        value={newChallenge.prize_details}
-                        onChange={(e) =>
-                          setNewChallenge({
-                            ...newChallenge,
-                            prize_details: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Max Participants</label>
-                      <input
-                        type="number"
-                        value={newChallenge.max_participants}
-                        onChange={(e) =>
-                          setNewChallenge({
-                            ...newChallenge,
-                            max_participants: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Challenge Image</label>
-                      <div>
-                        <input
-                          type="file"
-                          id="challenge-image-upload"
-                          accept="image/*"
-                          onChange={(e) => handleFileUpload(e, "image_url")}
-                          className="form-control"
-                          disabled={uploading}
-                        />
-                        {newChallenge.image_url && (
-                          <div className="mt-2 position-relative d-inline-block">
-                            <img
-                              src={newChallenge.image_url}
-                              alt="Preview"
-                              className="img-thumbnail"
-                              style={{ height: "100px" }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setNewChallenge({
-                                  ...newChallenge,
-                                  image_url: "",
-                                })
-                              }
-                              className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                            >
-                              <X size={14} />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Challenge Type</label>
-                      <select
-                        value={newChallenge.challenger_type}
-                        onChange={(e) =>
-                          setNewChallenge({
-                            ...newChallenge,
-                            challenger_type: e.target.value,
-                          })
-                        }
-                        className="form-select"
-                      >
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                      </select>
-                    </div>
-
-                    <div className="mb-3 form-check">
-                      <input
-                        type="checkbox"
-                        checked={newChallenge.is_trending}
-                        onChange={(e) =>
-                          setNewChallenge({
-                            ...newChallenge,
-                            is_trending: e.target.checked,
-                          })
-                        }
-                        className="form-check-input"
-                      />
-                      <label className="form-check-label">
-                        Mark as Trending
-                      </label>
-                    </div>
-
-                    {/* Tasks Section */}
-                    <div className="mb-3">
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <label className="form-label">Challenge Tasks</label>
-                        <button
-                          type="button"
-                          onClick={addTask}
-                          className="btn btn-sm btn-primary d-flex align-items-center"
-                        >
-                          <Plus size={16} className="me-1" />
-                          Add Task
-                        </button>
-                      </div>
-
-                      <div className="tasks-list">
-                        {tasks.map((task, index) => (
-                          <div key={index} className="card mb-3">
-                            <div className="card-body">
-                              <div className="d-flex justify-content-between align-items-start mb-3">
-                                <div className="w-100 me-2">
-                                  <label className="form-label">
-                                    Task Type
-                                  </label>
-                                  <select
-                                    value={task.task_type}
-                                    onChange={(e) =>
-                                      updateTask(
-                                        index,
-                                        "task_type",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="form-select"
-                                  >
-                                    <option value="watch_video">
-                                      Watch Video
-                                    </option>
-                                    <option value="upload_video">
-                                      Upload Video
-                                    </option>
-                                  </select>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={() => removeTask(index)}
-                                  className="btn btn-sm btn-danger mt-4"
-                                  disabled={tasks.length === 1}
-                                >
-                                  <X size={14} />
-                                </button>
-                              </div>
-
-                              <div className="mb-3">
-                                <label className="form-label">Task Title</label>
-                                <input
-                                  type="text"
-                                  value={task.task_title}
-                                  onChange={(e) =>
-                                    updateTask(
-                                      index,
-                                      "task_title",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="form-control"
-                                  placeholder="Enter task title"
-                                />
-                              </div>
-
-                              {task.task_type === "watch_video" && (
-                                <div className="mb-3">
-                                  <label className="form-label">
-                                    Video URL
-                                  </label>
-                                  <div>
-                                    <input
-                                      type="file"
-                                      id={`task-video-upload-${index}`}
-                                      accept="video/*"
-                                      onChange={(e) =>
-                                        handleFileUpload(e, "video_url", index)
-                                      }
-                                      className="form-control"
-                                      disabled={uploading}
-                                    />
-                                    {task.video_url && (
-                                      <div className="mt-2">
-                                        <div className="position-relative d-inline-block">
-                                          <video
-                                            src={task.video_url}
-                                            className="img-thumbnail"
-                                            style={{ height: "100px" }}
-                                            controls
-                                          />
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              updateTask(index, "video_url", "")
-                                            }
-                                            className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                          >
-                                            <X size={14} />
-                                          </button>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="modal-footer">
-                    <button
-                      onClick={() => setCreateChallengeModal(false)}
-                      className="btn btn-secondary"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleCreateChallenge}
-                      className="btn btn-primary"
-                    >
-                      Create Challenge
-                    </button>
+              {selectedSubmission.video_url && (
+                <div className="detail-section">
+                  <h4>Submission Video</h4>
+                  <div className="video-container">
+                    <video
+                      key={selectedSubmission.video_url}
+                      src={selectedSubmission.video_url}
+                      controls
+                      preload="metadata"
+                      controlsList="nodownload"
+                      onEnded={(e) => e.target.pause()}
+                      style={{ width: "100%", borderRadius: "8px" }}
+                    />
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-          {/* Edit Challenge Modal */}
-          {editChallengeModal && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">Edit Challenge</h5>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setEditChallengeModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label className="form-label">Title</label>
-                      <input
-                        type="text"
-                        value={editChallenge.title || ""}
-                        onChange={(e) =>
-                          setEditChallenge({
-                            ...editChallenge,
-                            title: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Description</label>
-                      <textarea
-                        value={editChallenge.description || ""}
-                        onChange={(e) =>
-                          setEditChallenge({
-                            ...editChallenge,
-                            description: e.target.value,
-                          })
-                        }
-                        rows={3}
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="row mb-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Dance Style</label>
-                        <input
-                          type="text"
-                          value={editChallenge.dance_style || ""}
-                          onChange={(e) =>
-                            setEditChallenge({
-                              ...editChallenge,
-                              dance_style: e.target.value,
-                            })
-                          }
-                          className="form-control"
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Dance Level</label>
-                        <select
-                          value={editChallenge.dance_level || ""}
-                          onChange={(e) =>
-                            setEditChallenge({
-                              ...editChallenge,
-                              dance_level: e.target.value,
-                            })
-                          }
-                          className="form-select"
-                        >
-                          <option value="">Select Level</option>
-                          <option value="Beginner">Beginner</option>
-                          <option value="Intermediate">Intermediate</option>
-                          <option value="Advanced">Advanced</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Prize Details</label>
-                      <input
-                        type="text"
-                        value={editChallenge.prize_details || ""}
-                        onChange={(e) =>
-                          setEditChallenge({
-                            ...editChallenge,
-                            prize_details: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Max Participants</label>
-                      <input
-                        type="number"
-                        value={editChallenge.max_participants || ""}
-                        onChange={(e) =>
-                          setEditChallenge({
-                            ...editChallenge,
-                            max_participants: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label className="form-label">Image URL</label>
-                      <input
-                        type="url"
-                        value={editChallenge.image_url || ""}
-                        onChange={(e) =>
-                          setEditChallenge({
-                            ...editChallenge,
-                            image_url: e.target.value,
-                          })
-                        }
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="mb-3 form-check">
-                      <input
-                        type="checkbox"
-                        checked={editChallenge.is_trending || false}
-                        onChange={(e) =>
-                          setEditChallenge({
-                            ...editChallenge,
-                            is_trending: e.target.checked,
-                          })
-                        }
-                        className="form-check-input"
-                      />
-                      <label className="form-check-label">
-                        Mark as Trending
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="modal-footer">
-                    <button
-                      onClick={() => setEditChallengeModal(false)}
-                      className="btn btn-secondary"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleUpdateChallenge}
-                      className="btn btn-primary"
-                    >
-                      Update Challenge
-                    </button>
+              )}
+              {selectedSubmission.admin_feedback && (
+                <div className="detail-section">
+                  <h4>Admin Feedback</h4>
+                  <div className="admin-feedback">
+                    {selectedSubmission.admin_feedback}
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-          {/* Challenge Details Modal */}
-          {challengeDetailsModal && selectedChallenge && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div className="modal-dialog modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">Challenge Details</h5>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setChallengeDetailsModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    <div className="row">
-                      <div className="col-md-6">
-                        {selectedChallenge.challenge.image_url && (
-                          <img
-                            src={selectedChallenge.challenge.image_url}
-                            alt={selectedChallenge.challenge.title}
-                            className="img-fluid rounded mb-3"
-                          />
-                        )}
-                        <h4>{selectedChallenge.challenge.title}</h4>
-                        <p className="text-muted">
-                          {selectedChallenge.challenge.description}
-                        </p>
-
-                        <div className="mt-4">
-                          <div className="d-flex align-items-center mb-2">
-                            <Calendar size={18} className="me-2 text-primary" />
-                            <span>
+              )}
+              {selectedSubmission.comments?.length > 0 && (
+                <div className="detail-section">
+                  <h4>Comments</h4>
+                  <div className="comments-list">
+                    {selectedSubmission.comments.map((comment) => (
+                      <div key={comment.id} className="comment-item">
+                        <img
+                          src={
+                            comment.profile_image_url || "/default-avatar.png"
+                          }
+                          alt={comment.username}
+                          className="comment-avatar"
+                          onError={(e) => {
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                        <div className="comment-content">
+                          <div className="comment-header">
+                            <span className="comment-username">
+                              {comment.username}
+                            </span>
+                            <span className="comment-date">
                               {new Date(
-                                selectedChallenge.challenge.start_date
-                              ).toLocaleDateString()}{" "}
-                              -{" "}
-                              {new Date(
-                                selectedChallenge.challenge.end_date
+                                comment.created_at,
                               ).toLocaleDateString()}
                             </span>
                           </div>
-                          <div className="d-flex align-items-center mb-2">
-                            <Award size={18} className="me-2 text-primary" />
-                            <span>
-                              {selectedChallenge.challenge.dance_style}
-                            </span>
-                          </div>
-                          <div className="d-flex align-items-center mb-2">
-                            <TrendingUp
-                              size={18}
-                              className="me-2 text-primary"
-                            />
-                            <span>
-                              {selectedChallenge.challenge.dance_level}
-                            </span>
-                          </div>
-                          {selectedChallenge.challenge.prize_details && (
-                            <div className="d-flex align-items-center mb-2">
-                              <Award size={18} className="me-2 text-primary" />
-                              <span>
-                                {selectedChallenge.challenge.prize_details}
-                              </span>
-                            </div>
-                          )}
-                          <div className="d-flex align-items-center mb-2">
-                            <Users size={18} className="me-2 text-primary" />
-                            <span>
-                              Max:{" "}
-                              {selectedChallenge.challenge.max_participants ||
-                                "Unlimited"}{" "}
-                              participants
-                            </span>
-                          </div>
+                          <p className="comment-text">{comment.content}</p>
                         </div>
+                        <button
+                          className="comment-delete-btn"
+                          onClick={() => handleDeleteComment(comment.id)}
+                        >
+                          <Trash2 size={12} />
+                        </button>
                       </div>
-
-                      <div className="col-md-6">
-                        <div className="row mb-4">
-                          <div className="col-6">
-                            <div className="card text-center">
-                              <div className="card-body">
-                                <Users
-                                  size={24}
-                                  className="text-primary mb-2"
-                                />
-                                <h4>
-                                  {selectedChallenge.challenge
-                                    .total_participants || 0}
-                                </h4>
-                                <p className="text-muted mb-0">Participants</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-6">
-                            <div className="card text-center">
-                              <div className="card-body">
-                                <Upload
-                                  size={24}
-                                  className="text-primary mb-2"
-                                />
-                                <h4>
-                                  {selectedChallenge.challenge
-                                    .total_submissions || 0}
-                                </h4>
-                                <p className="text-muted mb-0">Submissions</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-6 mt-3">
-                            <div className="card text-center">
-                              <div className="card-body">
-                                <Clock
-                                  size={24}
-                                  className="text-primary mb-2"
-                                />
-                                <h4>
-                                  {selectedChallenge.challenge
-                                    .pending_submissions || 0}
-                                </h4>
-                                <p className="text-muted mb-0">Pending</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {selectedChallenge.challenge.tasks &&
-                          selectedChallenge.challenge.tasks.length > 0 && (
-                            <div>
-                              <h5>Challenge Tasks</h5>
-                              <div className="list-group">
-                                {selectedChallenge.challenge.tasks.map(
-                                  (task, index) => (
-                                    <div
-                                      key={index}
-                                      className="list-group-item"
-                                    >
-                                      <div className="d-flex justify-content-between align-items-center mb-1">
-                                        <span className="badge bg-primary">
-                                          {task.task_type}
-                                        </span>
-                                        <span className="fw-semibold">
-                                          {task.task_title}
-                                        </span>
-                                      </div>
-                                      {task.video_url && (
-                                        <a
-                                          href={task.video_url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-primary mt-2"
-                                        >
-                                          <Play size={14} className="me-1" />
-                                          Watch Video
-                                        </a>
-                                      )}
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="modal-footer">
-                    <button
-                      onClick={() => setChallengeDetailsModal(false)}
-                      className="btn btn-secondary"
-                    >
-                      Close
-                    </button>
+                    ))}
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-          {/* Continue with remaining modals - they follow the same responsive pattern */}
-          {/* I'll include the key remaining modals with responsive fixes */}
-          {/* Submissions Modal */}
-          {" "}
-          {submissionsModal && selectedChallenge && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div className="modal-dialog modal-xl">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">
-                      Submissions - {selectedChallenge.title}
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setSubmissionsModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    {submissions.length === 0 ? (
-                      <div className="text-center py-5">
-                        <Upload size={48} className="text-muted mb-3" />
-                        <p className="text-muted">No submissions found</p>
-                      </div>
-                    ) : (
-                      <div className="row g-3">
-                        {submissions.map((submission) => (
-                          <div key={submission.id} className="col-md-6">
-                            <div className="card h-100">
-                              <div className="card-body">
-                                <div className="d-flex align-items-center mb-3">
-                                  <img
-                                    src={
-                                      submission.profile_image_url ||
-                                      "/default-avatar.png"
-                                    }
-                                    alt={submission.username}
-                                    className="rounded-circle me-3"
-                                    width="40"
-                                    height="40"
-                                    onError={(e) => {
-                                      e.target.src = "/default-avatar.png";
-                                    }}
-                                  />
-                                  <div>
-                                    <h6 className="mb-0">
-                                      {submission.username}
-                                    </h6>
-                                    <small className="text-muted">
-                                      {new Date(
-                                        submission.submitted_at
-                                      ).toLocaleDateString()}
-                                    </small>
-                                  </div>
-                                  <span
-                                    className={`badge ms-auto ${
-                                      submission.status === "pending"
-                                        ? "bg-warning"
-                                        : submission.status === "approved"
-                                        ? "bg-success"
-                                        : "bg-danger"
-                                    }`}
-                                  >
-                                    {submission.status}
-                                  </span>
-                                </div>
-
-                                <h6>{submission.title}</h6>
-                                {submission.description && (
-                                  <p className="text-muted small">
-                                    {submission.description}
-                                  </p>
-                                )}
-
-                                {submission.video_url && (
-                                  <div className="mb-3">
-                                    <a
-                                      href={submission.video_url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-sm btn-outline-primary"
-                                    >
-                                      <Play size={14} className="me-1" />
-                                      Watch Submission
-                                    </a>
-                                  </div>
-                                )}
-
-                                <div className="d-flex flex-wrap gap-1">
-                                  <button
-                                    onClick={() =>
-                                      openSubmissionDetail(submission)
-                                    }
-                                    className="btn btn-sm btn-outline-secondary"
-                                  >
-                                    <Eye size={14} className="me-1" />
-                                    View Details
-                                  </button>
-                                  {submission.status === "pending" && (
-                                    <>
-                                      <button
-                                        onClick={() =>
-                                          handleApproveSubmission(submission.id)
-                                        }
-                                        className="btn btn-sm btn-outline-success"
-                                      >
-                                        <CheckCircle
-                                          size={14}
-                                          className="me-1"
-                                        />
-                                        Approve
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          handleRejectSubmission(submission.id)
-                                        }
-                                        className="btn btn-sm btn-outline-danger"
-                                      >
-                                        <XCircle size={14} className="me-1" />
-                                        Reject
-                                      </button>
-                                    </>
-                                  )}
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteSubmission(submission.id)
-                                    }
-                                    className="btn btn-sm btn-outline-danger"
-                                  >
-                                    <Trash2 size={14} className="me-1" />
-                                    Delete
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="modal-footer">
-                    <button
-                      onClick={() => setSubmissionsModal(false)}
-                      className="btn btn-secondary"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* Participants Modal */}
-          {participantsModal && selectedChallenge && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div className="modal-dialog modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">
-                      Participants - {selectedChallenge.title}
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setParticipantsModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    {participants.length === 0 ? (
-                      <div className="text-center py-5">
-                        <Users size={48} className="text-muted mb-3" />
-                        <p className="text-muted">No participants found</p>
-                      </div>
-                    ) : (
-                      <div className="list-group">
-                        {participants.map((participant) => (
-                          <div
-                            key={participant.user_id}
-                            className="list-group-item"
-                          >
-                            <div className="d-flex justify-content-between align-items-center">
-                              <div className="d-flex align-items-center">
-                                <img
-                                  src={
-                                    participant.profile_image_url ||
-                                    "/default-avatar.png"
-                                  }
-                                  alt={participant.username}
-                                  className="rounded-circle me-3"
-                                  width="48"
-                                  height="48"
-                                  onError={(e) => {
-                                    e.target.src = "/default-avatar.png";
-                                  }}
-                                />
-                                <div>
-                                  <h6 className="mb-0">
-                                    {participant.username}
-                                  </h6>
-                                  <p className="mb-0 text-muted small">
-                                    {participant.email}
-                                  </p>
-                                  <small className="text-muted">
-                                    Joined:{" "}
-                                    {new Date(
-                                      participant.joined_at
-                                    ).toLocaleDateString()}
-                                  </small>
-                                </div>
-                              </div>
-
-                              <div className="d-flex align-items-center">
-                                <div className="me-3 text-end">
-                                  <div className="d-flex align-items-center">
-                                    <Upload
-                                      size={14}
-                                      className="me-1 text-muted"
-                                    />
-                                    <small>
-                                      {participant.submissions_count || 0}{" "}
-                                      submissions
-                                    </small>
-                                  </div>
-                                  <div className="d-flex align-items-center">
-                                    <ThumbsUp
-                                      size={14}
-                                      className="me-1 text-muted"
-                                    />
-                                    <small>
-                                      {participant.likes_received || 0} likes
-                                    </small>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    handleRemoveParticipant(
-                                      selectedChallenge.id,
-                                      participant.user_id
-                                    )
-                                  }
-                                  className="btn btn-sm btn-outline-danger"
-                                >
-                                  <UserMinus size={14} className="me-1" />
-                                  Remove
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="modal-footer">
-                    <button
-                      onClick={() => setParticipantsModal(false)}
-                      className="btn btn-secondary"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* Analytics Modal */}
-          {analyticsModal && selectedChallenge && analytics && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div className="modal-dialog modal-xl">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">
-                      Analytics - {selectedChallenge.title}
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setAnalyticsModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    <div className="row mb-4">
-                      <div className="col-md-12">
-                        <div className="card">
-                          <div className="card-header d-flex justify-content-between align-items-center">
-                            <h5 className="mb-0">Overview</h5>
-                            <BarChart3 className="text-primary" />
-                          </div>
-                          <div className="card-body">
-                            <div className="row">
-                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
-                                <div className="display-6 fw-bold text-primary">
-                                  {analytics.analytics.total_participants || 0}
-                                </div>
-                                <div className="text-muted">
-                                  Total Participants
-                                </div>
-                              </div>
-                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
-                                <div className="display-6 fw-bold text-primary">
-                                  {analytics.analytics.total_submissions || 0}
-                                </div>
-                                <div className="text-muted">
-                                  Total Submissions
-                                </div>
-                              </div>
-                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
-                                <div className="display-6 fw-bold text-success">
-                                  {analytics.analytics.approved_submissions ||
-                                    0}
-                                </div>
-                                <div className="text-muted">Approved</div>
-                              </div>
-                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
-                                <div className="display-6 fw-bold text-warning">
-                                  {analytics.analytics.pending_submissions || 0}
-                                </div>
-                                <div className="text-muted">Pending</div>
-                              </div>
-                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
-                                <div className="display-6 fw-bold text-info">
-                                  {analytics.analytics.total_likes || 0}
-                                </div>
-                                <div className="text-muted">Total Likes</div>
-                              </div>
-                              <div className="col-6 col-md-4 col-lg-2 text-center mb-3">
-                                <div className="display-6 fw-bold text-info">
-                                  {analytics.analytics.total_comments || 0}
-                                </div>
-                                <div className="text-muted">Total Comments</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {analytics.analytics.top_performers &&
-                      analytics.analytics.top_performers.length > 0 && (
-                        <div className="row mb-4">
-                          <div className="col-md-6">
-                            <div className="card h-100">
-                              <div className="card-header d-flex justify-content-between align-items-center">
-                                <h5 className="mb-0">Top Performers</h5>
-                                <Award className="text-primary" />
-                              </div>
-                              <div className="card-body">
-                                <div className="list-group list-group-flush">
-                                  {analytics.analytics.top_performers.map(
-                                    (performer, index) => (
-                                      <div
-                                        key={performer.user_id}
-                                        className="list-group-item d-flex align-items-center"
-                                      >
-                                        <div
-                                          className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                          style={{
-                                            width: "30px",
-                                            height: "30px",
-                                          }}
-                                        >
-                                          {index + 1}
-                                        </div>
-                                        <img
-                                          src={
-                                            performer.profile_image_url ||
-                                            "/default-avatar.png"
-                                          }
-                                          alt={performer.username}
-                                          className="rounded-circle me-3"
-                                          width="40"
-                                          height="40"
-                                          onError={(e) => {
-                                            e.target.src =
-                                              "/default-avatar.png";
-                                          }}
-                                        />
-                                        <div className="flex-grow-1">
-                                          <div className="fw-semibold">
-                                            {performer.username}
-                                          </div>
-                                          <div className="small text-muted">
-                                            {performer.likes_count} likes •{" "}
-                                            {performer.submissions_count}{" "}
-                                            submissions
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-6">
-                            <div className="card h-100">
-                              <div className="card-header d-flex justify-content-between align-items-center">
-                                <h5 className="mb-0">Engagement Metrics</h5>
-                                <TrendingUp className="text-primary" />
-                              </div>
-                              <div className="card-body">
-                                <div className="list-group list-group-flush">
-                                  <div className="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Average Likes per Submission</span>
-                                    <span className="fw-bold">
-                                      {analytics.analytics.engagement_metrics
-                                        .avg_likes_per_submission || 0}
-                                    </span>
-                                  </div>
-                                  <div className="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Average Comments per Submission</span>
-                                    <span className="fw-bold">
-                                      {analytics.analytics.engagement_metrics
-                                        .avg_comments_per_submission || 0}
-                                    </span>
-                                  </div>
-                                  <div className="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Participation Rate</span>
-                                    <span className="fw-bold">
-                                      {analytics.engagement_metrics
-                                        .participation_rate || 0}
-                                      %
-                                    </span>
-                                  </div>
-                                  <div className="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Completion Rate</span>
-                                    <span className="fw-bold">
-                                      {analytics.engagement_metrics
-                                        .completion_rate || 0}
-                                      %
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                  </div>
-
-                  {/* <div className="modal-footer">
-                    <button
-                      onClick={() => setAnalyticsModal(false)}
-                      className="btn btn-secondary"
-                    >
-                      Close
-                    </button>
-                    <button className="btn btn-primary">
-                      <Download size={16} className="me-1" />
-                      Export Report
-                    </button>
+              )}
+              {selectedSubmission.status === "pending" && (
+                <div className="admin-actions">
+                  {/* <div className="feedback-input">
+                    <label className="cp-form-label">Feedback (optional)</label>
+                    <textarea className="form-textarea" rows={3} placeholder="Add feedback for the creator..."
+                      value={feedbackText} onChange={e => setFeedbackText(e.target.value)} />
                   </div> */}
-                </div>
-              </div>
-            </div>
-          )}
-          {submissionsModal && selectedChallenge && (
-            <div
-              className="modal fade show d-block"
-              tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div className="modal-dialog modal-xl">
-                <div className="modal-content">
-                  <div className="modal-header bg-primary text-white">
-                    <h5 className="modal-title">
-                      Submissions - {selectedChallenge.title}
-                    </h5>
+                  <div className="action-buttons-group">
                     <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={() => setSubmissionsModal(false)}
-                    ></button>
-                  </div>
-
-                  <div className="modal-body">
-                    {submissions.length === 0 ? (
-                      <div className="text-center py-5">
-                        <Upload size={48} className="text-muted mb-3" />
-                        <p className="text-muted">No submissions found</p>
-                      </div>
-                    ) : (
-                      <div className="row g-3">
-                        {submissions.map((submission) => (
-                          <div key={submission.id} className="col-12 col-md-6">
-                            <div className="card h-100">
-                              <div className="card-body">
-                                <div className="d-flex align-items-center mb-3">
-                                  <img
-                                    src={
-                                      submission.profile_image_url ||
-                                      "/default-avatar.png"
-                                    }
-                                    alt={submission.username}
-                                    className="rounded-circle me-3"
-                                    width="40"
-                                    height="40"
-                                    onError={(e) => {
-                                      e.target.src = "/default-avatar.png";
-                                    }}
-                                  />
-                                  <div>
-                                    <h6 className="mb-0">
-                                      {submission.username}
-                                    </h6>
-                                    <small className="text-muted">
-                                      {new Date(
-                                        submission.submitted_at
-                                      ).toLocaleDateString()}
-                                    </small>
-                                  </div>
-                                  <span
-                                    className={`badge ms-auto ${
-                                      submission.status === "pending"
-                                        ? "bg-warning"
-                                        : submission.status === "approved"
-                                        ? "bg-success"
-                                        : "bg-danger"
-                                    }`}
-                                  >
-                                    {submission.status}
-                                  </span>
-                                </div>
-
-                                <h6>{submission.title}</h6>
-                                {submission.description && (
-                                  <p className="text-muted small">
-                                    {submission.description}
-                                  </p>
-                                )}
-
-                                {submission.video_url && (
-                                  <div className="mb-3">
-                                    <a
-                                      href={submission.video_url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-sm btn-outline-primary"
-                                    >
-                                      <Play size={14} className="me-1" />
-                                      Watch Submission
-                                    </a>
-                                  </div>
-                                )}
-
-                                <div className="d-flex flex-wrap gap-1">
-                                  <button
-                                    onClick={() =>
-                                      openSubmissionDetail(submission)
-                                    }
-                                    className="btn btn-sm btn-outline-secondary"
-                                  >
-                                    <Eye size={14} className="me-1" />
-                                    View Details
-                                  </button>
-                                  {submission.status === "pending" && (
-                                    <>
-                                      <button
-                                        onClick={() =>
-                                          handleApproveSubmission(submission.id)
-                                        }
-                                        className="btn btn-sm btn-outline-success"
-                                      >
-                                        <CheckCircle
-                                          size={14}
-                                          className="me-1"
-                                        />
-                                        Approve
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          handleRejectSubmission(submission.id)
-                                        }
-                                        className="btn btn-sm btn-outline-danger"
-                                      >
-                                        <XCircle size={14} className="me-1" />
-                                        Reject
-                                      </button>
-                                    </>
-                                  )}
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteSubmission(submission.id)
-                                    }
-                                    className="btn btn-sm btn-outline-danger"
-                                  >
-                                    <Trash2 size={14} className="me-1" />
-                                    Delete
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="modal-footer">
-                    <button
-                      onClick={() => setSubmissionsModal(false)}
-                      className="btn btn-secondary"
+                      className="approve-btn-large"
+                      onClick={() =>
+                        handleApproveSubmission(selectedSubmission.id)
+                      }
                     >
-                      Close
+                      <CheckCircle size={16} /> Approve Submission
+                    </button>
+                    <button
+                      className="reject-btn-large"
+                      onClick={() =>
+                        handleRejectSubmission(selectedSubmission.id)
+                      }
+                    >
+                      <XCircle size={16} /> Reject Submission
                     </button>
                   </div>
                 </div>
+              )}
+            </div>
+          </div>
+        </ModalShell>
+      )}
+
+      {/* ══ FLAGGED COMMENT DETAIL MODAL ══ */}
+      {/* {flaggedDetailModal && selectedFlaggedComment && (() => {
+        const c               = selectedFlaggedComment;
+        const commentId       = c.id || c.comment_id;
+        const content         = c.content || c.comment || "";
+        const username        = c.username || c.user?.username || "Unknown User";
+        const avatar          = c.profile_image_url || c.user?.profile_image_url || "/default-avatar.png";
+        const email           = c.email || c.user?.email || "";
+        const challengeTitle  = c.challenge_title || c.submission?.challenge_title || "—";
+        const submissionTitle = c.submission_title || c.submission?.title || "—";
+        const flagCount       = c.flag_count || c.reports_count || c.flagged_count || 1;
+        const createdAt       = c.created_at || c.commented_at;
+        const reasons         = c.flag_reasons || c.report_reasons || [];
+
+        return (
+          <ModalShell
+            title="Flagged Comment Review"
+            onClose={() => { setFlaggedDetailModal(false); setSelectedFlaggedComment(null); }}
+            maxWidth="600px"
+            footer={
+              <div className="flagged-detail-footer">
+                <button className="reject-btn-large reject-btn-large--no-flex"
+                  onClick={() => handleDeleteFlaggedComment(commentId)}>
+                  <Trash2 size={14} /> Delete Comment
+                </button>
+              </div>
+            }>
+            <div className="fd-user-card">
+              <img src={avatar} alt={username} className="fd-avatar"
+                onError={e => { e.target.src = "/default-avatar.png"; }} />
+              <div className="fd-user-info">
+                <div className="fd-username">{username}</div>
+                {email     && <div className="fd-email">{email}</div>}
+                {createdAt && <div className="fd-date">Commented: {new Date(createdAt).toLocaleString()}</div>}
+              </div>
+              <SeverityBadge count={flagCount} />
+            </div>
+
+            <div className="fd-section">
+              <div className="fd-section-label"><MessageSquare size={13} className="fd-label-icon" /> Comment Content</div>
+              <div className="fd-comment-box">{content}</div>
+            </div>
+
+            <div className="fd-section">
+              <div className="fd-section-label">Context</div>
+              <div className="fd-context-list">
+                {challengeTitle !== "—" && (
+                  <div className="fd-context-item">
+                    <Award size={14} className="fd-context-icon" />
+                    <div><span className="fd-context-type">Challenge</span><span className="fd-context-value">{challengeTitle}</span></div>
+                  </div>
+                )}
+                {submissionTitle !== "—" && (
+                  <div className="fd-context-item">
+                    <Upload size={14} className="fd-context-icon" />
+                    <div><span className="fd-context-type">Submission</span><span className="fd-context-value">{submissionTitle}</span></div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
+
+            {reasons.length > 0 && (
+              <div className="fd-section">
+                <div className="fd-section-label">
+                  <Flag size={13} className="fd-label-icon fd-label-icon--red" /> Report Reasons ({reasons.length})
+                </div>
+                <div className="fd-reasons-list">
+                  {reasons.map((r, i) => (
+                    <div key={i} className="fd-reason-item">
+                      <Flag size={12} className="fd-reason-icon" />
+                      <span>{r.reason || r}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </ModalShell>
+        );
+      })()} */}
+
+      {/* ══ CONFIRM DIALOG ══ */}
+      {confirmDialog.open && (
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onClose={closeConfirm}
+        />
+      )}
     </div>
   );
 };

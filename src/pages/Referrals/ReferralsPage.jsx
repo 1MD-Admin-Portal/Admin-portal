@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Search, Calendar } from "lucide-react";
+import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./ReferralsPage.css";
 import {
   getReferralLeaderboardService,
@@ -9,30 +14,112 @@ import {
 const ReferralsPage = () => {
   const [activeTab, setActiveTab] = useState("leaderboard"); // leaderboard | stats | user
   const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardPagination, setLeaderboardPagination] = useState({});
   const [stats, setStats] = useState(null);
   const [userId, setUserId] = useState(""); // Input user ID for user referrals
   const [userReferrals, setUserReferrals] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [page, setPage] = useState(1);
-
+  const [dateFrom, setDateFrom] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const limit = 20;
+  const [tableLoading, setTableLoading] = useState(false); // separate loader for search/filter
+  // useEffect(() => {
+  //   if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
+  //   if (activeTab === "stats") fetchStats();
+  //   if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
+  // }, [activeTab, leaderboardPage, page]);
   useEffect(() => {
-    if (activeTab === "leaderboard") fetchLeaderboard();
+    if (activeTab === "leaderboard") fetchLeaderboard(leaderboardPage);
     if (activeTab === "stats") fetchStats();
     if (activeTab === "user" && userId) fetchUserReferrals(userId, page);
-  }, [activeTab, page]);
+  }, [activeTab, leaderboardPage, page]);
 
-  const fetchLeaderboard = async () => {
-    setLoading(true);
-    try {
-      const data = await getReferralLeaderboardService();
-      setLeaderboard(data || []);
-    } catch (err) {
-      console.error("❌ Error fetching leaderboard:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Add this useEffect after your existing ones
+  useEffect(() => {
+    if (activeTab !== "leaderboard") return;
+    const debounceTimer = setTimeout(() => {
+      fetchLeaderboard(1);
+    }, 400);
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, dateFrom, activeTab]);
+
+  // const fetchLeaderboard = async (pageNum = 1) => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await getReferralLeaderboardService({
+  //       date_from: dateFrom,
+  //       search: searchTerm,
+  //       page: pageNum,
+  //       limit: limit,
+  //     });
+
+  //     // Handle different response structures
+  //     let leaderboardData = [];
+  //     let paginationData = {};
+
+  //     if (Array.isArray(data)) {
+  //       // If response is directly an array
+  //       leaderboardData = data;
+  //     } else if (data?.data && Array.isArray(data.data)) {
+  //       // If response has data property
+  //       leaderboardData = data.data;
+  //       paginationData = data.pagination || {};
+  //     } else if (Array.isArray(data?.leaderboard)) {
+  //       // If response has leaderboard array
+  //       leaderboardData = data.leaderboard;
+  //       paginationData = data.pagination || {};
+  //     }
+
+  //     setLeaderboard(leaderboardData);
+  //     setLeaderboardPagination(paginationData);
+  //   } catch (err) {
+  //     console.error("❌ Error fetching leaderboard:", err);
+  //     setLeaderboard([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const fetchLeaderboard = useCallback(
+    async (pageNum = 1) => {
+      setTableLoading(true);
+      try {
+        const data = await getReferralLeaderboardService({
+          date_from: dateFrom
+            ? dateFrom.toLocaleDateString("en-GB")
+            : undefined,
+          search: searchTerm,
+          page: pageNum,
+          limit: limit,
+        });
+
+        let leaderboardData = [];
+        let paginationData = {};
+
+        if (Array.isArray(data)) {
+          leaderboardData = data;
+        } else if (data?.data && Array.isArray(data.data)) {
+          leaderboardData = data.data;
+          paginationData = data.pagination || {};
+        } else if (Array.isArray(data?.leaderboard)) {
+          leaderboardData = data.leaderboard;
+          paginationData = data.pagination || {};
+        }
+
+        setLeaderboard(leaderboardData);
+        setLeaderboardPagination(paginationData);
+      } catch (err) {
+        console.error("❌ Error fetching leaderboard:", err);
+        setLeaderboard([]);
+      } finally {
+        setTableLoading(false);
+      }
+    },
+    [dateFrom, searchTerm],
+  ); // <-- dependencies here
 
   const fetchStats = async () => {
     setLoading(true);
@@ -86,11 +173,54 @@ const ReferralsPage = () => {
         </button> */}
       </div>
 
-      {loading && <p className="referral-loading-message">Loading...</p>}
+      {/* {loading && <GlobalLoader text="Loading referral data..." />} */}
+      {/* Add this inside the leaderboard table section */}
 
       {/* Leaderboard Tab */}
       {activeTab === "leaderboard" && !loading && (
         <div className="referral-content-section">
+          {/* Modern SaaS-style filter toolbar */}
+          <div className="referral-filter-toolbar">
+            <div className="referral-filter-search">
+              <Search className="referral-filter-icon" />
+              <input
+                id="leaderboard-search"
+                type="text"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setLeaderboardPage(1);
+                }}
+                className="referral-filter-input"
+              />
+            </div>
+            <div className="class-mod-filter-date">
+              <Calendar className="class-mod-filter-icon" />
+              <DatePicker
+                selected={dateFrom}
+                onChange={(date) => setDateFrom(date)}
+                onChangeRaw={(e) => e.preventDefault()}
+                placeholderText="From"
+                className="class-mod-filter-input"
+                dateFormat="dd-MM-yyyy"
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+              />
+            </div>
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setDateFrom("");
+                setLeaderboardPage(1);
+              }}
+              className="referral-filter-clear"
+            >
+              Clear
+            </button>
+          </div>
+
           <table className="referral-data-table">
             <thead>
               <tr>
@@ -113,6 +243,13 @@ const ReferralsPage = () => {
               ))}
             </tbody>
           </table>
+
+          <Pagination
+            currentPage={leaderboardPagination.current_page || leaderboardPage}
+            totalPages={leaderboardPagination.last_page || 1}
+            onPageChange={setLeaderboardPage}
+            isLoading={loading}
+          />
         </div>
       )}
 
@@ -123,23 +260,33 @@ const ReferralsPage = () => {
             <h3 className="referral-section-title">Overall Stats</h3>
             <div className="referral-stats-grid">
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.total_referrals}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.total_referrals}
+                </div>
                 <div className="referral-stat-label">Total Referrals</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.paid_referrals}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.paid_referrals}
+                </div>
                 <div className="referral-stat-label">Paid Referrals</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.unpaid_referrals}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.unpaid_referrals}
+                </div>
                 <div className="referral-stat-label">Unpaid Referrals</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.active_referrers}</div>
+                <div className="referral-stat-number">
+                  {stats.overall.active_referrers}
+                </div>
                 <div className="referral-stat-label">Active Referrers</div>
               </div>
               <div className="referral-stat-card">
-                <div className="referral-stat-number">{stats.overall.conversion_rate.toFixed(2)}%</div>
+                <div className="referral-stat-number">
+                  {stats.overall.conversion_rate.toFixed(2)}%
+                </div>
                 <div className="referral-stat-label">Conversion Rate</div>
               </div>
             </div>
@@ -173,8 +320,12 @@ const ReferralsPage = () => {
             <h3 className="referral-section-title">Top Referrer</h3>
             <div className="referral-performer-card">
               <div className="referral-performer-info">
-                <div className="referral-performer-name">{stats.top_referrer.name}</div>
-                <div className="referral-performer-email">{stats.top_referrer.email}</div>
+                <div className="referral-performer-name">
+                  {stats.top_referrer.name}
+                </div>
+                <div className="referral-performer-email">
+                  {stats.top_referrer.email}
+                </div>
               </div>
               <div className="referral-performer-stats">
                 <span className="referral-performer-metric">
@@ -200,7 +351,7 @@ const ReferralsPage = () => {
               onChange={(e) => setUserId(e.target.value)}
               className="referral-search-input"
             />
-            <button 
+            <button
               onClick={() => fetchUserReferrals(userId, 1)}
               className="referral-search-button"
             >
@@ -231,28 +382,14 @@ const ReferralsPage = () => {
             </table>
           )}
 
-          {pagination.total > 0 && (
-            <div className="referral-pagination-controls">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="referral-pagination-button"
-              >
-                Prev
-              </button>
-              <span className="referral-pagination-info">
-                Page {pagination.current_page || page} of{" "}
-                {pagination.last_page || 1}
-              </span>
-              <button
-                disabled={page >= (pagination.last_page || 1)}
-                onClick={() => setPage((p) => p + 1)}
-                className="referral-pagination-button"
-              >
-                Next
-              </button>
-            </div>
-          )}
+          {
+            <Pagination
+              currentPage={pagination.current_page || page}
+              totalPages={pagination.last_page || 1}
+              onPageChange={setPage}
+              isLoading={loading}
+            />
+          }
         </div>
       )}
     </div>

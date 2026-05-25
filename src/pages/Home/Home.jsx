@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Calendar,
 } from "lucide-react";
+import GlobalLoader from "../../components/common/GlobalLoader";
 import dashboardService from "../../services/dashboardService";
 import {
   KPI_CARDS,
@@ -72,12 +73,7 @@ const Home = () => {
   if (loadingState === LOADING_STATES.LOADING) {
     return (
       <div className="home-page-main-content">
-        <div className="home-page-loading-container">
-          <div className="home-page-loading-spinner">
-            <RefreshCw className="home-page-animate-spin" size={32} />
-          </div>
-          <p>Loading dashboard data...</p>
-        </div>
+        <GlobalLoader text="Loading dashboard data..." />
       </div>
     );
   }
@@ -241,7 +237,7 @@ const Home = () => {
             const value = metrics[card.key];
             const formattedValue = dashboardService.formatMetric(
               value,
-              card.format
+              card.format,
             );
 
             return (
@@ -345,7 +341,7 @@ const Home = () => {
                   {metrics.total_users > 0
                     ? Math.round(
                         (metrics.active_subscriptions / metrics.total_users) *
-                          100
+                          100,
                       )
                     : 0}
                   %
@@ -360,7 +356,7 @@ const Home = () => {
                         ? Math.round(
                             (metrics.active_subscriptions /
                               metrics.total_users) *
-                              100
+                              100,
                           )
                         : 0
                     }%`,
@@ -382,7 +378,7 @@ const Home = () => {
                     metrics.total_users > 0
                       ? parseFloat(metrics.total_revenue) / metrics.total_users
                       : 0,
-                    "currency"
+                    "currency",
                   )}
                 </span>
               </div>

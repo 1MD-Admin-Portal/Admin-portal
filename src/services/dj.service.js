@@ -3,11 +3,24 @@ import { CONSTANTS } from "../utils/constants";
 
 const BASE_URL = CONSTANTS.URL.BASE_URL;
 
-export const getDJApplications = async () => {
+export const getDJApplications = async (params = {}) => {
   const token = localStorage.getItem("token");
+  const { search = "", page = 1, limit = 10, status = "", date_from = "", date_to = "" } = params;
+
+  const queryParams = new URLSearchParams({
+    page,
+    limit,
+  });
+
+  if (search) queryParams.append("search", search);
+  if (status) queryParams.append("status", status);
+  if (date_from) queryParams.append("date_from", date_from);
+  if (date_to) queryParams.append("date_to", date_to);
+
+
 
   const res = await axios.get(
-    `${BASE_URL}${CONSTANTS.URL.DJ_APPLICATION_LIST}`,
+    `${BASE_URL}${CONSTANTS.URL.DJ_APPLICATION_LIST}?${queryParams.toString()}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -15,7 +28,9 @@ export const getDJApplications = async () => {
     }
   );
 
-  return res.data.applications;
+
+  // Return the full response object so we can access both applications and pagination
+  return res.data;
 };
 
 export const approveDJApplication = async (applicationId) => {

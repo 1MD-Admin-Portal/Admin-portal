@@ -1,141 +1,170 @@
-/* Main Container */
-.badge-management-container {
-  padding: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  margin-left: 265px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+/* =============================================
+   BADGE MANAGEMENT — THEME MATCHED TO CHALLENGE PAGE
+   White bg + Blue→Purple→Pink gradient
+   ============================================= */
+
+:root {
+  --grad: linear-gradient(135deg, #5b7cfa 0%, #8b5cf6 50%, #ec4899 100%);
+  --blue: #5b7cfa;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --dark: #1a1a2e;
+  --text: #374151;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f5f6fa;
+  --white: #ffffff;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 28px rgba(0,0,0,0.10);
+  --shadow-accent: 0 6px 20px rgba(91,124,250,0.35);
 }
 
-/* Header Section */
+/* ── MAIN CONTAINER ── */
+.badge-management-container {
+  padding: 2rem 2.5rem;
+  background: var(--bg);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
+}
+
+/* ── HEADER ── */
 .badge-header-section {
-  margin-bottom: 32px;
+  margin-bottom: 1rem;
+ 
+  border-bottom: 1.5px solid var(--border);
 }
 
 .badge-main-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 800;
-  color: white;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  letter-spacing: -0.025em;
+  margin: 0 0 0.25rem 0;
+  background: transparent;
+  -webkit-background-clip: text;
+  color: var(--blue);
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
-/* Navigation Tabs */
+/* ── NAV TABS ── */
 .badge-nav-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 32px;
-  padding: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: fit-content;
+      display: flex;
+    background: white;
+    border-radius: 16px;
+    padding: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .badge-nav-button {
-  padding: 12px 24px;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.8);
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-transform: capitalize;
-  letter-spacing: 0.025em;
+     flex: 1;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #64748b;
+    position: relative;
+    overflow: hidden;
 }
 
 .badge-nav-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  transform: translateY(-1px);
+  color: var(--blue);
+  background: rgba(91, 124, 250, 0.07);
 }
 
 .badge-nav-button.badge-nav-active {
-  background: white;
-  color: #667eea;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background: var(--grad);
+  color: #fff;
+  box-shadow: var(--shadow-accent);
+  font-weight: 600;
 }
 
-/* Loading State */
+/* ── LOADING STATE ── */
 .badge-loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
-  color: white;
+  padding: 5rem 1.25rem;
+  color: var(--muted);
 }
 
 .badge-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
   border-radius: 50%;
-  animation: badge-spin 1s linear infinite;
-  margin-bottom: 16px;
+  animation: badge-spin 0.9s linear infinite;
+  margin-bottom: 1rem;
 }
 
 @keyframes badge-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .badge-loading-state p {
   margin: 0;
-  font-size: 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* ── EMPTY STATE ── */
+.badge-empty-state {
+  text-align: center;
+  padding: 5rem 1.25rem;
+  color: var(--muted);
+  font-size: 0.95rem;
   font-weight: 500;
 }
 
-/* Empty State */
-.badge-empty-state {
-  text-align: center;
-  padding: 80px 20px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 16px;
-}
-
-/* Table Wrapper */
+/* ── TABLE WRAPPER ── */
 .badge-table-wrapper {
-  background: white;
-  border-radius: 20px;
+  background: var(--white);
+  border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-md);
+  border: 1.5px solid var(--border);
 }
 
-/* Table Styles */
+/* ── TABLE ── */
 .badge-data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .badge-table-header th {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px 24px;
-  text-align: left;
-  font-weight: 700;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: none;
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem);
+    background: linear-gradient(135deg, #5a7ddc 0%, #6576bc 100%);
+    
+    color: #ffffff;
+    font-weight: 600;
+    font-size: clamp(0.75rem, 1vw, 0.875rem);
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e2e8f0;
+    position: relative;
 }
 
 .badge-table-body .badge-table-row {
   transition: all 0.2s ease;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .badge-table-body .badge-table-row:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  transform: scale(1.005);
+  background: rgba(91, 124, 250, 0.04);
 }
 
 .badge-table-body .badge-table-row:last-child {
@@ -143,122 +172,124 @@
 }
 
 .badge-data-table td {
-  padding: 20px 24px;
-  vertical-align: top;
-  color: #374151;
+  padding: 1.125rem 1.5rem;
+  vertical-align: middle;
+  color: var(--text);
   line-height: 1.5;
 }
 
-/* Specific Cell Styles */
+/* ── CELL STYLES ── */
 .badge-emoji-cell {
-  font-size: 24px;
+  font-size: 1.5rem;
   text-align: center;
   width: 60px;
 }
 
 .badge-name-cell {
-  font-weight: 600;
-  color: #111827;
+  font-weight: 700;
+  color: var(--dark);
   min-width: 120px;
 }
 
 .badge-level-indicator {
-  display: inline-block;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #34d399, #10b981);
   color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 12px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .badge-commission-value {
-  display: inline-block;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 12px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.7rem;
+  white-space: nowrap;
 }
 
 .badge-description-cell {
-  max-width: 200px;
-  color: #6b7280;
-  font-size: 13px;
+  max-width: 220px;
+  color: var(--muted);
+  font-size: 0.825rem;
+  line-height: 1.55;
 }
 
 .badge-requirements-list {
-  display: flex;
-  flex-wrap: wrap;
+  
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, max-content));
   gap: 6px;
-  max-width: 250px;
 }
 
+
 .badge-requirement-item {
-  display: inline-block;
-  background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
-  color: #374151;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(91, 124, 250, 0.08);
+  color: var(--blue);
+  border: 1px solid rgba(91, 124, 250, 0.2);
+  padding: 0.2rem 0.55rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .badge-special-text {
-  color: #dc2626;
-  font-weight: 500;
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 0.825rem;
 }
 
 .badge-no-special {
   color: #9ca3af;
   font-style: italic;
+  font-size: 0.8rem;
 }
 
-/* Responsive Design */
+/* ── BADGE EMOJI IMAGE ── */
+.badge-emoji-img {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+/* ── RESPONSIVE ── */
 @media (max-width: 1200px) {
-  .badge-management-container {
-    margin-left: 0;
-    padding: 24px;
-  }
-  
-  .badge-main-title {
-    font-size: 28px;
-  }
-  
-  .badge-table-wrapper {
-    overflow-x: auto;
-  }
-  
-  .badge-data-table {
-    min-width: 800px;
-  }
+  .badge-management-container { padding: 1.5rem; }
+  .badge-main-title { font-size: 1.75rem; }
+  .badge-table-wrapper { overflow-x: auto; }
+  .badge-data-table { min-width: 700px; }
 }
 
 @media (max-width: 768px) {
-  .badge-management-container {
-    padding: 16px;
-  }
-  
-  .badge-main-title {
-    font-size: 24px;
-  }
-  
-  .badge-nav-tabs {
-    flex-wrap: wrap;
-  }
-  
-  .badge-nav-button {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-  
+  .badge-management-container { padding: 1rem; }
+  .badge-main-title { font-size: 1.5rem; }
+  .badge-nav-tabs { width: 100%; }
+  .badge-nav-button { padding: 0.5rem 1rem; font-size: 0.82rem; flex: 1; text-align: center; }
   .badge-data-table th,
-  .badge-data-table td {
-    padding: 16px 12px;
-  }
+  .badge-data-table td { padding: 0.875rem 1rem; }
+}
+
+@media (max-width: 480px) {
+  .badge-management-container { padding: 0.75rem; }
+  .badge-main-title { font-size: 1.375rem; }
 }

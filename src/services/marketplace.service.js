@@ -4,10 +4,10 @@ import { CONSTANTS } from "../utils/constants.js";
 const getToken = () => localStorage.getItem("token");
 
 // Fetch marketplace programs
-export const getMarketplacePrograms = async (page = 1, limit = 10) => {
+export const getMarketplacePrograms = async (page = 1, limit = 10, search = "") => {
   try {
     const res = await axios.get(
-      `${CONSTANTS.URL.BASE_URL}/api/v1/admin/marketplace-programs?page=${page}&limit=${limit}`,
+      `${CONSTANTS.URL.BASE_URL}/api/v1/admin/marketplace-programs?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
       {
         headers: { Authorization: `Bearer ${getToken()}` },
       }

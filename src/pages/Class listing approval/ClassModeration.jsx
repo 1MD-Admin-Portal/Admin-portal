@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
+import GlobalLoader from "../../components/common/GlobalLoader";
+import Pagination from "../../components/common/Pagination";
 import "./ClassModeration.css";
-import { X, CheckCircle, XCircle } from "lucide-react";
+import { X, CheckCircle, XCircle, Euro } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import { Search, Calendar } from "lucide-react";
 import {
   getPendingClassesService,
   getAllClassesService,
@@ -27,6 +34,13 @@ const ClassModeration = () => {
     limit: 10,
   });
 
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Filter states
+  const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -44,7 +58,15 @@ const ClassModeration = () => {
 
   useEffect(() => {
     fetchClasses();
-  }, [tab, page]);
+  }, [tab, page, debouncedSearch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 on new search
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleTabChange = (newTab) => {
     setTab(newTab);
@@ -53,19 +75,32 @@ const ClassModeration = () => {
     setSelectAll(false);
   };
 
-  const fetchClasses = async () => {
+  const fetchClasses = async (
+    currentPage = page,
+    currentSearch = debouncedSearch,
+    fromDate = dateFrom,
+    toDate = dateTo,
+  ) => {
     setLoading(true);
     try {
+      const payload = {
+        page: currentPage,
+        limit,
+        search: currentSearch,
+        date_from: fromDate ? fromDate.toLocaleDateString("en-CA") : undefined,
+        date_to: toDate ? toDate.toLocaleDateString("en-CA") : undefined,
+      };
+
       if (tab === "pending") {
-        const data = await getPendingClassesService(page, limit);
+        const data = await getPendingClassesService(payload);
         setPendingClasses(data.classes || []);
         setPagination(data.pagination || { page: 1, total: 0, limit });
       } else {
-        const data = await getAllClassesService(page, limit);
-        const approvedOnly = (data.classes || []).filter(
-          (cls) => cls.status?.toLowerCase() === "approved"
-        );
-        setOngoingClasses(approvedOnly);
+        const data = await getAllClassesService({
+          ...payload,
+          status: "approved",
+        });
+        setOngoingClasses(data.classes || []);
         setPagination(data.pagination || { page: 1, total: 0, limit });
       }
     } catch (err) {
@@ -121,11 +156,7 @@ const ClassModeration = () => {
     }
   };
 
-  const classesToShow = tab === "pending" ? pendingClasses : ongoingClasses;
-
-  const filteredClasses = classesToShow.filter((classItem) =>
-    classItem.class_title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClasses = tab === "pending" ? pendingClasses : ongoingClasses;
 
   const toggleSelectAll = () => {
     if (selectAll) {
@@ -180,42 +211,98 @@ const ClassModeration = () => {
         </button>
       </div>
 
-      {tab === "pending" && (
-        <div className="class-mod-bulk-actions">
-          <button onClick={() => handleBulkAction("approve")}>
-            {selectedIds.length
-              ? `Approve Selected (${selectedIds.length})`
-              : "Approve All"}
+      {/* Filter UI for both tabs */}
+      {(tab === "pending" || tab === "ongoing") && (
+        <div className="class-mod-filter-toolbar">
+          <div className="class-mod-filter-search">
+            <Search className="class-mod-filter-icon" />
+            <input
+              type="text"
+              placeholder="Search by class title or instructor..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="class-mod-filter-input"
+            />
+          </div>
+          <div className="class-mod-filter-date">
+            <Calendar className="class-mod-filter-icon" />
+            <DatePicker
+              selected={dateFrom}
+              onChange={(date) => setDateFrom(date)}
+              onChangeRaw={(e) => e.preventDefault()}
+              placeholderText="From"
+              className="class-mod-filter-input"
+              dateFormat="dd-MM-yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+            />
+          </div>
+          <div className="class-mod-filter-date">
+            <Calendar className="class-mod-filter-icon" />
+            <DatePicker
+              selected={dateTo}
+              onChange={(date) => setDateTo(date)}
+              minDate={dateFrom}
+              onChangeRaw={(e) => e.preventDefault()}
+              placeholderText="To"
+              className="class-mod-filter-input"
+              dateFormat="dd-MM-yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+            />
+          </div>
+          <button
+            className="class-mod-filter-apply"
+            onClick={() => {
+              setPage(1);
+              setDebouncedSearch(search);
+              fetchClasses(1, search, dateFrom, dateTo);
+            }}
+          >
+            Apply Filters
           </button>
-          <button onClick={() => handleBulkAction("reject")}>
-            {selectedIds.length
-              ? `Reject Selected (${selectedIds.length})`
-              : "Reject All"}
+
+          <button
+            className="class-mod-filter-apply"
+            style={{ marginLeft: 8, background: "#f3f4f6", color: "#a78bfa" }}
+            onClick={() => {
+              setSearch("");
+              setDebouncedSearch("");
+              setDateFrom(null);
+              setDateTo(null);
+              setPage(1);
+
+              fetchClasses(1, "", null, null); // ✅ pass cleared values
+            }}
+          >
+            Clear
           </button>
         </div>
       )}
 
-      <div className="class-mod-actions">
-        <div className="class-mod-search">
-          <span role="img" aria-label="search">
-            🔍
-          </span>
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
+      {/* Remove old search UI for pending tab, now handled in filter UI above */}
 
       {loading ? (
-        <p>Loading...</p>
+        <GlobalLoader text="Loading classes..." />
       ) : (
-        <table className="class-mod-table">
-          <thead>
-            <tr>
-              {tab === "pending" && (
+        <div
+          className="class-mod-table-container"
+          style={{
+            background: "var(--ev-white)",
+            borderRadius: "var(--ev-radius-lg)",
+            overflow: "hidden",
+            boxShadow: "var(--ev-shadow-md)",
+            border: "1px solid var(--ev-border)",
+            marginBottom: "1.5rem",
+            overflowX: "auto",
+          }}
+        >
+          <table className="class-mod-table">
+            <thead>
+              <tr>
+                {/* {tab === "pending" && (
                 <th>
                   <input
                     type="checkbox"
@@ -232,21 +319,44 @@ const ClassModeration = () => {
                     }
                   />
                 </th>
-              )}
-              <th>Instructor</th>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Capacity</th>
-              <th>Price</th>
-              <th>Slots</th>
-              <th>Status</th>
-              {tab === "pending" && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredClasses.map((classItem) => (
-              <tr key={classItem.id} className="class-mod-clickable-row">
-                {tab === "pending" && (
+              )} */}
+                <th>Instructor</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Created at</th>
+                <th>
+                  <Euro size={16} />
+                  Price
+                </th>
+                <th>Slots</th>
+                <th>Status</th>
+                {tab === "pending" && <th>Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+  {filteredClasses.length === 0 ? (
+    <tr>
+      <td
+        colSpan={tab === "pending" ? 9 : 8}
+        style={{
+          textAlign: "center",
+          padding: "40px",
+          color: "#6b7280",
+          fontSize: 14,
+        }}
+      >
+        {search || dateFrom || dateTo
+          ? "No classes found matching your filters."
+          : tab === "pending"
+          ? "⚠️ No classes for pending approval."
+          : "⚠️ No ongoing classes found."}
+      </td>
+    </tr>
+  ) : (
+    filteredClasses.map((classItem) => (
+                <tr key={classItem.id} className="class-mod-clickable-row">
+                  {/* {tab === "pending" && (
                   <td>
                     <input
                       type="checkbox"
@@ -263,87 +373,75 @@ const ClassModeration = () => {
                       }}
                     />
                   </td>
-                )}
-                <td onClick={() => openClassDetail(classItem.id)}>
-                  {classItem.instructor_name}
-                </td>
-                <td onClick={() => openClassDetail(classItem.id)}>
-                  {classItem.class_title}
-                </td>
-                <td>{classItem.class_type}</td>
-                <td>{classItem.max_students}</td>
-                <td>{classItem.price}</td>
-                <td>{classItem.current_students}</td>
-                <td>
-                  <span className={`class-mod-status ${classItem.status}`}>
-                    {classItem.status}
-                  </span>
-                </td>
-                {tab === "pending" && (
-                  <td className="class-mod-table-actions">
-                    <CheckCircle
-                      className={`class-mod-action-icon ${
-                        classItem.status !== "pending_approval"
-                          ? "class-mod-action-disabled"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        classItem.status === "pending_approval" &&
-                        handleApprove(classItem.id)
-                      }
-                    />
-                    <XCircle
-                      className={`class-mod-action-icon class-mod-reject ${
-                        classItem.status !== "pending_approval"
-                          ? "class-mod-action-disabled"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        classItem.status === "pending_approval" &&
-                        handleReject(classItem.id)
-                      }
-                    />
+                )} */}
+                  <td
+                    onClick={() => openClassDetail(classItem.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {classItem.instructor_name}
                   </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <td
+                    onClick={() => openClassDetail(classItem.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {classItem.class_title}
+                  </td>
+                  <td>{classItem.class_type}</td>
+                  <td>{classItem.max_students}</td>
+                  <td>
+                    {new Date(classItem.created_at).toLocaleDateString("en-GB")}
+                  </td>
+                  <td>
+                    <Euro size={14} />
+                    {classItem.price}
+                  </td>
+                  <td>{classItem.current_students}</td>
+                  <td>
+                    <span className={`class-mod-status ${classItem.status}`}>
+                      {classItem.status}
+                    </span>
+                  </td>
+                  {tab === "pending" && (
+                    <td className="class-mod-table-actions">
+                      <CheckCircle
+                        className={`class-mod-action-icon ${
+                          classItem.status !== "pending_approval"
+                            ? "class-mod-action-disabled"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          classItem.status === "pending_approval" &&
+                          handleApprove(classItem.id)
+                        }
+                      />
+                      <XCircle
+                        className={`class-mod-action-icon class-mod-reject ${
+                          classItem.status !== "pending_approval"
+                            ? "class-mod-action-disabled"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          classItem.status === "pending_approval" &&
+                          handleReject(classItem.id)
+                        }
+                      />
+                    </td>
+                  )}
+                </tr>
+    )
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Pagination */}
-      <div className="class-mod-pagination">
-        <button
-          disabled={pagination.page <= 1}
-          onClick={() => setPage((prev) => prev - 1)}
-        >
-          Prev
-        </button>
-
-        {Array.from(
-          { length: Math.ceil(pagination.total / pagination.limit) },
-          (_, i) => (
-            <button
-              key={i + 1}
-              className={
-                pagination.page === i + 1 ? "class-mod-pagination-active" : ""
-              }
-              onClick={() => setPage(i + 1)}
-            >
-              {i + 1}
-            </button>
-          )
-        )}
-
-        <button
-          disabled={
-            pagination.page >= Math.ceil(pagination.total / pagination.limit)
-          }
-          onClick={() => setPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        currentPage={pagination.page || 1}
+        totalPages={Math.ceil(pagination.total / pagination.limit) || 1}
+        onPageChange={setPage}
+        isLoading={loading}
+      />
 
       {/* Enhanced Detail Modal with exact DancersList structure */}
       {selectedClass && (
@@ -380,7 +478,7 @@ const ClassModeration = () => {
                     label: "Current Students",
                     value: selectedClass.current_students,
                   },
-                  { label: "Price", value: selectedClass.price },
+                  { label: "Price ( € )", value: selectedClass.price },
                   {
                     label: "Status",
                     value: selectedClass.status,
@@ -409,19 +507,18 @@ const ClassModeration = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="class-mod-modal-footer">
+            {/* <div className="class-mod-modal-footer">
               <button
                 className="class-mod-modal-close-btn"
                 onClick={() => setSelectedClass(null)}
               >
                 Close
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
     </div>
   );
 };
-
 export default ClassModeration;

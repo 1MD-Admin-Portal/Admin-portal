@@ -1,5 +1,6 @@
 // pages/ReportsPage.jsx
 import React, { useState, useEffect } from "react";
+import GlobalLoader from "../../../components/common/GlobalLoader";
 import {
   getReportsService,
   updateReportStatusService,
@@ -138,10 +139,10 @@ const ReportsPage = () => {
                           width: `${Math.max(
                             (count /
                               Math.max(
-                                ...Object.values(summary.reason_breakdown)
+                                ...Object.values(summary.reason_breakdown),
                               )) *
                               100,
-                            10
+                            10,
                           )}%`,
                         }}
                       ></div>
@@ -182,10 +183,7 @@ const ReportsPage = () => {
           <div className="reports-card-badge">{reports.length} items</div>
         </div>
         {loading ? (
-          <div className="reports-loading-state">
-            <div className="reports-loading-spinner"></div>
-            <p className="reports-loading-text">Loading reports...</p>
-          </div>
+          <GlobalLoader text="Loading reports..." />
         ) : (
           <div className="reports-table-wrapper">
             <table className="reports-modern-table">
@@ -511,12 +509,12 @@ const ReportsPage = () => {
             </div>
 
             <div className="reports-modal-footer">
-              <button
+              {/* <button
                 onClick={() => setReportModalOpen(false)}
                 className="reports-modal-action-btn reports-modal-secondary"
               >
                 Close
-              </button>
+              </button> */}
               {selectedReport.status === "pending" && (
                 <button
                   className="reports-modal-action-btn reports-modal-primary"

@@ -74,11 +74,7 @@ export const rejectEventService = async (
 ) => {
   try {
     const body = { admin_notes: adminNotes };
-    console.log(
-      "📤 Sending reject request:",
-      CONSTANTS.URL.REJECT_EVENT(eventId),
-      body
-    );
+    
     const response = await api.put(CONSTANTS.URL.REJECT_EVENT(eventId), body, {
       headers: { "Content-Type": "application/json" },
     });
